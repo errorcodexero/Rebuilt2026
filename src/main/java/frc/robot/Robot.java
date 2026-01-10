@@ -32,18 +32,11 @@ public class Robot extends LoggedRobot {
         Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
         Logger.recordMetadata("Robot", Constants.getRobot().toString());
         Logger.recordMetadata("Mode", Constants.getMode().toString());
-        
-        switch (BuildConstants.DIRTY) {
-            case 0:
-                Logger.recordMetadata("GitDirty", "All changes committed");
-                break;
-            case 1:
-                Logger.recordMetadata("GitDirty", "Uncomitted changes");
-                break;
-            default:
-                Logger.recordMetadata("GitDirty", "Unknown");
-                break;
-        }
+        Logger.recordMetadata("GitDirty", switch (BuildConstants.DIRTY) {
+          case 0 -> "All changes committed";
+          case 1 -> "Uncommitted changes";
+          default -> "Unknown";
+        });
         
         // Set up data receivers & replay source
         switch (Constants.getMode()) {

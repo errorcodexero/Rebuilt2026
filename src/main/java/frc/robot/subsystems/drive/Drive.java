@@ -91,7 +91,7 @@ public class Drive extends SubsystemBase {
     new Alert("Disconnected gyro, using kinematics as fallback.", AlertType.kError);
     
     private final SwerveDriveKinematics kinematics;
-    private Rotation2d rawGyroRotation = new Rotation2d();
+    private Rotation2d rawGyroRotation = Rotation2d.kZero;
     private SwerveModulePosition[] lastModulePositions = // For delta tracking
         new SwerveModulePosition[] {
             new SwerveModulePosition(),
@@ -138,7 +138,7 @@ public class Drive extends SubsystemBase {
 
         // Pose Estimators and Kinematics
         kinematics = new SwerveDriveKinematics(getModuleTranslations());
-        poseEstimator = new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
+        poseEstimator = new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, Pose2d.kZero);
 
         SPEED_12_VOLTS = kSpeed12Volts;
 
