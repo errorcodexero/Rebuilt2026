@@ -21,7 +21,7 @@ Instead of naming a folder or branch "IntakeShooter", name it "intakeshooter".
 **IO inputs** (the inputs object) should be named using the name of the subsystem, appended with "Inputs".
 
 ### Note
-**For any confusion about the AdvantageKit structure of subsystems, ask, or refer to the documentation [here](https://docs.advantagekit.org/data-flow/recording-inputs/io-interfaces), and the 2025 kitbot example [here](https://github.com/Mechanical-Advantage/AdvantageKit/tree/main/template_projects/sources/kitbot_2025/src/main/java/frc/robot).**
+**For any confusion about the AdvantageKit structure of subsystems, ask, or refer to the documentation [here](https://docs.advantagekit.org/data-flow/recording-inputs/io-interfaces), and the examples [here](https://github.com/Mechanical-Advantage/AdvantageKit/tree/main/template_projects/sources/).**
 
 ### Example
 Let's take a subsystem named **Arm**.
