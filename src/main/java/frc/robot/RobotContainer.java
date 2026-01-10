@@ -10,6 +10,8 @@ import java.util.Arrays;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
+import edu.wpi.first.net.WebServer;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -165,6 +167,9 @@ public class RobotContainer {
 
         // Choosers
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
+
+        // Publish Deploy Directory (for layout/asset downloading)
+        WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
 
         configureBindings();
         configureDriveBindings();
