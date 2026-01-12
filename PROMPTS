@@ -1,0 +1,44 @@
+Finished
+--------
+Create a new subsystem that is the intake subsystem.  The intake subsystem should follow the AdvantageKit methodlogy with a subsystem class, 
+and abstract IO class, a simulation hardware class, and a Kraken based hardware class.  The intake subsystem has one motor that deploys or 
+retracts the intake.  This angle of the intake should be managed by a Magic Motion position control type.  All of the contstants including 
+CAN ID, PID parameters, and MotionMagic constants should be in a seperate constants file.  The intake should be deployed or retracted by moving 
+the intake to a specific angle.  When the robot is initialized the intake will be at a known angle and this will be the reference point for the 
+intake going forward.  There will be ratio between the change in angle of the motor and the change in angle of the intake.  It is unknown 
+current but put a placeholder of 13 in the constants file.  The second motor in this subsystem will be used to spin a roller at the end of the 
+intake. There will be an unknown ratio between the spinner motor and the spinner wheel, so put this in the constants file as well and assume a 
+2 to 1 ratio for now.  This should be managed via a PID controller to control the velocity of the rollers.  There should be Command based 
+commands to move the intake to a specific position.  There should be a Command based command to set the spinner to a specific velocity.  All of 
+this code should use the WPILIB Units library and not use double to represent physical units anywhere.
+
+Create a shooter subsystem.  The shooter should have two motors that are mechanically coupled that rotate the flywheels. These two motors should
+be in a leader and followed configuration.  There should be a third motor that controls the hood and therefore changes the angle of the shot.  All
+of these motors should be Kraken motors.  This subsystem should be implemented using the Advantage Kit methodology with a subsystem class, an
+abstract IO class, a simulation hardware class, and a Kraken based hardware class. All of the contstants including CAN ID, PID parameters, and 
+MotionMagic constants should be in a seperate constants file.  There will be a ratio between the change in angle of the motor and the change in
+angle of the hood.  It is unknown currently but put a placeholder of 8 in the constants file.  There will be a ratio between the number of rotations
+of the flywheel motors and the flywheels that should be in the constants file as well.  There should be a Command that moves the hood to a specific
+position.  There should also be a Command that sets the shooter flywheels to a specific rotational velocity.  All of this code should use the WPILIB 
+Units library and not use double to represent physical units anywhere.
+
+Create a hooper subsystem.  The hopper should have three motors.  Two of these motors will be used to agitate the balls in the hopper and will be 
+in a leader and follower configuration.  The third motor will be used to move balls from the hopper to the shooter.  This subsystem should be implemented 
+using the Advantage Kit methodology with a subsystem class, an abstract IO class, a simulation hardware class, and a Kraken based hardware class. All of 
+the contstants including CAN ID, PID parameters, and MotionMagic constants should be in a seperate constants file.  There will be a ratio between the 
+number of rotations of the motors and the agitator wheels that should be in the constants file as well.  There should be a Command that sets the agitator
+motors to a specific rotational velocity.  There should also be a Command that sets the hopper motor to a specific rotational velocity.  All of this code 
+should use the WPILIB Units library and not use double to represent physical units anywhere.
+
+Create a robot level command that is stored in commands/robot.  This command should be the collect command and should deploy the intake, start the spinner
+motor, and start the hopper agitator motors.  This command should be interruptable and when interrupted should stop all of the motors and retract the intake.
+
+Create a robot level command that is stored in commands/robot.  This command should be the shoot command and should set the shooter flywheels to a specific
+velocity, move the hood to a specific angle, and start the hopper motor to feed balls into the shooter.  This command should be interruptable and when 
+interrupted should stop all of the motors.
+
+Create a shooter tuning command that is stored in commands/shooter.  This command should allow for manual control of the shooter hood angle and the shooter 
+flywheel velociy via smart dashboard numeric inputs.  This command should be interruptable and when interrupted should stop all of the motors.
+
+TODO
+----
