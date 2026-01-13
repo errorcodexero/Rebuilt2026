@@ -4,6 +4,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.MomentOfInertia;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -43,7 +44,7 @@ public class ShooterConstants {
   public static final double HOOD_MAX_JERK = 40.0; // Rotations per second^3 - TODO: Tune
   
   // Flywheel Motor PID (for velocity control)
-  public static final double FLYWHEEL_KP = 0.2; // TODO: Tune these values
+  public static final double FLYWHEEL_KP = 0.0; // TODO: Tune these values
   public static final double FLYWHEEL_KI = 0.0;
   public static final double FLYWHEEL_KD = 0.0;
   public static final double FLYWHEEL_KS = 0.05; // Static friction feedforward
@@ -66,6 +67,6 @@ public class ShooterConstants {
   public static final AngularVelocity FLYWHEEL_TOLERANCE = RotationsPerSecond.of(2.0);
 
   // Simulation
-  public static final double HOOD_MOMENT_OF_INERTIA = 0.08; // kg*m^2 - TODO: Calculate actual value
-  public static final double FLYWHEEL_MOMENT_OF_INERTIA = 0.01; // kg*m^2 - TODO: Calculate actual value
+  public static final MomentOfInertia HOOD_MOMENT_OF_INERTIA = KilogramSquareMeters.of(0.08); // TODO: Calculate actual value
+  public static final MomentOfInertia FLYWHEEL_MOMENT_OF_INERTIA = KilogramSquareMeters.of(0.01); // TODO: Calculate actual value
 }

@@ -32,8 +32,14 @@ public interface IntakeIO {
   /** Set the deploy motor to a target position using Motion Magic */
   public default void setDeployPosition(Angle position) {}
 
+  /** Set the deploy motor to a specific voltage (for SysId characterization) */
+  public default void setDeployVoltage(Voltage voltage) {}
+
   /** Set the spinner motor to a target velocity */
   public default void setSpinnerVelocity(AngularVelocity velocity) {}
+
+  /** Set the spinner motor to a specific voltage (for SysId characterization) */
+  public default void setSpinnerVoltage(Voltage voltage) {}
 
   /** Stop the deploy motor */
   public default void stopDeploy() {}

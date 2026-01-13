@@ -33,8 +33,14 @@ public interface HopperIO {
   /** Set the agitator motors to a target velocity */
   public default void setAgitatorVelocity(AngularVelocity velocity) {}
 
+  /** Set the agitator motors to a specific voltage (for SysId characterization) */
+  public default void setAgitatorVoltage(Voltage voltage) {}
+
   /** Set the feeder motor to a target velocity */
   public default void setFeederVelocity(AngularVelocity velocity) {}
+
+  /** Set the feeder motor to a specific voltage (for SysId characterization) */
+  public default void setFeederVoltage(Voltage voltage) {}
 
   /** Stop the agitator motors */
   public default void stopAgitators() {}

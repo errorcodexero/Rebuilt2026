@@ -48,12 +48,30 @@ public class Intake extends SubsystemBase {
   }
 
   /**
+   * Set the deploy motor voltage directly (for SysId characterization).
+   * @param voltage The voltage to apply to the deploy motor
+   */
+  public void setDeployVoltage(edu.wpi.first.units.measure.Voltage voltage) {
+    deployGoal = Degrees.of(0.0); // Clear position goal when using voltage control
+    io.setDeployVoltage(voltage);
+  }
+
+  /**
    * Set the spinner velocity.
    * @param velocity The target velocity for the spinner (positive = intake)
    */
   public void setSpinnerVelocity(AngularVelocity velocity) {
     spinnerGoal = velocity;
     io.setSpinnerVelocity(velocity);
+  }
+
+  /**
+   * Set the spinner motor voltage directly (for SysId characterization).
+   * @param voltage The voltage to apply to the spinner motor
+   */
+  public void setSpinnerVoltage(edu.wpi.first.units.measure.Voltage voltage) {
+    spinnerGoal = RotationsPerSecond.of(0.0); // Clear velocity goal when using voltage control
+    io.setSpinnerVoltage(voltage);
   }
 
   /**

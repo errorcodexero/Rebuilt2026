@@ -1,9 +1,10 @@
-package frc.robot.subsystems.intake;
+package frc.robot.commands.intake;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.subsystems.intake.Intake;
 
 /**
  * Factory class for creating intake commands.

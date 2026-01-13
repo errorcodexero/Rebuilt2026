@@ -2,6 +2,7 @@ package frc.robot.subsystems.hopper;
 
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.MomentOfInertia;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -51,6 +52,6 @@ public class HopperConstants {
   public static final AngularVelocity FEEDER_TOLERANCE = RotationsPerSecond.of(2.0);
 
   // Simulation
-  public static final double AGITATOR_MOMENT_OF_INERTIA = 0.005; // kg*m^2 - TODO: Calculate actual value
-  public static final double FEEDER_MOMENT_OF_INERTIA = 0.003; // kg*m^2 - TODO: Calculate actual value
+  public static final MomentOfInertia AGITATOR_MOMENT_OF_INERTIA = KilogramSquareMeters.of(0.005); // TODO: Calculate actual value
+  public static final MomentOfInertia FEEDER_MOMENT_OF_INERTIA = KilogramSquareMeters.of(0.003); // TODO: Calculate actual value
 }

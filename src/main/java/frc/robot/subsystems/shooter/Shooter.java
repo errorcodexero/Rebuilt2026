@@ -49,12 +49,30 @@ public class Shooter extends SubsystemBase {
   }
 
   /**
+   * Set the flywheel voltage directly (open-loop control).
+   * @param voltage The voltage to apply to the flywheel motors
+   */
+  public void setFlywheelVoltage(edu.wpi.first.units.measure.Voltage voltage) {
+    flywheelGoal = RotationsPerSecond.of(0.0); // Clear velocity goal when using voltage control
+    io.setFlywheelVoltage(voltage);
+  }
+
+  /**
    * Set the hood position.
    * @param angle The target angle for the hood
    */
   public void setHoodPosition(Angle angle) {
     hoodGoal = angle;
     io.setHoodPosition(angle);
+  }
+
+  /**
+   * Set the hood motor voltage directly (for SysId characterization).
+   * @param voltage The voltage to apply to the hood motor
+   */
+  public void setHoodVoltage(edu.wpi.first.units.measure.Voltage voltage) {
+    hoodGoal = Degrees.of(0.0); // Clear position goal when using voltage control
+    io.setHoodVoltage(voltage);
   }
 
   /**

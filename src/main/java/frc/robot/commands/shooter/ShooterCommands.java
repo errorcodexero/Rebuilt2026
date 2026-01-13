@@ -1,9 +1,11 @@
-package frc.robot.subsystems.shooter;
+package frc.robot.commands.shooter;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.subsystems.shooter.Shooter;
 
 /**
  * Factory class for creating shooter commands.
@@ -42,6 +44,17 @@ public class ShooterCommands {
   public static Command setFlywheelVelocity(Shooter shooter, AngularVelocity velocity) {
     return Commands.run(() -> shooter.setFlywheelVelocity(velocity), shooter)
         .withName("SetFlywheelVelocity");
+  }
+
+  /**
+   * Command to apply a specific voltage to the flywheel motors (open-loop control).
+   * @param shooter The shooter subsystem
+   * @param voltage The voltage to apply
+   * @return A command that applies the specified voltage to the flywheels
+   */
+  public static Command setFlywheelVoltage(Shooter shooter, Voltage voltage) {
+    return Commands.run(() -> shooter.setFlywheelVoltage(voltage), shooter)
+        .withName("SetFlywheelVoltage");
   }
 
   /**

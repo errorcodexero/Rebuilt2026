@@ -35,8 +35,14 @@ public interface ShooterIO {
   /** Set the flywheel motors to a target velocity */
   public default void setFlywheelVelocity(AngularVelocity velocity) {}
 
+  /** Set the flywheel motors to a specific voltage */
+  public default void setFlywheelVoltage(Voltage voltage) {}
+
   /** Set the hood motor to a target position using Motion Magic */
   public default void setHoodPosition(Angle position) {}
+
+  /** Set the hood motor to a specific voltage (for SysId characterization) */
+  public default void setHoodVoltage(Voltage voltage) {}
 
   /** Stop the flywheel motors */
   public default void stopFlywheels() {}

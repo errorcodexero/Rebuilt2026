@@ -21,6 +21,9 @@ public class HopperIOSim implements HopperIO {
   
   private double agitatorAppliedVolts = 0.0;
   private double feederAppliedVolts = 0.0;
+  
+  private boolean agitatorVoltageControl = false;
+  private boolean feederVoltageControl = false;
 
   public HopperIOSim() {
     // Create simulated motors using Kraken X60 (TalonFX) motor model
@@ -29,7 +32,7 @@ public class HopperIOSim implements HopperIO {
     agitatorSim = new DCMotorSim(
         LinearSystemId.createDCMotorSystem(
             agitatorGearbox,
-            HopperConstants.AGITATOR_MOMENT_OF_INERTIA,
+            HopperConstants.AGITATOR_MOMENT_OF_INERTIA.in(KilogramSquareMeters),
             HopperConstants.AGITATOR_GEAR_RATIO
         ),
         agitatorGearbox
@@ -39,7 +42,7 @@ public class HopperIOSim implements HopperIO {
     feederSim = new DCMotorSim(
         LinearSystemId.createDCMotorSystem(
             feederGearbox,
-            HopperConstants.FEEDER_MOMENT_OF_INERTIA,
+            HopperConstants.FEEDER_MOMENT_OF_INERTIA.in(KilogramSquareMeters),
             HopperConstants.FEEDER_GEAR_RATIO
         ),
         feederGearbox
@@ -64,37 +67,45 @@ public class HopperIOSim implements HopperIO {
     // Update agitator simulation
     agitatorSim.update(0.020); // 20ms robot loop
     
-    // Calculate agitator motor voltage with PID + feedforward
-    double agitatorPIDOutput = agitatorPID.calculate(
-        agitatorSim.getAngularVelocityRPM() / 60.0, // Convert to RPS
-        agitatorVelocitySetpoint.in(RotationsPerSecond)
-    );
+    // Calculate agitator motor voltage with PID + feedforward (only if not in voltage control mode)
+    if (!agitatorVoltageControl) {
+      double agitatorPIDOutput = agitatorPID.calculate(
+          agitatorSim.getAngularVelocityRPM() / 60.0, // Convert to RPS
+          agitatorVelocitySetpoint.in(RotationsPerSecond)
+      );
+      
+      double agitatorFF = agitatorVelocitySetpoint.in(RotationsPerSecond) * HopperConstants.AGITATOR_KV;
+      
+      agitatorAppliedVolts = MathUtil.clamp(
+          agitatorPIDOutput + agitatorFF,
+          -12.0,
+          12.0
+      );
+    }
+    // Otherwise use the voltage set directly via setAgitatorVoltage()
     
-    double agitatorFF = agitatorVelocitySetpoint.in(RotationsPerSecond) * HopperConstants.AGITATOR_KV;
-    
-    agitatorAppliedVolts = MathUtil.clamp(
-        agitatorPIDOutput + agitatorFF,
-        -12.0,
-        12.0
-    );
     agitatorSim.setInputVoltage(agitatorAppliedVolts);
     
     // Update feeder simulation
     feederSim.update(0.020);
     
-    // Calculate feeder motor voltage with PID + feedforward
-    double feederPIDOutput = feederPID.calculate(
-        feederSim.getAngularVelocityRPM() / 60.0, // Convert to RPS
-        feederVelocitySetpoint.in(RotationsPerSecond)
-    );
+    // Calculate feeder motor voltage with PID + feedforward (only if not in voltage control mode)
+    if (!feederVoltageControl) {
+      double feederPIDOutput = feederPID.calculate(
+          feederSim.getAngularVelocityRPM() / 60.0, // Convert to RPS
+          feederVelocitySetpoint.in(RotationsPerSecond)
+      );
+      
+      double feederFF = feederVelocitySetpoint.in(RotationsPerSecond) * HopperConstants.FEEDER_KV;
+      
+      feederAppliedVolts = MathUtil.clamp(
+          feederPIDOutput + feederFF,
+          -12.0,
+          12.0
+      );
+    }
+    // Otherwise use the voltage set directly via setFeederVoltage()
     
-    double feederFF = feederVelocitySetpoint.in(RotationsPerSecond) * HopperConstants.FEEDER_KV;
-    
-    feederAppliedVolts = MathUtil.clamp(
-        feederPIDOutput + feederFF,
-        -12.0,
-        12.0
-    );
     feederSim.setInputVoltage(feederAppliedVolts);
     
     // Update inputs - Agitators
@@ -116,23 +127,41 @@ public class HopperIOSim implements HopperIO {
   @Override
   public void setAgitatorVelocity(AngularVelocity velocity) {
     agitatorVelocitySetpoint = velocity;
+    agitatorVoltageControl = false; // Switch back to velocity control
+  }
+
+  @Override
+  public void setAgitatorVoltage(edu.wpi.first.units.measure.Voltage voltage) {
+    // In voltage control mode, bypass PID and directly apply voltage
+    agitatorAppliedVolts = MathUtil.clamp(voltage.in(Volts), -12.0, 12.0);
+    agitatorVoltageControl = true;
   }
 
   @Override
   public void setFeederVelocity(AngularVelocity velocity) {
     feederVelocitySetpoint = velocity;
+    feederVoltageControl = false; // Switch back to velocity control
+  }
+
+  @Override
+  public void setFeederVoltage(edu.wpi.first.units.measure.Voltage voltage) {
+    // In voltage control mode, bypass PID and directly apply voltage
+    feederAppliedVolts = MathUtil.clamp(voltage.in(Volts), -12.0, 12.0);
+    feederVoltageControl = true;
   }
 
   @Override
   public void stopAgitators() {
     agitatorVelocitySetpoint = RotationsPerSecond.of(0.0);
     agitatorAppliedVolts = 0.0;
+    agitatorVoltageControl = false;
   }
 
   @Override
   public void stopFeeder() {
     feederVelocitySetpoint = RotationsPerSecond.of(0.0);
     feederAppliedVolts = 0.0;
+    feederVoltageControl = false;
   }
 
   @Override

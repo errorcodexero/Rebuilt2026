@@ -18,7 +18,12 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.Mode;
+import frc.robot.autos.FlywheelVoltageAuto;
+import frc.robot.commands.auto.ShooterTuningAuto;
 import frc.robot.commands.drive.DriveCommands;
+import frc.robot.commands.intake.IntakeSysIdCommands;
+import frc.robot.commands.shooter.ShooterSysIdCommands;
+import frc.robot.commands.hopper.HopperSysIdCommands;
 import frc.robot.generated.CompTunerConstants;
 import frc.robot.generated.PracticeTunerConstants;
 import frc.robot.subsystems.drive.Drive;
@@ -27,6 +32,18 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIOReplay;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.hopper.Hopper;
+import frc.robot.subsystems.hopper.HopperIO;
+import frc.robot.subsystems.hopper.HopperIOKraken;
+import frc.robot.subsystems.hopper.HopperIOSim;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIO;
+import frc.robot.subsystems.intake.IntakeIOKraken;
+import frc.robot.subsystems.intake.IntakeIOSim;
+import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShooterIO;
+import frc.robot.subsystems.shooter.ShooterIOKraken;
+import frc.robot.subsystems.shooter.ShooterIOSim;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIO;
 import frc.robot.subsystems.vision.CameraIOLimelight4;
@@ -38,9 +55,13 @@ public class RobotContainer {
     // Subsystems
     private Drive drivebase_;
     private AprilTagVision vision_;
+    private Shooter shooter_;
+    private Intake intake_;
+    private Hopper hopper_;
 
     // Choosers
     private final LoggedDashboardChooser<Command> autoChooser_;
+    private final LoggedDashboardChooser<SysIdMechanism> sysIdMechanismChooser_;
 
     // Trigger Devices
     private final CommandXboxController gamepad_ = new CommandXboxController(0);
@@ -69,6 +90,10 @@ public class RobotContainer {
                         new CameraIOLimelight4(VisionConstants.frontLimelightName, drivebase_::getRotation)
                     );
 
+                    shooter_ = new Shooter(new ShooterIOKraken());
+                    intake_ = new Intake(new IntakeIOKraken());
+                    hopper_ = new Hopper(new HopperIOKraken());
+
                     break;
 
                 case PRACTICE:
@@ -88,6 +113,10 @@ public class RobotContainer {
                         new CameraIOLimelight4(VisionConstants.frontLimelightName, drivebase_::getRotation)
                     );
 
+                    shooter_ = new Shooter(new ShooterIOKraken());
+                    intake_ = new Intake(new IntakeIOKraken());
+                    hopper_ = new Hopper(new HopperIOKraken());
+
                     break;
 
                 case SIMBOT:
@@ -106,6 +135,10 @@ public class RobotContainer {
                         drivebase_::addVisionMeasurement,
                         new CameraIOPhotonSim("front", VisionConstants.frontTransform, drivebase_::getPose, true)
                     );
+
+                    shooter_ = new Shooter(new ShooterIOSim());
+                    intake_ = new Intake(new IntakeIOSim());
+                    hopper_ = new Hopper(new HopperIOSim());
 
                     break;
             }
@@ -158,6 +191,18 @@ public class RobotContainer {
             );
         }
 
+        if (shooter_ == null) {
+            shooter_ = new Shooter(new ShooterIO() {});
+        }
+
+        if (intake_ == null) {
+            intake_ = new Intake(new IntakeIO() {});
+        }
+
+        if (hopper_ == null) {
+            hopper_ = new Hopper(new HopperIO() {});
+        }
+
         DriveCommands.configure(
             drivebase_,
             () -> -gamepad_.getLeftY(),
@@ -167,6 +212,24 @@ public class RobotContainer {
 
         // Choosers
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
+        autoChooser_.addDefaultOption("None", Commands.print("No autonomous command configured"));
+        autoChooser_.addOption("Shooter Tuning", ShooterTuningAuto.getCommand(shooter_));
+        autoChooser_.addOption("Flywheel Voltage", FlywheelVoltageAuto.getCommand(shooter_));
+
+        // SysId mechanism chooser for test mode
+        sysIdMechanismChooser_ = new LoggedDashboardChooser<>("SysId Mechanism");
+        sysIdMechanismChooser_.addDefaultOption(
+            SysIdMechanism.INTAKE_DEPLOY.toString(), SysIdMechanism.INTAKE_DEPLOY);
+        sysIdMechanismChooser_.addOption(
+            SysIdMechanism.INTAKE_SPINNER.toString(), SysIdMechanism.INTAKE_SPINNER);
+        sysIdMechanismChooser_.addOption(
+            SysIdMechanism.SHOOTER_HOOD.toString(), SysIdMechanism.SHOOTER_HOOD);
+        sysIdMechanismChooser_.addOption(
+            SysIdMechanism.SHOOTER_FLYWHEEL.toString(), SysIdMechanism.SHOOTER_FLYWHEEL);
+        sysIdMechanismChooser_.addOption(
+            SysIdMechanism.HOPPER_AGITATOR.toString(), SysIdMechanism.HOPPER_AGITATOR);
+        sysIdMechanismChooser_.addOption(
+            SysIdMechanism.HOPPER_FEEDER.toString(), SysIdMechanism.HOPPER_FEEDER);
 
         // Publish Deploy Directory (for layout/asset downloading)
         WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
@@ -229,12 +292,148 @@ public class RobotContainer {
     }
 
     private void configureTestModeBindings() {
+        // Drive characterization (existing)
         gamepad_.back().and(RobotModeTriggers.test()).toggleOnTrue(
             DriveCommands.wheelRadiusCharacterization(drivebase_)
         );
+
+        // SysId characterization commands - only available in test mode
+        // Quasistatic tests (slow ramp)
+        gamepad_.a().and(RobotModeTriggers.test()).whileTrue(
+            Commands.either(
+                getSysIdQuasistaticForward(),
+                Commands.none(),
+                () -> sysIdMechanismChooser_.get() != null
+            )
+        );
+
+        gamepad_.b().and(RobotModeTriggers.test()).whileTrue(
+            Commands.either(
+                getSysIdQuasistaticReverse(),
+                Commands.none(),
+                () -> sysIdMechanismChooser_.get() != null
+            )
+        );
+
+        // Dynamic tests (fast step)
+        gamepad_.x().and(RobotModeTriggers.test()).whileTrue(
+            Commands.either(
+                getSysIdDynamicForward(),
+                Commands.none(),
+                () -> sysIdMechanismChooser_.get() != null
+            )
+        );
+
+        gamepad_.y().and(RobotModeTriggers.test()).whileTrue(
+            Commands.either(
+                getSysIdDynamicReverse(),
+                Commands.none(),
+                () -> sysIdMechanismChooser_.get() != null
+            )
+        );
+    }
+
+    /**
+     * Get the quasistatic forward SysId command for the selected mechanism.
+     */
+    private Command getSysIdQuasistaticForward() {
+        SysIdMechanism mechanism = sysIdMechanismChooser_.get();
+        if (mechanism == null) return Commands.none();
+
+        switch (mechanism) {
+            case INTAKE_DEPLOY:
+                return IntakeSysIdCommands.deployQuasistaticForward(intake_);
+            case INTAKE_SPINNER:
+                return IntakeSysIdCommands.spinnerQuasistaticForward(intake_);
+            case SHOOTER_HOOD:
+                return ShooterSysIdCommands.hoodQuasistaticForward(shooter_);
+            case SHOOTER_FLYWHEEL:
+                return ShooterSysIdCommands.flywheelQuasistaticForward(shooter_);
+            case HOPPER_AGITATOR:
+                return HopperSysIdCommands.agitatorQuasistaticForward(hopper_);
+            case HOPPER_FEEDER:
+                return HopperSysIdCommands.feederQuasistaticForward(hopper_);
+            default:
+                return Commands.none();
+        }
+    }
+
+    /**
+     * Get the quasistatic reverse SysId command for the selected mechanism.
+     */
+    private Command getSysIdQuasistaticReverse() {
+        SysIdMechanism mechanism = sysIdMechanismChooser_.get();
+        if (mechanism == null) return Commands.none();
+
+        switch (mechanism) {
+            case INTAKE_DEPLOY:
+                return IntakeSysIdCommands.deployQuasistaticReverse(intake_);
+            case INTAKE_SPINNER:
+                return IntakeSysIdCommands.spinnerQuasistaticReverse(intake_);
+            case SHOOTER_HOOD:
+                return ShooterSysIdCommands.hoodQuasistaticReverse(shooter_);
+            case SHOOTER_FLYWHEEL:
+                return ShooterSysIdCommands.flywheelQuasistaticReverse(shooter_);
+            case HOPPER_AGITATOR:
+                return HopperSysIdCommands.agitatorQuasistaticReverse(hopper_);
+            case HOPPER_FEEDER:
+                return HopperSysIdCommands.feederQuasistaticReverse(hopper_);
+            default:
+                return Commands.none();
+        }
+    }
+
+    /**
+     * Get the dynamic forward SysId command for the selected mechanism.
+     */
+    private Command getSysIdDynamicForward() {
+        SysIdMechanism mechanism = sysIdMechanismChooser_.get();
+        if (mechanism == null) return Commands.none();
+
+        switch (mechanism) {
+            case INTAKE_DEPLOY:
+                return IntakeSysIdCommands.deployDynamicForward(intake_);
+            case INTAKE_SPINNER:
+                return IntakeSysIdCommands.spinnerDynamicForward(intake_);
+            case SHOOTER_HOOD:
+                return ShooterSysIdCommands.hoodDynamicForward(shooter_);
+            case SHOOTER_FLYWHEEL:
+                return ShooterSysIdCommands.flywheelDynamicForward(shooter_);
+            case HOPPER_AGITATOR:
+                return HopperSysIdCommands.agitatorDynamicForward(hopper_);
+            case HOPPER_FEEDER:
+                return HopperSysIdCommands.feederDynamicForward(hopper_);
+            default:
+                return Commands.none();
+        }
+    }
+
+    /**
+     * Get the dynamic reverse SysId command for the selected mechanism.
+     */
+    private Command getSysIdDynamicReverse() {
+        SysIdMechanism mechanism = sysIdMechanismChooser_.get();
+        if (mechanism == null) return Commands.none();
+
+        switch (mechanism) {
+            case INTAKE_DEPLOY:
+                return IntakeSysIdCommands.deployDynamicReverse(intake_);
+            case INTAKE_SPINNER:
+                return IntakeSysIdCommands.spinnerDynamicReverse(intake_);
+            case SHOOTER_HOOD:
+                return ShooterSysIdCommands.hoodDynamicReverse(shooter_);
+            case SHOOTER_FLYWHEEL:
+                return ShooterSysIdCommands.flywheelDynamicReverse(shooter_);
+            case HOPPER_AGITATOR:
+                return HopperSysIdCommands.agitatorDynamicReverse(hopper_);
+            case HOPPER_FEEDER:
+                return HopperSysIdCommands.feederDynamicReverse(hopper_);
+            default:
+                return Commands.none();
+        }
     }
     
     public Command getAutonomousCommand() {
-        return Commands.print("No autonomous command configured");
+        return autoChooser_.get();
     }
 }

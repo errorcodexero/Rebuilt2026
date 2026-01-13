@@ -185,12 +185,22 @@ public class IntakeIOKraken implements IntakeIO {
   }
 
   @Override
+  public void setDeployVoltage(edu.wpi.first.units.measure.Voltage voltage) {
+    deployMotor.setControl(voltageRequest.withOutput(voltage.in(Volts)));
+  }
+
+  @Override
   public void setSpinnerVelocity(AngularVelocity velocity) {
     spinnerMotor.setControl(
         spinnerVelocityRequest
             .withVelocity(velocity)
             .withSlot(0)
     );
+  }
+
+  @Override
+  public void setSpinnerVoltage(edu.wpi.first.units.measure.Voltage voltage) {
+    spinnerMotor.setControl(voltageRequest.withOutput(voltage.in(Volts)));
   }
 
   @Override

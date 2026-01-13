@@ -22,6 +22,9 @@ public class IntakeIOSim implements IntakeIO {
   
   private double deployAppliedVolts = 0.0;
   private double spinnerAppliedVolts = 0.0;
+  
+  private boolean deployVoltageControl = false;
+  private boolean spinnerVoltageControl = false;
 
   public IntakeIOSim() {
     // Create simulated motors using Kraken X60 (TalonFX) motor model
@@ -29,7 +32,7 @@ public class IntakeIOSim implements IntakeIO {
     deployMotorSim = new DCMotorSim(
         LinearSystemId.createDCMotorSystem(
             deployGearbox,
-            IntakeConstants.DEPLOY_MOMENT_OF_INERTIA,
+            IntakeConstants.DEPLOY_MOMENT_OF_INERTIA.in(KilogramSquareMeters),
             IntakeConstants.DEPLOY_GEAR_RATIO
         ),
         deployGearbox
@@ -39,7 +42,7 @@ public class IntakeIOSim implements IntakeIO {
     spinnerMotorSim = new DCMotorSim(
         LinearSystemId.createDCMotorSystem(
             spinnerGearbox,
-            IntakeConstants.SPINNER_MOMENT_OF_INERTIA,
+            IntakeConstants.SPINNER_MOMENT_OF_INERTIA.in(KilogramSquareMeters),
             IntakeConstants.SPINNER_GEAR_RATIO
         ),
         spinnerGearbox
@@ -64,39 +67,47 @@ public class IntakeIOSim implements IntakeIO {
     // Update deploy motor simulation
     deployMotorSim.update(0.020); // 20ms robot loop
     
-    // Calculate deploy motor voltage with PID + gravity feedforward
-    double deployPIDOutput = deployPID.calculate(
-        deployMotorSim.getAngularPositionRotations(),
-        deployPositionSetpoint.in(Rotations)
-    );
+    // Calculate deploy motor voltage with PID + gravity feedforward (only if not in voltage control mode)
+    if (!deployVoltageControl) {
+      double deployPIDOutput = deployPID.calculate(
+          deployMotorSim.getAngularPositionRotations(),
+          deployPositionSetpoint.in(Rotations)
+      );
+      
+      // Simple gravity compensation (assumes horizontal = 0 degrees)
+      double gravityFF = IntakeConstants.DEPLOY_KG * 
+          Math.cos(deployMotorSim.getAngularPositionRad());
+      
+      deployAppliedVolts = MathUtil.clamp(
+          deployPIDOutput + gravityFF,
+          -12.0,
+          12.0
+      );
+    }
+    // Otherwise use the voltage set directly via setDeployVoltage()
     
-    // Simple gravity compensation (assumes horizontal = 0 degrees)
-    double gravityFF = IntakeConstants.DEPLOY_KG * 
-        Math.cos(deployMotorSim.getAngularPositionRad());
-    
-    deployAppliedVolts = MathUtil.clamp(
-        deployPIDOutput + gravityFF,
-        -12.0,
-        12.0
-    );
     deployMotorSim.setInputVoltage(deployAppliedVolts);
     
     // Update spinner motor simulation
     spinnerMotorSim.update(0.020);
     
-    // Calculate spinner motor voltage with PID
-    double spinnerPIDOutput = spinnerPID.calculate(
-        spinnerMotorSim.getAngularVelocityRPM() / 60.0, // Convert to RPS
-        spinnerVelocitySetpoint.in(RotationsPerSecond)
-    );
+    // Calculate spinner motor voltage with PID (only if not in voltage control mode)
+    if (!spinnerVoltageControl) {
+      double spinnerPIDOutput = spinnerPID.calculate(
+          spinnerMotorSim.getAngularVelocityRPM() / 60.0, // Convert to RPS
+          spinnerVelocitySetpoint.in(RotationsPerSecond)
+      );
+      
+      double spinnerFF = spinnerVelocitySetpoint.in(RotationsPerSecond) * IntakeConstants.SPINNER_KV;
+      
+      spinnerAppliedVolts = MathUtil.clamp(
+          spinnerPIDOutput + spinnerFF,
+          -12.0,
+          12.0
+      );
+    }
+    // Otherwise use the voltage set directly via setSpinnerVoltage()
     
-    double spinnerFF = spinnerVelocitySetpoint.in(RotationsPerSecond) * IntakeConstants.SPINNER_KV;
-    
-    spinnerAppliedVolts = MathUtil.clamp(
-        spinnerPIDOutput + spinnerFF,
-        -12.0,
-        12.0
-    );
     spinnerMotorSim.setInputVoltage(spinnerAppliedVolts);
     
     // Update inputs
@@ -120,23 +131,41 @@ public class IntakeIOSim implements IntakeIO {
         IntakeConstants.DEPLOY_MIN_ANGLE.in(Rotations),
         IntakeConstants.DEPLOY_MAX_ANGLE.in(Rotations)
     ));
+    deployVoltageControl = false; // Switch back to position control
+  }
+
+  @Override
+  public void setDeployVoltage(edu.wpi.first.units.measure.Voltage voltage) {
+    // In voltage control mode, bypass PID and directly apply voltage
+    deployAppliedVolts = MathUtil.clamp(voltage.in(Volts), -12.0, 12.0);
+    deployVoltageControl = true;
   }
 
   @Override
   public void setSpinnerVelocity(AngularVelocity velocity) {
     spinnerVelocitySetpoint = velocity;
+    spinnerVoltageControl = false; // Switch back to velocity control
+  }
+
+  @Override
+  public void setSpinnerVoltage(edu.wpi.first.units.measure.Voltage voltage) {
+    // In voltage control mode, bypass PID and directly apply voltage
+    spinnerAppliedVolts = MathUtil.clamp(voltage.in(Volts), -12.0, 12.0);
+    spinnerVoltageControl = true;
   }
 
   @Override
   public void stopDeploy() {
     deployPositionSetpoint = Rotations.of(deployMotorSim.getAngularPositionRotations());
     deployAppliedVolts = 0.0;
+    deployVoltageControl = false;
   }
 
   @Override
   public void stopSpinner() {
     spinnerVelocitySetpoint = RotationsPerSecond.of(0.0);
     spinnerAppliedVolts = 0.0;
+    spinnerVoltageControl = false;
   }
 
   @Override

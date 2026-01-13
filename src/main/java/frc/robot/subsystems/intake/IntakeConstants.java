@@ -4,6 +4,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.MomentOfInertia;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -61,6 +62,6 @@ public class IntakeConstants {
   public static final AngularVelocity SPINNER_TOLERANCE = RotationsPerSecond.of(2.0);
 
   // Simulation
-  public static final double DEPLOY_MOMENT_OF_INERTIA = 0.05; // kg*m^2 - TODO: Calculate actual value
-  public static final double SPINNER_MOMENT_OF_INERTIA = 0.001; // kg*m^2 - TODO: Calculate actual value
+  public static final MomentOfInertia DEPLOY_MOMENT_OF_INERTIA = KilogramSquareMeters.of(0.05); // TODO: Calculate actual value
+  public static final MomentOfInertia SPINNER_MOMENT_OF_INERTIA = KilogramSquareMeters.of(0.001); // TODO: Calculate actual value
 }

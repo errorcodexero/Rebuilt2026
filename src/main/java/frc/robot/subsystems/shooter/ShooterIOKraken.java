@@ -225,12 +225,23 @@ public class ShooterIOKraken implements ShooterIO {
   }
 
   @Override
+  public void setFlywheelVoltage(edu.wpi.first.units.measure.Voltage voltage) {
+    flywheelLeader.setControl(voltageRequest.withOutput(voltage.in(Volts)));
+    // Follower automatically follows
+  }
+
+  @Override
   public void setHoodPosition(Angle position) {
     hoodMotor.setControl(
         hoodPositionRequest
             .withPosition(position)
             .withSlot(0)
     );
+  }
+
+  @Override
+  public void setHoodVoltage(edu.wpi.first.units.measure.Voltage voltage) {
+    hoodMotor.setControl(voltageRequest.withOutput(voltage.in(Volts)));
   }
 
   @Override

@@ -199,12 +199,23 @@ public class HopperIOKraken implements HopperIO {
   }
 
   @Override
+  public void setAgitatorVoltage(edu.wpi.first.units.measure.Voltage voltage) {
+    agitatorLeader.setControl(voltageRequest.withOutput(voltage.in(Volts)));
+    // Follower automatically follows
+  }
+
+  @Override
   public void setFeederVelocity(AngularVelocity velocity) {
     feederMotor.setControl(
         feederVelocityRequest
             .withVelocity(velocity)
             .withSlot(0)
     );
+  }
+
+  @Override
+  public void setFeederVoltage(edu.wpi.first.units.measure.Voltage voltage) {
+    feederMotor.setControl(voltageRequest.withOutput(voltage.in(Volts)));
   }
 
   @Override

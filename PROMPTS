@@ -40,5 +40,25 @@ interrupted should stop all of the motors.
 Create a shooter tuning command that is stored in commands/shooter.  This command should allow for manual control of the shooter hood angle and the shooter 
 flywheel velociy via smart dashboard numeric inputs.  This command should be interruptable and when interrupted should stop all of the motors.
 
-TODO
-----
+Create an auto mode that just runs the shooter tuning command. 
+
+Add the newly created automode to the autoChooser in the robot container.
+
+Add a command to apply a specific voltage to the flywheel motors.
+
+Add a command that puts an input on the smartdashboard that is a voltage.  This voltage should then be applied to the shooter motor.  Then wrap this command 
+in an auto mode that just runs this new command.  Add this auto mode to the list that can be selected in the robot container.
+
+Add the required support to the intake subsystem to support the SysID framework.
+
+Add support into the robot container for running SysId commands.  These should only be available when the robot is it test mode.  There should be a enumerated 
+constant that sets that is being analyzed.  For instance, IntakeDeploy, IntakeSpinner, ShooterHood, ShooterFlywheel, HopperAgitator, HopperFeeder.
+
+Add the Hopper and the Intake to the RobotContainer.
+
+For the ShooterConstants.java file, change the MOMENT_OF_INTERTIA values to use the WPILib units library.
+
+MANUAL Code Changes
+-------------------
+Changed the robot type from COMPETITION to SIMBOT in Constants.java
+

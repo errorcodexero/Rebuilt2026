@@ -44,12 +44,30 @@ public class Hopper extends SubsystemBase {
   }
 
   /**
+   * Set the agitator motors voltage directly (for SysId characterization).
+   * @param voltage The voltage to apply to the agitator motors
+   */
+  public void setAgitatorVoltage(edu.wpi.first.units.measure.Voltage voltage) {
+    agitatorGoal = RotationsPerSecond.of(0.0); // Clear velocity goal when using voltage control
+    io.setAgitatorVoltage(voltage);
+  }
+
+  /**
    * Set the feeder velocity.
    * @param velocity The target velocity for the feeder
    */
   public void setFeederVelocity(AngularVelocity velocity) {
     feederGoal = velocity;
     io.setFeederVelocity(velocity);
+  }
+
+  /**
+   * Set the feeder motor voltage directly (for SysId characterization).
+   * @param voltage The voltage to apply to the feeder motor
+   */
+  public void setFeederVoltage(edu.wpi.first.units.measure.Voltage voltage) {
+    feederGoal = RotationsPerSecond.of(0.0); // Clear velocity goal when using voltage control
+    io.setFeederVoltage(voltage);
   }
 
   /**

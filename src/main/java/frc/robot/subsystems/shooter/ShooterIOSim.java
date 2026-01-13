@@ -22,6 +22,8 @@ public class ShooterIOSim implements ShooterIO {
   
   private double flywheelAppliedVolts = 0.0;
   private double hoodAppliedVolts = 0.0;
+  
+  private boolean hoodVoltageControl = false;
 
   public ShooterIOSim() {
     // Create simulated motors using Kraken X60 (TalonFX) motor model
@@ -30,7 +32,7 @@ public class ShooterIOSim implements ShooterIO {
     flywheelSim = new DCMotorSim(
         LinearSystemId.createDCMotorSystem(
             flywheelGearbox,
-            ShooterConstants.FLYWHEEL_MOMENT_OF_INERTIA,
+            ShooterConstants.FLYWHEEL_MOMENT_OF_INERTIA.in(KilogramSquareMeters),
             ShooterConstants.FLYWHEEL_GEAR_RATIO
         ),
         flywheelGearbox
@@ -40,7 +42,7 @@ public class ShooterIOSim implements ShooterIO {
     hoodSim = new DCMotorSim(
         LinearSystemId.createDCMotorSystem(
             hoodGearbox,
-            ShooterConstants.HOOD_MOMENT_OF_INERTIA,
+            ShooterConstants.HOOD_MOMENT_OF_INERTIA.in(KilogramSquareMeters),
             ShooterConstants.HOOD_GEAR_RATIO
         ),
         hoodGearbox
@@ -65,39 +67,47 @@ public class ShooterIOSim implements ShooterIO {
     // Update flywheel simulation
     flywheelSim.update(0.020); // 20ms robot loop
     
-    // Calculate flywheel motor voltage with PID + feedforward
-    double flywheelPIDOutput = flywheelPID.calculate(
-        flywheelSim.getAngularVelocityRPM() / 60.0, // Convert to RPS
-        flywheelVelocitySetpoint.in(RotationsPerSecond)
-    );
+    // Calculate flywheel motor voltage with PID + feedforward (only if velocity setpoint is non-zero)
+    if (flywheelVelocitySetpoint.in(RotationsPerSecond) != 0.0) {
+      double flywheelPIDOutput = flywheelPID.calculate(
+          flywheelSim.getAngularVelocityRPM() / 60.0, // Convert to RPS
+          flywheelVelocitySetpoint.in(RotationsPerSecond)
+      );
+      
+      double flywheelFF = flywheelVelocitySetpoint.in(RotationsPerSecond) * ShooterConstants.FLYWHEEL_KV;
+      
+      flywheelAppliedVolts = MathUtil.clamp(
+          flywheelPIDOutput + flywheelFF,
+          -12.0,
+          12.0
+      );
+    }
+    // Otherwise use the voltage set directly via setFlywheelVoltage()
     
-    double flywheelFF = flywheelVelocitySetpoint.in(RotationsPerSecond) * ShooterConstants.FLYWHEEL_KV;
-    
-    flywheelAppliedVolts = MathUtil.clamp(
-        flywheelPIDOutput + flywheelFF,
-        -12.0,
-        12.0
-    );
     flywheelSim.setInputVoltage(flywheelAppliedVolts);
     
     // Update hood simulation
     hoodSim.update(0.020);
     
-    // Calculate hood motor voltage with PID + gravity feedforward
-    double hoodPIDOutput = hoodPID.calculate(
-        hoodSim.getAngularPositionRotations(),
-        hoodPositionSetpoint.in(Rotations)
-    );
+    // Calculate hood motor voltage with PID + gravity feedforward (only if not in voltage control mode)
+    if (!hoodVoltageControl) {
+      double hoodPIDOutput = hoodPID.calculate(
+          hoodSim.getAngularPositionRotations(),
+          hoodPositionSetpoint.in(Rotations)
+      );
+      
+      // Simple gravity compensation (assumes horizontal = 0 degrees)
+      double gravityFF = ShooterConstants.HOOD_KG * 
+          Math.cos(hoodSim.getAngularPositionRad());
+      
+      hoodAppliedVolts = MathUtil.clamp(
+          hoodPIDOutput + gravityFF,
+          -12.0,
+          12.0
+      );
+    }
+    // Otherwise use the voltage set directly via setHoodVoltage()
     
-    // Simple gravity compensation (assumes horizontal = 0 degrees)
-    double gravityFF = ShooterConstants.HOOD_KG * 
-        Math.cos(hoodSim.getAngularPositionRad());
-    
-    hoodAppliedVolts = MathUtil.clamp(
-        hoodPIDOutput + gravityFF,
-        -12.0,
-        12.0
-    );
     hoodSim.setInputVoltage(hoodAppliedVolts);
     
     // Update inputs - Flywheels
@@ -123,6 +133,13 @@ public class ShooterIOSim implements ShooterIO {
   }
 
   @Override
+  public void setFlywheelVoltage(edu.wpi.first.units.measure.Voltage voltage) {
+    // In voltage control mode, bypass PID and directly apply voltage
+    flywheelAppliedVolts = MathUtil.clamp(voltage.in(Volts), -12.0, 12.0);
+    flywheelVelocitySetpoint = RotationsPerSecond.of(0.0); // Clear velocity setpoint
+  }
+
+  @Override
   public void setHoodPosition(Angle position) {
     // Clamp position to valid range
     hoodPositionSetpoint = Rotations.of(MathUtil.clamp(
@@ -130,6 +147,14 @@ public class ShooterIOSim implements ShooterIO {
         ShooterConstants.HOOD_MIN_ANGLE.in(Rotations),
         ShooterConstants.HOOD_MAX_ANGLE.in(Rotations)
     ));
+    hoodVoltageControl = false; // Switch back to position control
+  }
+
+  @Override
+  public void setHoodVoltage(edu.wpi.first.units.measure.Voltage voltage) {
+    // In voltage control mode, bypass PID and directly apply voltage
+    hoodAppliedVolts = MathUtil.clamp(voltage.in(Volts), -12.0, 12.0);
+    hoodVoltageControl = true;
   }
 
   @Override
@@ -142,6 +167,7 @@ public class ShooterIOSim implements ShooterIO {
   public void stopHood() {
     hoodPositionSetpoint = Rotations.of(hoodSim.getAngularPositionRotations());
     hoodAppliedVolts = 0.0;
+    hoodVoltageControl = false;
   }
 
   @Override
