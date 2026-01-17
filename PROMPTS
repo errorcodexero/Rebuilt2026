@@ -58,6 +58,8 @@ Add the Hopper and the Intake to the RobotContainer.
 
 For the ShooterConstants.java file, change the MOMENT_OF_INTERTIA values to use the WPILib units library.
 
+For the IntakeConstants.java and the HooperConstants.java file, change the MOMENT_OF_INTERTIA values to use the WPILib units library.
+
 MANUAL Code Changes
 -------------------
 Changed the robot type from COMPETITION to SIMBOT in Constants.java
