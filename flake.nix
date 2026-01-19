@@ -7,8 +7,8 @@
 
   outputs =
     {
-      self,
       nixpkgs,
+      ...
     }:
     let
       system = "x86_64-linux";
