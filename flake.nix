@@ -13,14 +13,14 @@
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
-      version = "2026.1.1";
+      version = "2026.2.1";
 
       wpilibJdk =
         pkgs.runCommand "wpilib-jdk"
           {
             src = pkgs.fetchzip {
               url = "https://packages.wpilib.workers.dev/installer/v${version}/Linux/WPILib_Linux-${version}.tar.gz";
-              hash = "sha256-lZNTm4X0ueLYnhBBZWGVL4gUjZApEEproS4vJiPJycw=";
+              hash = "sha256-yly96Zzj0jnvudZhwE30GqvK3Ny2Tqot84ZbPS0RrFM=";
             };
           }
           ''
@@ -32,6 +32,8 @@
     in
     {
       devShells.x86_64-linux.default = pkgs.mkShell {
+        name = "nix-simgui";
+
         packages = [ wpilibJdk pkgs.libGL ];
 
         JAVA_HOME = wpilibJdk;
