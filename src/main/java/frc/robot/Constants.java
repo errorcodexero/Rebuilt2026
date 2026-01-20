@@ -38,7 +38,7 @@ public final class Constants {
     }
     
     public static class FieldConstants {
-        public static final AprilTagFieldLayout layout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
+        public static final AprilTagFieldLayout layout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
     }
 
     /**
