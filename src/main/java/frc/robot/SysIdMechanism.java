@@ -7,7 +7,6 @@ package frc.robot;
 public enum SysIdMechanism {
   INTAKE_DEPLOY("Intake Deploy"),
   INTAKE_SPINNER("Intake Spinner"),
-  SHOOTER_HOOD("Shooter Hood"),
   SHOOTER_FLYWHEEL("Shooter Flywheel"),
   HOPPER_AGITATOR("Hopper Agitator"),
   HOPPER_FEEDER("Hopper Feeder");

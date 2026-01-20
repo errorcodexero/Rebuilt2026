@@ -9,14 +9,13 @@ import static edu.wpi.first.units.Units.*;
 
 /**
  * Command for tuning shooter parameters via SmartDashboard.
- * Allows manual control of hood angle and flywheel velocity.
+ * Allows manual control of flywheel velocity.
  * Updates continuously based on SmartDashboard inputs.
  */
 public class ShooterTuningCommand extends Command {
   private final Shooter shooter;
   
   // SmartDashboard keys
-  private static final String HOOD_ANGLE_KEY = "Shooter/Tuning/HoodAngleDegrees";
   private static final String FLYWHEEL_VELOCITY_KEY = "Shooter/Tuning/FlywheelVelocityRPS";
   
   /**
@@ -29,7 +28,6 @@ public class ShooterTuningCommand extends Command {
     addRequirements(shooter);
     
     // Initialize SmartDashboard with default values
-    SmartDashboard.putNumber(HOOD_ANGLE_KEY, ShooterConstants.HOOD_MID_ANGLE.in(Degrees));
     SmartDashboard.putNumber(FLYWHEEL_VELOCITY_KEY, ShooterConstants.FLYWHEEL_MID_SHOT_VELOCITY.in(RotationsPerSecond));
   }
 
@@ -42,18 +40,13 @@ public class ShooterTuningCommand extends Command {
   @Override
   public void execute() {
     // Read values from SmartDashboard
-    double hoodAngleDegrees = SmartDashboard.getNumber(HOOD_ANGLE_KEY, 
-        ShooterConstants.HOOD_MID_ANGLE.in(Degrees));
     double flywheelVelocityRPS = SmartDashboard.getNumber(FLYWHEEL_VELOCITY_KEY, 
         ShooterConstants.FLYWHEEL_MID_SHOT_VELOCITY.in(RotationsPerSecond));
     
     // Apply values to shooter
-    shooter.setHoodPosition(Degrees.of(hoodAngleDegrees));
     shooter.setFlywheelVelocity(RotationsPerSecond.of(flywheelVelocityRPS));
     
     // Log current state to SmartDashboard
-    SmartDashboard.putNumber("Shooter/Tuning/ActualHoodDegrees", 
-        shooter.getHoodPosition().in(Degrees));
     SmartDashboard.putNumber("Shooter/Tuning/ActualFlywheelRPS", 
         shooter.getFlywheelVelocity().in(RotationsPerSecond));
     SmartDashboard.putBoolean("Shooter/Tuning/ReadyToShoot", 
@@ -64,7 +57,6 @@ public class ShooterTuningCommand extends Command {
   public void end(boolean interrupted) {
     // Stop all motors when command ends
     shooter.stopFlywheels();
-    shooter.stopHood();
     
     if (interrupted) {
       System.out.println("Shooter Tuning Command Interrupted");

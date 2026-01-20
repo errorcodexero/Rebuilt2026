@@ -74,10 +74,25 @@ public class RobotContainer {
         if (Constants.getMode() != Mode.REPLAY) {
             switch (Constants.getRobot()) {
                 case COMPETITION:
+                    // drivebase_ = new Drive(
+                    //     new GyroIOPigeon2(CompTunerConstants.DrivetrainConstants.Pigeon2Id, CompTunerConstants.kCANBus),
+                    //     ModuleIOTalonFX::new,
+                    //     CompTunerConstants.FrontLeft,
+                    //     CompTunerConstants.FrontRight,
+                    //     CompTunerConstants.BackLeft,
+                    //     CompTunerConstants.BackRight,
+                    //     CompTunerConstants.kSpeedAt12Volts
+                    // );
 
+                    // vision_ = new AprilTagVision(
+                    //     drivebase_::addVisionMeasurement,
+                    //     new CameraIOLimelight4(VisionConstants.frontLimelightName, drivebase_::getRotation)
+                    // );
+
+                    // Sim robot, instantiate physics sim IO implementations
                     drivebase_ = new Drive(
-                        new GyroIOPigeon2(CompTunerConstants.DrivetrainConstants.Pigeon2Id, CompTunerConstants.kCANBus),
-                        ModuleIOTalonFX::new,
+                        new GyroIO() {},
+                        ModuleIOSim::new,
                         CompTunerConstants.FrontLeft,
                         CompTunerConstants.FrontRight,
                         CompTunerConstants.BackLeft,
@@ -87,14 +102,33 @@ public class RobotContainer {
 
                     vision_ = new AprilTagVision(
                         drivebase_::addVisionMeasurement,
-                        new CameraIOLimelight4(VisionConstants.frontLimelightName, drivebase_::getRotation)
-                    );
+                        new CameraIOPhotonSim("front", VisionConstants.frontTransform, drivebase_::getPose, true)
+                    );                    
 
                     shooter_ = new Shooter(new ShooterIOKraken());
-                    intake_ = new Intake(new IntakeIOKraken());
-                    hopper_ = new Hopper(new HopperIOKraken());
+                    // intake_ = new Intake(new IntakeIOKraken());
+                    // hopper_ = new Hopper(new HopperIOKraken());
 
                     break;
+
+                case SIMREAL:
+                    drivebase_ = new Drive(
+                        new GyroIO() {},
+                        ModuleIOSim::new,
+                        CompTunerConstants.FrontLeft,
+                        CompTunerConstants.FrontRight,
+                        CompTunerConstants.BackLeft,
+                        CompTunerConstants.BackRight,
+                        CompTunerConstants.kSpeedAt12Volts
+                    );
+
+                    vision_ = new AprilTagVision(
+                        drivebase_::addVisionMeasurement,
+                        new CameraIOPhotonSim("front", VisionConstants.frontTransform, drivebase_::getPose, true)
+                    );                    
+
+                    shooter_ = new Shooter(new ShooterIOKraken());                
+                    break ;
 
                 case PRACTICE:
 
@@ -213,7 +247,7 @@ public class RobotContainer {
         // Choosers
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
         autoChooser_.addDefaultOption("None", Commands.print("No autonomous command configured"));
-        autoChooser_.addOption("Shooter Tuning", ShooterTuningAuto.getCommand(shooter_));
+        autoChooser_.addOption("Flywheel Veloticy", ShooterTuningAuto.getCommand(shooter_));
         autoChooser_.addOption("Flywheel Voltage", FlywheelVoltageAuto.getCommand(shooter_));
 
         // SysId mechanism chooser for test mode
@@ -222,8 +256,6 @@ public class RobotContainer {
             SysIdMechanism.INTAKE_DEPLOY.toString(), SysIdMechanism.INTAKE_DEPLOY);
         sysIdMechanismChooser_.addOption(
             SysIdMechanism.INTAKE_SPINNER.toString(), SysIdMechanism.INTAKE_SPINNER);
-        sysIdMechanismChooser_.addOption(
-            SysIdMechanism.SHOOTER_HOOD.toString(), SysIdMechanism.SHOOTER_HOOD);
         sysIdMechanismChooser_.addOption(
             SysIdMechanism.SHOOTER_FLYWHEEL.toString(), SysIdMechanism.SHOOTER_FLYWHEEL);
         sysIdMechanismChooser_.addOption(
@@ -345,8 +377,6 @@ public class RobotContainer {
                 return IntakeSysIdCommands.deployQuasistaticForward(intake_);
             case INTAKE_SPINNER:
                 return IntakeSysIdCommands.spinnerQuasistaticForward(intake_);
-            case SHOOTER_HOOD:
-                return ShooterSysIdCommands.hoodQuasistaticForward(shooter_);
             case SHOOTER_FLYWHEEL:
                 return ShooterSysIdCommands.flywheelQuasistaticForward(shooter_);
             case HOPPER_AGITATOR:
@@ -370,8 +400,6 @@ public class RobotContainer {
                 return IntakeSysIdCommands.deployQuasistaticReverse(intake_);
             case INTAKE_SPINNER:
                 return IntakeSysIdCommands.spinnerQuasistaticReverse(intake_);
-            case SHOOTER_HOOD:
-                return ShooterSysIdCommands.hoodQuasistaticReverse(shooter_);
             case SHOOTER_FLYWHEEL:
                 return ShooterSysIdCommands.flywheelQuasistaticReverse(shooter_);
             case HOPPER_AGITATOR:
@@ -395,8 +423,6 @@ public class RobotContainer {
                 return IntakeSysIdCommands.deployDynamicForward(intake_);
             case INTAKE_SPINNER:
                 return IntakeSysIdCommands.spinnerDynamicForward(intake_);
-            case SHOOTER_HOOD:
-                return ShooterSysIdCommands.hoodDynamicForward(shooter_);
             case SHOOTER_FLYWHEEL:
                 return ShooterSysIdCommands.flywheelDynamicForward(shooter_);
             case HOPPER_AGITATOR:
@@ -420,8 +446,6 @@ public class RobotContainer {
                 return IntakeSysIdCommands.deployDynamicReverse(intake_);
             case INTAKE_SPINNER:
                 return IntakeSysIdCommands.spinnerDynamicReverse(intake_);
-            case SHOOTER_HOOD:
-                return ShooterSysIdCommands.hoodDynamicReverse(shooter_);
             case SHOOTER_FLYWHEEL:
                 return ShooterSysIdCommands.flywheelDynamicReverse(shooter_);
             case HOPPER_AGITATOR:

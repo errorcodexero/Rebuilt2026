@@ -39,14 +39,6 @@ public class FlywheelVoltageCommand extends Command {
     
     // Apply voltage to flywheel motors
     shooter_.setFlywheelVoltage(Volts.of(voltageSetpoint));
-    
-    // Log actual flywheel velocity for feedback
-    SmartDashboard.putNumber("Flywheel/ActualVelocityRPS", 
-        shooter_.getFlywheelVelocity().in(RotationsPerSecond));
-    SmartDashboard.putNumber("Flywheel/LeaderCurrentAmps", 
-        shooter_.getFlywheelLeaderCurrent());
-    SmartDashboard.putNumber("Flywheel/FollowerCurrentAmps", 
-        shooter_.getFlywheelFollowerCurrent());
   }
 
   @Override

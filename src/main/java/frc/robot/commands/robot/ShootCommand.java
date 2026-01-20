@@ -1,6 +1,5 @@
 package frc.robot.commands.robot;
 
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -9,16 +8,15 @@ import frc.robot.subsystems.shooter.Shooter;
 
 /**
  * Robot-level command to shoot game pieces.
- * Sets shooter flywheel velocity, positions hood, and feeds balls from hopper.
+ * Sets shooter flywheel velocity and feeds balls from hopper.
  * When interrupted, safely stops all motors.
  */
 public class ShootCommand {
   
   /**
-   * Creates a command to shoot game pieces at a specific velocity and angle.
+   * Creates a command to shoot game pieces at a specific velocity.
    * This command will:
    * - Spin up shooter flywheels to target velocity
-   * - Move hood to target angle
    * - Wait until shooter is ready
    * - Start feeding balls from hopper
    * 
@@ -29,16 +27,12 @@ public class ShootCommand {
    * @param shooter The shooter subsystem
    * @param hopper The hopper subsystem
    * @param flywheelVelocity The target flywheel velocity
-   * @param hoodAngle The target hood angle
    * @return A command that shoots game pieces
    */
-  public static Command shoot(Shooter shooter, Hopper hopper, AngularVelocity flywheelVelocity, Angle hoodAngle) {
+  public static Command shoot(Shooter shooter, Hopper hopper, AngularVelocity flywheelVelocity) {
     return Commands.sequence(
-        // Prepare shooter (spin up flywheels and position hood)
-        Commands.runOnce(() -> {
-          shooter.setFlywheelVelocity(flywheelVelocity);
-          shooter.setHoodPosition(hoodAngle);
-        }, shooter),
+        // Prepare shooter (spin up flywheels)
+        Commands.runOnce(() -> shooter.setFlywheelVelocity(flywheelVelocity), shooter),
         // Wait until shooter is ready
         Commands.waitUntil(shooter::isReadyToShoot),
         // Start feeding balls
@@ -130,14 +124,10 @@ public class ShootCommand {
    * 
    * @param shooter The shooter subsystem
    * @param flywheelVelocity The target flywheel velocity
-   * @param hoodAngle The target hood angle
    * @return A command that prepares the shooter
    */
-  public static Command prepareShooter(Shooter shooter, AngularVelocity flywheelVelocity, Angle hoodAngle) {
-    return Commands.runOnce(() -> {
-      shooter.setFlywheelVelocity(flywheelVelocity);
-      shooter.setHoodPosition(hoodAngle);
-    }, shooter)
+  public static Command prepareShooter(Shooter shooter, AngularVelocity flywheelVelocity) {
+    return Commands.runOnce(() -> shooter.setFlywheelVelocity(flywheelVelocity), shooter)
     .andThen(Commands.waitUntil(shooter::isReadyToShoot))
     .withName("PrepareShooter");
   }
@@ -149,14 +139,13 @@ public class ShootCommand {
    * @param shooter The shooter subsystem
    * @param hopper The hopper subsystem
    * @param flywheelVelocity The target flywheel velocity
-   * @param hoodAngle The target hood angle
    * @param seconds The duration to shoot in seconds
    * @return A command that shoots for the specified duration
    */
   public static Command shootForDuration(Shooter shooter, Hopper hopper, 
-                                         AngularVelocity flywheelVelocity, Angle hoodAngle, 
+                                         AngularVelocity flywheelVelocity, 
                                          double seconds) {
-    return shoot(shooter, hopper, flywheelVelocity, hoodAngle)
+    return shoot(shooter, hopper, flywheelVelocity)
         .withTimeout(seconds)
         .withName("ShootForDuration");
   }

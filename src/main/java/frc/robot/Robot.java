@@ -45,6 +45,14 @@ public class Robot extends LoggedRobot {
                 Logger.addDataReceiver(new WPILOGWriter());
                 Logger.addDataReceiver(new NT4Publisher());
                 break;
+
+            case REALSIM:
+                // Running on a real robot with simulated sensors, log to USB and NT
+                Logger.addDataReceiver(new NT4Publisher());
+                
+                // Silence Joystick Warnings
+                DriverStation.silenceJoystickConnectionWarning(RobotBase.isSimulation());
+                break;
             
             case SIM:
                 // Running a physics simulator, log to NT

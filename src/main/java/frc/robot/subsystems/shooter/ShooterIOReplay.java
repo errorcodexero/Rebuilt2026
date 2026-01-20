@@ -1,6 +1,5 @@
 package frc.robot.subsystems.shooter;
 
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 
 /**
@@ -24,32 +23,12 @@ public class ShooterIOReplay implements ShooterIO {
   }
 
   @Override
-  public void setHoodPosition(Angle position) {
-    // No-op for replay
-  }
-
-  @Override
   public void stopFlywheels() {
     // No-op for replay
   }
 
   @Override
-  public void stopHood() {
-    // No-op for replay
-  }
-
-  @Override
   public void setFlywheelBrake(boolean brake) {
-    // No-op for replay
-  }
-
-  @Override
-  public void setHoodBrake(boolean brake) {
-    // No-op for replay
-  }
-
-  @Override
-  public void resetHoodPosition(Angle currentAngle) {
     // No-op for replay
   }
 }

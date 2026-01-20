@@ -31,7 +31,7 @@ public final class Constants {
      */
     
     // Sets the currently running robot.
-    private static final RobotType robotType = RobotType.SIMBOT;
+    private static final RobotType robotType = RobotType.SIMREAL;
 
     public static class DriveConstants {
         public static final double slowModeJoystickMultiplier = 0.4;
@@ -48,6 +48,9 @@ public final class Constants {
     public static enum Mode {
         /** Running on a real robot. */
         REAL,
+
+        /** Running the real robot in a simulation */
+        REALSIM,
         
         /** Running a physics simulator. */
         SIM,
@@ -65,6 +68,9 @@ public final class Constants {
 
         /** The Sim Bot */
         SIMBOT,
+
+        /** The Sim Real Bot */
+        SIMREAL,
     }
 
     // This is only a fallback! This will not change the robot type.
@@ -87,6 +93,7 @@ public final class Constants {
     public static final Mode getMode() {
         return switch(getRobot()) {
             case SIMBOT -> Mode.SIM;
+            case SIMREAL -> Mode.REALSIM;
             default -> RobotBase.isReal() ? Mode.REAL : Mode.REPLAY;
         };
     }
