@@ -66,7 +66,13 @@ public class ShooterIOSim implements ShooterIO {
     // Update inputs - Flywheels
     inputs.flywheelVelocity = RotationsPerSecond.of(flywheelSim.getAngularVelocityRPM() / 60.0);
     inputs.flywheelAppliedVoltage = Volts.of(flywheelAppliedVolts); // Leader voltage only
-    inputs.flywheelTotalCurrent = Amps.of(Math.abs(flywheelSim.getCurrentDrawAmps())); // Total current from all motors
+    
+    // Split total current among motors for simulation
+    double totalCurrent = Math.abs(flywheelSim.getCurrentDrawAmps());
+    inputs.flywheelTotalCurrent = Amps.of(totalCurrent);
+    double currentPerMotor = totalCurrent / ShooterConstants.FLYWHEEL_MOTOR_CAN_IDS.length;
+    
+    inputs.flywheelMaxTemperature = 25.0; // Simulated constant temperature
   }
 
   @Override

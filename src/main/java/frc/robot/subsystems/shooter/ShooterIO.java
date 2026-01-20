@@ -15,6 +15,10 @@ public interface ShooterIO {
     public AngularVelocity flywheelVelocity = RotationsPerSecond.of(0.0);
     public Voltage flywheelAppliedVoltage = Volts.of(0.0); // Leader voltage only
     public Current flywheelTotalCurrent = Amps.of(0.0); // Sum of all motor currents
+    public double flywheelMaxTemperature = 0.0; // Maximum temperature across all motors (Celsius)
+    public Current flywheelCurrent0 = Amps.of(0.0);
+    public Current flywheelCurrent1 = Amps.of(0.0);
+    public Current flywheelCurrent2 = Amps.of(0.0);
   }
 
   /** Updates the set of loggable inputs. */

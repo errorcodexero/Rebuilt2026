@@ -146,12 +146,25 @@ public class ShooterIOKraken implements ShooterIO {
     inputs.flywheelVelocity = flywheelVelocity[0].getValue(); // Leader velocity
     inputs.flywheelAppliedVoltage = flywheelAppliedVolts[0].getValue(); // Leader voltage only
     
-    // Sum current from all motors
+    // Sum current from all motors and populate individual currents
     double totalCurrentAmps = 0.0;
     for (int i = 0; i < NUM_MOTORS; i++) {
       totalCurrentAmps += flywheelCurrent[i].getValue().in(Amps);
     }
+    inputs.flywheelCurrent0 = flywheelCurrent[0].getValue();
+    inputs.flywheelCurrent1 = flywheelCurrent[1].getValue();
+    inputs.flywheelCurrent2 = flywheelCurrent[2].getValue();
     inputs.flywheelTotalCurrent = Amps.of(totalCurrentAmps);
+    
+    // Find maximum temperature across all motors
+    double maxTempCelsius = flywheelTemperature[0].getValue().in(Celsius);
+    for (int i = 1; i < NUM_MOTORS; i++) {
+      double temp = flywheelTemperature[i].getValue().in(Celsius);
+      if (temp > maxTempCelsius) {
+        maxTempCelsius = temp;
+      }
+    }
+    inputs.flywheelMaxTemperature = maxTempCelsius;
 
     if (Robot.isSimulation()) {
       // Update flywheel simulation
@@ -166,7 +179,13 @@ public class ShooterIOKraken implements ShooterIO {
       // Update inputs - Flywheels
       inputs.flywheelVelocity = RotationsPerSecond.of(flywheelSim.getAngularVelocityRPM() / 60.0);
       inputs.flywheelAppliedVoltage = st.getMotorVoltageMeasure() ;
-      inputs.flywheelTotalCurrent = Amps.of(Math.abs(flywheelSim.getCurrentDrawAmps())); // Total current from all motors
+      
+      // Split total current among motors for simulation
+      double totalCurrent = Math.abs(flywheelSim.getCurrentDrawAmps());
+      inputs.flywheelTotalCurrent = Amps.of(totalCurrent);
+      double currentPerMotor = totalCurrent / NUM_MOTORS;
+      
+      inputs.flywheelMaxTemperature = 25.0; // Simulated constant temperature
     }
   }
 
