@@ -18,20 +18,12 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import static edu.wpi.first.units.Units.*;
 
 public class IntakeIOKraken implements IntakeIO {
-  private final TalonFX deployMotor;
   private final TalonFX spinnerMotor;
 
   // Control requests
   private final MotionMagicVoltage deployPositionRequest = new MotionMagicVoltage(0.0);
   private final VelocityVoltage spinnerVelocityRequest = new VelocityVoltage(0.0);
   private final VoltageOut voltageRequest = new VoltageOut(0.0);
-
-  // Status signals - Deploy Motor
-  private final StatusSignal<Angle> deployPosition;
-  private final StatusSignal<AngularVelocity> deployVelocity;
-  private final StatusSignal<edu.wpi.first.units.measure.Voltage> deployAppliedVolts;
-  private final StatusSignal<edu.wpi.first.units.measure.Current> deployCurrent;
-  private final StatusSignal<edu.wpi.first.units.measure.Temperature> deployTemperature;
 
   // Status signals - Spinner Motor
   private final StatusSignal<AngularVelocity> spinnerVelocity;
@@ -41,51 +33,9 @@ public class IntakeIOKraken implements IntakeIO {
 
   public IntakeIOKraken() {
     // Initialize motors
-    deployMotor = new TalonFX(IntakeConstants.DEPLOY_MOTOR_CAN_ID);
-    spinnerMotor = new TalonFX(IntakeConstants.SPINNER_MOTOR_CAN_ID);
+    spinnerMotor = new TalonFX(IntakeConstants.SPINNER_MOTOR_CAN_ID, "drivebase");
 
-    // Configure deploy motor
-    var deployConfig = new TalonFXConfiguration();
-    
-    // Motor output configuration
-    deployConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    deployConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-    
     // Current limits
-    deployConfig.CurrentLimits.StatorCurrentLimit = IntakeConstants.DEPLOY_CURRENT_LIMIT.in(Amps);
-    deployConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    
-    // Feedback configuration
-    deployConfig.Feedback.SensorToMechanismRatio = IntakeConstants.DEPLOY_GEAR_RATIO;
-    
-    // PID configuration
-    deployConfig.Slot0.kP = IntakeConstants.DEPLOY_KP;
-    deployConfig.Slot0.kI = IntakeConstants.DEPLOY_KI;
-    deployConfig.Slot0.kD = IntakeConstants.DEPLOY_KD;
-    deployConfig.Slot0.kS = IntakeConstants.DEPLOY_KS;
-    deployConfig.Slot0.kV = IntakeConstants.DEPLOY_KV;
-    deployConfig.Slot0.kA = IntakeConstants.DEPLOY_KA;
-    deployConfig.Slot0.kG = IntakeConstants.DEPLOY_KG;
-    deployConfig.Slot0.GravityType = com.ctre.phoenix6.signals.GravityTypeValue.Arm_Cosine;
-    
-    // Motion Magic configuration
-    deployConfig.MotionMagic.MotionMagicCruiseVelocity = 
-        IntakeConstants.DEPLOY_CRUISE_VELOCITY.in(RotationsPerSecond);
-    deployConfig.MotionMagic.MotionMagicAcceleration = 
-        IntakeConstants.DEPLOY_MAX_ACCELERATION.in(RotationsPerSecond.per(Second));
-    deployConfig.MotionMagic.MotionMagicJerk = 
-        IntakeConstants.DEPLOY_MAX_JERK;
-    
-    // Soft limits
-    deployConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-    deployConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 
-        IntakeConstants.DEPLOY_MAX_ANGLE.in(Rotations);
-    deployConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    deployConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 
-        IntakeConstants.DEPLOY_MIN_ANGLE.in(Rotations);
-    
-    tryUntilOk(5, () -> deployMotor.getConfigurator().apply(deployConfig, 0.25));
-    
     // Configure spinner motor
     var spinnerConfig = new TalonFXConfiguration();
     
@@ -110,13 +60,6 @@ public class IntakeIOKraken implements IntakeIO {
     
     tryUntilOk(5, () -> spinnerMotor.getConfigurator().apply(spinnerConfig, 0.25));
     
-    // Initialize status signals - Deploy Motor
-    deployPosition = deployMotor.getPosition();
-    deployVelocity = deployMotor.getVelocity();
-    deployAppliedVolts = deployMotor.getMotorVoltage();
-    deployCurrent = deployMotor.getStatorCurrent();
-    deployTemperature = deployMotor.getDeviceTemp();
-    
     // Initialize status signals - Spinner Motor
     spinnerVelocity = spinnerMotor.getVelocity();
     spinnerAppliedVolts = spinnerMotor.getMotorVoltage();
@@ -126,10 +69,6 @@ public class IntakeIOKraken implements IntakeIO {
     // Set update frequencies
     BaseStatusSignal.setUpdateFrequencyForAll(
         50.0, // 50 Hz
-        deployPosition,
-        deployVelocity,
-        deployAppliedVolts,
-        deployCurrent,
         spinnerVelocity,
         spinnerAppliedVolts,
         spinnerCurrent
@@ -137,12 +76,10 @@ public class IntakeIOKraken implements IntakeIO {
     
     BaseStatusSignal.setUpdateFrequencyForAll(
         4.0, // 4 Hz for temperature
-        deployTemperature,
         spinnerTemperature
     );
     
     // Optimize bus utilization
-    deployMotor.optimizeBusUtilization();
     spinnerMotor.optimizeBusUtilization();
   }
 
@@ -150,43 +87,17 @@ public class IntakeIOKraken implements IntakeIO {
   public void updateInputs(IntakeIOInputs inputs) {
     // Refresh all signals
     BaseStatusSignal.refreshAll(
-        deployPosition,
-        deployVelocity,
-        deployAppliedVolts,
-        deployCurrent,
-        deployTemperature,
         spinnerVelocity,
         spinnerAppliedVolts,
         spinnerCurrent,
         spinnerTemperature
     );
     
-    // Update deploy motor inputs
-    inputs.deployPosition = deployPosition.getValue();
-    inputs.deployVelocity = deployVelocity.getValue();
-    inputs.deployAppliedVoltage = deployAppliedVolts.getValue();
-    inputs.deployCurrent = deployCurrent.getValue();
-    inputs.deployTemperature = deployTemperature.getValue().in(Celsius);
-    
     // Update spinner motor inputs
     inputs.spinnerVelocity = spinnerVelocity.getValue();
     inputs.spinnerAppliedVoltage = spinnerAppliedVolts.getValue();
     inputs.spinnerCurrent = spinnerCurrent.getValue();
     inputs.spinnerTemperature = spinnerTemperature.getValue().in(Celsius);
-  }
-
-  @Override
-  public void setDeployPosition(Angle position) {
-    deployMotor.setControl(
-        deployPositionRequest
-            .withPosition(position)
-            .withSlot(0)
-    );
-  }
-
-  @Override
-  public void setDeployVoltage(edu.wpi.first.units.measure.Voltage voltage) {
-    deployMotor.setControl(voltageRequest.withOutput(voltage.in(Volts)));
   }
 
   @Override
@@ -204,18 +115,8 @@ public class IntakeIOKraken implements IntakeIO {
   }
 
   @Override
-  public void stopDeploy() {
-    deployMotor.setControl(voltageRequest.withOutput(0.0));
-  }
-
-  @Override
   public void stopSpinner() {
     spinnerMotor.setControl(voltageRequest.withOutput(0.0));
-  }
-
-  @Override
-  public void setDeployBrake(boolean brake) {
-    deployMotor.setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
   }
 
   @Override
@@ -223,8 +124,4 @@ public class IntakeIOKraken implements IntakeIO {
     spinnerMotor.setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
   }
 
-  @Override
-  public void resetDeployPosition(Angle currentAngle) {
-    tryUntilOk(5, () -> deployMotor.setPosition(currentAngle.in(Rotations), 0.25));
-  }
 }

@@ -21,7 +21,6 @@ import frc.robot.Constants.Mode;
 import frc.robot.autos.FlywheelVoltageAuto;
 import frc.robot.commands.auto.ShooterTuningAuto;
 import frc.robot.commands.drive.DriveCommands;
-import frc.robot.commands.intake.IntakeSysIdCommands;
 import frc.robot.commands.shooter.ShooterSysIdCommands;
 import frc.robot.commands.hopper.HopperSysIdCommands;
 import frc.robot.generated.CompTunerConstants;
@@ -105,8 +104,8 @@ public class RobotContainer {
                         new CameraIOPhotonSim("front", VisionConstants.frontTransform, drivebase_::getPose, true)
                     );                    
 
-                    shooter_ = new Shooter(new ShooterIOKraken());
-                    // intake_ = new Intake(new IntakeIOKraken());
+                    // shooter_ = new Shooter(new ShooterIOKraken());
+                    intake_ = new Intake(new IntakeIOKraken());
                     // hopper_ = new Hopper(new HopperIOKraken());
 
                     break;
@@ -126,8 +125,6 @@ public class RobotContainer {
                         drivebase_::addVisionMeasurement,
                         new CameraIOPhotonSim("front", VisionConstants.frontTransform, drivebase_::getPose, true)
                     );                    
-
-                    shooter_ = new Shooter(new ShooterIOKraken());                
                     break ;
 
                 case PRACTICE:
@@ -373,10 +370,6 @@ public class RobotContainer {
         if (mechanism == null) return Commands.none();
 
         switch (mechanism) {
-            case INTAKE_DEPLOY:
-                return IntakeSysIdCommands.deployQuasistaticForward(intake_);
-            case INTAKE_SPINNER:
-                return IntakeSysIdCommands.spinnerQuasistaticForward(intake_);
             case SHOOTER_FLYWHEEL:
                 return ShooterSysIdCommands.flywheelQuasistaticForward(shooter_);
             case HOPPER_AGITATOR:
@@ -396,10 +389,6 @@ public class RobotContainer {
         if (mechanism == null) return Commands.none();
 
         switch (mechanism) {
-            case INTAKE_DEPLOY:
-                return IntakeSysIdCommands.deployQuasistaticReverse(intake_);
-            case INTAKE_SPINNER:
-                return IntakeSysIdCommands.spinnerQuasistaticReverse(intake_);
             case SHOOTER_FLYWHEEL:
                 return ShooterSysIdCommands.flywheelQuasistaticReverse(shooter_);
             case HOPPER_AGITATOR:
@@ -419,10 +408,6 @@ public class RobotContainer {
         if (mechanism == null) return Commands.none();
 
         switch (mechanism) {
-            case INTAKE_DEPLOY:
-                return IntakeSysIdCommands.deployDynamicForward(intake_);
-            case INTAKE_SPINNER:
-                return IntakeSysIdCommands.spinnerDynamicForward(intake_);
             case SHOOTER_FLYWHEEL:
                 return ShooterSysIdCommands.flywheelDynamicForward(shooter_);
             case HOPPER_AGITATOR:
@@ -442,10 +427,6 @@ public class RobotContainer {
         if (mechanism == null) return Commands.none();
 
         switch (mechanism) {
-            case INTAKE_DEPLOY:
-                return IntakeSysIdCommands.deployDynamicReverse(intake_);
-            case INTAKE_SPINNER:
-                return IntakeSysIdCommands.spinnerDynamicReverse(intake_);
             case SHOOTER_FLYWHEEL:
                 return ShooterSysIdCommands.flywheelDynamicReverse(shooter_);
             case HOPPER_AGITATOR:

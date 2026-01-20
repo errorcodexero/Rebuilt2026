@@ -12,13 +12,6 @@ import static edu.wpi.first.units.Units.*;
 public interface IntakeIO {
   @AutoLog
   public static class IntakeIOInputs {
-    // Deploy Motor
-    public Angle deployPosition = IntakeConstants.DEPLOY_INITIAL_ANGLE;
-    public AngularVelocity deployVelocity = IntakeConstants.DEPLOY_CRUISE_VELOCITY.times(0.0);
-    public Voltage deployAppliedVoltage = Volts.of(0.0);
-    public Current deployCurrent = Amps.of(0.0);
-    public double deployTemperature = 0.0; // Celsius
-
     // Spinner Motor
     public AngularVelocity spinnerVelocity = IntakeConstants.SPINNER_MAX_VELOCITY.times(0.0);
     public Voltage spinnerAppliedVoltage = Volts.of(0.0);
