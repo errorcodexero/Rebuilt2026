@@ -14,6 +14,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import frc.robot.generated.CompTunerConstants;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -33,7 +34,7 @@ public class IntakeIOKraken implements IntakeIO {
 
   public IntakeIOKraken() {
     // Initialize motors
-    spinnerMotor = new TalonFX(IntakeConstants.SPINNER_MOTOR_CAN_ID, "drivebase");
+    spinnerMotor = new TalonFX(IntakeConstants.SPINNER_MOTOR_CAN_ID, CompTunerConstants.kCANBus);
 
     // Current limits
     // Configure spinner motor

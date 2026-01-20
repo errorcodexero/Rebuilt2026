@@ -21,6 +21,7 @@ import frc.robot.Constants.Mode;
 import frc.robot.autos.FlywheelVoltageAuto;
 import frc.robot.commands.auto.ShooterTuningAuto;
 import frc.robot.commands.drive.DriveCommands;
+import frc.robot.commands.intake.IntakeVoltageCommand;
 import frc.robot.commands.shooter.ShooterSysIdCommands;
 import frc.robot.commands.hopper.HopperSysIdCommands;
 import frc.robot.generated.CompTunerConstants;
@@ -73,31 +74,21 @@ public class RobotContainer {
         if (Constants.getMode() != Mode.REPLAY) {
             switch (Constants.getRobot()) {
                 case COMPETITION:
-                    // drivebase_ = new Drive(
-                    //     new GyroIOPigeon2(CompTunerConstants.DrivetrainConstants.Pigeon2Id, CompTunerConstants.kCANBus),
-                    //     ModuleIOTalonFX::new,
-                    //     CompTunerConstants.FrontLeft,
-                    //     CompTunerConstants.FrontRight,
-                    //     CompTunerConstants.BackLeft,
-                    //     CompTunerConstants.BackRight,
-                    //     CompTunerConstants.kSpeedAt12Volts
-                    // );
-
-                    // vision_ = new AprilTagVision(
-                    //     drivebase_::addVisionMeasurement,
-                    //     new CameraIOLimelight4(VisionConstants.frontLimelightName, drivebase_::getRotation)
-                    // );
-
-                    // Sim robot, instantiate physics sim IO implementations
                     drivebase_ = new Drive(
-                        new GyroIO() {},
-                        ModuleIOSim::new,
+                        new GyroIOPigeon2(CompTunerConstants.DrivetrainConstants.Pigeon2Id, CompTunerConstants.kCANBus),
+                        ModuleIOTalonFX::new,
                         CompTunerConstants.FrontLeft,
                         CompTunerConstants.FrontRight,
                         CompTunerConstants.BackLeft,
                         CompTunerConstants.BackRight,
                         CompTunerConstants.kSpeedAt12Volts
                     );
+
+                    // vision_ = new AprilTagVision(
+                    //     drivebase_::addVisionMeasurement,
+                    //     new CameraIOLimelight4(VisionConstants.frontLimelightName, drivebase_::getRotation)
+                    // );
+
 
                     vision_ = new AprilTagVision(
                         drivebase_::addVisionMeasurement,
@@ -270,7 +261,8 @@ public class RobotContainer {
 
     // Bind robot actions to commands here.
     private void configureBindings() {
-        
+        // Intake - A button runs intake spinner at 6 volts
+        gamepad_.a().whileTrue(new IntakeVoltageCommand(intake_, 6.0));
     }
 
     private void configureDriveBindings() {
