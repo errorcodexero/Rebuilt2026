@@ -76,10 +76,11 @@ public final class IntakeIOHardware implements IntakeIO {
         pivotMotor.getConfigurator().apply(MotionMagicConfigsPivot);
 
         public void updateInputs(IntakeIOInputs inputs) {
-
+            inputs.PivotAngle= pivotAngleSignal.getValue();
         }
         
 
 
 
+    }
 }
