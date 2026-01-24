@@ -71,7 +71,7 @@ public final class IntakeIOHardware implements IntakeIO {
         pivotMotor.getConfigurator().apply(pivotSoftLimitSwitchConfigs);
 
         var MotionMagicConfigsPivot= new MotionMagicConfigs();
-        MotionMagicConfigsPivot.MotionMagicCruiseVelocity= IntakeConstants.pivotMaxVelocity;
+        MotionMagicConfigsPivot.MotionMagicCruiseVelocity= IntakeConstants.pivotMaxVelocity.in(DegreesPerSecond);
         MotionMagicConfigsPivot.MotionMagicAcceleration= 0; //Temporary
         pivotMotor.getConfigurator().apply(MotionMagicConfigsPivot);
 
