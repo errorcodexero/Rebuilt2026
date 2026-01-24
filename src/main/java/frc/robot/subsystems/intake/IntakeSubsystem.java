@@ -20,6 +20,9 @@ public class IntakeSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         io.updateInputs(inputs);
+        Logger.recordOutput("Intake/PivotAngle", inputs.PivotAngle);
+        Logger.recordOutput("Intake/RollerVoltage", inputs.RollerAppliedVolts);
+        Logger.recordOutput("Intake/PivotAngularVelocity", inputs.PivotAngularVelocity);
     }
 
     public void setRollerVoltage(Voltage volts) {
@@ -33,5 +36,14 @@ public class IntakeSubsystem extends SubsystemBase {
     public void stopRoller(){
         io.setRollerVoltage(Volts.of(0));
     }
-    
+
+    public void stowIntake(){
+        setPivotAngle(IntakeConstants.stowedAngle);
+    }
+
+    public void deployIntake(){
+        setPivotAngle(IntakeConstants.deployedAngle);
+    }
+
+
 }

@@ -1,15 +1,12 @@
 package frc.robot.subsystems.intake;
 
 import static edu.wpi.first.units.Units.Volts;
-import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Time;
 
@@ -17,7 +14,7 @@ public final class IntakeConstants {
     public static final int rollerMotorCANID= 1;//Temporary
     public static final int pivotMotorCANID= 2; //Temporary
 
-    public static final int currentLimit= 40; //Temporary
+    public static final int currentLimit= 40; 
     public static final Time currentLimitTime= Seconds.of(1); //Temporary
 
 
@@ -31,8 +28,8 @@ public final class IntakeConstants {
     public static final double rollerKV= 0; //change later
     public static final double rollerKI= 0; //change later
 
-    public static final Angle stowedAngle= Degrees.of(-20); //Temporary
-    public static final Angle deployedAngle= Degrees.of(-35); //Temporary
-    public static final AngularVelocity pivotMaxVelocity= DegreesPerSecond.of(90); //Temporary
-    public static final Voltage rollerVoltage= Volts.of(6); //Temporary
+    public static final Angle stowedAngle= Degrees.of(-20); //Temporary angle
+    public static final Angle deployedAngle= Degrees.of(-35); //Temporary angle
+    public static final AngularVelocity pivotMaxVelocity= DegreesPerSecond.of(90); //Temporary speed
+    public static final Voltage rollerCollectVoltage= Volts.of(6); //Temporary voltage
 }

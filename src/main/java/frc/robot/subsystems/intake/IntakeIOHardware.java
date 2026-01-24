@@ -91,7 +91,7 @@ public final class IntakeIOHardware implements IntakeIO {
         BaseStatusSignal.setUpdateFrequencyForAll(50.0, rollerAngularVelocitySignal, rollerAppliedVoltsSignal, rollerCurrentAmpsSignal, pivotAngularVelocitySignal, pivotAppliedVoltsSignal, pivotCurrentAmpsSignal);
         BaseStatusSignal.setUpdateFrequencyForAll(20.0, rollerAngleSignal, pivotAngleSignal);
 
-        // Optimize CAN bus for these parent devices
+        // Optimize CAN bus for these parent devices-motors
         ParentDevice.optimizeBusUtilizationForAll(rollerMotor, pivotMotor);
         
     }
@@ -112,6 +112,7 @@ public final class IntakeIOHardware implements IntakeIO {
     }
     @Override
     public void setPivotAngle(Angle angle) {
+        // Create Motion Magic control request with desired angle
         final MotionMagicVoltage pivot= new MotionMagicVoltage(angle.in(Degrees));
         pivotMotor.setControl(pivot.withPosition(angle.in(Degrees)));
     }
