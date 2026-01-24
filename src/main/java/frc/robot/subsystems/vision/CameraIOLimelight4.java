@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Milliseconds;
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
@@ -42,8 +43,11 @@ public class CameraIOLimelight4 extends CameraIOLimelight {
     public CameraIOLimelight4(String name, Supplier<Rotation2d> rotationSupplier) {
         super(name, rotationSupplier);
 
+        LimelightHelpers.setRewindEnabled(name, VisionConstants.useRewind);
+
         bindIMUCommands();
         bindThrottleCommands();
+        bindRewindCommands();
     }
 
     @Override
@@ -79,6 +83,15 @@ public class CameraIOLimelight4 extends CameraIOLimelight {
         enabled.onFalse(setModeCommand(IMUMode.SEEDING));
     }
 
+    private void bindRewindCommands() {
+        // If rewind is disabled, skip binding these commands.
+        if (!VisionConstants.useRewind) return;
+
+        RobotModeTriggers.teleop().onFalse(Commands.runOnce(() -> {
+
+        }));
+    }
+
     private void setThrottle(int throttle) {
         currentThrottle_ = throttle;
     }
@@ -93,6 +106,10 @@ public class CameraIOLimelight4 extends CameraIOLimelight {
 
     private Command setModeCommand(IMUMode mode) {
         return Commands.runOnce(() -> setMode(mode)).ignoringDisable(true);
+    }
+
+    private Command saveRewind(Seconds.of(10)) {
+        return Commands.runOnce(() -> LimelightHelpers.triggerRewindCapture(name_, 165));
     }
 
 }
