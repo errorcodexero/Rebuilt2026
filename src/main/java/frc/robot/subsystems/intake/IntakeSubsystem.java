@@ -1,15 +1,37 @@
 package frc.robot.subsystems.intake; 
 
-import static edu.wpi.first.units.Units.Volts;
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.Amps;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.units.measure.Voltage;
-import static edu.wpi.first.units.Units.Seconds;
-import static edu.wpi.first.units.Units.Rotations;
-
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Voltage;
 
+import static edu.wpi.first.units.Units.*;
+
+public class IntakeSubsystem extends SubsystemBase {
+    private final IntakeIO io; 
+    private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
+    
+    
+    public IntakeSubsystem(IntakeIO io) {
+        this.io = io;
+    }   
+
+    @Override
+    public void periodic() {
+        io.updateInputs(inputs);
+    }
+
+    public void setRollerVoltage(Voltage volts) {
+        io.setRollerVoltage(volts);
+    }
+
+    public void setPivotAngle(Angle angle) {
+        io.setPivotAngle(angle);
+    }
+
+    public void stopRoller(){
+        io.setRollerVoltage(Volts.of(0));
+    }
+    
+}
