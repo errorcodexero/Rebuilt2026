@@ -65,21 +65,22 @@ public final class IntakeIOHardware implements IntakeIO {
 
         SoftwareLimitSwitchConfigs pivotSoftLimitSwitchConfigs= new SoftwareLimitSwitchConfigs();
         pivotSoftLimitSwitchConfigs.ForwardSoftLimitEnable= true;
-        pivotSoftLimitSwitchConfigs.ForwardSoftLimitThreshold= IntakeConstants.deployedAngle.in(Degrees);
+        pivotSoftLimitSwitchConfigs.ForwardSoftLimitThreshold= IntakeConstants.deployedAngle;
         pivotSoftLimitSwitchConfigs.ReverseSoftLimitEnable= true;
-        pivotSoftLimitSwitchConfigs.ReverseSoftLimitThreshold= IntakeConstants.stowedAngle.in(Degrees);
+        pivotSoftLimitSwitchConfigs.ReverseSoftLimitThreshold= IntakeConstants.stowedAngle;
         pivotMotor.getConfigurator().apply(pivotSoftLimitSwitchConfigs);
 
         var MotionMagicConfigsPivot= new MotionMagicConfigs();
-        MotionMagicConfigsPivot.MotionMagicCruiseVelocity= IntakeConstants.pivotMaxVelocity;
+        MotionMagicConfigsPivot.MotionMagicCruiseVelocity= IntakeConstants.pivotMaxVelocity.in(DegreesPerSecond); //Temporary
         MotionMagicConfigsPivot.MotionMagicAcceleration= 0; //Temporary
         pivotMotor.getConfigurator().apply(MotionMagicConfigsPivot);
 
         public void updateInputs(IntakeIOInputs inputs) {
             inputs.PivotAngle= pivotAngleSignal.getValue();
-    }
+        }
         
 
 
 
+    }
 }
