@@ -10,7 +10,7 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
-import frc.robot.generated.CompTunerConstants;  
+import frc.robot.generated.CompTunerConstants;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
@@ -71,8 +71,8 @@ public final class IntakeIOHardware implements IntakeIO {
         pivotMotor.getConfigurator().apply(pivotSoftLimitSwitchConfigs);
 
         var MotionMagicConfigsPivot= new MotionMagicConfigs();
-        MotionMagicConfigsPivot.MotionMagicCruiseVelocity= IntakeConstants.pivotMaxVelocity.in(DegreesPerSecond);
-        MotionMagicConfigsPivot.MotionMagicAcceleration= 0;
+        MotionMagicConfigsPivot.MotionMagicCruiseVelocity= IntakeConstants.pivotMaxVelocity.in(DegreesPerSecond); //Temporary
+        MotionMagicConfigsPivot.MotionMagicAcceleration= 0; //Temporary
         pivotMotor.getConfigurator().apply(MotionMagicConfigsPivot);
 
         public void updateInputs(IntakeIOInputs inputs) {
