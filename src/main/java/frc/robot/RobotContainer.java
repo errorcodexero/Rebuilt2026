@@ -19,7 +19,8 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.drive.DriveCommands;
-import frc.robot.generated.CompTunerConstants;
+import frc.robot.generated.AlphaTunerConstants;
+import frc.robot.generated.BetaTunerConstants;
 import frc.robot.generated.PracticeTunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -52,40 +53,30 @@ public class RobotContainer {
          */
         if (Constants.getMode() != Mode.REPLAY) {
             switch (Constants.getRobot()) {
-                case COMPETITION:
+                case ALPHA:
 
                     drivebase_ = new Drive(
-                        new GyroIOPigeon2(CompTunerConstants.DrivetrainConstants.Pigeon2Id, CompTunerConstants.kCANBus),
+                        new GyroIOPigeon2(AlphaTunerConstants.DrivetrainConstants.Pigeon2Id, AlphaTunerConstants.kCANBus),
                         ModuleIOTalonFX::new,
-                        CompTunerConstants.FrontLeft,
-                        CompTunerConstants.FrontRight,
-                        CompTunerConstants.BackLeft,
-                        CompTunerConstants.BackRight,
-                        CompTunerConstants.kSpeedAt12Volts
-                    );
-
-                    vision_ = new AprilTagVision(
-                        drivebase_::addVisionMeasurement,
-                        new CameraIOLimelight4(VisionConstants.frontLimelightName, drivebase_::getRotation)
+                        AlphaTunerConstants.FrontLeft,
+                        AlphaTunerConstants.FrontRight,
+                        AlphaTunerConstants.BackLeft,
+                        AlphaTunerConstants.BackRight,
+                        AlphaTunerConstants.kSpeedAt12Volts
                     );
 
                     break;
 
-                case PRACTICE:
+                case BETA:
 
                     drivebase_ = new Drive(
-                        new GyroIOPigeon2(PracticeTunerConstants.DrivetrainConstants.Pigeon2Id, PracticeTunerConstants.kCANBus),
+                        new GyroIOPigeon2(BetaTunerConstants.DrivetrainConstants.Pigeon2Id, BetaTunerConstants.kCANBus),
                         ModuleIOTalonFX::new,
-                        PracticeTunerConstants.FrontLeft,
-                        PracticeTunerConstants.FrontRight,
-                        PracticeTunerConstants.BackLeft,
-                        PracticeTunerConstants.BackRight,
-                        PracticeTunerConstants.kSpeedAt12Volts
-                    );
-
-                    vision_ = new AprilTagVision(
-                        drivebase_::addVisionMeasurement,
-                        new CameraIOLimelight4(VisionConstants.frontLimelightName, drivebase_::getRotation)
+                        BetaTunerConstants.FrontLeft,
+                        BetaTunerConstants.FrontRight,
+                        BetaTunerConstants.BackLeft,
+                        BetaTunerConstants.BackRight,
+                        BetaTunerConstants.kSpeedAt12Volts
                     );
 
                     break;
@@ -95,11 +86,11 @@ public class RobotContainer {
                     drivebase_ = new Drive(
                         new GyroIO() {},
                         ModuleIOSim::new,
-                        CompTunerConstants.FrontLeft,
-                        CompTunerConstants.FrontRight,
-                        CompTunerConstants.BackLeft,
-                        CompTunerConstants.BackRight,
-                        CompTunerConstants.kSpeedAt12Volts
+                        AlphaTunerConstants.FrontLeft,
+                        AlphaTunerConstants.FrontRight,
+                        AlphaTunerConstants.BackLeft,
+                        AlphaTunerConstants.BackRight,
+                        AlphaTunerConstants.kSpeedAt12Volts
                     );
 
                     vision_ = new AprilTagVision(
@@ -116,7 +107,7 @@ public class RobotContainer {
          */
         if (drivebase_ == null) { // This will be null in replay, or whenever a case above leaves a subsystem uninstantiated.
             switch (Constants.getRobot()) {
-                case PRACTICE:
+                case ALPHA:
                     drivebase_ = new Drive(
                         new GyroIO() {},
                         ModuleIOReplay::new,
@@ -133,11 +124,11 @@ public class RobotContainer {
                     drivebase_ = new Drive(
                         new GyroIO() {},
                         ModuleIOReplay::new,
-                        CompTunerConstants.FrontLeft,
-                        CompTunerConstants.FrontRight,
-                        CompTunerConstants.BackLeft,
-                        CompTunerConstants.BackRight,
-                        CompTunerConstants.kSpeedAt12Volts
+                        AlphaTunerConstants.FrontLeft,
+                        AlphaTunerConstants.FrontRight,
+                        AlphaTunerConstants.BackLeft,
+                        AlphaTunerConstants.BackRight,
+                        AlphaTunerConstants.kSpeedAt12Volts
                     );
 
                     break;
@@ -235,6 +226,6 @@ public class RobotContainer {
     }
     
     public Command getAutonomousCommand() {
-        return Commands.print("No autonomous command configured");
+        return DriveCommands.feedforwardCharacterization(drivebase_);
     }
 }
