@@ -5,6 +5,9 @@ import static edu.wpi.first.units.Units.Milliseconds;
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.DriverStation;
+
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -31,8 +34,11 @@ public class CameraIOLimelight4 extends CameraIOLimelight {
         }
     }
 
-    // Enabled Trigger
+    // Triggers
     private static final Trigger enabled = RobotModeTriggers.disabled().negate();
+    private static final Trigger fmsConnected = new Trigger(DriverStation::isFMSAttached);
+    private static final Trigger teleopOver = RobotModeTriggers.teleop().negate();
+    private static final Trigger usingRewind = fmsConnected.or(() -> VisionConstants.useRewindOffField);
 
     // The current mode of the IMU, assuming this is not set anywhere else and IMU is enabled.
     private IMUMode currentMode_ = VisionConstants.useIMU ? IMUMode.SEEDING : IMUMode.IGNORING;
@@ -87,9 +93,11 @@ public class CameraIOLimelight4 extends CameraIOLimelight {
         // If rewind is disabled, skip binding these commands.
         if (!VisionConstants.useRewind) return;
 
-        RobotModeTriggers.teleop().onFalse(Commands.runOnce(() -> {
-
-        }));
+        // When the robot disables, save the rewind.
+        teleopOver.and(usingRewind).onTrue(
+            saveRewind(Seconds.of(160))
+                .finallyDo(() -> System.out.println("Limelight rewind saved!"))
+        );
     }
 
     private void setThrottle(int throttle) {
@@ -108,8 +116,8 @@ public class CameraIOLimelight4 extends CameraIOLimelight {
         return Commands.runOnce(() -> setMode(mode)).ignoringDisable(true);
     }
 
-    private Command saveRewind(Seconds.of(10)) {
-        return Commands.runOnce(() -> LimelightHelpers.triggerRewindCapture(name_, 165));
+    private Command saveRewind(Time duration) {
+        return Commands.runOnce(() -> LimelightHelpers.triggerRewindCapture(name_, duration.in(Seconds)));
     }
 
 }
