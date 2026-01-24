@@ -80,14 +80,24 @@ public final class IntakeIOHardware implements IntakeIO {
         MotionMagicConfigsPivot.MotionMagicAcceleration= 0; 
         pivotMotor.getConfigurator().apply(MotionMagicConfigsPivot);
 
-        
 
+        // Initialize status signals
+        pivotAngleSignal = pivotMotor.getPosition();
+        pivotAngularVelocitySignal = pivotMotor.getVelocity();
+        rollerAngleSignal = rollerMotor.getPosition(); 
+        rollerAngularVelocitySignal = rollerMotor.getVelocity();
+        rollerAppliedVoltsSignal = rollerMotor.getSupplyVoltage();
+        pivotAppliedVoltsSignal = pivotMotor.getSupplyVoltage();
+        rollerCurrentAmpsSignal = rollerMotor.getSupplyCurrent();
+        pivotCurrentAmpsSignal = pivotMotor.getSupplyCurrent();
+    }
         // Configure periodic frames
         BaseStatusSignal.setUpdateFrequencyForAll(50.0, rollerAngularVelocitySignal, rollerAppliedVoltsSignal, rollerCurrentAmpsSignal, pivotAngularVelocitySignal, pivotAppliedVoltsSignal, pivotCurrentAmpsSignal);
         BaseStatusSignal.setUpdateFrequencyForAll(20.0, rollerAngleSignal, pivotAngleSignal);
 
         // Optimize CAN bus for these parent devices
         ParentDevice.optimizeBusUtilizationForAll(rollerMotor, pivotMotor);
+        
     }
 
-}
+    
