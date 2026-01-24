@@ -18,7 +18,7 @@ import static edu.wpi.first.units.Units.Volts;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -62,12 +62,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
-import frc.robot.generated.AlphaTunerConstants;
+import frc.robot.generated.BetaTunerConstants;
 import frc.robot.util.LocalADStarAK;
 
 public class Drive extends SubsystemBase {
     // These Constants should be the same for every drivebase, so just use the comp bot constants.
-    static final double ODOMETRY_FREQUENCY = new CANBus(AlphaTunerConstants.DrivetrainConstants.CANBusName).isNetworkFD() ? 250.0 : 100.0;
+    static final double ODOMETRY_FREQUENCY = BetaTunerConstants.kCANBus.isNetworkFD() ? 250.0 : 100.0;
     public final double DRIVE_BASE_RADIUS;
 
     // Gyro degrees-per-rotation correction/trim
@@ -108,19 +108,20 @@ public class Drive extends SubsystemBase {
 
     public Drive(
         GyroIO gyroIO,
-        Function<SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>, ModuleIO> moduleConstructor,
+        BiFunction<SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>, CANBus, ModuleIO> moduleConstructor,
         SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> flConfig,
         SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> frConfig,
         SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> blConfig,
         SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> brConfig,
+        CANBus canbus,
         LinearVelocity kSpeed12Volts
     ) {
         // Setup Module IOs
         this.gyroIO = gyroIO;
-        modules[0] = new Module(moduleConstructor.apply(flConfig), 0, flConfig);
-        modules[1] = new Module(moduleConstructor.apply(frConfig), 1, frConfig);
-        modules[2] = new Module(moduleConstructor.apply(blConfig), 2, blConfig);
-        modules[3] = new Module(moduleConstructor.apply(brConfig), 3, brConfig);
+        modules[0] = new Module(moduleConstructor.apply(flConfig, canbus), 0, flConfig);
+        modules[1] = new Module(moduleConstructor.apply(frConfig, canbus), 1, frConfig);
+        modules[2] = new Module(moduleConstructor.apply(blConfig, canbus), 2, blConfig);
+        modules[3] = new Module(moduleConstructor.apply(brConfig, canbus), 3, brConfig);
 
         flConfig_ = flConfig;
         frConfig_ = frConfig;

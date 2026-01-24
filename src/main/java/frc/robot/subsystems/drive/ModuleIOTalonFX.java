@@ -18,6 +18,7 @@ import static frc.robot.util.PhoenixUtil.tryUntilOk;
 import java.util.Queue;
 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -43,7 +44,6 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.generated.AlphaTunerConstants;
 
 /**
 * Module IO implementation for Talon FX drive motor controller, Talon FX turn motor controller, and
@@ -96,12 +96,13 @@ public class ModuleIOTalonFX implements ModuleIO {
     private final Debouncer turnEncoderConnectedDebounce = new Debouncer(0.5, Debouncer.DebounceType.kFalling);
     
     public ModuleIOTalonFX(
-        SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> constants
+        SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> constants,
+        CANBus canbus
     ) {
         this.constants = constants;
-        driveTalon = new TalonFX(constants.DriveMotorId, AlphaTunerConstants.kCANBus);
-        turnTalon = new TalonFX(constants.SteerMotorId, AlphaTunerConstants.kCANBus);
-        cancoder = new CANcoder(constants.EncoderId, AlphaTunerConstants.kCANBus);
+        driveTalon = new TalonFX(constants.DriveMotorId, canbus);
+        turnTalon = new TalonFX(constants.SteerMotorId, canbus);
+        cancoder = new CANcoder(constants.EncoderId, canbus);
         
         // Configure drive motor
         var driveConfig = constants.DriveMotorInitialConfigs;
