@@ -18,7 +18,7 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
-import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.configs.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.ParentDevice;
 
@@ -38,8 +38,6 @@ public final class IntakeIOHardware implements IntakeIO {
 
     // Control requests
     private final VoltageOut rollerVoltageRequest = new VoltageOut(0);
-    private final VoltageOut pivotVoltageRequest = new VoltageOut(0);
-    private final PositionVoltage pivotPositionRequest = new PositionVoltage(0.0);
 
     public IntakeIOHardware() {
     rollerMotor = new TalonFX(IntakeConstants.rollerMotorCANID, CompTunerConstants.kCANBus);
@@ -98,7 +96,26 @@ public final class IntakeIOHardware implements IntakeIO {
         ParentDevice.optimizeBusUtilizationForAll(rollerMotor, pivotMotor);
         
     }
-        // Configure periodic frames
+    @Override
+    public void updateInputs(IntakeIOInputsAutoLogged inputs) {
+        inputs.PivotAngle = pivotAngleSignal.getValue();
+        inputs.PivotAngularVelocity = pivotAngularVelocitySignal.getValue();
+        inputs.RollerAngularVelocity = rollerAngularVelocitySignal.getValue();
+        inputs.RollerAppliedVolts = rollerAppliedVoltsSignal.getValue();
+        inputs.PivotAppliedVolts = pivotAppliedVoltsSignal.getValue();
+        inputs.RollerCurrentAmps = rollerCurrentAmpsSignal.getValue();
+        inputs.PivotCurrentAmps = pivotCurrentAmpsSignal.getValue();
+    }
+    @Override
+    public void setRollerVoltage(Voltage volts) {
+    // Convert Voltage -> numeric volts and send via Phoenix voltage request
+        rollerMotor.setControl(rollerVoltageRequest.withOutput(volts.in(Volts)));
+    }
+    @Override
+    public void setPivotAngle(Angle angle) {
+        final MotionMagicVoltage pivot= new MotionMagicVoltage(angle.in(Degrees));
+        pivotMotor.setControl(pivot.withPosition(angle.in(Degrees)));
+    }
       
 }
 

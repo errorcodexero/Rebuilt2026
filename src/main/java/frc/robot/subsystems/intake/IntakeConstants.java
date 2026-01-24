@@ -2,6 +2,7 @@ package frc.robot.subsystems.intake;
 
 import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
@@ -25,8 +26,13 @@ public final class IntakeConstants {
     public static final double pivotKV= 0; //later for turning
     public static final double pivotKI= 0; //later for turning
 
-    public static final Angle stowedAngle= Rotations.of(0); //Temporary
-    public static final Angle deployedAngle= Rotations.of(0.1); //Temporary
+    public static final double rollerKP= 0.5; //later for roller speed
+    public static final double rollerKD= 0; //change later
+    public static final double rollerKV= 0; //change later
+    public static final double rollerKI= 0; //change later
+
+    public static final Angle stowedAngle= Degrees.of(-20); //Temporary
+    public static final Angle deployedAngle= Degrees.of(-35); //Temporary
     public static final AngularVelocity pivotMaxVelocity= DegreesPerSecond.of(90); //Temporary
     public static final Voltage rollerVoltage= Volts.of(6); //Temporary
 }
