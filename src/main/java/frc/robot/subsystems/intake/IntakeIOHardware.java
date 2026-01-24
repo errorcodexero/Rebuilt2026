@@ -90,8 +90,7 @@ public final class IntakeIOHardware implements IntakeIO {
         pivotAppliedVoltsSignal = pivotMotor.getSupplyVoltage();
         rollerCurrentAmpsSignal = rollerMotor.getSupplyCurrent();
         pivotCurrentAmpsSignal = pivotMotor.getSupplyCurrent();
-    }
-        // Configure periodic frames
+
         BaseStatusSignal.setUpdateFrequencyForAll(50.0, rollerAngularVelocitySignal, rollerAppliedVoltsSignal, rollerCurrentAmpsSignal, pivotAngularVelocitySignal, pivotAppliedVoltsSignal, pivotCurrentAmpsSignal);
         BaseStatusSignal.setUpdateFrequencyForAll(20.0, rollerAngleSignal, pivotAngleSignal);
 
@@ -99,5 +98,8 @@ public final class IntakeIOHardware implements IntakeIO {
         ParentDevice.optimizeBusUtilizationForAll(rollerMotor, pivotMotor);
         
     }
+        // Configure periodic frames
+      
+}
 
     
