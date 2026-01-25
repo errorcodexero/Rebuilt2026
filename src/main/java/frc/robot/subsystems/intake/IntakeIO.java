@@ -15,17 +15,27 @@ public interface IntakeIO {
 
     @AutoLog
     public class IntakeIOInputs{
-        public Angle PivotAngle= Degrees.of(0); //Temporary
-        public AngularVelocity PivotAngularVelocity= DegreesPerSecond.of(0); //Value is Temporary
-        public AngularVelocity RollerAngularVelocity= DegreesPerSecond.of(0); //Value is Temporary
-        public Voltage RollerAppliedVolts= Volts.of(0); //Value is Temporary
-        public Voltage PivotAppliedVolts= Volts.of(0); //Value is Temporary
-        public Current RollerCurrentAmps= Amps.of(0); //Value is Temporary
-        public Current PivotCurrentAmps= Amps.of(0); //Value is Temporary
+        public Angle PivotAngle= Degrees.of(0);
+        public AngularVelocity PivotAngularVelocity= DegreesPerSecond.of(0); 
+
+        public AngularVelocity RollerAngularVelocity= DegreesPerSecond.of(0); 
+        public Voltage RollerAppliedVolts= Volts.of(0); 
+
+        public Voltage PivotAppliedVolts= Volts.of(0);
+        public Current RollerCurrentAmps= Amps.of(0); 
+        public Current PivotCurrentAmps= Amps.of(0); 
     }
     
     public default void updateInputs(IntakeIOInputsAutoLogged inputs) {}
+
     public default void setRollerVoltage(Voltage volts) {}
+
+    public default void setRollerVelocity(AngularVelocity velocity) {}
+
+    public default void setPivotVelocity(AngularVelocity velocity) {}
+
     public default void setPivotAngle(Angle angle) {}
+
+    public default void stopRoller() {}
 
 }

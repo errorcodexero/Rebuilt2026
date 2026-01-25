@@ -1,15 +1,18 @@
 package frc.robot.subsystems.intake;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.controls.VoltageOut;
 import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
 
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import frc.robot.generated.CompTunerConstants;
 
 import com.ctre.phoenix6.BaseStatusSignal;
@@ -24,64 +27,81 @@ import com.ctre.phoenix6.hardware.ParentDevice;
 
 public final class IntakeIOHardware implements IntakeIO {
 
+    //Creating motor objects
     private final TalonFX rollerMotor;
     private final TalonFX pivotMotor;
+
+    //Pivot motor control requests
+    private final MotionMagicVoltage pivotAngleRequest= new MotionMagicVoltage(Degrees.of(0));
+    private final VelocityVoltage pivotVelocityRequest= new VelocityVoltage(DegreesPerSecond.of(0));
+
+    //Roller motor control requests
+    private final VoltageOut rollerVoltageRequest = new VoltageOut(0);
+    private final VelocityVoltage rollerVelocityRequest= new VelocityVoltage(DegreesPerSecond.of(0));
+
+    //Pivot status signals
     private StatusSignal<Angle> pivotAngleSignal;
     private StatusSignal<AngularVelocity> pivotAngularVelocitySignal;
-    private StatusSignal<Angle> rollerAngleSignal;
+    private StatusSignal<Current> pivotCurrentAmpsSignal;
+    private StatusSignal<Voltage> pivotAppliedVoltsSignal;
+
+    //Roller status signals
     private StatusSignal<AngularVelocity> rollerAngularVelocitySignal;
     private StatusSignal<Voltage> rollerAppliedVoltsSignal;
-    private StatusSignal<Voltage> pivotAppliedVoltsSignal;
-    private StatusSignal<Current> rollerCurrentAmpsSignal;
-    private StatusSignal<Current> pivotCurrentAmpsSignal;
-
-    // Control requests
-    
+    private StatusSignal<Current> rollerCurrentAmpsSignal; 
 
     public IntakeIOHardware() {
-    rollerMotor = new TalonFX(IntakeConstants.rollerMotorCANID, CompTunerConstants.kCANBus);
-    pivotMotor = new TalonFX(IntakeConstants.pivotMotorCANID, CompTunerConstants.kCANBus);
-        var limitConfigsPivot = new CurrentLimitsConfigs();
-        limitConfigsPivot.SupplyCurrentLimit = IntakeConstants.currentLimit;
-        limitConfigsPivot.SupplyCurrentLimitEnable = true;
-        pivotMotor.getConfigurator().apply(limitConfigsPivot);
+        // Initialize motor objects
+        rollerMotor = new TalonFX(IntakeConstants.rollerMotorCANID, CompTunerConstants.kCANBus);
+        pivotMotor = new TalonFX(IntakeConstants.pivotMotorCANID, CompTunerConstants.kCANBus);
 
-        var limitConfigsRoller= new CurrentLimitsConfigs();
-        limitConfigsRoller.SupplyCurrentLimit= IntakeConstants.currentLimit;
-        limitConfigsRoller.SupplyCurrentLimitEnable= true;
-        rollerMotor.getConfigurator().apply(limitConfigsRoller);
+        // Configuration for the pivot motor
+        final TalonFXConfiguration pivotConfigs= new TalonFXConfiguration();
 
-        Slot0Configs pivotSlot0Configs = new Slot0Configs();
-        pivotSlot0Configs.kP = IntakeConstants.pivotKP;
-        pivotSlot0Configs.kD= IntakeConstants.pivotKD;
-        pivotSlot0Configs.kV= IntakeConstants.pivotKV;
-        pivotSlot0Configs.kI= IntakeConstants.pivotKI;
-        pivotMotor.getConfigurator().apply(pivotSlot0Configs);
+        //Current Limit Configurations
+        pivotConfigs.CurrentLimits.StatorCurrentLimit = IntakeConstants.currentLimit;
+        pivotConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
+        pivotMotor.getConfigurator().apply(pivotConfigs);
 
-        Slot0Configs rollerSlot0Configs= new Slot0Configs();
-        rollerSlot0Configs.kP= IntakeConstants.rollerKP;
-        rollerSlot0Configs.kD= IntakeConstants.rollerKD;
-        rollerSlot0Configs.kV= IntakeConstants.rollerKV;
-        rollerSlot0Configs.kI= IntakeConstants.rollerKI;
-        rollerMotor.getConfigurator().apply(rollerSlot0Configs); 
+        //PID Configurations
+        pivotConfigs.Slot0.kP= IntakeConstants.pivotKP;
+        pivotConfigs.Slot0.kD= IntakeConstants.pivotKD;
+        pivotConfigs.Slot0.kV= IntakeConstants.pivotKV;
+        pivotConfigs.Slot0.kI= IntakeConstants.pivotKI;
+        pivotMotor.getConfigurator().apply(pivotConfigs);
 
-        SoftwareLimitSwitchConfigs pivotSoftLimitSwitchConfigs= new SoftwareLimitSwitchConfigs();
-        pivotSoftLimitSwitchConfigs.ForwardSoftLimitEnable= true;
-        pivotSoftLimitSwitchConfigs.ForwardSoftLimitThreshold= IntakeConstants.deployedAngle.in(Degrees);
-        pivotSoftLimitSwitchConfigs.ReverseSoftLimitEnable= true;
-        pivotSoftLimitSwitchConfigs.ReverseSoftLimitThreshold= IntakeConstants.stowedAngle.in(Degrees);
-        pivotMotor.getConfigurator().apply(pivotSoftLimitSwitchConfigs);
+        //Soft Limit Configurations
+        pivotConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable= true;
+        pivotConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold= IntakeConstants.deployedAngle.in(Degrees);
+        pivotConfigs.SoftwareLimitSwitch.ReverseSoftLimitEnable= true;
+        pivotConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold= IntakeConstants.stowedAngle.in(Degrees);
+        pivotMotor.getConfigurator().apply(pivotConfigs);
 
         var MotionMagicConfigsPivot= new MotionMagicConfigs();
-        MotionMagicConfigsPivot.MotionMagicCruiseVelocity= IntakeConstants.pivotMaxVelocity.in(DegreesPerSecond); 
-        MotionMagicConfigsPivot.MotionMagicAcceleration= 0; 
+        MotionMagicConfigsPivot.MotionMagicCruiseVelocity= IntakeConstants.pivotCruiseVelocity.in(DegreesPerSecond); 
+        MotionMagicConfigsPivot.MotionMagicAcceleration= IntakeConstants.pivotCruiseAcceleration.in(DegreesPerSecondPerSecond); 
+        MotionMagicConfigsPivot.MotionMagicJerk= IntakeConstants.pivotMaxJerk; 
         pivotMotor.getConfigurator().apply(MotionMagicConfigsPivot);
 
 
-        // Initialize status signals
+        // Configuration for the roller motor
+        final TalonFXConfiguration rollerConfigs= new TalonFXConfiguration();
+
+        //Current Limit Configurations
+        rollerConfigs.CurrentLimits.StatorCurrentLimit= IntakeConstants.currentLimit;
+        rollerConfigs.CurrentLimits.StatorCurrentLimitEnable= true;
+        rollerMotor.getConfigurator().apply(rollerConfigs);
+
+        //PID Configurations
+        rollerConfigs.Slot0.kP= IntakeConstants.rollerKP;
+        rollerConfigs.Slot0.kD= IntakeConstants.rollerKD;
+        rollerConfigs.Slot0.kV= IntakeConstants.rollerKV;
+        rollerConfigs.Slot0.kI= IntakeConstants.rollerKI;
+        rollerMotor.getConfigurator().apply(rollerConfigs);
+
+        // Initialize all status signals
         pivotAngleSignal = pivotMotor.getPosition();
         pivotAngularVelocitySignal = pivotMotor.getVelocity();
-        rollerAngleSignal = rollerMotor.getPosition(); 
         rollerAngularVelocitySignal = rollerMotor.getVelocity();
         rollerAppliedVoltsSignal = rollerMotor.getSupplyVoltage();
         pivotAppliedVoltsSignal = pivotMotor.getSupplyVoltage();
@@ -97,6 +117,16 @@ public final class IntakeIOHardware implements IntakeIO {
     }
     @Override
     public void updateInputs(IntakeIOInputsAutoLogged inputs) {
+        BaseStatusSignal.refreshAll(
+            pivotAngleSignal,
+            pivotAngularVelocitySignal,
+            rollerAngularVelocitySignal,
+            rollerAppliedVoltsSignal,
+            pivotAppliedVoltsSignal,
+            rollerCurrentAmpsSignal,
+            pivotCurrentAmpsSignal
+        );
+
         inputs.PivotAngle = pivotAngleSignal.getValue();
         inputs.PivotAngularVelocity = pivotAngularVelocitySignal.getValue();
         inputs.RollerAngularVelocity = rollerAngularVelocitySignal.getValue();
@@ -105,19 +135,33 @@ public final class IntakeIOHardware implements IntakeIO {
         inputs.RollerCurrentAmps = rollerCurrentAmpsSignal.getValue();
         inputs.PivotCurrentAmps = pivotCurrentAmpsSignal.getValue();
     }
+
     @Override
     public void setRollerVoltage(Voltage volts) {
-    // Convert Voltage -> numeric volts and send via Phoenix voltage request
-        final VoltageOut rollerVoltageRequest = new VoltageOut(0);
+        // Convert Voltage -> numeric volts and send via Phoenix voltage request
         rollerMotor.setControl(rollerVoltageRequest.withOutput(volts.in(Volts)));
     }
+
     @Override
     public void setPivotAngle(Angle angle) {
         // Create Motion Magic control request with desired angle
-        final MotionMagicVoltage pivot= new MotionMagicVoltage(angle.in(Degrees));
-        pivotMotor.setControl(pivot.withPosition(angle.in(Degrees)));
+        pivotMotor.setControl(pivotAngleRequest.withPosition(angle.in(Degrees)));
     }
-      
-}
 
-    
+    @Override
+    public void setRollerVelocity(AngularVelocity velocity) {
+        // Create Velocity control request with desired velocity
+        rollerMotor.setControl(rollerVelocityRequest.withVelocity(velocity.in(DegreesPerSecond)));
+    }
+
+    @Override
+    public void setPivotVelocity(AngularVelocity velocity) {
+        // Create Velocity control request with desired velocity
+        pivotMotor.setControl(pivotVelocityRequest.withVelocity(velocity.in(DegreesPerSecond)));
+    }
+
+    @Override
+    public void stopRoller() {
+        rollerMotor.setControl(rollerVoltageRequest.withOutput(0));
+    }  
+}
