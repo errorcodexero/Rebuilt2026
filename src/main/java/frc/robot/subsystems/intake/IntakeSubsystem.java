@@ -11,8 +11,8 @@ import static edu.wpi.first.units.Units.*;
 public class IntakeSubsystem extends SubsystemBase {
     private final IntakeIO io; 
     private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
-    
-    
+
+
     public IntakeSubsystem(IntakeIO io) {
         this.io = io;
     }   
@@ -23,6 +23,10 @@ public class IntakeSubsystem extends SubsystemBase {
         Logger.recordOutput("Intake/PivotAngle", inputs.PivotAngle);
         Logger.recordOutput("Intake/RollerVoltage", inputs.RollerAppliedVolts);
         Logger.recordOutput("Intake/PivotAngularVelocity", inputs.PivotAngularVelocity);
+        Logger.recordOutput("Intake/RollerAngularVelocity", inputs.RollerAngularVelocity);
+        Logger.recordOutput("Intake/RollerCurrentAmps", inputs.RollerCurrentAmps);
+        Logger.recordOutput("Intake/PivotCurrentAmps", inputs.PivotCurrentAmps);
+        Logger.recordOutput("Intake/PivotAppliedVolts", inputs.PivotAppliedVolts);
     }
 
     public void setRollerVoltage(Voltage volts) {
