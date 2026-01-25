@@ -29,6 +29,7 @@ public class IntakeSubsystem extends SubsystemBase {
         Logger.recordOutput("Intake/PivotAppliedVolts", inputs.PivotAppliedVolts);
     }
 
+    //Intake control methods
     public void setRollerVoltage(Voltage volts) {
         io.setRollerVoltage(volts);
     }
@@ -49,5 +50,11 @@ public class IntakeSubsystem extends SubsystemBase {
         setPivotAngle(IntakeConstants.deployedAngle);
     }
 
+    public void setRollerVelocity(AngularVelocity velocity) {
+        io.setRollerVelocity(velocity);
+    }   
 
+    public void setPivotVelocity(AngularVelocity velocity) {
+        io.setPivotVelocity(velocity);
+    }   
 }

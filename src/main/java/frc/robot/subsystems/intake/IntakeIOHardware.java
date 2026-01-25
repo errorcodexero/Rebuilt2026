@@ -77,11 +77,11 @@ public final class IntakeIOHardware implements IntakeIO {
         pivotConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold= IntakeConstants.stowedAngle.in(Degrees);
         pivotMotor.getConfigurator().apply(pivotConfigs);
 
-        var MotionMagicConfigsPivot= new MotionMagicConfigs();
-        MotionMagicConfigsPivot.MotionMagicCruiseVelocity= IntakeConstants.pivotCruiseVelocity.in(DegreesPerSecond); 
-        MotionMagicConfigsPivot.MotionMagicAcceleration= IntakeConstants.pivotCruiseAcceleration.in(DegreesPerSecondPerSecond); 
-        MotionMagicConfigsPivot.MotionMagicJerk= IntakeConstants.pivotMaxJerk; 
-        pivotMotor.getConfigurator().apply(MotionMagicConfigsPivot);
+        //Motion Magic Configurations
+        pivotConfigs.MotionMagic.MotionMagicCruiseVelocity= IntakeConstants.pivotCruiseVelocity.in(DegreesPerSecond); 
+        pivotConfigs.MotionMagic.MotionMagicAcceleration= IntakeConstants.pivotCruiseAcceleration.in(DegreesPerSecondPerSecond); 
+        pivotConfigs.MotionMagic.MotionMagicJerk= IntakeConstants.pivotMaxJerk; 
+        pivotMotor.getConfigurator().apply(pivotConfigs);
 
 
         // Configuration for the roller motor
@@ -109,7 +109,7 @@ public final class IntakeIOHardware implements IntakeIO {
         pivotCurrentAmpsSignal = pivotMotor.getSupplyCurrent();
 
         BaseStatusSignal.setUpdateFrequencyForAll(50.0, rollerAngularVelocitySignal, rollerAppliedVoltsSignal, rollerCurrentAmpsSignal, pivotAngularVelocitySignal, pivotAppliedVoltsSignal, pivotCurrentAmpsSignal);
-        BaseStatusSignal.setUpdateFrequencyForAll(20.0, rollerAngleSignal, pivotAngleSignal);
+        BaseStatusSignal.setUpdateFrequencyForAll(20.0, pivotAngleSignal);
 
         // Optimize CAN bus for these parent devices-motors
         ParentDevice.optimizeBusUtilizationForAll(rollerMotor, pivotMotor);
