@@ -36,7 +36,7 @@ public final class IntakeIOHardware implements IntakeIO {
     private StatusSignal<Current> pivotCurrentAmpsSignal;
 
     // Control requests
-    private final VoltageOut rollerVoltageRequest = new VoltageOut(0);
+    
 
     public IntakeIOHardware() {
     rollerMotor = new TalonFX(IntakeConstants.rollerMotorCANID, CompTunerConstants.kCANBus);
@@ -108,6 +108,7 @@ public final class IntakeIOHardware implements IntakeIO {
     @Override
     public void setRollerVoltage(Voltage volts) {
     // Convert Voltage -> numeric volts and send via Phoenix voltage request
+        final VoltageOut rollerVoltageRequest = new VoltageOut(0);
         rollerMotor.setControl(rollerVoltageRequest.withOutput(volts.in(Volts)));
     }
     @Override
