@@ -11,7 +11,8 @@ import static edu.wpi.first.units.Units.*;
 public class IntakeSubsystem extends SubsystemBase {
     private final IntakeIO io; 
     private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
-
+    private final Angle pivotDeployedAngle = IntakeConstants.deployedAngle;
+    private final Angle pivotStowedAngle = IntakeConstants.stowedAngle;
 
     public IntakeSubsystem(IntakeIO io) {
         this.io = io;
@@ -57,4 +58,32 @@ public class IntakeSubsystem extends SubsystemBase {
     public void setPivotVelocity(AngularVelocity velocity) {
         io.setPivotVelocity(velocity);
     }   
+
+    public Angle getPivotAngle(){
+        return inputs.PivotAngle;
+    }
+
+    public boolean isIntakeDeployed(){
+        if(getPivotAngle().in(Degrees)==pivotDeployedAngle.in(Degrees)){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isIntakeStowed(){
+        if(getPivotAngle().in(Degrees)==pivotStowedAngle.in(Degrees)){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isPivotAtAngle(Angle angle){
+        if(getPivotAngle().in(Degrees)==angle.in(Degrees)){
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
