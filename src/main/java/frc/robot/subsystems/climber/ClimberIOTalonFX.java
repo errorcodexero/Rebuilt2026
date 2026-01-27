@@ -7,26 +7,37 @@ import java.util.List;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Voltage;
 
 public class ClimberIOTalonFX implements ClimberIO {
 
-    private final TalonFX motorOne;
-    private final TalonFX motorTwo;
+    protected final TalonFX motorOne;
+    protected final TalonFX motorTwo;
 
     private final StatusSignal<Angle> motorOnePosition;
+    private final StatusSignal<Voltage> motorOneVoltage;
+    private final StatusSignal<Current> motorOneCurrent;
 
     private final StatusSignal<Angle> motorTwoPosition;
+    private final StatusSignal<Voltage> motorTwoVoltage;
+    private final StatusSignal<Current> motorTwoCurrent;
 
-    private final List<BaseStatusSignal> signalsToUpdate;
+    private final List<BaseStatusSignal> motorOneSignals;
+    private final List<BaseStatusSignal> motorTwoSignals;
+
+    private final Debouncer oneIsOkDebounce = new Debouncer(0.5, DebounceType.kFalling);
+    private final Debouncer twoIsOkDebounce = new Debouncer(0.5, DebounceType.kFalling);
 
     public ClimberIOTalonFX() {
         motorOne = new TalonFX(ClimberConstants.motorOneId);
         motorTwo = new TalonFX(ClimberConstants.motorTwoId);
-
-        motorOnePosition = motorOne.getPosition();
 
         // Example configuration
         TalonFXConfiguration motorOneConfiguration = new TalonFXConfiguration();
@@ -34,20 +45,55 @@ public class ClimberIOTalonFX implements ClimberIO {
         motorOneConfiguration.Feedback.SensorToMechanismRatio = 1;
         tryUntilOk(5, () -> motorOne.getConfigurator().apply(motorOneConfiguration, 0.25));
 
+        // Example config two
+        TalonFXConfiguration motorTwoConfiguration = new TalonFXConfiguration();
+        motorTwoConfiguration.CurrentLimits.StatorCurrentLimitEnable = true;
+        tryUntilOk(5, () -> motorTwo.getConfigurator().apply(motorTwoConfiguration, 0.25));
+
+        motorOnePosition = motorOne.getPosition();
+        motorOneVoltage = motorOne.getMotorVoltage();
+        motorOneCurrent = motorOne.getStatorCurrent();
+
         motorTwoPosition = motorTwo.getPosition();
+        motorTwoVoltage = motorTwo.getMotorVoltage();
+        motorTwoCurrent = motorTwo.getStatorCurrent();
 
-        signalsToUpdate = List.of(
+        motorOneSignals = List.of(
             motorOnePosition,
-
-            motorTwoPosition
+            motorOneVoltage,
+            motorOneCurrent
         );
+
+        motorTwoSignals = List.of(
+            motorTwoPosition,
+            motorTwoVoltage,
+            motorTwoCurrent
+        );
+
+        tryUntilOk(5, () -> BaseStatusSignal.setUpdateFrequencyForAll(50, motorOneSignals));
+        tryUntilOk(5, () -> BaseStatusSignal.setUpdateFrequencyForAll(50, motorTwoSignals));
     }
 
     @Override
     public void updateInputs(ClimberInputs inputs) {
-        BaseStatusSignal.refreshAll(signalsToUpdate);
-        BaseStatusSignal.setUpdateFrequencyForAll(50, signalsToUpdate);
+        var motorOneStatus = BaseStatusSignal.refreshAll(motorOneSignals);
+        var motorTwoStatus = BaseStatusSignal.refreshAll(motorTwoSignals);
 
-        inputs.position = motorOnePosition.getValue();
+        inputs.oneConnected = oneIsOkDebounce.calculate(motorOneStatus.isOK());
+        inputs.twoConnected = twoIsOkDebounce.calculate(motorTwoStatus.isOK());
+
+        inputs.onePosition = motorOnePosition.getValue();
+        inputs.oneVolts = motorOneVoltage.getValue();
+        inputs.oneCurrent = motorOneCurrent.getValue();
+
+        inputs.twoPosition = motorTwoPosition.getValue();
+        inputs.twoVolts = motorTwoVoltage.getValue();
+        inputs.twoCurrent = motorTwoCurrent.getValue();
+    }
+
+    @Override
+    public void applyOutputs(ClimberOutputs outputs) {
+        motorOne.setControl(new PositionVoltage(outputs.oneSetpoint));
+        motorTwo.setControl(new PositionVoltage(outputs.twoSetpoint));
     }
 }
