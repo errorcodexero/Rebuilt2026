@@ -13,13 +13,12 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import com.ctre.phoenix6.controls.VelocityVoltage;
-import frc.robot.generated.CompTunerConstants;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.ParentDevice;
-
+import com.ctre.phoenix6.CANBus; 
 
 public final class IntakeIOHardware implements IntakeIO {
 
@@ -46,10 +45,10 @@ public final class IntakeIOHardware implements IntakeIO {
     private StatusSignal<Voltage> rollerAppliedVoltsSignal;
     private StatusSignal<Current> rollerCurrentAmpsSignal; 
 
-    public IntakeIOHardware() {
+    public IntakeIOHardware(CANBus pivotBus, CANBus rollerBus) {
         // Initialize motor objects
-        rollerMotor = new TalonFX(IntakeConstants.rollerMotorCANID, CompTunerConstants.kCANBus);
-        pivotMotor = new TalonFX(IntakeConstants.pivotMotorCANID, CompTunerConstants.kCANBus);
+        rollerMotor = new TalonFX(IntakeConstants.rollerMotorCANID, rollerBus);
+        pivotMotor = new TalonFX(IntakeConstants.pivotMotorCANID, pivotBus);
 
         // Configuration for the pivot motor
         final TalonFXConfiguration pivotConfigs= new TalonFXConfiguration();
@@ -135,25 +134,25 @@ public final class IntakeIOHardware implements IntakeIO {
     @Override
     public void setRollerVoltage(Voltage volts) {
         // Convert Voltage -> numeric volts and send via Phoenix voltage request
-        rollerMotor.setControl(rollerVoltageRequest.withOutput(volts.in(Volts)));
+        rollerMotor.setControl(rollerVoltageRequest.withOutput(volts));
     }
 
     @Override
     public void setPivotAngle(Angle angle) {
         // Create Motion Magic control request with desired angle
-        pivotMotor.setControl(pivotAngleRequest.withPosition(angle.in(Degrees)));
+        pivotMotor.setControl(pivotAngleRequest.withPosition(angle));
     }
 
     @Override
     public void setRollerVelocity(AngularVelocity velocity) {
         // Create Velocity control request with desired velocity
-        rollerMotor.setControl(rollerVelocityRequest.withVelocity(velocity.in(DegreesPerSecond)));
+        rollerMotor.setControl(rollerVelocityRequest.withVelocity(velocity));
     }
 
     @Override
     public void setPivotVoltage(Voltage voltage) {
         // Create Voltage control request with desired voltage
-        pivotMotor.setControl(pivotVoltageRequest.withOutput(Volts.of(voltage)));
+        pivotMotor.setControl(pivotVoltageRequest.withOutput(voltage));
     }
 
     @Override
