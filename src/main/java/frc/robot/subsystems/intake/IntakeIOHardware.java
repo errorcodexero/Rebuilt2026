@@ -29,10 +29,10 @@ public final class IntakeIOHardware implements IntakeIO {
 
     //Pivot motor control requests
     private final MotionMagicVoltage pivotAngleRequest= new MotionMagicVoltage(Degrees.of(0));
-    private final VelocityVoltage pivotVelocityRequest= new VelocityVoltage(DegreesPerSecond.of(0));
+    private final VoltageOut pivotVoltageRequest= new VoltageOut(Volts.of(0));
 
     //Roller motor control requests
-    private final VoltageOut rollerVoltageRequest = new VoltageOut(0);
+    private final VoltageOut rollerVoltageRequest = new VoltageOut(Volts.of(0));
     private final VelocityVoltage rollerVelocityRequest= new VelocityVoltage(DegreesPerSecond.of(0));
 
     //Pivot status signals
@@ -68,9 +68,9 @@ public final class IntakeIOHardware implements IntakeIO {
 
         //Soft Limit Configurations
         pivotConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable= true;
-        pivotConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold= IntakeConstants.deployedAngle.in(Degrees);
+        pivotConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold= IntakeConstants.pivotMaxAngle.in(Degrees);
         pivotConfigs.SoftwareLimitSwitch.ReverseSoftLimitEnable= true;
-        pivotConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold= IntakeConstants.stowedAngle.in(Degrees);
+        pivotConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold= IntakeConstants.pivotMinAngle.in(Degrees);
         pivotMotor.getConfigurator().apply(pivotConfigs);
 
         //Motion Magic Configurations
@@ -104,8 +104,8 @@ public final class IntakeIOHardware implements IntakeIO {
         rollerCurrentAmpsSignal = rollerMotor.getSupplyCurrent();
         pivotCurrentAmpsSignal = pivotMotor.getSupplyCurrent();
 
-        BaseStatusSignal.setUpdateFrequencyForAll(50.0, rollerAngularVelocitySignal, rollerAppliedVoltsSignal, rollerCurrentAmpsSignal, pivotAngularVelocitySignal, pivotAppliedVoltsSignal, pivotCurrentAmpsSignal);
-        BaseStatusSignal.setUpdateFrequencyForAll(20.0, pivotAngleSignal);
+        BaseStatusSignal.setUpdateFrequencyForAll(20, rollerAppliedVoltsSignal, rollerCurrentAmpsSignal,pivotAppliedVoltsSignal, pivotCurrentAmpsSignal);
+        BaseStatusSignal.setUpdateFrequencyForAll(50, pivotAngleSignal,pivotAngularVelocitySignal,rollerAngularVelocitySignal);
 
         // Optimize CAN bus for these parent devices-motors
         ParentDevice.optimizeBusUtilizationForAll(rollerMotor, pivotMotor);
@@ -151,9 +151,9 @@ public final class IntakeIOHardware implements IntakeIO {
     }
 
     @Override
-    public void setPivotVelocity(AngularVelocity velocity) {
-        // Create Velocity control request with desired velocity
-        pivotMotor.setControl(pivotVelocityRequest.withVelocity(velocity.in(DegreesPerSecond)));
+    public void setPivotVoltage(Voltage voltage) {
+        // Create Voltage control request with desired voltage
+        pivotMotor.setControl(pivotVoltageRequest.withOutput(Volts.of(voltage)));
     }
 
     @Override

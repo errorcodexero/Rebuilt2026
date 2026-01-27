@@ -24,11 +24,15 @@ public final class IntakeConstants {
     public static final double pivotKD= 0.05; //later for turning
     public static final double pivotKV= 0; //later for turning
     public static final double pivotKI= 0; //later for turning
+    public static final double pivotKA= 0; //later for turning
+    public static final double pivotKS= 0; //later for turning
 
     public static final double rollerKP= 0.5; //later for roller speed
     public static final double rollerKD= 0; //change later
     public static final double rollerKV= 0; //change later
     public static final double rollerKI= 0; //change later
+    public static final double rollerKA=0; //change later
+    public static final double rollerKS= 0; //change later
 
     public static final Angle stowedAngle= Degrees.of(-20); //Temporary angle
     public static final Angle deployedAngle= Degrees.of(-35); //Temporary angle

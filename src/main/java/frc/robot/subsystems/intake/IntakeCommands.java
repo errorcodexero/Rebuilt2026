@@ -53,9 +53,9 @@ public class IntakeCommands {
     ////////////////////////////////////////////////////////////////
     /// Continously move the pivot at set velocity until interrupted
     ////////////////////////////////////////////////////////////////
-    public static Command setPivotVelocityCommand(IntakeSubsystem intake, AngularVelocity velocity) {
-        return Commands.run(() -> intake.setPivotVelocity(velocity), intake)
-        .withName("Set Pivot Velocity");
+    public static Command setPivotVoltageCommand(IntakeSubsystem intake, Voltage voltage) {
+        return Commands.run(() -> intake.setPivotVoltage(voltage), intake)
+        .withName("Set Pivot Voltage");
     }
 
     /////////////////////////////////////////////////////////////
