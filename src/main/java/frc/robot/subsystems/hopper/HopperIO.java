@@ -1,5 +1,6 @@
 package frc.robot.subsystems.hopper;
+import edu.wpi.first.units.*;
 
-public class HopperIO {
+public interface HopperIO {
     
 }
