@@ -2,6 +2,7 @@ package frc.robot.subsystems.intake;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.configs.*;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.controls.VoltageOut;
 import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.units.Units.Degrees;
@@ -53,6 +54,9 @@ public final class IntakeIOHardware implements IntakeIO {
         // Configuration for the pivot motor
         final TalonFXConfiguration pivotConfigs= new TalonFXConfiguration();
 
+        //Setting pivot motor to Brake mode
+        pivotConfigs.MotorOutput.NeutralMode= NeutralModeValue.Brake;
+
         //Current Limit Configurations
         pivotConfigs.CurrentLimits.StatorCurrentLimit = IntakeConstants.currentLimit;
         pivotConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -81,6 +85,9 @@ public final class IntakeIOHardware implements IntakeIO {
 
         // Configuration for the roller motor
         final TalonFXConfiguration rollerConfigs= new TalonFXConfiguration();
+        
+        //Setting roller motor to Coast mode
+        rollerConfigs.MotorOutput.NeutralMode= NeutralModeValue.Coast;
 
         //Current Limit Configurations
         rollerConfigs.CurrentLimits.StatorCurrentLimit= IntakeConstants.currentLimit;

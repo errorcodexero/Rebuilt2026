@@ -68,27 +68,24 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public boolean isIntakeDeployed(){
-        if(Degrees.of(getPivotAngle().in(Degrees)).isNear(pivotDeployedAngle, Degrees)){
-            return true;
-        } else {
-            return false;
-        }
+        // Compare pivot angle to deployed angle with a small tolerance (degrees)
+        double currentDeg = getPivotAngle().in(Degrees);
+        double targetDeg = pivotDeployedAngle.in(Degrees);
+        return Math.abs(currentDeg - targetDeg) <= IntakeConstants.pivotDegreeTolerance;
     }
 
     public boolean isIntakeStowed(){
-        if((getPivotAngle().in(Degrees)).isNear(pivotStowedAngle.in(Degrees))){
-            return true;
-        } else {
-            return false;
-        }
+        // Compare pivot angle to stowed angle with a small tolerance (degrees)
+        double currentDeg = getPivotAngle().in(Degrees);
+        double targetDeg = pivotStowedAngle.in(Degrees);
+        return Math.abs(currentDeg - targetDeg) <= IntakeConstants.pivotDegreeTolerance;
     }
 
     public boolean isPivotAtAngle(Angle angle){
-        if(getPivotAngle().in(Degrees)==angle.in(Degrees)){
-            return true;
-        } else {
-            return false;
-        }
+        // Compare pivot angle to target angle with a small tolerance (degrees)
+        double currentDeg = getPivotAngle().in(Degrees);
+        double targetDeg = angle.in(Degrees);
+        return Math.abs(currentDeg - targetDeg) <= IntakeConstants.pivotDegreeTolerance;
     }
 
     ////////////////////////////

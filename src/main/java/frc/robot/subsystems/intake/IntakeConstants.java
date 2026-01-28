@@ -45,4 +45,7 @@ public final class IntakeConstants {
 
     public static final AngularVelocity rollerMaxVelocity= DegreesPerSecond.of(360); //Temporary speed
     public static final Voltage rollerCollectVoltage= Volts.of(6); //Temporary voltage
+
+    public static final double pivotDegreeTolerance= 2; //Tolerance to compare current angle to target
+
 }
