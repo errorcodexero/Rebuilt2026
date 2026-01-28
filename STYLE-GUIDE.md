@@ -30,6 +30,6 @@ Let's take a subsystem named **Arm**.
 
 **The IO interface** would be named "ArmIO".
 
-**The IO implementations** would be named "ArmIOHardware", or "ArmIOSim".
+**The IO implementations** would be named "ArmIOTalonFX", "ArmIOSparkMax", "ArmIOSim", etc.
 
 **The IO inputs** object would be named "ArmInputs".
