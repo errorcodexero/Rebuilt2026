@@ -1,5 +1,6 @@
 package frc.robot.subsystems.intake;
 
+import static frc.robot.util.PhoenixUtil.tryUntilOk;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -20,6 +21,7 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.CANBus; 
+
 
 public final class IntakeIOHardware implements IntakeIO {
 
@@ -60,27 +62,27 @@ public final class IntakeIOHardware implements IntakeIO {
         //Current Limit Configurations
         pivotConfigs.CurrentLimits.StatorCurrentLimit = IntakeConstants.currentLimit;
         pivotConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
-        pivotMotor.getConfigurator().apply(pivotConfigs);
 
         //PID Configurations
         pivotConfigs.Slot0.kP= IntakeConstants.pivotKP;
         pivotConfigs.Slot0.kD= IntakeConstants.pivotKD;
         pivotConfigs.Slot0.kV= IntakeConstants.pivotKV;
         pivotConfigs.Slot0.kI= IntakeConstants.pivotKI;
-        pivotMotor.getConfigurator().apply(pivotConfigs);
 
         //Soft Limit Configurations
         pivotConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable= true;
         pivotConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold= IntakeConstants.pivotMaxAngle.in(Degrees);
         pivotConfigs.SoftwareLimitSwitch.ReverseSoftLimitEnable= true;
         pivotConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold= IntakeConstants.pivotMinAngle.in(Degrees);
-        pivotMotor.getConfigurator().apply(pivotConfigs);
 
         //Motion Magic Configurations
         pivotConfigs.MotionMagic.MotionMagicCruiseVelocity= IntakeConstants.pivotCruiseVelocity.in(DegreesPerSecond); 
         pivotConfigs.MotionMagic.MotionMagicAcceleration= IntakeConstants.pivotCruiseAcceleration.in(DegreesPerSecondPerSecond); 
         pivotConfigs.MotionMagic.MotionMagicJerk= IntakeConstants.pivotMaxJerk; 
-        pivotMotor.getConfigurator().apply(pivotConfigs);
+
+        //Used to apply configs once instead of having multiple iterations to do this
+        //Also trys the configuartion 5 times until it receives an OK status signal 
+        tryUntilOk(5, () -> pivotMotor.getConfigurator().apply(pivotConfigs, 0.25));
 
 
         // Configuration for the roller motor
@@ -92,14 +94,16 @@ public final class IntakeIOHardware implements IntakeIO {
         //Current Limit Configurations
         rollerConfigs.CurrentLimits.StatorCurrentLimit= IntakeConstants.currentLimit;
         rollerConfigs.CurrentLimits.StatorCurrentLimitEnable= true;
-        rollerMotor.getConfigurator().apply(rollerConfigs);
 
         //PID Configurations
         rollerConfigs.Slot0.kP= IntakeConstants.rollerKP;
         rollerConfigs.Slot0.kD= IntakeConstants.rollerKD;
         rollerConfigs.Slot0.kV= IntakeConstants.rollerKV;
         rollerConfigs.Slot0.kI= IntakeConstants.rollerKI;
-        rollerMotor.getConfigurator().apply(rollerConfigs);
+
+        //Used to apply configs once instead of having multiple iterations to do this
+        //Also trys the configuartion 5 times until it receives an OK status signal 
+        tryUntilOk(5, () -> rollerMotor.getConfigurator().apply(rollerConfigs, 0.25));
 
         // Initialize all status signals
         pivotAngleSignal = pivotMotor.getPosition();
