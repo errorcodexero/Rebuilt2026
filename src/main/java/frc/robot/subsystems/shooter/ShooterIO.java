@@ -11,6 +11,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 
 public interface ShooterIO {
     @AutoLog
@@ -44,6 +45,8 @@ public interface ShooterIO {
 
     public default void updateInputs(ShooterIOInputs inputs) {}
 
+    public default void setHoodVoltage(Voltage vol) {}
+
     public default void setShooterVelocity(AngularVelocity vel) {}
 
     public default void setShooterVoltage(Voltage vol) {}
@@ -51,5 +54,9 @@ public interface ShooterIO {
     public default void stopShooter() {}
 
     public default void setHoodPosition(Angle pos) {}
+
+    public default void logShooterMotors(SysIdRoutineLog log){}
+
+    public default void logHoodMotor(SysIdRoutineLog log){}
     
 }

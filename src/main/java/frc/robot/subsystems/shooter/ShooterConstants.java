@@ -1,7 +1,9 @@
 package frc.robot.subsystems.shooter;
 
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Time;
 
 public class ShooterConstants {
@@ -18,6 +20,8 @@ public class ShooterConstants {
     public static final Time currentLimitTime = Seconds.of(1); 
 
     public static final double gearRatio = 1.0;
+
+    public static final AngularVelocity shooterTolerance = RotationsPerSecond.of(1.0);
 
 
     public class PID {
