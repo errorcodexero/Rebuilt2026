@@ -36,7 +36,7 @@ public class Shooter extends SubsystemBase {
         io_.updateInputs(inputs_);
         Logger.recordOutput("shooter/shooterTarget", shooterTarget.in(RotationsPerSecond));
         Logger.recordOutput("shooter/hoodTarget", hoodTarget);
-        Logger.processInputs("Grabber", inputs_);
+        Logger.processInputs("Shooter", inputs_);
     }
 
     // Shooter Methods
