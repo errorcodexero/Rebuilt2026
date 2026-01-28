@@ -17,13 +17,13 @@ import edu.wpi.first.units.measure.Current;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 
 import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.StatusSignal;     
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.CANBus; 
 
 
-public final class IntakeIOHardware implements IntakeIO {
+public class IntakeIOHardware implements IntakeIO {
 
     //Creating motor objects
     private final TalonFX rollerMotor;
