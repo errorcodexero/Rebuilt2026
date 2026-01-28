@@ -1,14 +1,15 @@
 package frc.robot.subsystems.vision;
 
 import static edu.wpi.first.units.Units.Milliseconds;
+import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.AutoLogOutput;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
-
-import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
@@ -36,8 +37,13 @@ public class CameraIOLimelight4 extends CameraIOLimelight {
 
     // Triggers
     private static final Trigger enabled = RobotModeTriggers.disabled().negate();
+    
     private static final Trigger fmsConnected = new Trigger(DriverStation::isFMSAttached);
+
+    @AutoLogOutput
     private static final Trigger teleopOver = RobotModeTriggers.teleop().negate();
+    
+    @AutoLogOutput
     private static final Trigger usingRewind = fmsConnected.or(() -> VisionConstants.useRewindOffField);
 
     // The current mode of the IMU, assuming this is not set anywhere else and IMU is enabled.
@@ -97,6 +103,7 @@ public class CameraIOLimelight4 extends CameraIOLimelight {
         teleopOver.and(usingRewind).onTrue(
             saveRewind(Seconds.of(160))
                 .finallyDo(() -> System.out.println("Limelight rewind saved!"))
+                .ignoringDisable(true)
         );
     }
 
