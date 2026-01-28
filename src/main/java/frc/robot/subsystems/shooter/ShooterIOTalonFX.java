@@ -10,15 +10,19 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import static edu.wpi.first.units.Units.Revolutions;
+import static edu.wpi.first.units.Units.RevolutionsPerSecond;
+
 import static frc.robot.util.PhoenixUtil.tryUntilOk;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import frc.robot.generated.CompTunerConstants;
 
-public class ShooterIOHardware implements ShooterIO {
+public class ShooterIOTalonFX implements ShooterIO {
     
     private TalonFX shooter1Motor;
     private TalonFX shooter2Motor;
@@ -26,6 +30,9 @@ public class ShooterIOHardware implements ShooterIO {
     private TalonFX shooter4Motor;
     
     private TalonFX hoodMotor;
+
+    private Voltage shooterVoltage;
+    private Voltage hoodVoltage;
 
 
     //Pivot status signals
@@ -51,7 +58,7 @@ public class ShooterIOHardware implements ShooterIO {
     private StatusSignal<Voltage> shooter4AppliedVoltsSignal;
     private StatusSignal<Current> shooter4CurrentAmpsSignal;
 
-    public ShooterIOHardware() {
+    public ShooterIOTalonFX() {
 
         shooter1Motor = new TalonFX(ShooterConstants.shooter1CANID, CompTunerConstants.kCANBus);
         shooter2Motor = new TalonFX(ShooterConstants.shooter2CANID, CompTunerConstants.kCANBus);
@@ -174,6 +181,7 @@ public class ShooterIOHardware implements ShooterIO {
 
     public void setShooterVoltage(Voltage vol) {
         shooter1Motor.setControl(new VoltageOut(vol));
+        shooterVoltage = vol;
     }
 
     public void stopShooter() {
@@ -183,4 +191,23 @@ public class ShooterIOHardware implements ShooterIO {
     public void setHoodPosition(Angle pos) {
         shooter1Motor.setControl(new MotionMagicVoltage(pos).withEnableFOC(true));
     }
+
+    public void setHoodVoltage(Voltage vol) {
+        hoodMotor.setControl(new VoltageOut(vol));
+        hoodVoltage = vol;
+    }
+
+    public void logShooterMotors(SysIdRoutineLog log) {
+        log.motor("shooters")
+            .voltage(shooterVoltage)
+            .angularVelocity(RevolutionsPerSecond.of(shooter1AngularVelocitySignal.refresh().getValueAsDouble()));
+    }
+
+    public void logHoodMotor(SysIdRoutineLog log) {
+        log.motor("hood")
+            .voltage(hoodVoltage)
+            .angularPosition(Revolutions.of(hoodAngleSignal.refresh().getValueAsDouble()))
+            .angularVelocity(RevolutionsPerSecond.of(hoodAngularVelocitySignal.refresh().getValueAsDouble()));
+    }
+
 }
