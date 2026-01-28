@@ -27,7 +27,7 @@ import com.ctre.phoenix6.StatusSignal;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.RobotController;
-import frc.robot.generated.CompTunerConstants;
+import frc.robot.generated.BetaTunerConstants;
 
 /**
  * Provides an interface for asynchronously reading high-frequency measurements to a set of queues.
@@ -46,7 +46,7 @@ public class PhoenixOdometryThread extends Thread {
   private final List<Queue<Double>> timestampQueues = new ArrayList<>();
 
   private static boolean isCANFD =
-      new CANBus(CompTunerConstants.DrivetrainConstants.CANBusName).isNetworkFD();
+      new CANBus(BetaTunerConstants.DrivetrainConstants.CANBusName).isNetworkFD();
   private static PhoenixOdometryThread instance = null;
 
   public static PhoenixOdometryThread getInstance() {
