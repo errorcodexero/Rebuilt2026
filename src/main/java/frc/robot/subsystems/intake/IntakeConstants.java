@@ -5,12 +5,15 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
+import static edu.wpi.first.units.Units.KilogramSquareMeters;
 
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.AngularAcceleration;
+
 
 public final class IntakeConstants {
     public static final int rollerMotorCANID= 1;//Temporary
@@ -48,4 +51,8 @@ public final class IntakeConstants {
 
     public static final double pivotDegreeTolerance= 2; //Tolerance to compare current angle to target
 
+    public static final double pivotGearRatio= 0; //Unsure yet, will need it for the simulator
+    public static final double rollerGearRatio= 0; //Unsure yet, will need it for the simulator
+    public static final MomentOfInertia PIVOT_MOMENTOFINERTIA= KilogramSquareMeters.of(0.01);
+    public static final MomentOfInertia ROLLER_MOMENTOFINERTIA= KilogramSquareMeters.of(0.01);
 }
