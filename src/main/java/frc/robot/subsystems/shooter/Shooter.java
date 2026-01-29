@@ -14,6 +14,7 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
@@ -34,9 +35,9 @@ public class Shooter extends SubsystemBase {
     @Override
     public void periodic() {
         io_.updateInputs(inputs_);
+        Logger.processInputs("Shooter", inputs_);
         Logger.recordOutput("shooter/shooterTarget", shooterTarget.in(RotationsPerSecond));
         Logger.recordOutput("shooter/hoodTarget", hoodTarget);
-        Logger.processInputs("Shooter", inputs_);
     }
 
     // Shooter Methods
@@ -75,6 +76,20 @@ public class Shooter extends SubsystemBase {
                 .plus(inputs_.shooter4Current);
     }
 
+    public Command setShooterVelocityCommand(Shooter shooter, AngularVelocity vel) {
+        return Commands.runOnce(() -> shooter.setShooterVelocity(vel), shooter)
+        .andThen(Commands.waitUntil(() -> shooter.isShooterReady())).withName("Set Shooter Velocity");
+    }
+
+    public Command stopShooterCommand(Shooter shooter) {
+        return Commands.runOnce(() -> shooter.stopShooter(), shooter)
+        .andThen(Commands.waitUntil(() -> shooter.isShooterReady())).withName("Stop Shooter");
+    }
+
+    public Command setShooterVoltageCommand(Shooter shooter, Voltage vol) {
+        return Commands.runOnce(() -> shooter.setShooterVoltage(vol), shooter).withName("Set Shooter Voltage");
+    }
+
     // Hood Methods
     public void setHoodAngle(Angle pos) {
         hoodTarget = pos;
@@ -94,6 +109,14 @@ public class Shooter extends SubsystemBase {
         return inputs_.hoodVoltage;
     }
 
+    public Command hoodToPosCommand(Shooter shooter, Angle pos) {
+        return Commands.runOnce(() -> shooter.setHoodAngle(pos), shooter).withName("Set Hood Position");
+    }
+
+    public Command setHoodVoltageCommand(Shooter shooter, Voltage vol) {
+        return Commands.runOnce(() -> shooter.setHoodVoltage(vol), shooter).withName("Set Hood Voltage");
+    }
+
     // Sys ID
     public Command shooterSysIdQuasistatic(SysIdRoutine.Direction dir) {
         return shooterIdRoutine().quasistatic(dir);
@@ -106,11 +129,11 @@ public class Shooter extends SubsystemBase {
     private SysIdRoutine shooterIdRoutine() {
         Voltage step = Volts.of(7);
         Time to = Seconds.of(10.0);
-        SysIdRoutine.Config cfg = new SysIdRoutine.Config(null, step, to, null);
+        SysIdRoutine.Config cfg = new SysIdRoutine.Config(null, step, to, (state) -> Logger.recordOutput("HoodSysIdTestState", state.toString()));
 
         SysIdRoutine.Mechanism mfg = new SysIdRoutine.Mechanism(
                 (volts) -> io_.setShooterVoltage(volts),
-                (log) -> io_.logShooterMotors(log),
+                null,
                 this);
 
         return new SysIdRoutine(cfg, mfg);
@@ -128,11 +151,11 @@ public class Shooter extends SubsystemBase {
     private SysIdRoutine hoodIdRoutine() {
         Voltage step = Volts.of(7);
         Time to = Seconds.of(10.0);
-        SysIdRoutine.Config cfg = new SysIdRoutine.Config(null, step, to, null);
+        SysIdRoutine.Config cfg = new SysIdRoutine.Config(null, step, to, (state) -> Logger.recordOutput("ShooterSysIdTestState", state.toString()));
 
         SysIdRoutine.Mechanism mfg = new SysIdRoutine.Mechanism(
                 (volts) -> io_.setHoodVoltage(volts),
-                (log) -> io_.logHoodMotor(log),
+                null,
                 this);
 
         return new SysIdRoutine(cfg, mfg);
