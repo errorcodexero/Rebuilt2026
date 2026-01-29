@@ -31,7 +31,7 @@ public final class Constants {
      */
     
     // Sets the currently running robot.
-    private static final RobotType robotType = RobotType.BETA;
+    private static final RobotType robotType = RobotType.NAUTILUS;
 
     public static class DriveConstants {
         public static final double slowModeJoystickMultiplier = 0.4;
@@ -63,8 +63,11 @@ public final class Constants {
         /** The Beta Bot (with wood base) */
         BETA,
 
+        /** Our 2025 Robot */
+        NAUTILUS,
+
         /** The Sim Bot */
-        SIMBOT,
+        SIMBOT
     }
 
     // This is only a fallback! This will not change the robot type.

@@ -23,6 +23,7 @@ import frc.robot.commands.drive.DriveCommands;
 import frc.robot.generated.AlphaTunerConstants;
 import frc.robot.generated.BetaTunerConstants;
 import frc.robot.generated.CompTunerConstants;
+import frc.robot.generated.NautilusTunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -31,6 +32,7 @@ import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIO;
+import frc.robot.subsystems.vision.CameraIOLimelight4;
 import frc.robot.subsystems.vision.CameraIOPhotonSim;
 import frc.robot.subsystems.vision.VisionConstants;
 
@@ -79,6 +81,25 @@ public class RobotContainer {
                         BetaTunerConstants.BackRight,
                         BetaTunerConstants.kCANBus,
                         BetaTunerConstants.kSpeedAt12Volts
+                    );
+
+                    break;
+
+                case NAUTILUS:
+                    drivebase_ = new Drive(
+                        new GyroIOPigeon2(NautilusTunerConstants.DrivetrainConstants.Pigeon2Id, NautilusTunerConstants.kCANBus),
+                        ModuleIOTalonFX::new,
+                        NautilusTunerConstants.FrontLeft,
+                        NautilusTunerConstants.FrontRight,
+                        NautilusTunerConstants.BackLeft,
+                        NautilusTunerConstants.BackRight,
+                        NautilusTunerConstants.kCANBus,
+                        NautilusTunerConstants.kSpeedAt12Volts
+                    );
+
+                    vision_ = new AprilTagVision(
+                        drivebase_::addVisionMeasurement,
+                        new CameraIOLimelight4("limelight", drivebase_::getRotation)
                     );
 
                     break;
@@ -137,6 +158,20 @@ public class RobotContainer {
                     );
 
                     break;
+
+                case NAUTILUS:
+                    drivebase_ = new Drive(
+                        new GyroIO() {},
+                        ModuleIOReplay::new,
+                        NautilusTunerConstants.FrontLeft,
+                        NautilusTunerConstants.FrontRight,
+                        NautilusTunerConstants.BackLeft,
+                        NautilusTunerConstants.BackRight,
+                        NautilusTunerConstants.kCANBus,
+                        NautilusTunerConstants.kSpeedAt12Volts
+                    );
+
+                    break;
                     
                 default: // SimBot or Comp Bot
                     drivebase_ = new Drive(
@@ -160,7 +195,7 @@ public class RobotContainer {
             };
 
             CameraIO[] cams = new CameraIO[numCams];
-            Arrays.fill(cams, new CameraIO() {});
+            Arrays.setAll(cams, i -> new CameraIO() {});
 
             vision_ = new AprilTagVision(
                 drivebase_::addVisionMeasurement,
