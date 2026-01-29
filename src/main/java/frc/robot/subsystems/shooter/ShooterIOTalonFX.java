@@ -10,16 +10,12 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
 
-import static edu.wpi.first.units.Units.Revolutions;
-import static edu.wpi.first.units.Units.RevolutionsPerSecond;
-
 import static frc.robot.util.PhoenixUtil.tryUntilOk;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import frc.robot.generated.CompTunerConstants;
 
 public class ShooterIOTalonFX implements ShooterIO {
@@ -31,9 +27,7 @@ public class ShooterIOTalonFX implements ShooterIO {
     
     private TalonFX hoodMotor;
 
-    private Voltage shooterVoltage;
-    private Voltage hoodVoltage;
-
+    private StatusSignalCollection signals;
 
     //Pivot status signals
     private StatusSignal<Angle> hoodAngleSignal;
@@ -149,8 +143,9 @@ public class ShooterIOTalonFX implements ShooterIO {
 
         ParentDevice.optimizeBusUtilizationForAll(shooter1Motor, shooter2Motor, shooter3Motor, shooter4Motor, hoodMotor);
     }
-    
-    public void updateInputs(ShooterIOInputsAutoLogged inputs, StatusSignalCollection signals) {
+
+    @Override
+    public void updateInputs(ShooterIOInputsAutoLogged inputs) {
         signals.refreshAll();
 
         inputs.hoodPosition = hoodAngleSignal.getValue();
@@ -181,7 +176,6 @@ public class ShooterIOTalonFX implements ShooterIO {
 
     public void setShooterVoltage(Voltage vol) {
         shooter1Motor.setControl(new VoltageOut(vol));
-        shooterVoltage = vol;
     }
 
     public void stopShooter() {
@@ -194,20 +188,5 @@ public class ShooterIOTalonFX implements ShooterIO {
 
     public void setHoodVoltage(Voltage vol) {
         hoodMotor.setControl(new VoltageOut(vol));
-        hoodVoltage = vol;
     }
-
-    public void logShooterMotors(SysIdRoutineLog log) {
-        log.motor("shooters")
-            .voltage(shooterVoltage)
-            .angularVelocity(RevolutionsPerSecond.of(shooter1AngularVelocitySignal.refresh().getValueAsDouble()));
-    }
-
-    public void logHoodMotor(SysIdRoutineLog log) {
-        log.motor("hood")
-            .voltage(hoodVoltage)
-            .angularPosition(Revolutions.of(hoodAngleSignal.refresh().getValueAsDouble()))
-            .angularVelocity(RevolutionsPerSecond.of(hoodAngularVelocitySignal.refresh().getValueAsDouble()));
-    }
-
 }
