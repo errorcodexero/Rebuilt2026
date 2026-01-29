@@ -14,11 +14,16 @@ public class IntakeIOSim extends IntakeIOHardware{
     private final DCMotorSim rollerMotorSim;
 
     public IntakeIOSim() throws Exception{
-    private final DCMotorSim m_motorSimModel = new DCMotorSim(
-        LinearSystemId.createDCMotorSystem(
-            DCMotor.getKrakenX60Foc(1), IntakeConstants.pivotGearRatio.in(KilogramSquareMeters), IntakeConstants.pivotGearRatio
-   ),
+        final pivotMotorSim  = new DCMotorSim(
+            LinearSystemId.createDCMotorSystem(
+                DCMotor.getKrakenX60Foc(1), IntakeConstants.PIVOT_MOMENTOFINERTIA.in(KilogramSquareMeters), IntakeConstants.pivotGearRatio
+            ),
         DCMotor.getKrakenX60Foc(1)
-);
+        );  
+
+        final rollerMotorSim= new DCMotorSim(
+            LinearSystemId.createDCMotorSystem(
+                DCMotor.getKrakenX60Foc(1), IntakeConstants., 0)
+        )
     }
 }

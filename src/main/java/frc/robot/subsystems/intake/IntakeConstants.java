@@ -29,7 +29,7 @@ public final class IntakeConstants {
     public static final double pivotKI= 0; //later for turning
     public static final double pivotKA= 0; //later for turning
     public static final double pivotKS= 0; //later for turning
-
+    
     public static final double rollerKP= 0.5; //later for roller speed
     public static final double rollerKD= 0; //change later
     public static final double rollerKV= 0; //change later
