@@ -31,7 +31,7 @@ public final class Constants {
      */
     
     // Sets the currently running robot.
-    private static final RobotType robotType = RobotType.COMPETITION;
+    private static final RobotType robotType = RobotType.BETA;
 
     public static class DriveConstants {
         public static final double slowModeJoystickMultiplier = 0.4;
@@ -57,18 +57,18 @@ public final class Constants {
     }
 
     public static enum RobotType {
-        /** The Competition Bot */
-        COMPETITION,
+        /** The Alpha Bot (with cardboard n intake) */
+        ALPHA,
 
-        /** The Practice Bot (aka the old allegro) */
-        PRACTICE,
+        /** The Beta Bot (with wood base) */
+        BETA,
 
         /** The Sim Bot */
         SIMBOT,
     }
 
     // This is only a fallback! This will not change the robot type.
-    private static final RobotType defaultRobotType = RobotType.COMPETITION;
+    private static final RobotType defaultRobotType = RobotType.BETA;
 
     private static final Alert invalidRobotType = new Alert(
         "Invalid RobotType selected. Defaulting to " + defaultRobotType.toString(),
