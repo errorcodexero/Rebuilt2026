@@ -3,8 +3,10 @@ import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.units.*;
 import edu.wpi.first.units.measure.*;
+import org.littletonrobotics.junction.AutoLog;
 
 public interface HopperIO {
+    @AutoLog
     public static class HopperIOInputs {
 
         public AngularVelocity feederVelocity = DegreesPerSecond.of(0);
