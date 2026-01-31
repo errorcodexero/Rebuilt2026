@@ -5,6 +5,7 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.FeetPerSecond;
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
@@ -29,6 +30,8 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIOReplay;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.thriftyclimb.ThriftyClimb;
+import frc.robot.subsystems.thriftyclimb.ThriftyClimbIOSim;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIO;
 import frc.robot.subsystems.vision.CameraIOPhotonSim;
@@ -39,6 +42,7 @@ public class RobotContainer {
     // Subsystems
     private Drive drivebase_;
     private AprilTagVision vision_;
+    private ThriftyClimb thriftyClimb_;
 
     // Choosers
     private final LoggedDashboardChooser<Command> autoChooser_;
@@ -99,6 +103,23 @@ public class RobotContainer {
                     vision_ = new AprilTagVision(
                         drivebase_::addVisionMeasurement,
                         new CameraIOPhotonSim("front", VisionConstants.frontTransform, drivebase_::getPose, true)
+                    );
+
+                    thriftyClimb_ = new ThriftyClimb(
+                        new ThriftyClimbIOSim()
+                    );
+
+                    break;
+                default: // Comp Bot
+                    drivebase_ = new Drive(
+                        new GyroIOPigeon2(CompTunerConstants.DrivetrainConstants.Pigeon2Id, CompTunerConstants.kCANBus),
+                        ModuleIOTalonFX::new,
+                        CompTunerConstants.FrontLeft,
+                        CompTunerConstants.FrontRight,
+                        CompTunerConstants.BackLeft,
+                        CompTunerConstants.BackRight,
+                        CompTunerConstants.kCANBus,
+                        CompTunerConstants.kSpeedAt12Volts
                     );
 
                     break;
@@ -192,7 +213,7 @@ public class RobotContainer {
 
     // Bind robot actions to commands here.
     private void configureBindings() {
-        
+        gamepad_.a().onTrue(thriftyClimb_.ToggleClimb());
     }
 
     private void configureDriveBindings() {

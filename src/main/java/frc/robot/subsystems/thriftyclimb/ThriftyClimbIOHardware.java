@@ -7,13 +7,19 @@ import static edu.wpi.first.units.Units.Revolutions;
 import static edu.wpi.first.units.Units.RevolutionsPerSecond;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
+
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import frc.robot.subsystems.climber.ClimberConstants;
 
 public class ThriftyClimbIOHardware implements ThriftyClimbIO {
-    public TalonFX climb_;
+    private final TalonFX climb_;
+
+    // Protected accessor for simulator subclasses
+    protected TalonFX getClimb() {
+        return climb_;
+    }
 
     public ThriftyClimbIOHardware(){
         climb_ = new TalonFX(ClimberConstants.thriftyClimbId);
@@ -33,7 +39,6 @@ public class ThriftyClimbIOHardware implements ThriftyClimbIO {
 
     public void applyOutputs(ThriftyClimbOutputs outputs) {
         // Example output application
-
-        climb_.setControl(new PositionVoltage(outputs.setpoint.in(Inches) * ClimberConstants.thriftyGearRatio * Math.PI * ClimberConstants.thriftyClimbSpoolRad.in(Inches)));
+        climb_.setControl(new MotionMagicVoltage(Revolutions.of(outputs.setpoint.in(Inches) * ClimberConstants.thriftyGearRatio * Math.PI * ClimberConstants.thriftyClimbSpoolRad.in(Inches))));
     }
 }
