@@ -34,6 +34,9 @@ public class VisionConstants {
     // LL4 Config
     public static final boolean useIMU = false; // Whether or not to use the internal IMU
     public static final IMUMode enabledIMUMode = IMUMode.ASSIST_EXTERNAL; // What mode to use on the internal IMU
+
+    public static final boolean useRewind = true; // Whether or not to enable rewind
+    public static final boolean useRewindOffField = true; // Whether to enable rewind when not connected to the FMS.
     
     public static final boolean regulateThrottle = false; // Whether or not we use LL4 throttle to regulate temperature
     public static final int numSkippedFramesEnabled = 0; // How many frames to skip in enabled, (probably 0 but you might want to?)

@@ -10,7 +10,7 @@ import edu.wpi.first.math.numbers.N3;
 public interface PoseEstimateConsumer {
     public void integrate(
         Pose2d robotPose,
-        double timestampSecnds,
+        double timestampSeconds,
         Matrix<N3, N1> standardDeviations
     );
 
