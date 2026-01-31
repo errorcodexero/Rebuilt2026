@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.5536000000000003,
+        "y": 1.7876555555555558
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.2512666666666665,
+        "y": 1.6969555555555562
+      },
+      "isLocked": false,
+      "linkedName": "A3_P2-Shootloc"
+    },
+    {
+      "anchor": {
+        "x": 2.7876888888888884,
+        "y": 1.6868777777777768
+      },
+      "prevControl": {
+        "x": 2.6554085713883198,
+        "y": 1.457101641314082
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "A3_P1-Shootloc1"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 48.17983011986426
+  },
+  "reversed": false,
+  "folder": "Aarush",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 1.3019526725789716
+  },
+  "useDefaultConstraints": true
+}

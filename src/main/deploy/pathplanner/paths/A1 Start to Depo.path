@@ -1,0 +1,84 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.503211111111111,
+        "y": 6.3226555555555555
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.9515262985541173,
+        "y": 7.34426970631643
+      },
+      "isLocked": false,
+      "linkedName": "A1_Start"
+    },
+    {
+      "anchor": {
+        "x": 0.41941111110438467,
+        "y": 7.582377777772834
+      },
+      "prevControl": {
+        "x": 1.150885279771002,
+        "y": 8.065296702893116
+      },
+      "nextControl": {
+        "x": 0.21077790270959482,
+        "y": 7.444638225156687
+      },
+      "isLocked": false,
+      "linkedName": "A1_P1_waypoint"
+    },
+    {
+      "anchor": {
+        "x": 0.41941111110438467,
+        "y": 4.921844444444445
+      },
+      "prevControl": {
+        "x": 0.7337190676471191,
+        "y": 6.892221797925452
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "A1_P1_Depo"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 1.5654205607476634,
+      "maxWaypointRelativePos": 1.8925233644859814,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.2,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": "Aarush",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": false
+}
