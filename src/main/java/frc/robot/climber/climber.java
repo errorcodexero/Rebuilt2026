@@ -1,7 +1,32 @@
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-package.frc.robot.subsystems.climber;
-// imports needed for the climber  
+package frc.robot.climber;
+import java.util.InputMismatchException;
 
-public class Climber extends SubsystemBase {
-   
+import org.littletonrobotics.junction.Logger;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+
+public class climber extends SubsystemBase {
+    
+    private final climberIO io;
+    private final ClimberInputsAutoLogged inputs = new ClimberInputsAutoLogged(); 
+    private final ClimberOutputs outputs = new ClimberOutputs();
+    
+    public climber(climberIO io){
+        this.io=io;
+    }
+    @Override 
+    public void periodic() {
+        io.updateInput(inputs);
+        Logger.processInputs(getName(), null);
+        
+        //periodic logic function for climber 
+        io.applytheOutputs(outputs);
+    }
+    public Command motorOneAngle(Angle angle){
+        return runOnce(null)->; {outputs.oneSetPoint= angle;});
+    }
 }
+
+
