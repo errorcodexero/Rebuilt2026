@@ -1,10 +1,15 @@
 package frc.robot.subsystems.vision;
 
 import static edu.wpi.first.units.Units.Milliseconds;
+import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
@@ -30,8 +35,16 @@ public class CameraIOLimelight4 extends CameraIOLimelight {
         }
     }
 
-    // Enabled Trigger
+    // Triggers
     private static final Trigger enabled = RobotModeTriggers.disabled().negate();
+    
+    private static final Trigger fmsConnected = new Trigger(DriverStation::isFMSAttached);
+
+    @AutoLogOutput
+    private static final Trigger teleopOver = RobotModeTriggers.teleop().negate();
+    
+    @AutoLogOutput
+    private static final Trigger usingRewind = fmsConnected.or(() -> VisionConstants.useRewindOffField);
 
     // The current mode of the IMU, assuming this is not set anywhere else and IMU is enabled.
     private IMUMode currentMode_ = VisionConstants.useIMU ? IMUMode.SEEDING : IMUMode.IGNORING;
@@ -42,8 +55,11 @@ public class CameraIOLimelight4 extends CameraIOLimelight {
     public CameraIOLimelight4(String name, Supplier<Rotation2d> rotationSupplier) {
         super(name, rotationSupplier);
 
+        LimelightHelpers.setRewindEnabled(name, VisionConstants.useRewind);
+
         bindIMUCommands();
         bindThrottleCommands();
+        bindRewindCommands();
     }
 
     @Override
@@ -79,6 +95,18 @@ public class CameraIOLimelight4 extends CameraIOLimelight {
         enabled.onFalse(setModeCommand(IMUMode.SEEDING));
     }
 
+    private void bindRewindCommands() {
+        // If rewind is disabled, skip binding these commands.
+        if (!VisionConstants.useRewind) return;
+
+        // When the robot disables, save the rewind.
+        teleopOver.and(usingRewind).onTrue(
+            saveRewind(Seconds.of(160))
+                .finallyDo(() -> System.out.println("Limelight rewind saved!"))
+                .ignoringDisable(true)
+        );
+    }
+
     private void setThrottle(int throttle) {
         currentThrottle_ = throttle;
     }
@@ -93,6 +121,10 @@ public class CameraIOLimelight4 extends CameraIOLimelight {
 
     private Command setModeCommand(IMUMode mode) {
         return Commands.runOnce(() -> setMode(mode)).ignoringDisable(true);
+    }
+
+    private Command saveRewind(Time duration) {
+        return Commands.runOnce(() -> LimelightHelpers.triggerRewindCapture(name_, duration.in(Seconds)));
     }
 
 }
