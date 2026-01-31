@@ -66,4 +66,18 @@ public class IntakeCommands {
         .andThen(Commands.waitUntil(() -> intake.isPivotAtAngle(angle))
         .withTimeout(1)).withName("Set Pivot Angle");
     }
+
+    ////////////////////////////////
+    ///Deploy and intake in parallel
+    ////////////////////////////////
+    public static Command intakeDeployCommand(IntakeSubsystem intake){
+        return Commands.parallel(setRollerVoltageCommand(intake, IntakeConstants.rollerCollectVoltage), deployIntakeCommand(intake));
+    }
+
+    ////////////////////////////////////////
+    ///Stow and stop the rollers in parallel
+    ////////////////////////////////////////
+    public static Command stopStowCommand(IntakeSubsystem intake){
+        return Commands.parallel(stopRollerCommand(intake), stowIntakeCommand(intake));
+    }
 }

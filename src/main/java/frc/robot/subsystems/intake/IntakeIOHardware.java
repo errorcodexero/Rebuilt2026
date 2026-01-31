@@ -68,6 +68,9 @@ public class IntakeIOHardware implements IntakeIO {
         pivotConfigs.Slot0.kD= IntakeConstants.pivotKD;
         pivotConfigs.Slot0.kV= IntakeConstants.pivotKV;
         pivotConfigs.Slot0.kI= IntakeConstants.pivotKI;
+        pivotConfigs.Slot0.kA= IntakeConstants.pivotKA;
+        pivotConfigs.Slot0.kG= IntakeConstants.pivotKG;
+        pivotConfigs.Slot0.kS= IntakeConstants.pivotKS;
 
         //Soft Limit Configurations
         pivotConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable= true;
@@ -100,6 +103,9 @@ public class IntakeIOHardware implements IntakeIO {
         rollerConfigs.Slot0.kD= IntakeConstants.rollerKD;
         rollerConfigs.Slot0.kV= IntakeConstants.rollerKV;
         rollerConfigs.Slot0.kI= IntakeConstants.rollerKI;
+        rollerConfigs.Slot0.kA= IntakeConstants.rollerKA;
+        rollerConfigs.Slot0.kS= IntakeConstants.rollerKS;
+        rollerConfigs.Slot0.kG= IntakeConstants.rollerKG;
 
         //Used to apply configs once instead of having multiple iterations to do this
         //Also trys the configuartion 5 times until it receives an OK status signal 
