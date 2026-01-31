@@ -111,8 +111,8 @@ public class IntakeIOHardware implements IntakeIO {
         rollerAngularVelocitySignal = rollerMotor.getVelocity();
         rollerAppliedVoltsSignal = rollerMotor.getSupplyVoltage();
         pivotAppliedVoltsSignal = pivotMotor.getSupplyVoltage();
-        rollerCurrentAmpsSignal = rollerMotor.getSupplyCurrent();
-        pivotCurrentAmpsSignal = pivotMotor.getSupplyCurrent();
+        rollerCurrentAmpsSignal = rollerMotor.getStatorCurrent();
+        pivotCurrentAmpsSignal = pivotMotor.getStatorCurrent();
 
         BaseStatusSignal.setUpdateFrequencyForAll(20, rollerAppliedVoltsSignal, rollerCurrentAmpsSignal,pivotAppliedVoltsSignal, pivotCurrentAmpsSignal);
         BaseStatusSignal.setUpdateFrequencyForAll(50, pivotAngleSignal,pivotAngularVelocitySignal,rollerAngularVelocitySignal);
