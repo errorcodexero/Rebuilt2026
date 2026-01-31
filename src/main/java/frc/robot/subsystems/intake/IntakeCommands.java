@@ -14,7 +14,7 @@ public class IntakeCommands {
     public static Command stowIntakeCommand(IntakeSubsystem intake) {
         return Commands.runOnce(() -> intake.stowIntake(), intake)
         .andThen(Commands.waitUntil(() -> intake.isIntakeStowed())
-        .withTimeout(1)).withName("Stow Intake");
+        .withTimeout(2)).withName("Stow Intake");
     }
 
     //////////////////////////////////////////////////////
@@ -23,7 +23,7 @@ public class IntakeCommands {
     public static Command deployIntakeCommand(IntakeSubsystem intake) {
         return Commands.runOnce(() -> intake.deployIntake(), intake)
         .andThen(Commands.waitUntil(() -> intake.isIntakeDeployed())
-        .withTimeout(1)).withName("Deploy Intake");
+        .withTimeout(2)).withName("Deploy Intake");
     }
 
     /////////////////////////
@@ -64,7 +64,7 @@ public class IntakeCommands {
     public static Command setPivotAngleCommand(IntakeSubsystem intake, Angle angle) {
         return Commands.runOnce(() -> intake.setPivotAngle(angle), intake)
         .andThen(Commands.waitUntil(() -> intake.isPivotAtAngle(angle))
-        .withTimeout(1)).withName("Set Pivot Angle");
+        .withTimeout(2)).withName("Set Pivot Angle");
     }
 
     ////////////////////////////////

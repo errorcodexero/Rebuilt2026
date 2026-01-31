@@ -12,6 +12,7 @@ import static edu.wpi.first.units.Units.KilogramSquareMeters;
 public class IntakeIOSim extends IntakeIOTalonFX{
     private final DCMotorSim pivotMotorSim;
     private final DCMotorSim rollerMotorSim;
+    
     public IntakeIOSim() {
         super(CompTunerConstants.kCANBus, CompTunerConstants.kCANBus);
         pivotMotorSim= new DCMotorSim(
