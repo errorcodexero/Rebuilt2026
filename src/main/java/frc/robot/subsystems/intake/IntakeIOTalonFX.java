@@ -23,7 +23,7 @@ import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.CANBus; 
 
 
-public class IntakeIOHardware implements IntakeIO {
+public class IntakeIOTalonFX implements IntakeIO {
 
     //Creating motor objects
     public final TalonFX rollerMotor;
@@ -48,7 +48,7 @@ public class IntakeIOHardware implements IntakeIO {
     private StatusSignal<Voltage> rollerAppliedVoltsSignal;
     private StatusSignal<Current> rollerCurrentAmpsSignal; 
 
-    public IntakeIOHardware(CANBus pivotBus, CANBus rollerBus) {
+    public IntakeIOTalonFX(CANBus pivotBus, CANBus rollerBus) {
         // Initialize motor objects
         rollerMotor = new TalonFX(IntakeConstants.rollerMotorCANID, rollerBus);
         pivotMotor = new TalonFX(IntakeConstants.pivotMotorCANID, pivotBus);

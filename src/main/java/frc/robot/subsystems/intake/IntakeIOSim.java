@@ -9,7 +9,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotController;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 
-public class IntakeIOSim extends IntakeIOHardware{
+public class IntakeIOSim extends IntakeIOTalonFX{
     private final DCMotorSim pivotMotorSim;
     private final DCMotorSim rollerMotorSim;
     public IntakeIOSim() {
