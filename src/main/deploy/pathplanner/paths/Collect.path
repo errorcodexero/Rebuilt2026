@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 0.4294888888869066,
+        "y": 6.907166666663488
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 0.4307196180025796,
+        "y": 6.154932223897935
+      },
+      "isLocked": false,
+      "linkedName": "DepotTop"
+    },
+    {
+      "anchor": {
+        "x": 0.4294888888869066,
+        "y": 4.969119339435449
+      },
+      "prevControl": {
+        "x": 0.4294888888869066,
+        "y": 5.219119339435449
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.2,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 90.0
+  },
+  "reversed": false,
+  "folder": "Depot Climb",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 90.0
+  },
+  "useDefaultConstraints": false
+}
