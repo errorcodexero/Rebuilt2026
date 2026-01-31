@@ -31,26 +31,26 @@ public class ShooterIOTalonFX implements ShooterIO {
 
     //Pivot status signals
     private StatusSignal<Angle> hoodAngleSignal;
-    private StatusSignal<AngularVelocity> hoodAngularVelocitySignal;
-    private StatusSignal<Current> hoodCurrentAmpsSignal;
-    private StatusSignal<Voltage> hoodAppliedVoltsSignal;
+    private StatusSignal<AngularVelocity> hoodAngularVelocity;
+    private StatusSignal<Current> hoodCurrentAmps;
+    private StatusSignal<Voltage> hoodAppliedVolts;
 
     
-    private StatusSignal<AngularVelocity> shooter1AngularVelocitySignal;
-    private StatusSignal<Voltage> shooter1AppliedVoltsSignal;
-    private StatusSignal<Current> shooter1CurrentAmpsSignal;
+    private StatusSignal<AngularVelocity> shooter1AngularVelocity;
+    private StatusSignal<Voltage> shooter1AppliedVolts;
+    private StatusSignal<Current> shooter1CurrentAmps;
 
-    private StatusSignal<AngularVelocity> shooter2AngularVelocitySignal;
-    private StatusSignal<Voltage> shooter2AppliedVoltsSignal;
-    private StatusSignal<Current> shooter2CurrentAmpsSignal;
+    private StatusSignal<AngularVelocity> shooter2AngularVelocity;
+    private StatusSignal<Voltage> shooter2AppliedVolts;
+    private StatusSignal<Current> shooter2CurrentAmps;
 
-    private StatusSignal<AngularVelocity> shooter3AngularVelocitySignal;
-    private StatusSignal<Voltage> shooter3AppliedVoltsSignal;
-    private StatusSignal<Current> shooter3CurrentAmpsSignal;
+    private StatusSignal<AngularVelocity> shooter3AngularVelocity;
+    private StatusSignal<Voltage> shooter3AppliedVolts;
+    private StatusSignal<Current> shooter3CurrentAmps;
 
-    private StatusSignal<AngularVelocity> shooter4AngularVelocitySignal;
-    private StatusSignal<Voltage> shooter4AppliedVoltsSignal;
-    private StatusSignal<Current> shooter4CurrentAmpsSignal;
+    private StatusSignal<AngularVelocity> shooter4AngularVelocity;
+    private StatusSignal<Voltage> shooter4AppliedVolts;
+    private StatusSignal<Current> shooter4CurrentAmps;
 
     public ShooterIOTalonFX() {
 
@@ -72,11 +72,6 @@ public class ShooterIOTalonFX implements ShooterIO {
         shooterConfigs.Slot0.kA = ShooterConstants.PID.shooterkA;
         shooterConfigs.Slot0.kG = ShooterConstants.PID.shooterkG;
         shooterConfigs.Slot0.kS = ShooterConstants.PID.shooterkS;
-
-        shooter1Motor.getConfigurator().apply(shooterConfigs);
-        shooter2Motor.getConfigurator().apply(shooterConfigs);
-        shooter3Motor.getConfigurator().apply(shooterConfigs);
-        shooter4Motor.getConfigurator().apply(shooterConfigs);
 
 
         hoodConfigs.Slot0.kP = ShooterConstants.PID.hoodkP;
@@ -119,58 +114,75 @@ public class ShooterIOTalonFX implements ShooterIO {
         shooter4Motor.setControl(new Follower(ShooterConstants.shooter1CANID, null));
 
 
+        hoodAngleSignal = hoodMotor.getPosition();
+        hoodAngularVelocity = hoodMotor.getVelocity();
+        hoodAppliedVolts = hoodMotor.getSupplyVoltage();
+        hoodCurrentAmps = hoodMotor.getSupplyCurrent();
+        shooter1AngularVelocity = shooter1Motor.getVelocity();
+        shooter1AppliedVolts = shooter1Motor.getSupplyVoltage();
+        shooter1CurrentAmps = shooter1Motor.getSupplyCurrent();
+        shooter2AngularVelocity = shooter2Motor.getVelocity();
+        shooter2AppliedVolts = shooter2Motor.getSupplyVoltage();
+        shooter2CurrentAmps = shooter2Motor.getSupplyCurrent();
+        shooter3AngularVelocity = shooter3Motor.getVelocity();
+        shooter3AppliedVolts = shooter3Motor.getSupplyVoltage();
+        shooter3CurrentAmps = shooter3Motor.getSupplyCurrent();
+        shooter4AngularVelocity = shooter4Motor.getVelocity();
+        shooter4AppliedVolts = shooter4Motor.getSupplyVoltage();
+        shooter4CurrentAmps = shooter4Motor.getSupplyCurrent();
+        
         // Status Signal Collection, less repetitive code
         StatusSignalCollection signals = new StatusSignalCollection(
-        hoodAngleSignal = hoodMotor.getPosition(),
-        hoodAngularVelocitySignal = hoodMotor.getVelocity(),
-        hoodAppliedVoltsSignal = hoodMotor.getSupplyVoltage(),
-        hoodCurrentAmpsSignal = hoodMotor.getSupplyCurrent(),
-        shooter1AngularVelocitySignal = shooter1Motor.getVelocity(),
-        shooter1AppliedVoltsSignal = shooter1Motor.getSupplyVoltage(),
-        shooter1CurrentAmpsSignal = shooter1Motor.getSupplyCurrent(),
-        shooter2AngularVelocitySignal = shooter2Motor.getVelocity(),
-        shooter2AppliedVoltsSignal = shooter2Motor.getSupplyVoltage(),
-        shooter2CurrentAmpsSignal = shooter2Motor.getSupplyCurrent(),
-        shooter3AngularVelocitySignal = shooter3Motor.getVelocity(),
-        shooter3AppliedVoltsSignal = shooter3Motor.getSupplyVoltage(),
-        shooter3CurrentAmpsSignal = shooter3Motor.getSupplyCurrent(),
-        shooter4AngularVelocitySignal = shooter4Motor.getVelocity(),
-        shooter4AppliedVoltsSignal = shooter4Motor.getSupplyVoltage(),
-        shooter4CurrentAmpsSignal = shooter4Motor.getSupplyCurrent()
+        hoodAngleSignal,
+        hoodAngularVelocity,
+        hoodAppliedVolts,
+        hoodCurrentAmps,
+        shooter1AngularVelocity,
+        shooter1AppliedVolts,
+        shooter1CurrentAmps,
+        shooter2AngularVelocity,
+        shooter2AppliedVolts,
+        shooter2CurrentAmps,
+        shooter3AngularVelocity,
+        shooter3AppliedVolts,
+        shooter3CurrentAmps,
+        shooter4AngularVelocity,
+        shooter4AppliedVolts,
+        shooter4CurrentAmps
         );
 
-        signals.setUpdateFrequencyForAll(50.0);
+        tryUntilOk(5, () -> signals.setUpdateFrequencyForAll(50.0));
 
         ParentDevice.optimizeBusUtilizationForAll(shooter1Motor, shooter2Motor, shooter3Motor, shooter4Motor, hoodMotor);
     }
 
     @Override
-    public void updateInputs(ShooterIOInputsAutoLogged inputs) {
+    public void updateInputs(ShooterIOInputs inputs) {
         signals.refreshAll();
 
         inputs.hoodPosition = hoodAngleSignal.getValue();
-        inputs.hoodVelocity = hoodAngularVelocitySignal.getValue();
-        inputs.hoodCurrent = hoodCurrentAmpsSignal.getValue();
-        inputs.hoodVoltage = hoodAppliedVoltsSignal.getValue();
+        inputs.hoodVelocity = hoodAngularVelocity.getValue();
+        inputs.hoodCurrent = hoodCurrentAmps.getValue();
+        inputs.hoodVoltage = hoodAppliedVolts.getValue();
 
-        inputs.shooter1Velocity = shooter1AngularVelocitySignal.getValue();
-        inputs.shooter2Velocity = shooter2AngularVelocitySignal.getValue();
-        inputs.shooter3Velocity = shooter3AngularVelocitySignal.getValue();
-        inputs.shooter4Velocity = shooter4AngularVelocitySignal.getValue();
+        inputs.shooter1Velocity = shooter1AngularVelocity.getValue();
+        inputs.shooter2Velocity = shooter2AngularVelocity.getValue();
+        inputs.shooter3Velocity = shooter3AngularVelocity.getValue();
+        inputs.shooter4Velocity = shooter4AngularVelocity.getValue();
 
-        inputs.shooter1Voltage = shooter1AppliedVoltsSignal.getValue();
-        inputs.shooter2Voltage = shooter2AppliedVoltsSignal.getValue();
-        inputs.shooter3Voltage = shooter3AppliedVoltsSignal.getValue();
-        inputs.shooter4Voltage = shooter4AppliedVoltsSignal.getValue();
+        inputs.shooter1Voltage = shooter1AppliedVolts.getValue();
+        inputs.shooter2Voltage = shooter2AppliedVolts.getValue();
+        inputs.shooter3Voltage = shooter3AppliedVolts.getValue();
+        inputs.shooter4Voltage = shooter4AppliedVolts.getValue();
 
-        inputs.shooter1Current = shooter1CurrentAmpsSignal.getValue();
-        inputs.shooter2Current = shooter2CurrentAmpsSignal.getValue();
-        inputs.shooter3Current = shooter3CurrentAmpsSignal.getValue();
-        inputs.shooter4Current = shooter4CurrentAmpsSignal.getValue();
+        inputs.shooter1Current = shooter1CurrentAmps.getValue();
+        inputs.shooter2Current = shooter2CurrentAmps.getValue();
+        inputs.shooter3Current = shooter3CurrentAmps.getValue();
+        inputs.shooter4Current = shooter4CurrentAmps.getValue();
     }
 
     public void setShooterVelocity(AngularVelocity vel) {
-        AngularVelocity velocity = vel.div(ShooterConstants.gearRatio);
+        AngularVelocity velocity = vel.times(ShooterConstants.gearRatio);
         shooter1Motor.setControl(new MotionMagicVelocityVoltage(velocity));
     }
 

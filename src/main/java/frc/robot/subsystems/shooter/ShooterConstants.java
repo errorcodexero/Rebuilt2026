@@ -19,7 +19,7 @@ public class ShooterConstants {
     public static final int currentLimit = 40; 
     public static final Time currentLimitTime = Seconds.of(1); 
 
-    public static final double gearRatio = 1.0;
+    public static final double gearRatio = 75/27;
 
     public static final AngularVelocity shooterTolerance = RotationsPerSecond.of(1.0);
 
