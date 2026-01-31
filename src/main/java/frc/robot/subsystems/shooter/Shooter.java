@@ -36,8 +36,8 @@ public class Shooter extends SubsystemBase {
     public void periodic() {
         io_.updateInputs(inputs_);
         Logger.processInputs("Shooter", inputs_);
-        Logger.recordOutput("shooter/shooterTarget", shooterTarget.in(RotationsPerSecond));
-        Logger.recordOutput("shooter/hoodTarget", hoodTarget);
+        Logger.recordOutput("shooter/VelocitySetPoint", shooterTarget);
+        Logger.recordOutput("shooter/HoodSetPoint", hoodTarget);
     }
 
     // Shooter Methods
@@ -76,18 +76,18 @@ public class Shooter extends SubsystemBase {
                 .plus(inputs_.shooter4Current);
     }
 
-    public Command setShooterVelocityCommand(Shooter shooter, AngularVelocity vel) {
-        return Commands.runOnce(() -> shooter.setShooterVelocity(vel), shooter)
-        .andThen(Commands.waitUntil(() -> shooter.isShooterReady())).withName("Set Shooter Velocity");
+    public Command setVelocityCmd(AngularVelocity vel) {
+        return Commands.runOnce(() -> setShooterVelocity(vel))
+        .andThen(Commands.waitUntil(() -> isShooterReady())).withName("Set Shooter Velocity");
     }
 
-    public Command stopShooterCommand(Shooter shooter) {
-        return Commands.runOnce(() -> shooter.stopShooter(), shooter)
-        .andThen(Commands.waitUntil(() -> shooter.isShooterReady())).withName("Stop Shooter");
+    public Command stopCommand() {
+        return runOnce(() -> stopShooter())
+        .andThen(Commands.waitUntil(() -> isShooterReady())).withName("Stop Shooter");
     }
 
-    public Command setShooterVoltageCommand(Shooter shooter, Voltage vol) {
-        return Commands.runOnce(() -> shooter.setShooterVoltage(vol), shooter).withName("Set Shooter Voltage");
+    public Command setVoltageCmd(Voltage vol) {
+        return Commands.runOnce(() -> setShooterVoltage(vol)).withName("Set Shooter Voltage");
     }
 
     // Hood Methods
@@ -109,12 +109,12 @@ public class Shooter extends SubsystemBase {
         return inputs_.hoodVoltage;
     }
 
-    public Command hoodToPosCommand(Shooter shooter, Angle pos) {
-        return Commands.runOnce(() -> shooter.setHoodAngle(pos), shooter).withName("Set Hood Position");
+    public Command hoodToPosCmd(Angle pos) {
+        return Commands.runOnce(() -> setHoodAngle(pos)).withName("Set Hood Position");
     }
 
-    public Command setHoodVoltageCommand(Shooter shooter, Voltage vol) {
-        return Commands.runOnce(() -> shooter.setHoodVoltage(vol), shooter).withName("Set Hood Voltage");
+    public Command setHoodVoltageCmd(Voltage vol) {
+        return Commands.runOnce(() -> setHoodVoltage(vol)).withName("Set Hood Voltage");
     }
 
     // Sys ID

@@ -42,7 +42,7 @@ public interface ShooterIO {
         public AngularVelocity hoodVelocity = RadiansPerSecond.zero();
     }
 
-    public default void updateInputs(ShooterIOInputsAutoLogged inputs) {}
+    public default void updateInputs(ShooterIOInputs inputs) {}
 
     public default void setHoodVoltage(Voltage vol) {}
 
