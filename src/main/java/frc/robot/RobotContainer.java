@@ -4,7 +4,9 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.FeetPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import java.util.Arrays;
 
@@ -13,14 +15,14 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.drive.DriveCommands;
+import frc.robot.generated.AlphaTunerConstants;
+import frc.robot.generated.BetaTunerConstants;
 import frc.robot.generated.CompTunerConstants;
-import frc.robot.generated.PracticeTunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -29,7 +31,6 @@ import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIO;
-import frc.robot.subsystems.vision.CameraIOLimelight4;
 import frc.robot.subsystems.vision.CameraIOPhotonSim;
 import frc.robot.subsystems.vision.VisionConstants;
 
@@ -52,40 +53,32 @@ public class RobotContainer {
          */
         if (Constants.getMode() != Mode.REPLAY) {
             switch (Constants.getRobot()) {
-                case COMPETITION:
+                case ALPHA:
 
                     drivebase_ = new Drive(
-                        new GyroIOPigeon2(CompTunerConstants.DrivetrainConstants.Pigeon2Id, CompTunerConstants.kCANBus),
+                        new GyroIOPigeon2(AlphaTunerConstants.DrivetrainConstants.Pigeon2Id, AlphaTunerConstants.kCANBus),
                         ModuleIOTalonFX::new,
-                        CompTunerConstants.FrontLeft,
-                        CompTunerConstants.FrontRight,
-                        CompTunerConstants.BackLeft,
-                        CompTunerConstants.BackRight,
-                        CompTunerConstants.kSpeedAt12Volts
-                    );
-
-                    vision_ = new AprilTagVision(
-                        drivebase_::addVisionMeasurement,
-                        new CameraIOLimelight4(VisionConstants.frontLimelightName, drivebase_::getRotation)
+                        AlphaTunerConstants.FrontLeft,
+                        AlphaTunerConstants.FrontRight,
+                        AlphaTunerConstants.BackLeft,
+                        AlphaTunerConstants.BackRight,
+                        AlphaTunerConstants.kCANBus,
+                        AlphaTunerConstants.kSpeedAt12Volts
                     );
 
                     break;
 
-                case PRACTICE:
+                case BETA:
 
                     drivebase_ = new Drive(
-                        new GyroIOPigeon2(PracticeTunerConstants.DrivetrainConstants.Pigeon2Id, PracticeTunerConstants.kCANBus),
+                        new GyroIOPigeon2(BetaTunerConstants.DrivetrainConstants.Pigeon2Id, BetaTunerConstants.kCANBus),
                         ModuleIOTalonFX::new,
-                        PracticeTunerConstants.FrontLeft,
-                        PracticeTunerConstants.FrontRight,
-                        PracticeTunerConstants.BackLeft,
-                        PracticeTunerConstants.BackRight,
-                        PracticeTunerConstants.kSpeedAt12Volts
-                    );
-
-                    vision_ = new AprilTagVision(
-                        drivebase_::addVisionMeasurement,
-                        new CameraIOLimelight4(VisionConstants.frontLimelightName, drivebase_::getRotation)
+                        BetaTunerConstants.FrontLeft,
+                        BetaTunerConstants.FrontRight,
+                        BetaTunerConstants.BackLeft,
+                        BetaTunerConstants.BackRight,
+                        BetaTunerConstants.kCANBus,
+                        BetaTunerConstants.kSpeedAt12Volts
                     );
 
                     break;
@@ -99,6 +92,7 @@ public class RobotContainer {
                         CompTunerConstants.FrontRight,
                         CompTunerConstants.BackLeft,
                         CompTunerConstants.BackRight,
+                        CompTunerConstants.kCANBus,
                         CompTunerConstants.kSpeedAt12Volts
                     );
 
@@ -116,15 +110,30 @@ public class RobotContainer {
          */
         if (drivebase_ == null) { // This will be null in replay, or whenever a case above leaves a subsystem uninstantiated.
             switch (Constants.getRobot()) {
-                case PRACTICE:
+                case ALPHA:
                     drivebase_ = new Drive(
                         new GyroIO() {},
                         ModuleIOReplay::new,
-                        PracticeTunerConstants.FrontLeft,
-                        PracticeTunerConstants.FrontRight,
-                        PracticeTunerConstants.BackLeft,
-                        PracticeTunerConstants.BackRight,
-                        PracticeTunerConstants.kSpeedAt12Volts
+                        AlphaTunerConstants.FrontLeft,
+                        AlphaTunerConstants.FrontRight,
+                        AlphaTunerConstants.BackLeft,
+                        AlphaTunerConstants.BackRight,
+                        AlphaTunerConstants.kCANBus,
+                        AlphaTunerConstants.kSpeedAt12Volts
+                    );
+
+                    break;
+
+                case BETA:
+                    drivebase_ = new Drive(
+                        new GyroIO() {},
+                        ModuleIOReplay::new,
+                        BetaTunerConstants.FrontLeft,
+                        BetaTunerConstants.FrontRight,
+                        BetaTunerConstants.BackLeft,
+                        BetaTunerConstants.BackRight,
+                        BetaTunerConstants.kCANBus,
+                        BetaTunerConstants.kSpeedAt12Volts
                     );
 
                     break;
@@ -137,6 +146,7 @@ public class RobotContainer {
                         CompTunerConstants.FrontRight,
                         CompTunerConstants.BackLeft,
                         CompTunerConstants.BackRight,
+                        CompTunerConstants.kCANBus,
                         CompTunerConstants.kSpeedAt12Volts
                     );
 
@@ -167,6 +177,10 @@ public class RobotContainer {
 
         // Choosers
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
+        autoChooser_.onChange(auto -> {
+            System.err.println("Auto \"" + auto.getName() + "\" selected!");
+            // This should be used to set up robot position setting, initialization, etc.
+        });
 
         // Publish Deploy Directory (for layout/asset downloading)
         WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
@@ -235,6 +249,6 @@ public class RobotContainer {
     }
     
     public Command getAutonomousCommand() {
-        return Commands.print("No autonomous command configured");
+        return DriveCommands.feedforwardCharacterization(drivebase_);
     }
 }
