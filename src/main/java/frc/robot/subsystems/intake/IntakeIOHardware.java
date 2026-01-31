@@ -26,8 +26,8 @@ import com.ctre.phoenix6.CANBus;
 public class IntakeIOHardware implements IntakeIO {
 
     //Creating motor objects
-    private final TalonFX rollerMotor;
-    private final TalonFX pivotMotor;
+    public final TalonFX rollerMotor;
+    public final TalonFX pivotMotor;
 
     //Pivot motor control requests
     private final MotionMagicVoltage pivotAngleRequest= new MotionMagicVoltage(Degrees.of(0));
