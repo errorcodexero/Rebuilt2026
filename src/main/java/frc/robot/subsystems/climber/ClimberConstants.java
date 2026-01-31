@@ -8,7 +8,7 @@ import edu.wpi.first.units.measure.MomentOfInertia;
 public class ClimberConstants {
     public static final int motorOneId = 0;
     public static final int motorTwoId = 1;
-    public static final int thriftyClimbId = 0;
+    public static final int thriftyClimbId = 1;
 
     public static final Distance thriftyClimbSpoolRad = Inches.of(1.5);
     public static final double thriftyGearRatio = 50.0;

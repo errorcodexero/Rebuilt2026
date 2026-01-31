@@ -30,8 +30,10 @@ public final class Constants {
      * CONFIGURATION
      */
     
-    // Sets the currently running robot.
-    private static final RobotType robotType = RobotType.BETA;
+    // Sets the currently running robot. Change to SIMBOT when running the
+    // desktop physics simulation so AdvantageKit runs in SIM mode instead of
+    // falling back to REPLAY.
+    private static final RobotType robotType = RobotType.SIMBOT;
 
     public static class DriveConstants {
         public static final double slowModeJoystickMultiplier = 0.4;
@@ -68,7 +70,7 @@ public final class Constants {
     }
 
     // This is only a fallback! This will not change the robot type.
-    private static final RobotType defaultRobotType = RobotType.BETA;
+    private static final RobotType defaultRobotType = RobotType.SIMBOT;
 
     private static final Alert invalidRobotType = new Alert(
         "Invalid RobotType selected. Defaulting to " + defaultRobotType.toString(),
