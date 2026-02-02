@@ -104,7 +104,7 @@ public class IntakeSubsystem extends SubsystemBase {
                 (state) -> SignalLogger.writeString("state", state.toString()) //Logging the state of the routine
             ),
             new SysIdRoutine.Mechanism(
-                (Voltage voltage)-> setRollerVoltage(voltage),
+                (Voltage voltage)-> setPivotVoltage(voltage),
                 null, 
                 this
             )
