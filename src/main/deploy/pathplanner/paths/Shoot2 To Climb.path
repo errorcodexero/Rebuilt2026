@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.5536000000000003,
-        "y": 1.7876555555555558
+        "x": 3.3016555555555556,
+        "y": 0.9713555555555557
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.2512666666666665,
-        "y": 1.6969555555555562
+        "x": 2.728165500014941,
+        "y": 1.7093464300164145
       },
       "isLocked": false,
-      "linkedName": "A3_P2-Shootloc"
+      "linkedName": "Shoot2"
     },
     {
       "anchor": {
-        "x": 2.7876888888888884,
-        "y": 1.6868777777777768
+        "x": 1.5481222222222222,
+        "y": 3.752822222222222
       },
       "prevControl": {
-        "x": 2.6554085713883198,
-        "y": 1.457101641314082
+        "x": 2.0147248545881693,
+        "y": 2.880077770320452
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "A3_P1-Shootloc1"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 48.17983011986426
+    "rotation": -0.939190945735607
   },
   "reversed": false,
-  "folder": "Aarush",
+  "folder": "Neutral Zone Climb",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 1.3019526725789716
+    "rotation": 59.058463533677475
   },
   "useDefaultConstraints": true
 }

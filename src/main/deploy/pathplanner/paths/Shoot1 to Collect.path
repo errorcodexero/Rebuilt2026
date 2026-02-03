@@ -3,71 +3,71 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.510988888890775,
-        "y": 7.400977777773835
+        "x": 3.183572540543293,
+        "y": 1.8884333333333334
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.993910352536805,
-        "y": 7.123817473336218
+        "x": 3.241188888888889,
+        "y": 1.424855555555556
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "NZShoot"
     },
     {
       "anchor": {
-        "x": 7.584711111111112,
-        "y": 6.514133333333333
+        "x": 4.420288888888888,
+        "y": 0.5682444444444434
       },
       "prevControl": {
-        "x": 7.109955814930003,
-        "y": 7.262145637106508
+        "x": 3.362122222222222,
+        "y": 0.5581666666666659
       },
       "nextControl": {
-        "x": 8.150318659692804,
-        "y": 5.622976544037205
+        "x": 4.965955104380984,
+        "y": 0.573441265544368
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 6.677711111111111,
-        "y": 1.162833333333333
+        "x": 7.080822222222223,
+        "y": 1.3845444444444432
       },
       "prevControl": {
-        "x": 7.190594268566315,
-        "y": 1.709184725467117
+        "x": 6.627620125346861,
+        "y": 0.9578229697334206
       },
       "nextControl": {
-        "x": 6.115665027577804,
-        "y": 0.5641108841396616
+        "x": 7.755325527950738,
+        "y": 2.0196364868298695
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.553600000001887,
-        "y": 0.6186333333293907
+        "x": 7.786266666666666,
+        "y": 5.274566666666667
       },
       "prevControl": {
-        "x": 3.774842439490595,
-        "y": 0.7350454588536901
+        "x": 7.675411111111112,
+        "y": 4.216400000000001
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "TrenchShoot"
+      "linkedName": "NZCollect"
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.95,
-      "rotationDegrees": 90.0
+      "waypointRelativePos": 1.0,
+      "rotationDegrees": 0.0
     },
     {
-      "waypointRelativePos": 1.8105263157894893,
-      "rotationDegrees": 90.0
+      "waypointRelativePos": 2.0,
+      "rotationDegrees": -88.95837332399009
     }
   ],
   "constraintZones": [],
@@ -83,13 +83,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 76.29303899592018
+    "rotation": -90.0
   },
   "reversed": false,
-  "folder": "Neutral Zone Collect",
+  "folder": "Neutral Zone Climb",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 59.058463533677475
   },
   "useDefaultConstraints": true
 }

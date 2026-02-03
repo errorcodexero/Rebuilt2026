@@ -3,8 +3,8 @@
   "robotLength": 0.9,
   "holonomicMode": true,
   "pathFolders": [
-    "Aarush",
     "Depot",
+    "Neutral Zone Climb",
     "Neutral Zone Collect"
   ],
   "autoFolders": [],

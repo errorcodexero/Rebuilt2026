@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.574633333333333,
-        "y": 5.899388888888889
+        "x": 3.5225775206223133,
+        "y": 1.8884333333333334
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.143588888888888,
-        "y": 1.384544444444443
+        "x": 3.1870766019182764,
+        "y": 1.8405346824899806
       },
       "isLocked": false,
-      "linkedName": "A3_P2-NZpass.endpoint"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.148188888888889,
-        "y": 0.5984777777777766
+        "x": 3.183572540543293,
+        "y": 1.8884333333333334
       },
       "prevControl": {
-        "x": 6.738177777777778,
-        "y": 0.39692222222222195
+        "x": 3.4312193520287444,
+        "y": 1.8542126267203871
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "A3_P4-Shootloc2"
+      "linkedName": "NZShoot"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 90.19894287936062
+    "rotation": 59.058463533677475
   },
   "reversed": false,
-  "folder": "Aarush",
+  "folder": "Neutral Zone Climb",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -92.24574256589494
+    "rotation": 90.05732683363037
   },
   "useDefaultConstraints": true
 }
