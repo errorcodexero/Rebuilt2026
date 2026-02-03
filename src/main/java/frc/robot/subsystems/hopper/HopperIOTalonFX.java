@@ -1,12 +1,15 @@
 package frc.robot.subsystems.hopper;
+
+import static frc.robot.util.PhoenixUtil.tryUntilOk;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.controls.*;
-import edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
+
 
 import com.ctre.phoenix6.hardware.*;
 
@@ -50,7 +53,7 @@ public class HopperIOTalonFX implements HopperIO {
         feederConfig.Slot0.kV = HopperConstants.feederKV;
         feederConfig.Slot0.kA = HopperConstants.feederKA;
 
-        feederMotor.getConfigurator().apply(feederConfig);
+        tryUntilOk(5, () -> feederMotor.getConfigurator().apply(feederConfig, 0.25));
 
         feederConfig.CurrentLimits.StatorCurrentLimit = HopperConstants.feederCurrentLimit.in(Amps);
 
@@ -65,7 +68,7 @@ public class HopperIOTalonFX implements HopperIO {
         scramblerConfig.Slot0.kV = HopperConstants.scramblerKV;
         scramblerConfig.Slot0.kA = HopperConstants.scramblerKA;
 
-        scramblerMotor.getConfigurator().apply(scramblerConfig);
+        tryUntilOk(5, () -> scramblerMotor.getConfigurator().apply(scramblerConfig, 0.25));
 
         scramblerConfig.CurrentLimits.StatorCurrentLimit = HopperConstants.scramblerCurrentLimit.in(Amps);
         
