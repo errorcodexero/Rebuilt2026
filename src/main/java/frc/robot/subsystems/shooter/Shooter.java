@@ -77,7 +77,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public Command setVelocityCmd(AngularVelocity vel) {
-        return Commands.runOnce(() -> setShooterVelocity(vel))
+        return runOnce(() -> setShooterVelocity(vel))
         .andThen(Commands.waitUntil(() -> isShooterReady())).withName("Set Shooter Velocity");
     }
 
@@ -87,7 +87,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public Command setVoltageCmd(Voltage vol) {
-        return Commands.runOnce(() -> setShooterVoltage(vol)).withName("Set Shooter Voltage");
+        return runOnce(() -> setShooterVoltage(vol)).withName("Set Shooter Voltage");
     }
 
     // Hood Methods
@@ -96,25 +96,14 @@ public class Shooter extends SubsystemBase {
         io_.setHoodPosition(pos);
     }
 
-    public void setHoodVoltage(Voltage vol) {
-        hoodTarget = Radians.of(0);
-        io_.setHoodVoltage(vol);
-    }
-
-    public Angle getHoodAngle() {
-        return inputs_.hoodPosition;
-    }
-
-    public Voltage getHoodVoltage() {
-        return inputs_.hoodVoltage;
-    }
-
     public Command hoodToPosCmd(Angle pos) {
-        return Commands.runOnce(() -> setHoodAngle(pos)).withName("Set Hood Position");
+        return runOnce(() -> setHoodAngle(pos)).withName("Set Hood Position");
     }
 
-    public Command setHoodVoltageCmd(Voltage vol) {
-        return Commands.runOnce(() -> setHoodVoltage(vol)).withName("Set Hood Voltage");
+    // Both
+
+    public Command goToShootReadyCommand(AngularVelocity vel, Angle pos) {
+        return Commands.parallel(this.setVelocityCmd(vel), this.hoodToPosCmd(pos)).withName("Ready To Shoot");
     }
 
     // Sys ID
@@ -133,28 +122,6 @@ public class Shooter extends SubsystemBase {
 
         SysIdRoutine.Mechanism mfg = new SysIdRoutine.Mechanism(
                 (volts) -> io_.setShooterVoltage(volts),
-                null,
-                this);
-
-        return new SysIdRoutine(cfg, mfg);
-    }
-
-
-    public Command hoodSysIdQuasistatic(SysIdRoutine.Direction dir) {
-        return hoodIdRoutine().quasistatic(dir);
-    }
-
-    public Command hoodSysIdDynamic(SysIdRoutine.Direction dir) {
-        return hoodIdRoutine().dynamic(dir);
-    }
-
-    private SysIdRoutine hoodIdRoutine() {
-        Voltage step = Volts.of(7);
-        Time to = Seconds.of(10.0);
-        SysIdRoutine.Config cfg = new SysIdRoutine.Config(null, step, to, (state) -> Logger.recordOutput("ShooterSysIdTestState", state.toString()));
-
-        SysIdRoutine.Mechanism mfg = new SysIdRoutine.Mechanism(
-                (volts) -> io_.setHoodVoltage(volts),
                 null,
                 this);
 
