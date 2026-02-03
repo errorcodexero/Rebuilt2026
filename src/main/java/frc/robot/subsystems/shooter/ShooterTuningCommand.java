@@ -3,6 +3,8 @@ package frc.robot.subsystems.shooter;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -21,12 +23,11 @@ public class ShooterTuningCommand extends Command {
 
     @Override
     public void execute() {
-        double shooterVelocity = SmartDashboard.getNumber("Shooter/Tuning/ShooterRPS", 0);
 
-        
-        double HoodAngle = SmartDashboard.getNumber("Shooter/Tuning/HoodAngle", ShooterConstants.SoftwareLimits.hoodMinAngle);
+        LoggedNetworkNumber shooterVelocity = new LoggedNetworkNumber("Shooter/Tuning/TargetShooterRPS", 0);
+        LoggedNetworkNumber HoodAngle = new LoggedNetworkNumber("Shooter/Tuning/TargetHoodAngle", ShooterConstants.SoftwareLimits.hoodMinAngle);
 
-        shooter_.goToShootReadyCommand(RotationsPerSecond.of(shooterVelocity), Degrees.of(HoodAngle));
+        shooter_.goToShootReadyCommand(RotationsPerSecond.of(shooterVelocity.getAsDouble()), Degrees.of(HoodAngle.getAsDouble()));
 
         SmartDashboard.putNumber("Shooter/Tuning/ActualShooterRPS", shooter_.getShooterVelocity().in(RotationsPerSecond));
         SmartDashboard.putBoolean("Shooter/Tuning/ShooterReady", shooter_.isShooterReady());
