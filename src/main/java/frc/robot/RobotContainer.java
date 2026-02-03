@@ -10,8 +10,10 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import java.util.Arrays;
 
+import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -47,6 +49,10 @@ public class RobotContainer {
     private final CommandXboxController gamepad_ = new CommandXboxController(0);
 
     public RobotContainer() {
+
+        Logger.recordOutput("TestMechanismPoses", new Pose3d[] {
+            Pose3d.kZero, Pose3d.kZero, Pose3d.kZero
+        });
 
         /**
          * Subsystem setup
