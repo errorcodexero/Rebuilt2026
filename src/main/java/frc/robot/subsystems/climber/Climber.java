@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.climber.ClimberIO.ClimberOutputs;
 
+@Deprecated
 public class Climber extends SubsystemBase {
 
     private final ClimberIO io;

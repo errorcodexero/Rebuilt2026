@@ -7,9 +7,9 @@ import edu.wpi.first.units.measure.LinearVelocity;
 
 public interface ThriftyClimbIO {
     @AutoLog
-    public static class ThriftyClimbIOInputs{
-        public Distance pos;
-        public LinearVelocity vel;
+    public static class ThriftyClimbInputs {
+        public Distance position;
+        public LinearVelocity velocity;
         public Current current;
     }
 
@@ -17,7 +17,7 @@ public interface ThriftyClimbIO {
         public Distance setpoint;
     }
 
-    public void updateInputs(ThriftyClimbIOInputs inputs);
+    public default void updateInputs(ThriftyClimbInputs inputs) {};
 
-    public void applyOutputs(ThriftyClimbOutputs outputs);
+    public default void applyOutputs(ThriftyClimbOutputs outputs) {};
 }

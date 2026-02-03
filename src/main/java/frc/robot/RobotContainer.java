@@ -31,6 +31,7 @@ import frc.robot.subsystems.drive.ModuleIOReplay;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.thriftyclimb.ThriftyClimb;
+import frc.robot.subsystems.thriftyclimb.ThriftyClimbIO;
 import frc.robot.subsystems.thriftyclimb.ThriftyClimbIOSim;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIO;
@@ -189,6 +190,10 @@ public class RobotContainer {
             );
         }
 
+        if (thriftyClimb_ == null) {
+            thriftyClimb_ = new ThriftyClimb(new ThriftyClimbIO() {});
+        }
+
         DriveCommands.configure(
             drivebase_,
             () -> -gamepad_.getLeftY(),
@@ -213,7 +218,7 @@ public class RobotContainer {
 
     // Bind robot actions to commands here.
     private void configureBindings() {
-        gamepad_.a().onTrue(thriftyClimb_.ToggleClimb());
+        gamepad_.a().onTrue(thriftyClimb_.toggle());
     }
 
     private void configureDriveBindings() {
