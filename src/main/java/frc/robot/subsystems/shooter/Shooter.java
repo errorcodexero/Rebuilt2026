@@ -36,8 +36,8 @@ public class Shooter extends SubsystemBase {
     public void periodic() {
         io_.updateInputs(inputs_);
         Logger.processInputs("Shooter", inputs_);
-        Logger.recordOutput("shooter/VelocitySetPoint", shooterTarget);
-        Logger.recordOutput("shooter/HoodSetPoint", hoodTarget);
+        Logger.recordOutput("Shooter/VelocitySetPoint", shooterTarget);
+        Logger.recordOutput("Shooter/HoodSetPoint", hoodTarget);
     }
 
     // Shooter Methods
@@ -101,9 +101,15 @@ public class Shooter extends SubsystemBase {
     }
 
     // Both
+    public void goToShooterPosition(AngularVelocity vel, Angle pos) {
+        shooterTarget = vel;
+        this.setShooterVelocity(shooterTarget);
+        hoodTarget = pos;
+        this.setHoodAngle(hoodTarget);
+    }
 
     public Command goToShootReadyCommand(AngularVelocity vel, Angle pos) {
-        return Commands.parallel(this.setVelocityCmd(vel), this.hoodToPosCmd(pos)).withName("Ready To Shoot");
+        return runOnce(() -> goToShooterPosition(vel, pos)).andThen(Commands.waitUntil(() -> isShooterReady()));
     }
 
     // Sys ID

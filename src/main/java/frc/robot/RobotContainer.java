@@ -70,8 +70,6 @@ public class RobotContainer {
                         AlphaTunerConstants.kSpeedAt12Volts
                     );
 
-                    shooter_ = new Shooter(new ShooterIO() {});
-
                     break;
 
                 case BETA:
@@ -106,7 +104,6 @@ public class RobotContainer {
                         drivebase_::addVisionMeasurement,
                         new CameraIOPhotonSim("front", VisionConstants.frontTransform, drivebase_::getPose, true)
                     );
-
 
                     break;
             }
@@ -173,6 +170,10 @@ public class RobotContainer {
                 drivebase_::addVisionMeasurement,
                 cams
             );
+        }
+
+        if (shooter_ == null) {
+            shooter_ = new Shooter(new ShooterIO() {});
         }
 
         DriveCommands.configure(
