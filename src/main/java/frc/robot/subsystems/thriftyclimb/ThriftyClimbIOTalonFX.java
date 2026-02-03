@@ -22,17 +22,21 @@ public class ThriftyClimbIOTalonFX implements ThriftyClimbIO {
         TalonFXConfiguration motorOneConfiguration = new TalonFXConfiguration();
         motorOneConfiguration.Feedback.FeedbackRemoteSensorID = 3;
         motorOneConfiguration.Feedback.SensorToMechanismRatio = 1;
+        motorOneConfiguration.Slot0.kP = 0.1;
+        motorOneConfiguration.Slot0.kI = 0.0;
+        motorOneConfiguration.Slot0.kD = 0.0;
+        motorOneConfiguration.MotionMagic.MotionMagicCruiseVelocity = 2000;
         climb_.getConfigurator().apply(motorOneConfiguration, 0.25);
-        climb_.setPosition(Degrees.of(ClimberConstants.thriftyStowedHeight.in(Inches) * ClimberConstants.thriftyGearRatio * Math.PI * ClimberConstants.thriftyClimbSpoolRad.in(Inches)));
+        climb_.setPosition(Degrees.of(ClimberConstants.thriftyStowedHeight.in(Inches) * ClimberConstants.thriftyGearRatio * Math.PI * ClimberConstants.thriftyClimbSpoolDiameter.in(Inches)));
     }
 
     public void updateInputs(ThriftyClimbInputs inputs) {
-        inputs.position = Inches.of(climb_.getPosition().getValue().in(Revolutions) / (ClimberConstants.thriftyGearRatio * Math.PI * ClimberConstants.thriftyClimbSpoolRad.in(Inches)));
-        inputs.velocity = InchesPerSecond.of(climb_.getVelocity().getValue().in(RevolutionsPerSecond) / (ClimberConstants.thriftyGearRatio * Math.PI * ClimberConstants.thriftyClimbSpoolRad.in(Inches)));;
+        inputs.position = Inches.of(climb_.getPosition().getValue().in(Revolutions) / (ClimberConstants.thriftyGearRatio * Math.PI * ClimberConstants.thriftyClimbSpoolDiameter.in(Inches)));
+        inputs.velocity = InchesPerSecond.of(climb_.getVelocity().getValue().in(RevolutionsPerSecond) / (ClimberConstants.thriftyGearRatio * Math.PI * ClimberConstants.thriftyClimbSpoolDiameter.in(Inches)));;
         inputs.current = climb_.getStatorCurrent().getValue();
     }
 
     public void applyOutputs(ThriftyClimbOutputs outputs) {
-        climb_.setControl(new MotionMagicVoltage(Revolutions.of(outputs.setpoint.in(Inches) * ClimberConstants.thriftyGearRatio * Math.PI * ClimberConstants.thriftyClimbSpoolRad.in(Inches))));
+        climb_.setControl(new MotionMagicVoltage(Revolutions.of(outputs.setpoint.in(Inches) * ClimberConstants.thriftyGearRatio * Math.PI * ClimberConstants.thriftyClimbSpoolDiameter.in(Inches))));
     }
 }

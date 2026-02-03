@@ -15,11 +15,13 @@ public class ThriftyClimb extends SubsystemBase {
     private final ThriftyClimbIO io_;
     private final ThriftyClimbInputsAutoLogged inputs_ = new ThriftyClimbInputsAutoLogged();
     private final ThriftyClimbOutputs outputs_ = new ThriftyClimbIO.ThriftyClimbOutputs();
+   
     
     private boolean climbing_ = false;
 
     public ThriftyClimb(ThriftyClimbIO io) {
         io_ = io;
+        outputs_.setpoint = ClimberConstants.thriftyStowedHeight;
     }
 
     @Override

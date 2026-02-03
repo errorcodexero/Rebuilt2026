@@ -10,13 +10,13 @@ public class ClimberConstants {
     public static final int motorTwoId = 1;
     public static final int thriftyClimbId = 1;
 
-    public static final Distance thriftyClimbSpoolRad = Inches.of(1.5);
+    public static final Distance thriftyClimbSpoolDiameter = Inches.of(1.5 * 2);
     public static final double thriftyGearRatio = 50.0;
     public static final Distance thriftyClimbHeight = Inches.of(29.0);
     public static final Distance thriftyStowedHeight = Inches.of(20.0);
 
     public static class Sim {
-        public static final MomentOfInertia MOI = KilogramSquareMeters.zero();
+        public static final MomentOfInertia MOI = KilogramSquareMeters.of(0.001);
         public static final double gearRatio = 1.0;
     }
 }

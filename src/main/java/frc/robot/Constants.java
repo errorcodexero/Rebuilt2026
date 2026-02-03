@@ -70,7 +70,7 @@ public final class Constants {
     }
 
     // This is only a fallback! This will not change the robot type.
-    private static final RobotType defaultRobotType = RobotType.SIMBOT;
+    private static final RobotType defaultRobotType = RobotType.BETA;
 
     private static final Alert invalidRobotType = new Alert(
         "Invalid RobotType selected. Defaulting to " + defaultRobotType.toString(),
