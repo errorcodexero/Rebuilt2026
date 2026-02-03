@@ -55,7 +55,6 @@ public class IntakeIOSim extends IntakeIOTalonFX{
         rollerMotorSimState.setRawRotorPosition(rollerMotorSim.getAngularPosition().times(IntakeConstants.rollerGearRatio));
         rollerMotorSimState.setRotorVelocity(rollerMotorSim.getAngularVelocity().times(IntakeConstants.rollerGearRatio));
 
-        System.out.print("Intake voltage")
         super.updateInputs(inputs);
     }
 }
