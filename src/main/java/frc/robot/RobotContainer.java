@@ -31,7 +31,6 @@ import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterIO;
-import frc.robot.subsystems.shooter.ShooterIOSim;
 import frc.robot.subsystems.shooter.ShooterTuningCommand;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIO;
@@ -108,7 +107,6 @@ public class RobotContainer {
                         new CameraIOPhotonSim("front", VisionConstants.frontTransform, drivebase_::getPose, true)
                     );
 
-                    shooter_ = new Shooter(new ShooterIOSim());
 
                     break;
             }
