@@ -1,6 +1,7 @@
 package frc.robot.subsystems.intake;
 
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.generated.CompTunerConstants;
 
 import com.ctre.phoenix6.sim.TalonFXSimState;
@@ -8,10 +9,12 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotController;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.Degrees;
 
 public class IntakeIOSim extends IntakeIOTalonFX{
-    private final DCMotorSim pivotMotorSim;
-    private final DCMotorSim rollerMotorSim;
+    public final DCMotorSim pivotMotorSim;
+    public final DCMotorSim rollerMotorSim;
     
     public IntakeIOSim() {
         super(CompTunerConstants.kCANBus, CompTunerConstants.kCANBus);
@@ -52,6 +55,7 @@ public class IntakeIOSim extends IntakeIOTalonFX{
         rollerMotorSimState.setRawRotorPosition(rollerMotorSim.getAngularPosition().times(IntakeConstants.rollerGearRatio));
         rollerMotorSimState.setRotorVelocity(rollerMotorSim.getAngularVelocity().times(IntakeConstants.rollerGearRatio));
 
+        System.out.print("Intake voltage")
         super.updateInputs(inputs);
     }
 }

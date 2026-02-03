@@ -32,12 +32,18 @@ import frc.robot.subsystems.vision.CameraIO;
 import frc.robot.subsystems.vision.CameraIOLimelight4;
 import frc.robot.subsystems.vision.CameraIOPhotonSim;
 import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.intake.IntakeIO;
+import frc.robot.subsystems.intake.IntakeIOSim;
+import frc.robot.subsystems.intake.IntakeIOTalonFX;
+import frc.robot.subsystems.intake.IntakeConstants;
 
 public class RobotContainer {
 
     // Subsystems
     private Drive drivebase_;
     private AprilTagVision vision_;
+    private IntakeSubsystem intake_;
 
     // Choosers
     private final LoggedDashboardChooser<Command> autoChooser_;
@@ -107,6 +113,8 @@ public class RobotContainer {
                         new CameraIOPhotonSim("front", VisionConstants.frontTransform, drivebase_::getPose, true)
                     );
 
+                    intake_= new IntakeSubsystem(new IntakeIOSim());
+
                     break;
             }
         }
@@ -158,6 +166,10 @@ public class RobotContainer {
             );
         }
 
+        if (intake_ == null) {
+            intake_ = new IntakeSubsystem(new IntakeIO() {});
+        }
+
         DriveCommands.configure(
             drivebase_,
             () -> -gamepad_.getLeftY(),
@@ -178,7 +190,25 @@ public class RobotContainer {
 
     // Bind robot actions to commands here.
     private void configureBindings() {
-        
+        //Testing out each of the commands in the simulator
+        gamepad_.a().whileTrue(
+            intake_.setRollerVoltageCommand(intake_, IntakeConstants.rollerCollectVoltage)
+        );
+        gamepad_.b().whileTrue(
+            intake_.setRollerVoltageCommand(intake_, IntakeConstants.rollerCollectVoltage)
+        );
+        gamepad_.x().whileTrue(
+            intake_.setRollerVoltageCommand(intake_, IntakeConstants.rollerCollectVoltage)
+        );
+        gamepad_.y().whileTrue(
+            intake_.setRollerVoltageCommand(intake_, IntakeConstants.rollerCollectVoltage)
+        );
+        gamepad_.leftBumper().whileTrue(
+            intake_.setRollerVoltageCommand(intake_, IntakeConstants.rollerCollectVoltage)
+        );
+        gamepad_.rightBumper().whileTrue(
+            intake_.setRollerVoltageCommand(intake_, IntakeConstants.rollerCollectVoltage)
+        );
     }
 
     private void configureDriveBindings() {

@@ -1,11 +1,13 @@
 package frc.robot.subsystems.intake; 
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Time;
@@ -26,13 +28,14 @@ public class IntakeSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         io.updateInputs(inputs);
-        Logger.recordOutput("Intake/PivotAngle", inputs.PivotAngle);
+        /*Logger.recordOutput("Intake/PivotAngle", inputs.PivotAngle);
         Logger.recordOutput("Intake/RollerVoltage", inputs.RollerAppliedVolts);
         Logger.recordOutput("Intake/PivotAngularVelocity", inputs.PivotAngularVelocity);
         Logger.recordOutput("Intake/RollerAngularVelocity", inputs.RollerAngularVelocity);
         Logger.recordOutput("Intake/RollerCurrentAmps", inputs.RollerCurrentAmps);
         Logger.recordOutput("Intake/PivotCurrentAmps", inputs.PivotCurrentAmps);
-        Logger.recordOutput("Intake/PivotAppliedVolts", inputs.PivotAppliedVolts);
+        Logger.recordOutput("Intake/PivotAppliedVolts", inputs.PivotAppliedVolts);*/
+        //In case we still need them
     }
 
     //Intake control methods
@@ -89,8 +92,86 @@ public class IntakeSubsystem extends SubsystemBase {
         return Math.abs(currentDeg - targetDeg) <= IntakeConstants.pivotDegreeTolerance;
     }
 
+    /////////////
+    ///Commands//
+    /////////////
+    
+    //////////////////////////////////////////////////////
+    /// First stow the intake, and then wait until it is stowed
+    //////////////////////////////////////////////////////
+    public Command stowIntakeCommand(IntakeSubsystem intake) {
+        return Commands.runOnce(() -> intake.stowIntake(), intake)
+        .andThen(Commands.waitUntil(() -> intake.isIntakeStowed())
+        .withTimeout(2)).withName("Stow Intake");
+    }
+
+    //////////////////////////////////////////////////////
+    /// First deploy the intake, and then wait until it is deployed
+    //////////////////////////////////////////////////////
+    public Command deployIntakeCommand(IntakeSubsystem intake) {
+        return Commands.runOnce(() -> intake.deployIntake(), intake)
+        .andThen(Commands.waitUntil(() -> intake.isIntakeDeployed())
+        .withTimeout(2)).withName("Deploy Intake");
+    }
+
+    /////////////////////////
+    /// Stop the rollers once
+    /////////////////////////
+    public Command stopRollerCommand(IntakeSubsystem intake) {
+        return Commands.runOnce(() -> intake.stopRoller(), intake)
+        .withName("Stop Roller");
+    }
+
+    ////////////////////////////////////////////////////////
+    /// Continously set the roller voltage until interrupted
+    ////////////////////////////////////////////////////////
+    public Command setRollerVoltageCommand(IntakeSubsystem intake, Voltage volts) {
+        return Commands.run(() -> intake.setRollerVoltage(volts), intake)
+        .withName("Set Roller Voltage");
+    }
+
+    //////////////////////////////////////////////////////////////////
+    /// Continously move the rollers at set velocity until interrupted
+    //////////////////////////////////////////////////////////////////
+    public Command setRollerVelocityCommand(IntakeSubsystem intake, AngularVelocity velocity) {
+        return Commands.run(() -> intake.setRollerVelocity(velocity), intake)
+        .withName("Set Roller Velocity");
+    }
+
+    ////////////////////////////////////////////////////////////////
+    /// Continously move the pivot at set velocity until interrupted
+    ////////////////////////////////////////////////////////////////
+    public Command setPivotVoltageCommand(IntakeSubsystem intake, Voltage voltage) {
+        return Commands.run(() -> intake.setPivotVoltage(voltage), intake)
+        .withName("Set Pivot Voltage");
+    }
+
+    /////////////////////////////////////////////////////////////
+    /// First set the angle target, then wait until it is reached
+    /////////////////////////////////////////////////////////////
+    public Command setPivotAngleCommand(IntakeSubsystem intake, Angle angle) {
+        return Commands.runOnce(() -> intake.setPivotAngle(angle), intake)
+        .andThen(Commands.waitUntil(() -> intake.isPivotAtAngle(angle))
+        .withTimeout(2)).withName("Set Pivot Angle");
+    }
+
+    ////////////////////////////////
+    ///Deploy and intake in parallel
+    ////////////////////////////////
+    public Command intakeDeployCommand(IntakeSubsystem intake){
+        return Commands.parallel(setRollerVoltageCommand(intake, IntakeConstants.rollerCollectVoltage), deployIntakeCommand(intake));
+    }
+
+    ////////////////////////////////////////
+    ///Stow and stop the rollers in parallel
+    ////////////////////////////////////////
+    public Command stopStowCommand(IntakeSubsystem intake){
+        return Commands.parallel(stopRollerCommand(intake), stowIntakeCommand(intake));
+    }
+
+
     ////////////////////////////
-    /// Sys ID Routine creation
+    /// Sys ID Routine creation/
     /// ////////////////////////
 
     public final SysIdRoutine pivotSysIdRoutine(){
@@ -101,7 +182,7 @@ public class IntakeSubsystem extends SubsystemBase {
                 null, //Default ramp rate of the voltage of 1 V/s, according to Phoenix 6 documentation
                 stepVoltage_pivot,
                 timeOut_pivot,
-                (state) -> SignalLogger.writeString("state", state.toString()) //Logging the state of the routine
+                (state) -> Logger.recordOutput("state", state.toString()) //Logging the state of the routine
             ),
             new SysIdRoutine.Mechanism(
                 (Voltage voltage)-> setPivotVoltage(voltage),
@@ -119,7 +200,7 @@ public class IntakeSubsystem extends SubsystemBase {
                 null, //Default ramp rate of the voltage of 1 V/s, according to Phoenix 6 documentation
                 stepVoltage_roller,
                 timeOut_roller,
-                (state) -> SignalLogger.writeString("state", state.toString()) //Logging the state of the routine
+                (state) -> Logger.recordOutput("state", state.toString()) //Logging the state of the routine
             ),
             new SysIdRoutine.Mechanism(
                 (Voltage Volts)-> setRollerVoltage(Volts),
@@ -128,10 +209,11 @@ public class IntakeSubsystem extends SubsystemBase {
             )
         );
     }
+
     
-    //////////////////
-    // Sys Id Commands
-    //////////////////
+    ///////////////////
+    // Sys Id Commands/
+    ///////////////////
 
     public Command pivotSysIdQuasistaticCommand(SysIdRoutine.Direction direction){
         return pivotSysIdRoutine().quasistatic(direction);
