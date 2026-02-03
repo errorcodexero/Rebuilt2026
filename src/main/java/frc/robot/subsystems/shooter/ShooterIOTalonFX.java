@@ -116,15 +116,15 @@ public class ShooterIOTalonFX implements ShooterIO {
         
         // Status Signal Collection, less repetitive code
         StatusSignalCollection signals = new StatusSignalCollection(
-        shooter1AngularVelocity,
-        shooter1AppliedVolts,
-        shooter1CurrentAmps,
-        shooter2AngularVelocity,
-        shooter2AppliedVolts,
-        shooter2CurrentAmps,
-        shooter3AngularVelocity,
-        shooter3AppliedVolts,
-        shooter3CurrentAmps
+            shooter1AngularVelocity,
+            shooter1AppliedVolts,
+            shooter1CurrentAmps,
+            shooter2AngularVelocity,
+            shooter2AppliedVolts,
+            shooter2CurrentAmps,
+            shooter3AngularVelocity,
+            shooter3AppliedVolts,
+            shooter3CurrentAmps
         );
 
         tryUntilOk(5, () -> signals.setUpdateFrequencyForAll(50.0));
@@ -139,17 +139,14 @@ public class ShooterIOTalonFX implements ShooterIO {
         inputs.shooter1Velocity = shooter1AngularVelocity.getValue();
         inputs.shooter2Velocity = shooter2AngularVelocity.getValue();
         inputs.shooter3Velocity = shooter3AngularVelocity.getValue();
-        // inputs.shooter4Velocity = shooter4AngularVelocity.getValue();
 
         inputs.shooter1Voltage = shooter1AppliedVolts.getValue();
         inputs.shooter2Voltage = shooter2AppliedVolts.getValue();
         inputs.shooter3Voltage = shooter3AppliedVolts.getValue();
-        //inputs.shooter4Voltage = shooter4AppliedVolts.getValue();
 
         inputs.shooter1Current = shooter1CurrentAmps.getValue();
         inputs.shooter2Current = shooter2CurrentAmps.getValue();
         inputs.shooter3Current = shooter3CurrentAmps.getValue();
-       // inputs.shooter4Current = shooter4CurrentAmps.getValue();
     }
 
     public void setShooterVelocity(AngularVelocity vel) {
