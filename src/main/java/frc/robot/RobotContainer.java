@@ -11,6 +11,7 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import java.util.Arrays;
 
+import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import edu.wpi.first.net.WebServer;

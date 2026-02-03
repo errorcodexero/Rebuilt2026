@@ -9,10 +9,9 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-
 import frc.robot.Robot;
-import frc.robot.subsystems.climber.ClimberConstants;
 
 public class ThriftyClimbIOSim extends ThriftyClimbIOTalonFX {
     private final DCMotorSim climbSim;
@@ -20,10 +19,10 @@ public class ThriftyClimbIOSim extends ThriftyClimbIOTalonFX {
     public ThriftyClimbIOSim() {
         LinearSystem<N2, N1, N2> sys = LinearSystemId.createDCMotorSystem(
             DCMotor.getKrakenX60Foc(1),
-            ClimberConstants.Sim.MOI.in(KilogramSquareMeters),
-            ClimberConstants.Sim.gearRatio
+            ThriftyClimbConstants.MOI.in(KilogramSquareMeters),
+            ThriftyClimbConstants.thriftyGearRatio
         );
-            
+
         climbSim = new DCMotorSim(sys, DCMotor.getKrakenX60Foc(1));
     }
         
@@ -37,15 +36,11 @@ public class ThriftyClimbIOSim extends ThriftyClimbIOTalonFX {
         // Copy back rotor position/velocity into the TalonFX sim so hardware layer reports correct values
         state.setRawRotorPosition(climbSim.getAngularPosition());
         state.setRotorVelocity(climbSim.getAngularVelocity());
+        state.setRotorAcceleration(climbSim.getAngularAcceleration());
+        state.setSupplyVoltage(RobotController.getBatteryVoltage());
         
         // Delegate to hardware implementation to populate the inputs from the TalonFX signals
         super.updateInputs(inputs);
-    }
-    
-    @Override
-    public void applyOutputs(ThriftyClimbOutputs outputs) {
-        // Reuse hardware behavior: convert setpoint to motor control (motion magic voltage)
-        super.applyOutputs(outputs);
     }
 }
     
