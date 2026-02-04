@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.235711111111111,
-        "y": 7.169188888888889
+        "x": 0.4294888888869066,
+        "y": 6.907166666663488
       },
       "prevControl": null,
       "nextControl": {
-        "x": 0.29847777777777806,
-        "y": 7.25988888888889
+        "x": 0.4307196180025796,
+        "y": 6.154932223897935
       },
       "isLocked": false,
       "linkedName": "DepotTop"
     },
     {
       "anchor": {
-        "x": 0.4778780685063567,
-        "y": 4.878668147623577
+        "x": 0.4294888888869066,
+        "y": 4.969119339435449
       },
       "prevControl": {
-        "x": 0.4778780685063567,
-        "y": 5.128668147623577
+        "x": 0.4294888888869066,
+        "y": 5.219119339435449
       },
       "nextControl": null,
       "isLocked": false,
@@ -45,7 +45,7 @@
     "rotation": 90.0
   },
   "reversed": false,
-  "folder": "Depot",
+  "folder": "Depot Climb",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 90.0
