@@ -1,0 +1,86 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 7.786266666666666,
+        "y": 5.274566666666667
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 7.512908618927661,
+        "y": 4.725257261879589
+      },
+      "isLocked": false,
+      "linkedName": "NZCollect"
+    },
+    {
+      "anchor": {
+        "x": 6.123433333333334,
+        "y": 0.8705777777777768
+      },
+      "prevControl": {
+        "x": 6.625310521774494,
+        "y": 1.3291866699439865
+      },
+      "nextControl": {
+        "x": 5.692226992508508,
+        "y": 0.4765469933244141
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 4.6179782666574,
+        "y": 0.6342763739173767
+      },
+      "prevControl": {
+        "x": 5.145552467498008,
+        "y": 0.6144166180553179
+      },
+      "nextControl": {
+        "x": 3.8264836266479385,
+        "y": 0.6640710270517992
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.3016555555555556,
+        "y": 0.9713555555555557
+      },
+      "prevControl": {
+        "x": 4.45032605440521,
+        "y": 0.5703541065968624
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Shoot2"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.2,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 59.058463533677475
+  },
+  "reversed": false,
+  "folder": "Neutral Zone Climb",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -90.0
+  },
+  "useDefaultConstraints": true
+}
