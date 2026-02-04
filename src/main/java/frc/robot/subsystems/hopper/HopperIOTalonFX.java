@@ -18,8 +18,8 @@ import static edu.wpi.first.units.Units.Amps;
 public class HopperIOTalonFX implements HopperIO {
     
     //Creating Motor Objects
-    private TalonFX feederMotor;
-    private TalonFX scramblerMotor;
+    protected final TalonFX feederMotor;
+    protected final TalonFX scramblerMotor;
 
     //Feeder Control Requests
     private final VoltageOut feederVoltageRequest = new VoltageOut(0);
