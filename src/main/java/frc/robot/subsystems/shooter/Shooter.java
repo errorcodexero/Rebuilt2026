@@ -6,6 +6,8 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.util.function.Supplier;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.units.measure.Angle;
@@ -108,8 +110,12 @@ public class Shooter extends SubsystemBase {
         this.setHoodAngle(hoodTarget);
     }
 
-    public Command goToShootReadyCommand(AngularVelocity vel, Angle pos) {
-        return runOnce(() -> goToShooterPosition(vel, pos)).andThen(Commands.waitUntil(() -> isShooterReady()));
+    public Command runSetpointCmd(AngularVelocity vel, Angle pos) {
+        return runOnce(() -> goToShooterPosition(vel, pos)).andThen(Commands.waitUntil(this::isShooterReady));
+    }
+
+    public Command runDynamicSetpoint(Supplier<AngularVelocity> vel, Supplier<Angle> pos ) {
+        return run(() -> goToShooterPosition(vel.get(), pos.get()));
     }
 
     // Sys ID
