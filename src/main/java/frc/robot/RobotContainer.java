@@ -39,6 +39,7 @@ import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIO;
 import frc.robot.subsystems.vision.CameraIOPhotonSim;
 import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.util.Mechanism3d;
 
 public class RobotContainer {
 
@@ -54,7 +55,6 @@ public class RobotContainer {
     private final CommandXboxController gamepad_ = new CommandXboxController(0);
 
     public RobotContainer() {
-
         /**
          * Subsystem setup
          */
@@ -185,6 +185,10 @@ public class RobotContainer {
             () -> -gamepad_.getLeftX(),
             () -> -gamepad_.getRightX()
         );
+
+        // Initialize the visualizers.
+        Mechanism3d.measured.zero();
+        Mechanism3d.setpoints.zero();
 
         // Choosers
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
