@@ -151,16 +151,16 @@ public class IntakeSubsystem extends SubsystemBase {
     ///Deploy and intake in parallel
     ////////////////////////////////
     public Command intakeDeployCommand(){
-        return Commands.runOnce(() -> deployIntake())
-        .andThen(Commands.runOnce(()-> setRollerVoltage(IntakeConstants.rollerCollectVoltage)));
+        return Commands.runOnce(() -> setRollerVoltage(IntakeConstants.rollerCollectVoltage))
+        .andThen(Commands.runOnce(()->deployIntake() ));
     }
 
     ////////////////////////////////////////
     ///Stow and stop the rollers in parallel
     ////////////////////////////////////////
     public Command stopStowCommand(){
-        return Commands.runOnce(() -> stowIntake())
-        .andThen(Commands.runOnce(()-> stopRoller()));
+        return Commands.runOnce(() -> stopRollerCommand())
+        .andThen(Commands.runOnce(()-> stowIntakeCommand()));
     }
 
 
