@@ -37,6 +37,7 @@ import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeIOTalonFX;
 import frc.robot.subsystems.intake.IntakeConstants;
+import static edu.wpi.first.units.Units.Volts;
 
 public class RobotContainer {
 
@@ -192,23 +193,41 @@ public class RobotContainer {
     private void configureBindings() {
         //Testing out each of the commands in the simulator
         gamepad_.a().whileTrue(
-            intake_.setRollerVoltageCommand(intake_, IntakeConstants.rollerCollectVoltage)
+            intake_.setRollerVoltageCommand(IntakeConstants.rollerCollectVoltage)
         );
+
         gamepad_.b().whileTrue(
-            intake_.setRollerVoltageCommand(intake_, IntakeConstants.rollerCollectVoltage)
+            intake_.setPivotAngleCommand(IntakeConstants.pivotTargetAngle)
         );
+
         gamepad_.x().whileTrue(
-            intake_.setRollerVoltageCommand(intake_, IntakeConstants.rollerCollectVoltage)
+            intake_.deployIntakeCommand()
         );
+
         gamepad_.y().whileTrue(
-            intake_.setRollerVoltageCommand(intake_, IntakeConstants.rollerCollectVoltage)
+            intake_.stowIntakeCommand()
         );
+
         gamepad_.leftBumper().whileTrue(
-            intake_.setRollerVoltageCommand(intake_, IntakeConstants.rollerCollectVoltage)
+            intake_.stopRollerCommand()
         );
+
         gamepad_.rightBumper().whileTrue(
-            intake_.setRollerVoltageCommand(intake_, IntakeConstants.rollerCollectVoltage)
+            intake_.setRollerVelocityCommand(IntakeConstants.rollerMaxVelocity)
         );
+
+        gamepad_.back().whileTrue(
+            intake_.setPivotVoltageCommand(IntakeConstants.pivotVoltage)
+        );
+
+        gamepad_.rightTrigger().whileTrue(
+            intake_.intakeDeployCommand()
+        );
+
+        gamepad_.leftTrigger().whileTrue(
+            intake_.stopStowCommand()
+        );
+
     }
 
     private void configureDriveBindings() {
