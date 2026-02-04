@@ -11,7 +11,7 @@ public class climber extends SubsystemBase {
     
     private final climberIO io;
     private final ClimberInputsAutoLogged inputs = new ClimberInputsAutoLogged(); 
-    private final ClimberOutputs outputs = new ClimberOutputs();
+    private final climberconstants outputs = new ClimberOutputs();
     
     public climber(climberIO io){
         this.io=io;
@@ -21,11 +21,11 @@ public class climber extends SubsystemBase {
         io.updateInput(inputs);
         Logger.processInputs(getName(), null);
         
-        //periodic logic function for climber 
-        io.applytheOutputs(outputs);
+        ///periodic logic function for climber 
+        io.applytheOutputs(Climber outputs);
     }
     public Command motorOneAngle(Angle angle){
-        return runOnce(null)->; {outputs.oneSetPoint= angle;});
+        return Commands.runOnce(()->; {outputs.oneSetPoint= angle;});
     }
 }
 

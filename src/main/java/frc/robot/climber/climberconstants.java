@@ -3,7 +3,7 @@ package frc.robot.climber;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import edu.wpi.first.units.measure.MomentOfInertia;
 
-public class climberconstants {
+public class ClimberConstants {
 
 public static final int MotoroneID = 0;
 public static final int MotortwoID = 1; 
