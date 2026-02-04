@@ -4,6 +4,7 @@ import java.util.InputMismatchException;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
@@ -11,14 +12,14 @@ public class climber extends SubsystemBase {
     
     private final climberIO io;
     private final ClimberInputsAutoLogged inputs = new ClimberInputsAutoLogged(); 
-    private final climberconstants outputs = new ClimberOutputs();
+    private final ClimberConstants outputs = new ClimberOutputs();
     
-    public climber(climberIO io){
-        this.io=io;
+    public climber(ClimberIO io){
+        this.Io=io;
     }
     @Override 
     public void periodic() {
-        io.updateInput(inputs);
+        Io.updateInput(Inputs);
         Logger.processInputs(getName(), null);
         
         ///periodic logic function for climber 
