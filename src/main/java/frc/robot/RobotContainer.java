@@ -6,22 +6,36 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.FeetPerSecond;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import java.util.Arrays;
 
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.COTS;
+import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
+import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnFly;
+import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.Mode;
+import frc.robot.Constants.RobotType;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.generated.AlphaTunerConstants;
 import frc.robot.generated.BetaTunerConstants;
@@ -29,8 +43,9 @@ import frc.robot.generated.CompTunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
+import frc.robot.subsystems.drive.GyroIOMaple;
+import frc.robot.subsystems.drive.ModuleIOMaple;
 import frc.robot.subsystems.drive.ModuleIOReplay;
-import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
@@ -39,6 +54,7 @@ import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIO;
 import frc.robot.subsystems.vision.CameraIOPhotonSim;
 import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.util.MapleSimUtil;
 import frc.robot.util.Mechanism3d;
 
 public class RobotContainer {
@@ -92,9 +108,34 @@ public class RobotContainer {
 
                 case SIMBOT:
                     // Sim robot, instantiate physics sim IO implementations
+                    // Create and configure a drivetrain simulation configuration
+                    DriveTrainSimulationConfig config = DriveTrainSimulationConfig.Default()
+                        .withGyro(COTS.ofPigeon2())
+                        .withSwerveModule(COTS.ofMark4(
+                            DCMotor.getKrakenX60(1),
+                            DCMotor.getKrakenX60(1),
+                            COTS.WHEELS.COLSONS.cof,
+                            2
+                        ))
+                        .withTrackLengthTrackWidth(
+                            Meters.of(Math.abs(
+                                CompTunerConstants.FrontLeft.LocationX -
+                                CompTunerConstants.BackLeft.LocationX
+                            )),
+                            Meters.of(Math.abs(
+                                CompTunerConstants.FrontLeft.LocationX -
+                                CompTunerConstants.FrontRight.LocationX
+                            ))
+                        )
+                        .withBumperSize(Inches.of(30.75), Inches.of(37.25));
+
+                    // Add sim drivebase to simulation and where modules can get it.
+                    // CALL THIS BEFORE CREATING THE DRIVEBASE!!!
+                    MapleSimUtil.createSwerve(config, new Pose2d(2.0, 2.0, Rotation2d.kZero));
+
                     drivebase_ = new Drive(
-                        new GyroIO() {},
-                        ModuleIOSim::new,
+                        new GyroIOMaple(),
+                        ModuleIOMaple::new,
                         CompTunerConstants.FrontLeft,
                         CompTunerConstants.FrontRight,
                         CompTunerConstants.BackLeft,
@@ -105,7 +146,7 @@ public class RobotContainer {
 
                     vision_ = new AprilTagVision(
                         drivebase_::addVisionMeasurement,
-                        new CameraIOPhotonSim("front", VisionConstants.frontTransform, drivebase_::getPose, true)
+                        new CameraIOPhotonSim("front", VisionConstants.frontTransform, MapleSimUtil::getPosition, true)
                     );
 
                     break;
@@ -189,6 +230,29 @@ public class RobotContainer {
         // Initialize the visualizers.
         Mechanism3d.measured.zero();
         Mechanism3d.setpoints.zero();
+
+        // Maple Sim
+        if (Constants.getRobot() == RobotType.SIMBOT) {
+            MapleSimUtil.start();
+
+            gamepad_.a().onTrue(Commands.runOnce(() -> {
+                var fuel = new RebuiltFuelOnFly(
+                    MapleSimUtil.getPosition().getTranslation(),
+                    new Translation2d(), // Initial Robot Position
+                    MapleSimUtil.getFieldChassisSpeeds(),
+                    MapleSimUtil.getPosition().getRotation(),
+                    Meters.of(0.5), // Initial Height
+                    MetersPerSecond.of(8),
+                    Degrees.of(50)
+                )
+                .withHitTargetCallBack(() -> System.out.println("Fuel Scored!"))
+                .withProjectileTrajectoryDisplayCallBack(
+                    poses -> Logger.recordOutput("MapleSim/Trajectory", poses.toArray(Pose3d[]::new))
+                );
+
+                SimulatedArena.getInstance().addGamePieceProjectile(fuel);
+            }));
+        }
 
         // Choosers
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
