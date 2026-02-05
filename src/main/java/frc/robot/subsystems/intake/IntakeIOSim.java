@@ -9,15 +9,16 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotController;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 
-public class IntakeIOSim extends IntakeIOTalonFX{
+public class IntakeIOSim extends IntakeIOTalonFX {
     public final DCMotorSim pivotMotorSim;
     public final DCMotorSim rollerMotorSim;
     
     public IntakeIOSim() {
-        super(CompTunerConstants.kCANBus, CompTunerConstants.kCANBus);
+        super(CompTunerConstants.kCANBus, CompTunerConstants.kCANBus); // This needs to be changed
+
         pivotMotorSim= new DCMotorSim(
             LinearSystemId.createDCMotorSystem(
-                DCMotor.getKrakenX60Foc(1), IntakeConstants.PIVOT_MOMENTOFINERTIA.in(KilogramSquareMeters), IntakeConstants.pivotGearRatio
+                DCMotor.getKrakenX60Foc(1), IntakeConstants.PIVOT_MOMENTOFINERTIA.in(KilogramSquareMeters), IntakeConstants.motorToPivotGearRatio
             ),
         DCMotor.getKrakenX60Foc(1) //Not sure how many motors
         );  
@@ -41,8 +42,8 @@ public class IntakeIOSim extends IntakeIOTalonFX{
         pivotMotorSim.setInputVoltage(pivotMotorSimState.getMotorVoltage());
         pivotMotorSim.update(0.020); //20 millisecond robot sim loop
 
-        pivotMotorSimState.setRawRotorPosition(pivotMotorSim.getAngularPosition().times(IntakeConstants.pivotGearRatio));
-        pivotMotorSimState.setRotorVelocity(pivotMotorSim.getAngularVelocity().times(IntakeConstants.pivotGearRatio));
+        pivotMotorSimState.setRawRotorPosition(pivotMotorSim.getAngularPosition().times(IntakeConstants.motorToPivotGearRatio));
+        pivotMotorSimState.setRotorVelocity(pivotMotorSim.getAngularVelocity().times(IntakeConstants.motorToPivotGearRatio));
         
         rollerMotorSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
 

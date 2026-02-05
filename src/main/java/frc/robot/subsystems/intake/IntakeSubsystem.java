@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.util.Mechanism3d;
 
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.units.measure.Voltage;
@@ -19,6 +20,8 @@ public class IntakeSubsystem extends SubsystemBase {
     private final Angle pivotDeployedAngle = IntakeConstants.deployedAngle;
     private final Angle pivotStowedAngle = IntakeConstants.stowedAngle;
 
+    private Angle setpointAngle = pivotStowedAngle;
+
     public IntakeSubsystem(IntakeIO io) {
         this.io = io;
         Logger.processInputs("Intake", inputs);
@@ -28,6 +31,11 @@ public class IntakeSubsystem extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Intake", inputs);
+
+        Logger.recordOutput("Intake/Setpoint", setpointAngle);
+
+        Mechanism3d.measured.setIntake(inputs.PivotAngle);
+        Mechanism3d.setpoints.setIntake(setpointAngle);
     }
 
     //Intake control methods
@@ -36,11 +44,12 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void setPivotAngle(Angle angle) {
+        setpointAngle = angle;
         io.setPivotAngle(angle);
     }
 
     public void stopRoller(){
-        io.setRollerVoltage(Volts.of(0));
+        io.stopRoller();
     }
 
     public void stowIntake(){
@@ -63,25 +72,16 @@ public class IntakeSubsystem extends SubsystemBase {
         return inputs.PivotAngle;
     }
 
-    public boolean isIntakeDeployed(){
-        // Compare pivot angle to deployed angle with a small tolerance (degrees)
-        double currentDeg = getPivotAngle().in(Degrees);
-        double targetDeg = pivotDeployedAngle.in(Degrees);
-        return Math.abs(currentDeg - targetDeg) <= IntakeConstants.pivotDegreeTolerance;
+    public boolean isIntakeDeployed() {
+        return isPivotAtAngle(pivotDeployedAngle);
     }
 
     public boolean isIntakeStowed(){
-        // Compare pivot angle to stowed angle with a small tolerance (degrees)
-        double currentDeg = getPivotAngle().in(Degrees);
-        double targetDeg = pivotStowedAngle.in(Degrees);
-        return Math.abs(currentDeg - targetDeg) <= IntakeConstants.pivotDegreeTolerance;
+        return isPivotAtAngle(pivotStowedAngle);
     }
 
     public boolean isPivotAtAngle(Angle angle){
-        // Compare pivot angle to target angle with a small tolerance (degrees)
-        double currentDeg = getPivotAngle().in(Degrees);
-        double targetDeg = angle.in(Degrees);
-        return Math.abs(currentDeg - targetDeg) <= IntakeConstants.pivotDegreeTolerance;
+        return inputs.PivotAngle.isNear(angle, IntakeConstants.pivotTolerance);
     }
 
     /////////////
