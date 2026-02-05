@@ -3,9 +3,9 @@
 ![Pull Requests](https://img.shields.io/github/issues-pr/errorcodexero/Rebuilt2026?logo=github&color=orange)
 ![Last Commit](https://img.shields.io/github/last-commit/errorcodexero/Rebuilt2026?logo=git&color=yellow&logoColor=white)
 
-This project is the source code for 1425's robot designed for the First Robotics Competition 2026 game, REBUILT.
+This project is the source code for Relic, 1425's robot designed for the First Robotics Competition 2026 game, REBUILT.
 
-![Reefscape](/rebuilt.webp)
+![Rebuilt](/relic.png)
 
 ## Contributing
 While contributing to this project, please create a branch for what you are working on, and follow our repository naming conventions written [here](./STYLE-GUIDE.md).
