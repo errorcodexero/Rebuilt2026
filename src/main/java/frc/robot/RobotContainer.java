@@ -260,6 +260,8 @@ public class RobotContainer {
                     poses -> Logger.recordOutput("MapleSim/Trajectory", poses.toArray(Pose3d[]::new))
                 );
 
+                MapleSimUtil.loseGamepiece();
+
                 SimulatedArena.getInstance().addGamePieceProjectile(fuel);
             }));
         }

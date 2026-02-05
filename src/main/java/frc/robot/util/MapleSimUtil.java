@@ -1,6 +1,11 @@
 package frc.robot.util;
 
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
+
+import org.ironmaple.simulation.IntakeSimulation;
 import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.IntakeSimulation.IntakeSide;
 import org.ironmaple.simulation.drivesims.GyroSimulation;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
@@ -13,11 +18,14 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
+import frc.robot.Constants;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 
 public class MapleSimUtil {
     private static SwerveDriveSimulation drivebaseSimulation;
+
+    private static IntakeSimulation intakeSimulation;
 
     private static final Command run =
         Commands.run(MapleSimUtil::periodic)
@@ -27,14 +35,14 @@ public class MapleSimUtil {
     /** Starts the MapleSim simulation, kicks off a periodic method. */
     public static void start() {
         var rebuilt = (Arena2026Rebuilt) SimulatedArena.getInstance();
-        rebuilt.setEfficiencyMode(false);
+        rebuilt.setEfficiencyMode(Constants.spawnLessFuelInSim);
         rebuilt.resetFieldForAuto();
 
         CommandScheduler.getInstance().schedule(run);
     }
 
     private static void periodic() {
-        var arena = SimulatedArena.getInstance();
+        var arena = (Arena2026Rebuilt) SimulatedArena.getInstance();
         
         arena.simulationPeriodic();
 
@@ -44,30 +52,61 @@ public class MapleSimUtil {
         Logger.recordOutput("MapleSim/Pose", getPosition());
         Logger.recordOutput("MapleSim/Score/Red", arena.getScore(Alliance.Red));
         Logger.recordOutput("MapleSim/Score/Blue", arena.getScore(Alliance.Blue));
+        Logger.recordOutput("MapleSim/FuelRemaining", getRemainingGamepieces());
+        Logger.recordOutput("MapleSim/Intaking", intakeSimulation.isRunning());
+        Logger.recordOutput("MapleSim/ActiveHub", arena.isActive(true) ? Alliance.Blue : Alliance.Red);
     }
 
-    public static void createSwerve(DriveTrainSimulationConfig config, Pose2d initialPose) {
+    public static SwerveDriveSimulation createSwerve(DriveTrainSimulationConfig config, Pose2d initialPose) {
         drivebaseSimulation = new SwerveDriveSimulation(config, initialPose);
         SimulatedArena.getInstance().addDriveTrainSimulation(drivebaseSimulation);
-    }
-
-    public static GyroSimulation getGyroSimulation() {
-        if (drivebaseSimulation == null) throw new IllegalStateException("Drivebase sim is not setup yet!");
-        return drivebaseSimulation.getGyroSimulation();
-    }
-
-    public static SwerveModuleSimulation[] getModuleSimulations() {
-        if (drivebaseSimulation == null) throw new IllegalStateException("Drivebase sim is not setup yet!");
-        return drivebaseSimulation.getModules();
+        return drivebaseSimulation;
     }
 
     public static Pose2d getPosition() {
-        if (drivebaseSimulation == null) throw new IllegalStateException("Drivebase sim is not setup yet!");
         return drivebaseSimulation.getSimulatedDriveTrainPose();
     }
 
     public static ChassisSpeeds getFieldChassisSpeeds() {
-        if (drivebaseSimulation == null) throw new IllegalStateException("Drivebase sim is not setup yet!");
         return drivebaseSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative();
+    }
+
+    public static IntakeSimulation createIntake() {
+        if (drivebaseSimulation == null) throw new IllegalStateException("Intake cannot be created before swerve is!");
+
+        intakeSimulation = IntakeSimulation.OverTheBumperIntake(
+            "Fuel",
+            drivebaseSimulation,
+            Inches.of(29.5),
+            Inches.of(8.125),
+            IntakeSide.FRONT,
+            80
+        );
+
+        return intakeSimulation;
+    }
+
+    public static int getRemainingGamepieces() {
+        return intakeSimulation.getGamePiecesAmount();
+    }
+
+    public static void setIntakeRunning(boolean running) {
+        if (running) {
+            intakeSimulation.startIntake();
+        } else {
+            intakeSimulation.stopIntake();
+        }
+    }
+
+    public static void loseGamepiece() {
+        intakeSimulation.obtainGamePieceFromIntake();
+    }
+
+    public static GyroSimulation getGyroSimulation() {
+        return drivebaseSimulation.getGyroSimulation();
+    }
+
+    public static SwerveModuleSimulation[] getModuleSimulations() {
+        return drivebaseSimulation.getModules();
     }
  }

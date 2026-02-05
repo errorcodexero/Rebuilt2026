@@ -33,6 +33,8 @@ public final class Constants {
     // Sets the currently running robot.
     private static final RobotType robotType = RobotType.SIMBOT;
 
+    public static final boolean spawnLessFuelInSim = true;
+
     public static class DriveConstants {
         public static final double slowModeJoystickMultiplier = 0.4;
     }

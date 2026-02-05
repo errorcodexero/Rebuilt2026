@@ -4,6 +4,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants;
+import frc.robot.Constants.Mode;
+import frc.robot.Constants.RobotType;
+import frc.robot.util.MapleSimUtil;
 import frc.robot.util.Mechanism3d;
 
 import org.littletonrobotics.junction.Logger;
@@ -25,6 +29,10 @@ public class IntakeSubsystem extends SubsystemBase {
     public IntakeSubsystem(IntakeIO io) {
         this.io = io;
         Logger.processInputs("Intake", inputs);
+
+        if (Constants.getMode() == Mode.SIM) {
+            MapleSimUtil.createIntake();
+        }
     }   
 
     @Override
@@ -36,6 +44,10 @@ public class IntakeSubsystem extends SubsystemBase {
 
         Mechanism3d.measured.setIntake(inputs.PivotAngle);
         Mechanism3d.setpoints.setIntake(setpointAngle);
+
+        if (Constants.getMode() == Mode.SIM) {
+            MapleSimUtil.setIntakeRunning(isIntakeDeployed());
+        }
     }
 
     //Intake control methods
