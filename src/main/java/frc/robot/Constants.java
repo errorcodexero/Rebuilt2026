@@ -64,7 +64,7 @@ public final class Constants {
         BETA,
 
         /** The Sim Bot */
-        SIMBOT,
+        SIMBOT
     }
 
     // This is only a fallback! This will not change the robot type.
