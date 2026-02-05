@@ -39,6 +39,12 @@ import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIO;
 import frc.robot.subsystems.vision.CameraIOPhotonSim;
 import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.intake.IntakeIO;
+import frc.robot.subsystems.intake.IntakeIOSim;
+import frc.robot.subsystems.intake.IntakeIOTalonFX;
+import frc.robot.subsystems.intake.IntakeConstants; 
+import static edu.wpi.first.units.Units.Volts;
 import frc.robot.util.Mechanism3d;
 
 public class RobotContainer {
@@ -46,6 +52,7 @@ public class RobotContainer {
     // Subsystems
     private Drive drivebase_;
     private AprilTagVision vision_;
+    private IntakeSubsystem intake_;
     private Shooter shooter_;
 
     // Choosers
@@ -107,6 +114,8 @@ public class RobotContainer {
                         drivebase_::addVisionMeasurement,
                         new CameraIOPhotonSim("front", VisionConstants.frontTransform, drivebase_::getPose, true)
                     );
+
+                    intake_= new IntakeSubsystem(new IntakeIOSim());
 
                     break;
             }
@@ -175,6 +184,10 @@ public class RobotContainer {
             );
         }
 
+        if (intake_ == null) {
+            intake_ = new IntakeSubsystem(new IntakeIO() {});
+        }
+        
         if (shooter_ == null) {
             shooter_ = new Shooter(new ShooterIO() {});
         }
@@ -207,7 +220,43 @@ public class RobotContainer {
 
     // Bind robot actions to commands here.
     private void configureBindings() {
-        
+        //Testing out each of the commands in the simulator
+        gamepad_.a().whileTrue(
+            intake_.setRollerVoltageCommand(IntakeConstants.rollerCollectVoltage)
+        );
+
+        gamepad_.b().whileTrue(
+            intake_.setPivotAngleCommand(IntakeConstants.pivotTargetAngle)
+        );
+
+        gamepad_.x().whileTrue(
+            intake_.deployIntakeCommand()
+        );
+
+        gamepad_.y().whileTrue(
+            intake_.stowIntakeCommand()
+        );
+
+        gamepad_.leftBumper().whileTrue(
+            intake_.stopRollerCommand()
+        );
+
+        gamepad_.rightBumper().whileTrue(
+            intake_.setRollerVelocityCommand(IntakeConstants.rollerMaxVelocity)
+        );
+
+        gamepad_.back().whileTrue(
+            intake_.setPivotVoltageCommand(IntakeConstants.pivotVoltage)
+        );
+
+        gamepad_.rightTrigger().whileTrue(
+            intake_.intakeDeployCommand()
+        );
+
+        gamepad_.leftTrigger().whileTrue(
+            intake_.stopStowCommand()
+        );
+
     }
 
     private void configureDriveBindings() {
