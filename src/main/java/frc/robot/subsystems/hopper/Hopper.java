@@ -5,6 +5,9 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.Constants.Mode;
+import frc.robot.util.MapleSimUtil;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 
@@ -26,11 +29,17 @@ public class Hopper extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Hopper", inputs);
+
+        if (Constants.getMode() == Mode.SIM) {
+            // Set shooter running if feeder and scrambler are both rolling.
+            MapleSimUtil.setShooterRunning(
+                inputs.feederVelocity.gt(RadiansPerSecond.zero()) &&
+                inputs.scramblerVelocity.gt(RadiansPerSecond.zero())
+            );
+        }
         
-        Logger.recordOutput("Hopper/ScramblerGoalRPS",
-        scramblerGoal.in(RotationsPerSecond));
-        Logger.recordOutput("Hopper/FeederGoalRPS",
-        feederGoal.in(RotationsPerSecond));
+        Logger.recordOutput("Hopper/ScramblerGoal", scramblerGoal);
+        Logger.recordOutput("Hopper/FeederGoal", feederGoal);
         Logger.recordOutput("Hopper/ScramblerAtGoal", isScramblerAtGoal());
         Logger.recordOutput("Hopper/FeederAtGoal", isFeederAtGoal());
     }
