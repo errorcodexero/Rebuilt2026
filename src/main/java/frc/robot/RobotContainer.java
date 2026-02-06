@@ -11,6 +11,7 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.Arrays;
 
@@ -53,7 +54,6 @@ import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.ShooterIO;
-import frc.robot.subsystems.shooter.ShooterIOSim;
 import frc.robot.subsystems.thriftyclimb.ThriftyClimb;
 import frc.robot.subsystems.thriftyclimb.ThriftyClimbIO;
 import frc.robot.subsystems.thriftyclimb.ThriftyClimbIOSim;
@@ -274,7 +274,7 @@ public class RobotContainer {
         if (Constants.getRobot() == RobotType.SIMBOT) {
             MapleSimUtil.start();
 
-            gamepad_.a().onTrue(Commands.runOnce(() -> {
+            gamepad_.rightTrigger().whileTrue(Commands.runOnce(() -> {
                 if (MapleSimUtil.getRemainingGamepieces() == 0) return;
 
                 var fuel = new RebuiltFuelOnFly(
@@ -294,7 +294,9 @@ public class RobotContainer {
                 MapleSimUtil.loseGamepiece();
 
                 SimulatedArena.getInstance().addGamePieceProjectile(fuel);
-            }));
+            })
+            .andThen(Commands.waitTime(Seconds.of(0.5)))
+            .repeatedly());
         }
 
         // Choosers
