@@ -20,16 +20,16 @@ public class IntakeIOSim extends IntakeIOTalonFX {
 
         pivotMotorSim= new DCMotorSim(
             LinearSystemId.createDCMotorSystem(
-                DCMotor.getKrakenX60Foc(1), IntakeConstants.PIVOT_MOMENTOFINERTIA.in(KilogramSquareMeters), IntakeConstants.motorToPivotGearRatio
+                DCMotor.getKrakenX60Foc(1), IntakeConstants.PIVOT_MOMENTOFINERTIA.in(KilogramSquareMeters), IntakeConstants.pivotToMotorGearRatio
             ),
-            DCMotor.getKrakenX60Foc(1) //Not sure how many motors
+            DCMotor.getKrakenX60Foc(1)
         );  
 
         rollerMotorSim= new DCMotorSim(
             LinearSystemId.createDCMotorSystem(
                 DCMotor.getKrakenX60Foc(1), IntakeConstants.ROLLER_MOMENTOFINERTIA.in(KilogramSquareMeters), IntakeConstants.rollerGearRatio
             ),
-            DCMotor.getKrakenX60Foc(1) //Not sure how many motors
+            DCMotor.getKrakenX60Foc(1)
         );
     }
 
@@ -44,13 +44,13 @@ public class IntakeIOSim extends IntakeIOTalonFX {
         pivotMotorSim.setInputVoltage(pivotMotorSimState.getMotorVoltage());
         pivotMotorSim.update(Robot.defaultPeriodSecs);
 
-        pivotMotorSimState.setRawRotorPosition(pivotMotorSim.getAngularPosition().times(IntakeConstants.motorToPivotGearRatio));
-        pivotMotorSimState.setRotorVelocity(pivotMotorSim.getAngularVelocity().times(IntakeConstants.motorToPivotGearRatio));
+        pivotMotorSimState.setRawRotorPosition(pivotMotorSim.getAngularPosition().times(IntakeConstants.pivotToMotorGearRatio));
+        pivotMotorSimState.setRotorVelocity(pivotMotorSim.getAngularVelocity().times(IntakeConstants.pivotToMotorGearRatio));
         
         rollerMotorSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
 
         rollerMotorSim.setInputVoltage(rollerMotorSimState.getMotorVoltage());
-        rollerMotorSim.update(Robot.defaultPeriodSecs); //20 millisecond robot sim loop
+        rollerMotorSim.update(Robot.defaultPeriodSecs);
 
         rollerMotorSimState.setRawRotorPosition(rollerMotorSim.getAngularPosition().times(IntakeConstants.rollerGearRatio));
         rollerMotorSimState.setRotorVelocity(rollerMotorSim.getAngularVelocity().times(IntakeConstants.rollerGearRatio));
