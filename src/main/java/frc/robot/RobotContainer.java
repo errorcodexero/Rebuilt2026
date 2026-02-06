@@ -53,6 +53,7 @@ import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.ShooterIO;
+import frc.robot.subsystems.shooter.ShooterIOSim;
 import frc.robot.subsystems.thriftyclimb.ThriftyClimb;
 import frc.robot.subsystems.thriftyclimb.ThriftyClimbIO;
 import frc.robot.subsystems.thriftyclimb.ThriftyClimbIOSim;
@@ -159,6 +160,8 @@ public class RobotContainer {
                     );
 
                     intake_= new IntakeSubsystem(new IntakeIOSim());
+
+                    shooter_ = new Shooter(new ShooterIOSim());
                     
                     thriftyClimb_ = new ThriftyClimb(
                         new ThriftyClimbIOSim()
