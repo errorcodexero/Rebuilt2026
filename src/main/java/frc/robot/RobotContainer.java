@@ -42,6 +42,9 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIOMaple;
 import frc.robot.subsystems.drive.ModuleIOReplay;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.hopper.Hopper;
+import frc.robot.subsystems.hopper.HopperIO;
+import frc.robot.subsystems.hopper.HopperIOSim;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeSubsystem;
@@ -66,9 +69,10 @@ public class RobotContainer {
     // Subsystems
     private Drive drivebase_;
     private AprilTagVision vision_;
-    private ThriftyClimb thriftyClimb_;
     private IntakeSubsystem intake_;
     private Shooter shooter_;
+    private Hopper hopper_;
+    private ThriftyClimb climb_;
 
     // Choosers
     private final LoggedDashboardChooser<Command> autoChooser_;
@@ -159,10 +163,10 @@ public class RobotContainer {
                     intake_= new IntakeSubsystem(new IntakeIOSim());
 
                     shooter_ = new Shooter(new ShooterIOSim(), new HoodIOSim());
+
+                    hopper_ = new Hopper(new HopperIOSim());
                     
-                    thriftyClimb_ = new ThriftyClimb(
-                        new ThriftyClimbIOSim()
-                    );
+                    climb_ = new ThriftyClimb(new ThriftyClimbIOSim());
 
                     break;
                 default: // Comp Bot
@@ -243,10 +247,6 @@ public class RobotContainer {
                 cams
             );
         }
-
-        if (thriftyClimb_ == null) {
-            thriftyClimb_ = new ThriftyClimb(new ThriftyClimbIO() {});
-        }
         
         if (intake_ == null) {
             intake_ = new IntakeSubsystem(new IntakeIO() {});
@@ -254,6 +254,14 @@ public class RobotContainer {
         
         if (shooter_ == null) {
             shooter_ = new Shooter(new ShooterIO() {}, new HoodIO() {});
+        }
+
+        if (hopper_ == null) {
+            hopper_ = new Hopper(new HopperIO() {});
+        }
+
+        if (climb_ == null) {
+            climb_ = new ThriftyClimb(new ThriftyClimbIO() {});
         }
 
         DriveCommands.configure(
@@ -289,7 +297,7 @@ public class RobotContainer {
 
     // Bind robot actions to commands here.
     private void configureBindings() {
-        gamepad_.a().onTrue(thriftyClimb_.toggle());
+        gamepad_.a().onTrue(climb_.toggle());
         //Testing out each of the commands in the simulator
         gamepad_.start().onTrue(Commands.either(
             intake_.deployCmd(),

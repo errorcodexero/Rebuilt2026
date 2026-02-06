@@ -15,6 +15,7 @@ import org.ironmaple.simulation.drivesims.GyroSimulation;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
+import org.ironmaple.simulation.gamepieces.GamePieceProjectile;
 import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt;
 import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnFly;
 import org.littletonrobotics.junction.Logger;
@@ -29,9 +30,9 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 
 public class MapleSimUtil {
@@ -52,25 +53,17 @@ public class MapleSimUtil {
 
     private static final Command runShooter =
         Commands.runOnce(() -> {
-            if (MapleSimUtil.getRemainingGamepieces() == 0) return;
+            if (getRemainingGamepieces() == 0) return;
 
-            var fuel = new RebuiltFuelOnFly(
-                getPosition().getTranslation(),
-                new Translation2d(), // Initial Shooter Position
-                getFieldChassisSpeeds(),
-                getPosition().getRotation(),
-                Meters.of(0.5), // Initial Height
-                MetersPerSecond.of(shooterVelocity.in(RadiansPerSecond) * shooterRadius.in(Meters)),
-                hoodAngle
-            )
-            .withHitTargetCallBack(() -> System.out.println("Fuel Scored!"))
-            .withProjectileTrajectoryDisplayCallBack(
-                poses -> Logger.recordOutput("MapleSim/Trajectory", poses.toArray(Pose3d[]::new))
-            );
-
+            var fuelLeft = createProjectile(Inches.of(3.7));
             loseGamepiece();
+            SimulatedArena.getInstance().addGamePieceProjectile(fuelLeft);
 
-            SimulatedArena.getInstance().addGamePieceProjectile(fuel);
+            if (getRemainingGamepieces() == 0) return;
+            
+            var fuelRight = createProjectile(Inches.of(-3.7));
+            loseGamepiece();
+            SimulatedArena.getInstance().addGamePieceProjectile(fuelRight);            
         })
         .andThen(Commands.waitTime(Milliseconds.of(1000 / 10)))
         .repeatedly();
@@ -121,6 +114,22 @@ public class MapleSimUtil {
         );
 
         return intakeSimulation;
+    }
+
+    public static GamePieceProjectile createProjectile(Distance yOffset) {
+        return new RebuiltFuelOnFly(
+            getPosition().getTranslation(),
+            new Translation2d(Inches.of(-8), Inches.of(3.7)), // Initial Shooter Position
+            getFieldChassisSpeeds(),
+            getPosition().getRotation(),
+            Inches.of(18.5), // Initial Height
+            MetersPerSecond.of(shooterVelocity.in(RadiansPerSecond) * shooterRadius.in(Meters)),
+            hoodAngle
+        )
+        .withHitTargetCallBack(() -> System.out.println("Fuel Scored!"))
+        .withProjectileTrajectoryDisplayCallBack(
+            poses -> Logger.recordOutput("MapleSim/Trajectory", poses.toArray(Pose3d[]::new))
+        );
     }
 
     public static Pose2d getPosition() {
