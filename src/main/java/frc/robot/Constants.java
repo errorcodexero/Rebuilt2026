@@ -30,7 +30,9 @@ public final class Constants {
      * CONFIGURATION
      */
     
-    // Sets the currently running robot.
+    // Sets the currently running robot. Change to SIMBOT when running the
+    // desktop physics simulation so AdvantageKit runs in SIM mode instead of
+    // falling back to REPLAY.
     private static final RobotType robotType = RobotType.SIMBOT;
 
     public static class DriveConstants {
