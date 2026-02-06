@@ -118,9 +118,17 @@ public class IntakeSubsystem extends SubsystemBase {
      * @return
      */
     public Command deployCmd() {
-        return runOnce(() -> deploy())
-            .andThen(Commands.waitUntil(() -> isIntakeDeployed())
+        return startDeployCmd()
+            .andThen(Commands.waitUntil(this::isIntakeDeployed)
             .withTimeout(2)).withName("Deploy Intake");
+    }
+
+    /**
+     * Command that starts the deployment of the intake, but doesnt wait until its done. 
+     * @return
+     */
+    public Command startDeployCmd() {
+        return runOnce(this::deploy);
     }
 
     /**
@@ -129,6 +137,12 @@ public class IntakeSubsystem extends SubsystemBase {
      */
     public Command runIntakeCmd() {
         return startEnd(this::startIntaking, this::stopIntaking);
+    }
+
+    public Command intakeSequence() {
+        return runIntakeCmd().beforeStarting(
+            deployCmd().onlyIf(this::isIntakeStowed)
+        );
     }
 
     ////////////////////////////

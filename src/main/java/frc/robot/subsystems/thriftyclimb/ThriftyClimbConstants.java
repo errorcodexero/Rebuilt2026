@@ -6,7 +6,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.MomentOfInertia;
 
 public class ThriftyClimbConstants {
-    public static final int thriftyClimbId = 6;
+    public static final int thriftyClimbId = 7;
 
     public static final Distance thriftyClimbSpoolDiameter = Inches.of(1.5 * 2);
     public static final double thriftyGearRatio = 1.0 / 50.0;

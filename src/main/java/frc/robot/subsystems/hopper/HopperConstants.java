@@ -8,8 +8,8 @@ public class HopperConstants {
     
     //Feeder Constants
 
-    public static final int feederMotorCANID = 0; //To be updated
-    public static final double feederGearRatio = 0.0; //To be updated
+    public static final int feederMotorCANID = 5; //To be updated
+    public static final double feederGearRatio = 1.0; //To be updated
 
     public static final double feederKP = 0.0; //To be updated
     public static final double feederKI = 0.0; //To be updated
@@ -23,8 +23,8 @@ public class HopperConstants {
     public static final Current feederCurrentLimit = Amps.of(0.0); //To be updated
 
     //Scrambler Constants
-    public static final int scramblerMotorCANID = 0; //To be updated
-    public static final double scramblerGearRatio = 0.0; //To be updated
+    public static final int scramblerMotorCANID = 6; //To be updated
+    public static final double scramblerGearRatio = 1.0; //To be updated
 
     public static final double scramblerKP = 0.0; //To be updated
     public static final double scramblerKI = 0.0; //To be updated

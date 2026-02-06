@@ -133,8 +133,8 @@ public class RobotContainer {
                                 CompTunerConstants.BackLeft.LocationX
                             )),
                             Meters.of(Math.abs(
-                                CompTunerConstants.FrontLeft.LocationX -
-                                CompTunerConstants.FrontRight.LocationX
+                                CompTunerConstants.FrontLeft.LocationY -
+                                CompTunerConstants.FrontRight.LocationY
                             ))
                         )
                         .withBumperSize(Inches.of(30.75), Inches.of(37.25));
@@ -308,7 +308,7 @@ public class RobotContainer {
         // While the left trigger is held, we will run the intake. If the intake is stowed, it will also deploy it.
         gamepad_.leftTrigger().whileTrue(
             intake_.runIntakeCmd().beforeStarting(
-                intake_.deployCmd().onlyIf(intake_::isIntakeStowed)
+                intake_.startDeployCmd().onlyIf(intake_::isIntakeStowed)
             )
         );
 

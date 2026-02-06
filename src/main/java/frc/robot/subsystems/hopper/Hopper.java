@@ -37,7 +37,7 @@ public class Hopper extends SubsystemBase {
                 inputs.scramblerVelocity.gt(RadiansPerSecond.zero())
             );
         }
-        
+
         Logger.recordOutput("Hopper/ScramblerGoal", scramblerGoal);
         Logger.recordOutput("Hopper/FeederGoal", feederGoal);
         Logger.recordOutput("Hopper/ScramblerAtGoal", isScramblerAtGoal());
