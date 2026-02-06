@@ -35,7 +35,7 @@ public final class Constants {
     // falling back to REPLAY.
     private static final RobotType robotType = RobotType.SIMBOT;
 
-    public static final boolean spawnLessFuelInSim = true;
+    public static final boolean spawnLessFuelInSim = false;
 
     public static class DriveConstants {
         public static final double slowModeJoystickMultiplier = 0.4;

@@ -275,6 +275,8 @@ public class RobotContainer {
             MapleSimUtil.start();
 
             gamepad_.a().onTrue(Commands.runOnce(() -> {
+                if (MapleSimUtil.getRemainingGamepieces() == 0) return;
+
                 var fuel = new RebuiltFuelOnFly(
                     MapleSimUtil.getPosition().getTranslation(),
                     new Translation2d(), // Initial Robot Position
