@@ -297,8 +297,7 @@ public class RobotContainer {
 
     // Bind robot actions to commands here.
     private void configureBindings() {
-        gamepad_.a().onTrue(climb_.toggle());
-        //Testing out each of the commands in the simulator
+        // Manually deploying and undeploying the intake.
         gamepad_.start().onTrue(Commands.either(
             intake_.deployCmd(),
             intake_.stowCmd(),
@@ -313,7 +312,10 @@ public class RobotContainer {
         );
 
         // While the right trigger is held, we will shoot into the hub.
-        gamepad_.rightTrigger().whileTrue(shooter_.shootCmd());
+        gamepad_.rightTrigger().whileTrue(shooter_.shootCmd(hopper_));
+
+        // When the hopper isnt shooting, set it to run its idle velocity.
+        hopper_.setDefaultCommand(hopper_.idleScrambler());
     }
 
     private void configureDriveBindings() {

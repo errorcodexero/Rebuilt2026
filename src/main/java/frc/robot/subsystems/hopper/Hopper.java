@@ -45,69 +45,80 @@ public class Hopper extends SubsystemBase {
     }
     
     // Scrambler control
-    public void setScramblerVelocity(AngularVelocity velocity) {
+    private void setScramblerVelocity(AngularVelocity velocity) {
         scramblerGoal = velocity;
         io.setScramblerVelocity(velocity);
     }
     
-    public void setScramblerVoltage(Voltage voltage) {
+    private void setScramblerVoltage(Voltage voltage) {
         scramblerGoal = RotationsPerSecond.of(0.0);
         io.setScramblerVoltage(voltage);
     }
     
-    public void idleScrambler() {
-        setScramblerVelocity(
-            HopperConstants.scramblerMaxVelocity.times(0.15)
-        );
-    }
-    
-    public void activeScrambler() {
-        setScramblerVelocity(HopperConstants.scramblerMaxVelocity);
-    }
-    
-    public void stopScrambler() {
+    private void stopScrambler() {
         setScramblerVoltage(Volts.of(0.0));
     }
     
     // Feeder control
-    public void setFeederVelocity(AngularVelocity velocity) {
+    private void setFeederVelocity(AngularVelocity velocity) {
         feederGoal = velocity;
         io.setFeederVelocity(velocity);
     }
     
-    public void setFeederVoltage(Voltage voltage) {
+    private void setFeederVoltage(Voltage voltage) {
         feederGoal = RotationsPerSecond.of(0.0);
         io.setFeederVoltage(voltage);
     }
     
-    public void stopFeeder() {
+    private void stopFeeder() {
         setFeederVoltage(Volts.of(0.0));
     }
     
-    public void stopAll() {
+    private void stopAll() {
         stopScrambler();
         stopFeeder();
     }
     
-    public void feed() {
-        setFeederVelocity(HopperConstants.feederMaxVelocity);
-    }
-    
-    public void feedSlow() {
-        setFeederVelocity(
-            HopperConstants.feederMaxVelocity.times(0.5)
+    // Commands
+
+    /**
+     * Runs the scrambler at its idling speed until the command ends.
+     * @return
+     */
+    public Command idleScrambler() {
+        return startEnd(
+            () -> setFeederVelocity(HopperConstants.feederMaxVelocity.times(0.15)),
+            this::stopFeeder
         );
     }
-    
-    public void reverseFeed() {
-        setFeederVelocity(
-            HopperConstants.feederMaxVelocity.times(-0.5)
-        );
+
+    /**
+     * Runs the feeder and scrambler at specified speeds.
+     * @param feeder
+     * @param scrambler
+     * @return
+     */
+    public Command feed(AngularVelocity feeder, AngularVelocity scrambler) {
+        return startEnd(() -> {
+            setFeederVelocity(feeder);
+            setScramblerVelocity(scrambler);
+        }, this::stopAll);
+    }
+
+    /**
+     * Runs the scrambler at its active speed, and the feeder.
+     * @return
+     */
+    public Command forwardFeed() {
+        return feed(HopperConstants.scramblerActiveVelocity, HopperConstants.feedingVelocity);
     }
     
-    public void scrambleAndFeed() {
-        activeScrambler();
-        feed();
+    /**
+     * Runs the scramble and feeder in reverse.
+     * @return
+     */
+    public Command reverseFeed() {
+        return feed(HopperConstants.scramblerActiveVelocity.times(-1), HopperConstants.feedingVelocity.times(-1));
     }
     
     // Readbacks + state checks
@@ -136,27 +147,27 @@ public class Hopper extends SubsystemBase {
     }
     
     public Command setFeederVoltageCommand(Voltage voltage) {
-        return Commands.run(() -> setFeederVoltage(voltage), this)
-        .withName("Hopper.SetFeederVoltage");
+        return runOnce(() -> setFeederVoltage(voltage))
+            .withName("Hopper.SetFeederVoltage");
     }
     
     public Command setScramblerVoltageCommand(Voltage voltage) {
-        return Commands.run(() -> setScramblerVoltage(voltage), this)
-        .withName("Hopper.SetScramblerVoltage");
+        return runOnce(() -> setScramblerVoltage(voltage))
+            .withName("Hopper.SetScramblerVoltage");
     }
     
     public Command stopFeederCommand() {
-        return Commands.run(this::stopFeeder, this)
-        .withName("Hopper.StopFeeder");
+        return runOnce(this::stopFeeder)
+            .withName("Hopper.StopFeeder");
     }
     
     public Command stopScramblerCommand() {
-        return Commands.run(this::stopScrambler, this)
-        .withName("Hopper.StopScrambler");
+        return runOnce(this::stopScrambler)
+            .withName("Hopper.StopScrambler");
     }
     
     public Command stopAllCommand() {
-        return Commands.run(this::stopAll, this)
-        .withName("Hopper.StopAll");
+        return runOnce(this::stopAll)
+            .withName("Hopper.StopAll");
     }
 }

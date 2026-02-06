@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.util.MapleSimUtil;
 import frc.robot.util.Mechanism3d;
 
@@ -130,24 +131,28 @@ public class Shooter extends SubsystemBase {
     }
 
     /**
-     * Shoot balls into the hub until the command ends.
+     * Shoot balls from the shooter until the command ends.
      * @return
      */
-    public Command shootCmd() {
-        return startEnd(() -> {
-            shooterIO.setVelocity(RPM.of(1000));
-            hoodIO.runPosition(Degrees.of(45));
-        }, () -> {
-            shooterIO.stop();
-        });
+    public Command shootCmd(Hopper hopper) {
+        return Commands.parallel(
+            runDynamicSetpoints(() -> RPM.of(1000), () -> Degrees.of(45)),
+            hopper.forwardFeed()
+        );
     }
 
     public Command runToSetpointsCmd(AngularVelocity vel, Angle pos) {
         return runOnce(() -> setSetpoints(vel, pos)).andThen(Commands.waitUntil(this::isShooterReady));
     }
 
+    /**
+     * Runs supplied setpoints until the command ends, then stops.
+     * @param vel
+     * @param pos
+     * @return
+     */
     public Command runDynamicSetpoints(Supplier<AngularVelocity> vel, Supplier<Angle> pos ) {
-        return run(() -> setSetpoints(vel.get(), pos.get()));
+        return runEnd(() -> setSetpoints(vel.get(), pos.get()), this::stopShooter);
     }
 
     // Sys ID

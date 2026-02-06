@@ -5,13 +5,17 @@ import edu.wpi.first.units.measure.*;
 import static edu.wpi.first.units.Units.*;
 
 public class HopperConstants {
+
+    // Command Constants
+    public static final AngularVelocity feedingVelocity = RotationsPerSecond.of(20);
+    public static final AngularVelocity scramblerActiveVelocity = RotationsPerSecond.of(10);
     
     //Feeder Constants
 
     public static final int feederMotorCANID = 5; //To be updated
     public static final double feederGearRatio = 1.0; //To be updated
 
-    public static final double feederKP = 0.0; //To be updated
+    public static final double feederKP = 1.0; //To be updated
     public static final double feederKI = 0.0; //To be updated
     public static final double feederKD = 0.0; //To be updated
     public static final double feederKS = 0.0; //To be updated
