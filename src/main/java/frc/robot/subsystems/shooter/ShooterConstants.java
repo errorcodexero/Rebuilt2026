@@ -15,18 +15,17 @@ public class ShooterConstants {
 
     public static final int hoodCANID = 4;
 
-
     public static final int currentLimit = 40; 
     public static final Time currentLimitTime = Seconds.of(1); 
 
-    public static final double gearRatio = 75/27;
+    public static final double gearRatio = 75.0 / 27.0;
 
     public static final AngularVelocity shooterTolerance = RotationsPerSecond.of(1.0);
 
 
     public class PID {
             // shooter
-            public static final double shooterkP = 0.0; 
+            public static final double shooterkP = 0.5; 
             public static final double shooterkI = 0.0;
             public static final double shooterkD = 0.0;
             public static final double shooterkV = 0.0;

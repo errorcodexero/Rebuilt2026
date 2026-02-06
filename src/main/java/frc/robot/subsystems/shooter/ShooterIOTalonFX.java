@@ -27,7 +27,6 @@ public class ShooterIOTalonFX implements ShooterIO {
 
     private Servo hood1;
     private Servo hood2;
-    
 
     private StatusSignalCollection signals;
 
@@ -55,7 +54,7 @@ public class ShooterIOTalonFX implements ShooterIO {
         hood2 = new Servo(1);
 
         final TalonFXConfiguration shooterConfigs = new TalonFXConfiguration();
-        final TalonFXConfiguration hoodConfigs = new TalonFXConfiguration();
+        // final TalonFXConfiguration hoodConfigs = new TalonFXConfiguration();
 
         // PID 
         shooterConfigs.Slot0.kP = ShooterConstants.PID.shooterkP;
@@ -67,20 +66,20 @@ public class ShooterIOTalonFX implements ShooterIO {
         shooterConfigs.Slot0.kS = ShooterConstants.PID.shooterkS;
 
 
-        hoodConfigs.Slot0.kP = ShooterConstants.PID.hoodkP;
-        hoodConfigs.Slot0.kD = ShooterConstants.PID.hoodkD;
-        hoodConfigs.Slot0.kI = ShooterConstants.PID.hoodkI;
-        hoodConfigs.Slot0.kV = ShooterConstants.PID.hoodkV;
-        hoodConfigs.Slot0.kA = ShooterConstants.PID.hoodkA;
-        hoodConfigs.Slot0.kG = ShooterConstants.PID.hoodkG;
-        hoodConfigs.Slot0.kS = ShooterConstants.PID.hoodkS;
+        // hoodConfigs.Slot0.kP = ShooterConstants.PID.hoodkP;
+        // hoodConfigs.Slot0.kD = ShooterConstants.PID.hoodkD;
+        // hoodConfigs.Slot0.kI = ShooterConstants.PID.hoodkI;
+        // hoodConfigs.Slot0.kV = ShooterConstants.PID.hoodkV;
+        // hoodConfigs.Slot0.kA = ShooterConstants.PID.hoodkA;
+        // hoodConfigs.Slot0.kG = ShooterConstants.PID.hoodkG;
+        // hoodConfigs.Slot0.kS = ShooterConstants.PID.hoodkS;
 
 
         // Software Limits - only hood
-        hoodConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-        hoodConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold = ShooterConstants.SoftwareLimits.hoodMaxAngle;
-        hoodConfigs.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-        hoodConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold = ShooterConstants.SoftwareLimits.hoodMinAngle;
+        // hoodConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+        // hoodConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold = ShooterConstants.SoftwareLimits.hoodMaxAngle;
+        // hoodConfigs.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+        // hoodConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold = ShooterConstants.SoftwareLimits.hoodMinAngle;
 
         // Motion Magic Configurations
         shooterConfigs.MotionMagic.MotionMagicCruiseVelocity = ShooterConstants.MotionMagic.shooterkMaxVelocity; 
@@ -91,8 +90,8 @@ public class ShooterIOTalonFX implements ShooterIO {
         shooterConfigs.CurrentLimits.StatorCurrentLimit = ShooterConstants.currentLimit;
         shooterConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
 
-        hoodConfigs.CurrentLimits.StatorCurrentLimit = ShooterConstants.currentLimit;
-        shooterConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
+        // hoodConfigs.CurrentLimits.StatorCurrentLimit = ShooterConstants.currentLimit;
+        // hoodConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
 
         // Similar to our checkError function
         tryUntilOk(5, () -> shooter1Motor.getConfigurator().apply(shooterConfigs, 0.25));
@@ -102,7 +101,6 @@ public class ShooterIOTalonFX implements ShooterIO {
         // Setting other shooter motors as followers
         shooter2Motor.setControl(new Follower(ShooterConstants.shooter1CANID, null));
         shooter3Motor.setControl(new Follower(ShooterConstants.shooter1CANID, null));
-
 
         shooter1AngularVelocity = shooter1Motor.getVelocity();
         shooter1AppliedVolts = shooter1Motor.getSupplyVoltage();
@@ -147,10 +145,12 @@ public class ShooterIOTalonFX implements ShooterIO {
         inputs.shooter1Current = shooter1CurrentAmps.getValue();
         inputs.shooter2Current = shooter2CurrentAmps.getValue();
         inputs.shooter3Current = shooter3CurrentAmps.getValue();
+
+        inputs.wheelVelocity = inputs.shooter1Velocity.times(ShooterConstants.gearRatio);
     }
 
     public void setShooterVelocity(AngularVelocity vel) {
-        AngularVelocity velocity = vel.times(ShooterConstants.gearRatio);
+        AngularVelocity velocity = vel.div(ShooterConstants.gearRatio);
         shooter1Motor.setControl(new MotionMagicVelocityVoltage(velocity));
     }
 
@@ -159,7 +159,7 @@ public class ShooterIOTalonFX implements ShooterIO {
     }
 
     public void stopShooter() {
-        shooter1Motor.set(0);
+        shooter1Motor.stopMotor();
     }
 
     public void setHoodPosition(Angle pos) {

@@ -40,6 +40,8 @@ public interface ShooterIO {
         public Voltage hoodVoltage = Volts.zero();
         public Current hoodCurrent = Amps.zero();
         public AngularVelocity hoodVelocity = RadiansPerSecond.zero();
+
+        public AngularVelocity wheelVelocity = RadiansPerSecond.zero();
     }
 
     public default void updateInputs(ShooterIOInputs inputs) {}

@@ -140,6 +140,7 @@ public class RobotContainer {
                     // Add sim drivebase to simulation and where modules can get it.
                     // CALL THIS BEFORE CREATING THE DRIVEBASE!
                     MapleSimUtil.createSwerve(config, new Pose2d(2.0, 2.0, Rotation2d.kZero));
+                    MapleSimUtil.createIntake();
 
                     drivebase_ = new Drive(
                         new GyroIOMaple(),
@@ -310,12 +311,21 @@ public class RobotContainer {
     private void configureBindings() {
         gamepad_.a().onTrue(thriftyClimb_.toggle());
         //Testing out each of the commands in the simulator
-        gamepad_.x().onTrue(Commands.either(
-            intake_.deployIntakeCommand(),
-            intake_.stowIntakeCommand(),
+        gamepad_.start().onTrue(Commands.either(
+            intake_.deployCmd(),
+            intake_.stowCmd(),
             intake_::isIntakeStowed
         ));
 
+        // While the left trigger is held, we will run the intake. If the intake is stowed, it will also deploy it.
+        gamepad_.leftTrigger().whileTrue(
+            intake_.runIntakeCmd().beforeStarting(
+                intake_.deployCmd().onlyIf(intake_::isIntakeStowed)
+            )
+        );
+
+        // While the right trigger is held, we will shoot into the hub.
+        gamepad_.rightTrigger().whileTrue(shooter_.shootCmd());
     }
 
     private void configureDriveBindings() {
@@ -374,7 +384,7 @@ public class RobotContainer {
         LoggedNetworkNumber hoodAngle = new LoggedNetworkNumber("Tuning/Shooter/TargetHoodAngle", ShooterConstants.SoftwareLimits.hoodMinAngle);
 
         gamepad_.a().and(RobotModeTriggers.test()).toggleOnTrue(
-            shooter_.runDynamicSetpoint(() -> RotationsPerSecond.of(shooterVelocity.get()), () -> Degrees.of(hoodAngle.get()))
+            shooter_.runDynamicSetpoints(() -> RotationsPerSecond.of(shooterVelocity.get()), () -> Degrees.of(hoodAngle.get()))
         );
     }
     

@@ -1,7 +1,9 @@
 package frc.robot.subsystems.shooter;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RevolutionsPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -19,81 +21,92 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants;
+import frc.robot.Constants.Mode;
+import frc.robot.util.MapleSimUtil;
+import frc.robot.util.Mechanism3d;
 
 public class Shooter extends SubsystemBase {
     
     private final ShooterIO io_;
-    private final ShooterIOInputsAutoLogged inputs_;
-    private AngularVelocity shooterTarget;
-    private Angle hoodTarget;
+    private final ShooterIOInputsAutoLogged inputs_ = new ShooterIOInputsAutoLogged();
+
+    private AngularVelocity shooterTarget = RadiansPerSecond.zero();
+    private Angle hoodTarget = Radians.zero();
 
     public Shooter(ShooterIO io) {
         io_ = io;
-        inputs_ = new ShooterIOInputsAutoLogged();
-        shooterTarget = RotationsPerSecond.zero();
-        hoodTarget = Radians.zero();
     }
 
     @Override
     public void periodic() {
         io_.updateInputs(inputs_);
         Logger.processInputs("Shooter", inputs_);
+
+        Mechanism3d.measured.setHood(hoodTarget);
+        Mechanism3d.setpoints.setHood(hoodTarget);
+
+        if (Constants.getMode() == Mode.SIM) {
+            MapleSimUtil.setShooterVelocity(inputs_.wheelVelocity);
+            MapleSimUtil.setHoodAngle(hoodTarget);
+        }
+        
         Logger.recordOutput("Shooter/VelocitySetPoint", shooterTarget);
         Logger.recordOutput("Shooter/HoodSetPoint", hoodTarget);
     }
 
     // Shooter Methods
 
-    public void setShooterVelocity(AngularVelocity vel) {
+    private void setShooterVelocity(AngularVelocity vel) {
         shooterTarget = vel;
         io_.setShooterVelocity(vel);
     }
 
-    public void setShooterVoltage(Voltage vol) {
-        shooterTarget = RotationsPerSecond.of(0.0);
+    private void setShooterVoltage(Voltage vol) {
+        shooterTarget = RotationsPerSecond.zero();
         io_.setShooterVoltage(vol);
     }
 
-    public void stopShooter() {
-        shooterTarget = RotationsPerSecond.of(0.0);
+    private void stopShooter() {
+        shooterTarget = RotationsPerSecond.zero();
         io_.stopShooter();
     }
 
     public AngularVelocity getShooterVelocity() {
-        return inputs_.shooter1Velocity;
-    }
-    
-    public boolean isShooterReady() {
-        return Math.abs(inputs_.shooter1Velocity.in(RotationsPerSecond) - shooterTarget.in(RotationsPerSecond)) < ShooterConstants.shooterTolerance.in(RevolutionsPerSecond); 
+        return inputs_.wheelVelocity;
     }
 
     public Voltage getShooterVoltage() {
         return inputs_.shooter1Voltage;
     }
+    
+    public boolean isShooterReady() {
+        return inputs_.wheelVelocity.isNear(shooterTarget, ShooterConstants.shooterTolerance); 
+    }
 
     public Current getShooterCurrent() {
         return (inputs_.shooter1Current)
-                .plus(inputs_.shooter2Current)
-                .plus(inputs_.shooter3Current)
-                .plus(inputs_.shooter4Current);
+            .plus(inputs_.shooter2Current)
+            .plus(inputs_.shooter3Current)
+            .plus(inputs_.shooter4Current);
     }
 
-    public Command setVelocityCmd(AngularVelocity vel) {
+    public Command runToVelocityCmd(AngularVelocity vel) {
         return runOnce(() -> setShooterVelocity(vel))
-        .andThen(Commands.waitUntil(() -> isShooterReady())).withName("Set Shooter Velocity");
+            .andThen(Commands.waitUntil(this::isShooterReady)).withName("Set Shooter Velocity");
     }
 
-    public Command stopCommand() {
+    public Command stopCmd() {
         return runOnce(() -> stopShooter())
-        .andThen(Commands.waitUntil(() -> isShooterReady())).withName("Stop Shooter");
+            .andThen(Commands.waitUntil(this::isShooterReady)).withName("Stop Shooter");
     }
 
-    public Command setVoltageCmd(Voltage vol) {
+    public Command runVoltageCmd(Voltage vol) {
         return runOnce(() -> setShooterVoltage(vol)).withName("Set Shooter Voltage");
     }
 
     // Hood Methods
-    public void setHoodAngle(Angle pos) {
+    private void setHoodAngle(Angle pos) {
         hoodTarget = pos;
         io_.setHoodPosition(pos);
     }
@@ -103,19 +116,32 @@ public class Shooter extends SubsystemBase {
     }
 
     // Both
-    public void goToShooterPosition(AngularVelocity vel, Angle pos) {
+    private void setSetpoints(AngularVelocity vel, Angle pos) {
         shooterTarget = vel;
-        this.setShooterVelocity(shooterTarget);
+        setShooterVelocity(shooterTarget);
         hoodTarget = pos;
-        this.setHoodAngle(hoodTarget);
+        setHoodAngle(hoodTarget);
     }
 
-    public Command runSetpointCmd(AngularVelocity vel, Angle pos) {
-        return runOnce(() -> goToShooterPosition(vel, pos)).andThen(Commands.waitUntil(this::isShooterReady));
+    /**
+     * Shoot balls into the hub until the command ends.
+     * @return
+     */
+    public Command shootCmd() {
+        return startEnd(() -> {
+            io_.setShooterVelocity(RPM.of(1000));
+            io_.setHoodPosition(Degrees.of(45));
+        }, () -> {
+            io_.stopShooter();
+        });
     }
 
-    public Command runDynamicSetpoint(Supplier<AngularVelocity> vel, Supplier<Angle> pos ) {
-        return run(() -> goToShooterPosition(vel.get(), pos.get()));
+    public Command runToSetpointsCmd(AngularVelocity vel, Angle pos) {
+        return runOnce(() -> setSetpoints(vel, pos)).andThen(Commands.waitUntil(this::isShooterReady));
+    }
+
+    public Command runDynamicSetpoints(Supplier<AngularVelocity> vel, Supplier<Angle> pos ) {
+        return run(() -> setSetpoints(vel.get(), pos.get()));
     }
 
     // Sys ID

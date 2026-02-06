@@ -1,22 +1,22 @@
 package frc.robot.subsystems.intake; 
 
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
+
+import org.littletonrobotics.junction.Logger;
+
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
-import frc.robot.Constants.RobotType;
 import frc.robot.util.MapleSimUtil;
 import frc.robot.util.Mechanism3d;
-
-import org.littletonrobotics.junction.Logger;
-import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Time;
-
-import static edu.wpi.first.units.Units.*;
 
 public class IntakeSubsystem extends SubsystemBase {
     private final IntakeIO io; 
@@ -28,11 +28,6 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public IntakeSubsystem(IntakeIO io) {
         this.io = io;
-        Logger.processInputs("Intake", inputs);
-
-        if (Constants.getMode() == Mode.SIM) {
-            MapleSimUtil.createIntake();
-        }
     }   
 
     @Override
@@ -40,45 +35,53 @@ public class IntakeSubsystem extends SubsystemBase {
         io.updateInputs(inputs);
         Logger.processInputs("Intake", inputs);
 
-        Logger.recordOutput("Intake/Setpoint", setpointAngle);
+        Logger.recordOutput("Intake/PivotSetpoint", setpointAngle);
 
         Mechanism3d.measured.setIntake(inputs.PivotAngle);
         Mechanism3d.setpoints.setIntake(setpointAngle);
 
         if (Constants.getMode() == Mode.SIM) {
-            MapleSimUtil.setIntakeRunning(isIntakeDeployed());
+            MapleSimUtil.setIntakeRunning(isIntakeDeployed() && inputs.RollerAngularVelocity.gt(RadiansPerSecond.zero()));
         }
     }
 
     //Intake control methods
-    public void setRollerVoltage(Voltage volts) {
+    private void setRollerVoltage(Voltage volts) {
         io.setRollerVoltage(volts);
     }
 
-    public void setPivotAngle(Angle angle) {
+    private void setPivotAngle(Angle angle) {
         setpointAngle = angle;
         io.setPivotAngle(angle);
     }
 
-    public void stopRoller(){
+    /**
+     * Runs the roller.
+     */
+    private void startIntaking() {
+        io.setRollerVoltage(IntakeConstants.rollerCollectVoltage);
+    }
+
+    /**
+     * Stops the roller.
+     */
+    private void stopIntaking() {
         io.stopRoller();
     }
 
-    public void stowIntake(){
+    /**
+     * Stows the intake and hopper.
+     */
+    private void stow() {
         setPivotAngle(IntakeConstants.stowedAngle);
     }
 
-    public void deployIntake(){
+    /**
+     * Deploys the intake and hopper.
+     */
+    private void deploy() {
         setPivotAngle(IntakeConstants.deployedAngle);
     }
-
-    public void setRollerVelocity(AngularVelocity velocity) {
-        io.setRollerVelocity(velocity);
-    }   
-
-    public void setPivotVoltage(Voltage voltage) {
-        io.setPivotVoltage(voltage);
-    }   
 
     public Angle getPivotAngle(){
         return inputs.PivotAngle;
@@ -100,81 +103,33 @@ public class IntakeSubsystem extends SubsystemBase {
     ///Commands//
     /////////////
     
-    //////////////////////////////////////////////////////
-    /// First stow the intake, and then wait until it is stowed
-    //////////////////////////////////////////////////////
-    public Command stowIntakeCommand() {
-        return Commands.runOnce(() -> stowIntake())
-        .andThen(Commands.waitUntil(() -> isIntakeStowed())
-        .withTimeout(2)).withName("Stow Intake");
+    /**
+     * Command that stows the intake and ends when it gets there.
+     * @return
+     */
+    public Command stowCmd() {
+        return Commands.runOnce(() -> stow())
+            .andThen(Commands.waitUntil(() -> isIntakeStowed())
+            .withTimeout(2)).withName("Stow Intake");
     }
 
-    //////////////////////////////////////////////////////
-    /// First deploy the intake, and then wait until it is deployed
-    //////////////////////////////////////////////////////
-    public Command deployIntakeCommand() {
-        return Commands.runOnce(() -> deployIntake())
-        .andThen(Commands.waitUntil(() -> isIntakeDeployed())
-        .withTimeout(2)).withName("Deploy Intake");
+    /**
+     * Command that deploys the intake and ends when it gets there.
+     * @return
+     */
+    public Command deployCmd() {
+        return runOnce(() -> deploy())
+            .andThen(Commands.waitUntil(() -> isIntakeDeployed())
+            .withTimeout(2)).withName("Deploy Intake");
     }
 
-    /////////////////////////
-    /// Stop the rollers once
-    /////////////////////////
-    public Command stopRollerCommand() {
-        return Commands.runOnce(() -> stopRoller())
-        .withName("Stop Roller");
+    /**
+     * Command that runs the intake until the command ends.
+     * @return The command
+     */
+    public Command runIntakeCmd() {
+        return startEnd(this::startIntaking, this::stopIntaking);
     }
-
-    ////////////////////////////////////////////////////////
-    /// Continously set the roller voltage until interrupted
-    ////////////////////////////////////////////////////////
-    public Command setRollerVoltageCommand(Voltage volts) {
-        return Commands.run(() -> setRollerVoltage(volts))
-        .withName("Set Roller Voltage");
-    }
-
-    //////////////////////////////////////////////////////////////////
-    /// Continously move the rollers at set velocity until interrupted
-    //////////////////////////////////////////////////////////////////
-    public Command setRollerVelocityCommand(AngularVelocity velocity) {
-        return Commands.run(() -> setRollerVelocity(velocity))
-        .withName("Set Roller Velocity");
-    }
-
-    ////////////////////////////////////////////////////////////////
-    /// Continously move the pivot at set velocity until interrupted
-    ////////////////////////////////////////////////////////////////
-    public Command setPivotVoltageCommand(Voltage voltage) {
-        return Commands.run(() -> setPivotVoltage(voltage))
-        .withName("Set Pivot Voltage");
-    }
-
-    /////////////////////////////////////////////////////////////
-    /// First set the angle target, then wait until it is reached
-    /////////////////////////////////////////////////////////////
-    public Command setPivotAngleCommand(Angle angle) {
-        return Commands.runOnce(() ->setPivotAngle(angle))
-        .andThen(Commands.waitUntil(() -> isPivotAtAngle(angle))
-        .withTimeout(2)).withName("Set Pivot Angle");
-    }
-
-    ////////////////////////////////
-    ///Deploy and intake in parallel
-    ////////////////////////////////
-    public Command intakeDeployCommand(){
-        return Commands.runOnce(() -> setRollerVoltage(IntakeConstants.rollerCollectVoltage))
-        .andThen(Commands.runOnce(()->deployIntake() ));
-    }
-
-    ////////////////////////////////////////
-    ///Stow and stop the rollers in parallel
-    ////////////////////////////////////////
-    public Command stopStowCommand(){
-        return Commands.runOnce(() -> stopRollerCommand())
-        .andThen(Commands.runOnce(()-> stowIntakeCommand()));
-    }
-
 
     ////////////////////////////
     /// Sys ID Routine creation/
@@ -191,7 +146,7 @@ public class IntakeSubsystem extends SubsystemBase {
                 (state) -> Logger.recordOutput("state", state.toString()) //Logging the state of the routine
             ),
             new SysIdRoutine.Mechanism(
-                (Voltage voltage)-> setPivotVoltage(voltage),
+                (Voltage voltage)-> io.setPivotVoltage(voltage),
                 null, 
                 this
             )

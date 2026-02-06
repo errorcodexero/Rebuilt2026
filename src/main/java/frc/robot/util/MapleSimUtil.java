@@ -1,11 +1,12 @@
 package frc.robot.util;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import org.ironmaple.simulation.IntakeSimulation;
-import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.IntakeSimulation.IntakeSide;
+import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.GyroSimulation;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
@@ -15,17 +16,23 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
-import frc.robot.Constants;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Constants;
 
 public class MapleSimUtil {
     private static SwerveDriveSimulation drivebaseSimulation;
 
     private static IntakeSimulation intakeSimulation;
+
+    private static Angle hoodAngle = Degrees.zero();
+    private static boolean shooterRunning = false;
+    private static AngularVelocity shooterVelocity = RadiansPerSecond.zero();
 
     private static final Command run =
         Commands.run(MapleSimUtil::periodic)
@@ -63,14 +70,6 @@ public class MapleSimUtil {
         return drivebaseSimulation;
     }
 
-    public static Pose2d getPosition() {
-        return drivebaseSimulation.getSimulatedDriveTrainPose();
-    }
-
-    public static ChassisSpeeds getFieldChassisSpeeds() {
-        return drivebaseSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative();
-    }
-
     public static IntakeSimulation createIntake() {
         if (drivebaseSimulation == null) throw new IllegalStateException("Intake cannot be created before swerve is!");
 
@@ -84,6 +83,14 @@ public class MapleSimUtil {
         );
 
         return intakeSimulation;
+    }
+
+    public static Pose2d getPosition() {
+        return drivebaseSimulation.getSimulatedDriveTrainPose();
+    }
+
+    public static ChassisSpeeds getFieldChassisSpeeds() {
+        return drivebaseSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative();
     }
 
     public static int getRemainingGamepieces() {
@@ -100,6 +107,18 @@ public class MapleSimUtil {
 
     public static void loseGamepiece() {
         intakeSimulation.obtainGamePieceFromIntake();
+    }
+
+    public static void setShooterRunning(boolean running) {
+        shooterRunning = running;
+    }
+
+    public static void setShooterVelocity(AngularVelocity velocity) {
+        shooterVelocity = velocity;
+    }
+
+    public static void setHoodAngle(Angle angle) {
+        hoodAngle = angle;
     }
 
     public static GyroSimulation getGyroSimulation() {
