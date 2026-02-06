@@ -161,7 +161,7 @@ public class RobotContainer {
 
                     intake_= new IntakeSubsystem(new IntakeIOSim());
 
-                    shooter_ = new Shooter(new ShooterIOSim());
+                    // shooter_ = new Shooter(new ShooterIOSim());
                     
                     thriftyClimb_ = new ThriftyClimb(
                         new ThriftyClimbIOSim()
