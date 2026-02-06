@@ -2,13 +2,9 @@ package frc.robot.subsystems.hopper;
 
 import org.littletonrobotics.junction.Logger;
 
-import org.littletonrobotics.junction.Logger;
-
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Voltage;
-
-import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 
@@ -30,12 +26,12 @@ public class Hopper extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
 
+    Logger.processInputs("Hopper", inputs);
+
     Logger.recordOutput("Hopper/ScramblerGoalRPS", scramblerGoal.in(RotationsPerSecond));
     Logger.recordOutput("Hopper/FeederGoalRPS", feederGoal.in(RotationsPerSecond));
     Logger.recordOutput("Hopper/ScramblerAtGoal", isScramblerAtGoal());
     Logger.recordOutput("Hopper/FeederAtGoal", isFeederAtGoal());
-
-    Logger.processInputs("Hopper", inputs);
   }
 
   //scrambler
@@ -127,4 +123,32 @@ public class Hopper extends SubsystemBase {
   public boolean isFeederAtGoal() {
     return Math.abs(inputs.feederVelocity.in(RotationsPerSecond) - feederGoal.in(RotationsPerSecond)) < 1.0;
   }
+
+    // Hopper Commands
+  public Command setFeederVoltageCommand(Voltage voltage) {
+    return Commands.run(() -> setFeederVoltage(voltage), this)
+        .withName("Hopper.SetFeederVoltage");
+  }
+
+  public Command setScramblerVoltageCommand(Voltage voltage) {
+    return Commands.run(() -> setScramblerVoltage(voltage), this)
+        .withName("Hopper.SetScramblerVoltage");
+  }
+
+  public Command stopFeederCommand() {
+    return Commands.run(this::stopFeeder, this)
+        .withName("Hopper.StopFeeder");
+  }
+
+  public Command stopScramblerCommand() {
+    return Commands.run(this::stopScrambler, this)
+        .withName("Hopper.StopScrambler");
+  }
+
+  public Command stopAllCommand() {
+  return Commands.run(this::stopAll, this)
+      .withName("Hopper.StopAll");
+  }
+
+
 }
