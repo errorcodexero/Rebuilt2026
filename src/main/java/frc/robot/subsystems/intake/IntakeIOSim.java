@@ -1,6 +1,7 @@
 package frc.robot.subsystems.intake;
 
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import frc.robot.Robot;
 import frc.robot.generated.CompTunerConstants;
 
 import com.ctre.phoenix6.sim.TalonFXSimState;
@@ -40,7 +41,7 @@ public class IntakeIOSim extends IntakeIOTalonFX {
         pivotMotorSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
         
         pivotMotorSim.setInputVoltage(pivotMotorSimState.getMotorVoltage());
-        pivotMotorSim.update(0.020); //20 millisecond robot sim loop
+        pivotMotorSim.update(Robot.defaultPeriodSecs);
 
         pivotMotorSimState.setRawRotorPosition(pivotMotorSim.getAngularPosition().times(IntakeConstants.motorToPivotGearRatio));
         pivotMotorSimState.setRotorVelocity(pivotMotorSim.getAngularVelocity().times(IntakeConstants.motorToPivotGearRatio));
@@ -48,7 +49,7 @@ public class IntakeIOSim extends IntakeIOTalonFX {
         rollerMotorSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
 
         rollerMotorSim.setInputVoltage(rollerMotorSimState.getMotorVoltage());
-        rollerMotorSim.update(0.020); //20 millisecond robot sim loop
+        rollerMotorSim.update(Robot.defaultPeriodSecs); //20 millisecond robot sim loop
 
         rollerMotorSimState.setRawRotorPosition(rollerMotorSim.getAngularPosition().times(IntakeConstants.rollerGearRatio));
         rollerMotorSimState.setRotorVelocity(rollerMotorSim.getAngularVelocity().times(IntakeConstants.rollerGearRatio));

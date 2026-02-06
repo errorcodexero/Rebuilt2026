@@ -21,9 +21,9 @@ import edu.wpi.first.wpilibj.Servo;
 
 public class ShooterIOTalonFX implements ShooterIO {
     
-    private TalonFX shooter1Motor;
-    private TalonFX shooter2Motor;
-    private TalonFX shooter3Motor;
+    protected TalonFX shooter1Motor;
+    protected TalonFX shooter2Motor;
+    protected TalonFX shooter3Motor;
 
     private Servo hood1;
     private Servo hood2;
