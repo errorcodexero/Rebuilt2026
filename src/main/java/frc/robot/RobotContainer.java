@@ -53,6 +53,9 @@ import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.ShooterIO;
+import frc.robot.subsystems.thriftyclimb.ThriftyClimb;
+import frc.robot.subsystems.thriftyclimb.ThriftyClimbIO;
+import frc.robot.subsystems.thriftyclimb.ThriftyClimbIOSim;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIO;
 import frc.robot.subsystems.vision.CameraIOPhotonSim;
@@ -65,6 +68,7 @@ public class RobotContainer {
     // Subsystems
     private Drive drivebase_;
     private AprilTagVision vision_;
+    private ThriftyClimb thriftyClimb_;
     private IntakeSubsystem intake_;
     private Shooter shooter_;
 
@@ -154,6 +158,23 @@ public class RobotContainer {
                     );
 
                     intake_= new IntakeSubsystem(new IntakeIOSim());
+                    
+                    thriftyClimb_ = new ThriftyClimb(
+                        new ThriftyClimbIOSim()
+                    );
+
+                    break;
+                default: // Comp Bot
+                    drivebase_ = new Drive(
+                        new GyroIOPigeon2(CompTunerConstants.DrivetrainConstants.Pigeon2Id, CompTunerConstants.kCANBus),
+                        ModuleIOTalonFX::new,
+                        CompTunerConstants.FrontLeft,
+                        CompTunerConstants.FrontRight,
+                        CompTunerConstants.BackLeft,
+                        CompTunerConstants.BackRight,
+                        CompTunerConstants.kCANBus,
+                        CompTunerConstants.kSpeedAt12Volts
+                    );
 
                     break;
             }
@@ -222,6 +243,10 @@ public class RobotContainer {
             );
         }
 
+        if (thriftyClimb_ == null) {
+            thriftyClimb_ = new ThriftyClimb(new ThriftyClimbIO() {});
+        }
+        
         if (intake_ == null) {
             intake_ = new IntakeSubsystem(new IntakeIO() {});
         }
@@ -283,6 +308,7 @@ public class RobotContainer {
 
     // Bind robot actions to commands here.
     private void configureBindings() {
+        gamepad_.a().onTrue(thriftyClimb_.toggle());
         //Testing out each of the commands in the simulator
         gamepad_.x().onTrue(Commands.either(
             intake_.deployIntakeCommand(),
