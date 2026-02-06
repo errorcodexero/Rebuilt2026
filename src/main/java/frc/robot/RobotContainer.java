@@ -51,9 +51,12 @@ import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.shooter.HoodIO;
+import frc.robot.subsystems.shooter.HoodIOSim;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.ShooterIO;
+import frc.robot.subsystems.shooter.ShooterIOSim;
 import frc.robot.subsystems.thriftyclimb.ThriftyClimb;
 import frc.robot.subsystems.thriftyclimb.ThriftyClimbIO;
 import frc.robot.subsystems.thriftyclimb.ThriftyClimbIOSim;
@@ -161,7 +164,7 @@ public class RobotContainer {
 
                     intake_= new IntakeSubsystem(new IntakeIOSim());
 
-                    // shooter_ = new Shooter(new ShooterIOSim());
+                    shooter_ = new Shooter(new ShooterIOSim(), new HoodIOSim());
                     
                     thriftyClimb_ = new ThriftyClimb(
                         new ThriftyClimbIOSim()
@@ -256,7 +259,7 @@ public class RobotContainer {
         }
         
         if (shooter_ == null) {
-            shooter_ = new Shooter(new ShooterIO() {});
+            shooter_ = new Shooter(new ShooterIO() {}, new HoodIO() {});
         }
 
         DriveCommands.configure(

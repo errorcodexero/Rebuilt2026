@@ -1,7 +1,6 @@
 package frc.robot.subsystems.thriftyclimb;
 
 import static edu.wpi.first.units.Units.Centimeter;
-import static edu.wpi.first.units.Units.Meters;
 
 import org.littletonrobotics.junction.Logger;
 

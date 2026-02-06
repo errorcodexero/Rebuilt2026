@@ -28,27 +28,33 @@ import frc.robot.util.Mechanism3d;
 
 public class Shooter extends SubsystemBase {
     
-    private final ShooterIO io_;
-    private final ShooterIOInputsAutoLogged inputs_ = new ShooterIOInputsAutoLogged();
+    private final ShooterIO shooterIO;
+    private final ShooterIOInputsAutoLogged shooterInputs = new ShooterIOInputsAutoLogged();
+
+    private final HoodIO hoodIO;
+    private final HoodInputsAutoLogged hoodInputs = new HoodInputsAutoLogged();
 
     private AngularVelocity shooterTarget = RadiansPerSecond.zero();
     private Angle hoodTarget = Radians.zero();
 
-    public Shooter(ShooterIO io) {
-        io_ = io;
+    public Shooter(ShooterIO ioShooter, HoodIO ioHood) {
+        this.shooterIO = ioShooter;
+        this.hoodIO = ioHood;
     }
 
     @Override
     public void periodic() {
-        io_.updateInputs(inputs_);
-        Logger.processInputs("Shooter", inputs_);
+        shooterIO.updateInputs(shooterInputs);
+        Logger.processInputs("Shooter", shooterInputs);
+        hoodIO.updateInputs(hoodInputs);
+        Logger.processInputs("Shooter/Hood", hoodInputs);
 
-        Mechanism3d.measured.setHood(hoodTarget);
+        Mechanism3d.measured.setHood(hoodInputs.position);
         Mechanism3d.setpoints.setHood(hoodTarget);
 
         if (Constants.getMode() == Mode.SIM) {
-            MapleSimUtil.setShooterVelocity(inputs_.wheelVelocity);
-            MapleSimUtil.setHoodAngle(hoodTarget);
+            MapleSimUtil.setShooterVelocity(shooterInputs.wheelVelocity);
+            MapleSimUtil.setHoodAngle(hoodInputs.position);
         }
         
         Logger.recordOutput("Shooter/VelocitySetPoint", shooterTarget);
@@ -59,36 +65,36 @@ public class Shooter extends SubsystemBase {
 
     private void setShooterVelocity(AngularVelocity vel) {
         shooterTarget = vel;
-        io_.setShooterVelocity(vel);
+        shooterIO.setVelocity(vel);
     }
 
     private void setShooterVoltage(Voltage vol) {
         shooterTarget = RotationsPerSecond.zero();
-        io_.setShooterVoltage(vol);
+        shooterIO.setVoltage(vol);
     }
 
     private void stopShooter() {
         shooterTarget = RotationsPerSecond.zero();
-        io_.stopShooter();
+        shooterIO.stop();
     }
 
     public AngularVelocity getShooterVelocity() {
-        return inputs_.wheelVelocity;
+        return shooterInputs.wheelVelocity;
     }
 
     public Voltage getShooterVoltage() {
-        return inputs_.shooter1Voltage;
+        return shooterInputs.shooter1Voltage;
     }
     
     public boolean isShooterReady() {
-        return inputs_.wheelVelocity.isNear(shooterTarget, ShooterConstants.shooterTolerance); 
+        return shooterInputs.wheelVelocity.isNear(shooterTarget, ShooterConstants.shooterTolerance); 
     }
 
     public Current getShooterCurrent() {
-        return (inputs_.shooter1Current)
-            .plus(inputs_.shooter2Current)
-            .plus(inputs_.shooter3Current)
-            .plus(inputs_.shooter4Current);
+        return (shooterInputs.shooter1Current)
+            .plus(shooterInputs.shooter2Current)
+            .plus(shooterInputs.shooter3Current)
+            .plus(shooterInputs.shooter4Current);
     }
 
     public Command runToVelocityCmd(AngularVelocity vel) {
@@ -108,7 +114,7 @@ public class Shooter extends SubsystemBase {
     // Hood Methods
     private void setHoodAngle(Angle pos) {
         hoodTarget = pos;
-        io_.setHoodPosition(pos);
+        hoodIO.runPosition(pos);
     }
 
     public Command hoodToPosCmd(Angle pos) {
@@ -129,10 +135,10 @@ public class Shooter extends SubsystemBase {
      */
     public Command shootCmd() {
         return startEnd(() -> {
-            io_.setShooterVelocity(RPM.of(1000));
-            io_.setHoodPosition(Degrees.of(45));
+            shooterIO.setVelocity(RPM.of(1000));
+            hoodIO.runPosition(Degrees.of(45));
         }, () -> {
-            io_.stopShooter();
+            shooterIO.stop();
         });
     }
 
@@ -156,10 +162,10 @@ public class Shooter extends SubsystemBase {
     private SysIdRoutine shooterIdRoutine() {
         Voltage step = Volts.of(7);
         Time to = Seconds.of(10.0);
-        SysIdRoutine.Config cfg = new SysIdRoutine.Config(null, step, to, (state) -> Logger.recordOutput("HoodSysIdTestState", state.toString()));
+        SysIdRoutine.Config cfg = new SysIdRoutine.Config(null, step, to, (state) -> Logger.recordOutput("SysIdTestState", state.toString()));
 
         SysIdRoutine.Mechanism mfg = new SysIdRoutine.Mechanism(
-                (volts) -> io_.setShooterVoltage(volts),
+                (volts) -> shooterIO.setVoltage(volts),
                 null,
                 this);
 
