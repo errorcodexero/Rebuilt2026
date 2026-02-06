@@ -6,14 +6,12 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.FeetPerSecond;
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import java.util.Arrays;
 
-import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
@@ -34,22 +32,20 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIOReplay;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
-import frc.robot.subsystems.thriftyclimb.ThriftyClimb;
-import frc.robot.subsystems.thriftyclimb.ThriftyClimbIO;
-import frc.robot.subsystems.thriftyclimb.ThriftyClimbIOSim;
+import frc.robot.subsystems.intake.IntakeConstants;
+import frc.robot.subsystems.intake.IntakeIO;
+import frc.robot.subsystems.intake.IntakeIOSim;
+import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.ShooterIO;
+import frc.robot.subsystems.thriftyclimb.ThriftyClimb;
+import frc.robot.subsystems.thriftyclimb.ThriftyClimbIO;
+import frc.robot.subsystems.thriftyclimb.ThriftyClimbIOSim;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIO;
 import frc.robot.subsystems.vision.CameraIOPhotonSim;
 import frc.robot.subsystems.vision.VisionConstants;
-import frc.robot.subsystems.intake.IntakeSubsystem;
-import frc.robot.subsystems.intake.IntakeIO;
-import frc.robot.subsystems.intake.IntakeIOSim;
-import frc.robot.subsystems.intake.IntakeIOTalonFX;
-import frc.robot.subsystems.intake.IntakeConstants; 
-import static edu.wpi.first.units.Units.Volts;
 import frc.robot.util.Mechanism3d;
 
 public class RobotContainer {
@@ -209,6 +205,8 @@ public class RobotContainer {
 
         if (thriftyClimb_ == null) {
             thriftyClimb_ = new ThriftyClimb(new ThriftyClimbIO() {});
+        }
+        
         if (intake_ == null) {
             intake_ = new IntakeSubsystem(new IntakeIO() {});
         }
