@@ -1,14 +1,15 @@
 package frc.robot.subsystems.intake;
 
+import static edu.wpi.first.units.Units.KilogramSquareMeters;
+
+import com.ctre.phoenix6.sim.TalonFXSimState;
+
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.Robot;
 import frc.robot.generated.CompTunerConstants;
-
-import com.ctre.phoenix6.sim.TalonFXSimState;
-import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.RobotController;
-import static edu.wpi.first.units.Units.KilogramSquareMeters;
 
 public class IntakeIOSim extends IntakeIOTalonFX {
     public final DCMotorSim pivotMotorSim;
@@ -21,14 +22,14 @@ public class IntakeIOSim extends IntakeIOTalonFX {
             LinearSystemId.createDCMotorSystem(
                 DCMotor.getKrakenX60Foc(1), IntakeConstants.PIVOT_MOMENTOFINERTIA.in(KilogramSquareMeters), IntakeConstants.motorToPivotGearRatio
             ),
-        DCMotor.getKrakenX60Foc(1) //Not sure how many motors
+            DCMotor.getKrakenX60Foc(1) //Not sure how many motors
         );  
 
         rollerMotorSim= new DCMotorSim(
             LinearSystemId.createDCMotorSystem(
                 DCMotor.getKrakenX60Foc(1), IntakeConstants.ROLLER_MOMENTOFINERTIA.in(KilogramSquareMeters), IntakeConstants.rollerGearRatio
             ),
-        DCMotor.getKrakenX60Foc(1) //Not sure how many motors
+            DCMotor.getKrakenX60Foc(1) //Not sure how many motors
         );
     }
 

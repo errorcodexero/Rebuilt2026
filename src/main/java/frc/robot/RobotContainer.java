@@ -9,9 +9,9 @@ import static edu.wpi.first.units.Units.FeetPerSecond;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.Arrays;
 
@@ -295,7 +295,7 @@ public class RobotContainer {
 
                 SimulatedArena.getInstance().addGamePieceProjectile(fuel);
             })
-            .andThen(Commands.waitTime(Seconds.of(0.5)))
+            .andThen(Commands.waitTime(Milliseconds.of(1000 / 15)))
             .repeatedly());
         }
 

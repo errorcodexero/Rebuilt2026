@@ -16,8 +16,8 @@ import edu.wpi.first.units.measure.AngularAcceleration;
 
 
 public final class IntakeConstants {
-    public static final int rollerMotorCANID= 1;//Temporary
-    public static final int pivotMotorCANID= 2; //Temporary
+    public static final int rollerMotorCANID= 8;//Temporary
+    public static final int pivotMotorCANID= 9; //Temporary
 
     public static final int currentLimit= 40; 
     public static final Time currentLimitTime= Seconds.of(1); //Temporary
@@ -57,5 +57,5 @@ public final class IntakeConstants {
     public static final double motorToPivotGearRatio = 2.0; //Unsure yet, will need it for the simulator
     public static final double rollerGearRatio = 1.0; //Unsure yet, will need it for the simulator
     public static final MomentOfInertia PIVOT_MOMENTOFINERTIA = KilogramSquareMeters.of(0.01);
-    public static final MomentOfInertia ROLLER_MOMENTOFINERTIA = KilogramSquareMeters.of(0.01);
+    public static final MomentOfInertia ROLLER_MOMENTOFINERTIA = KilogramSquareMeters.of(0.001);
 }

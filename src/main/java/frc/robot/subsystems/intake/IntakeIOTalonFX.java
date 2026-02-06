@@ -115,8 +115,8 @@ public class IntakeIOTalonFX implements IntakeIO {
         pivotAngleSignal = pivotMotor.getPosition();
         pivotAngularVelocitySignal = pivotMotor.getVelocity();
         rollerAngularVelocitySignal = rollerMotor.getVelocity();
-        rollerAppliedVoltsSignal = rollerMotor.getSupplyVoltage();
-        pivotAppliedVoltsSignal = pivotMotor.getSupplyVoltage();
+        rollerAppliedVoltsSignal = rollerMotor.getMotorVoltage();
+        pivotAppliedVoltsSignal = pivotMotor.getMotorVoltage();
         rollerCurrentAmpsSignal = rollerMotor.getStatorCurrent();
         pivotCurrentAmpsSignal = pivotMotor.getStatorCurrent();
 
