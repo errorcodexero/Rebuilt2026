@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.5225775206223133,
+        "y": 1.8884333333333334
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.1870766019182764,
+        "y": 1.8405346824899806
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.183572540543293,
+        "y": 1.8884333333333334
+      },
+      "prevControl": {
+        "x": 3.4312193520287444,
+        "y": 1.8542126267203871
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "NZShoot"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 59.058463533677475
+  },
+  "reversed": false,
+  "folder": "Neutral Zone Climb",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 90.05732683363037
+  },
+  "useDefaultConstraints": true
+}
