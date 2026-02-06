@@ -25,16 +25,17 @@ public class Hopper extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-
     Logger.processInputs("Hopper", inputs);
 
-    Logger.recordOutput("Hopper/ScramblerGoalRPS", scramblerGoal.in(RotationsPerSecond));
-    Logger.recordOutput("Hopper/FeederGoalRPS", feederGoal.in(RotationsPerSecond));
+    Logger.recordOutput("Hopper/ScramblerGoalRPS",
+        scramblerGoal.in(RotationsPerSecond));
+    Logger.recordOutput("Hopper/FeederGoalRPS",
+        feederGoal.in(RotationsPerSecond));
     Logger.recordOutput("Hopper/ScramblerAtGoal", isScramblerAtGoal());
     Logger.recordOutput("Hopper/FeederAtGoal", isFeederAtGoal());
   }
 
-  //scrambler
+  // Scrambler control
   public void setScramblerVelocity(AngularVelocity velocity) {
     scramblerGoal = velocity;
     io.setScramblerVelocity(velocity);
@@ -46,22 +47,20 @@ public class Hopper extends SubsystemBase {
   }
 
   public void idleScrambler() {
-    double fraction = 0.15; // idle = 15% of configured max
-    setScramblerVelocity(
-        RotationsPerSecond.of(HopperConstants.scramblerMaxVelocity.in(RotationsPerSecond) * fraction)
-    );
-  }
+  setScramblerVelocity(
+      HopperConstants.scramblerMaxVelocity.times(0.15)
+  );
+}
 
   public void activeScrambler() {
     setScramblerVelocity(HopperConstants.scramblerMaxVelocity);
   }
 
   public void stopScrambler() {
-    scramblerGoal = RotationsPerSecond.of(0.0);
-    io.setScramblerVoltage(Volts.of(0.0));
+    setScramblerVoltage(Volts.of(0.0));
   }
 
-  //feeder
+  // Feeder control
   public void setFeederVelocity(AngularVelocity velocity) {
     feederGoal = velocity;
     io.setFeederVelocity(velocity);
@@ -73,8 +72,7 @@ public class Hopper extends SubsystemBase {
   }
 
   public void stopFeeder() {
-    feederGoal = RotationsPerSecond.of(0.0);
-    io.setFeederVoltage(Volts.of(0.0));
+    setFeederVoltage(Volts.of(0.0));
   }
 
   public void stopAll() {
@@ -87,19 +85,23 @@ public class Hopper extends SubsystemBase {
   }
 
   public void feedSlow() {
-    setFeederVelocity(RotationsPerSecond.of(HopperConstants.feederMaxVelocity.in(RotationsPerSecond) * 0.5));
-  }
+  setFeederVelocity(
+      HopperConstants.feederMaxVelocity.times(0.5)
+  );
+}
 
   public void reverseFeed() {
-    setFeederVelocity(RotationsPerSecond.of(-HopperConstants.feederMaxVelocity.in(RotationsPerSecond) * 0.5));
-  }
+  setFeederVelocity(
+      HopperConstants.feederMaxVelocity.times(-0.5)
+  );
+}
 
   public void scrambleAndFeed() {
     activeScrambler();
     feed();
   }
 
-  //readbacks + state checks
+  // Readbacks + state checks
   public AngularVelocity getScramblerVelocity() {
     return inputs.scramblerVelocity;
   }
@@ -117,14 +119,18 @@ public class Hopper extends SubsystemBase {
   }
 
   public boolean isScramblerAtGoal() {
-    return Math.abs(inputs.scramblerVelocity.in(RotationsPerSecond) - scramblerGoal.in(RotationsPerSecond)) < 1.0;
+    return Math.abs(
+        inputs.scramblerVelocity.in(RotationsPerSecond)
+            - scramblerGoal.in(RotationsPerSecond)) < 1.0;
   }
 
   public boolean isFeederAtGoal() {
-    return Math.abs(inputs.feederVelocity.in(RotationsPerSecond) - feederGoal.in(RotationsPerSecond)) < 1.0;
+    return Math.abs(
+        inputs.feederVelocity.in(RotationsPerSecond)
+            - feederGoal.in(RotationsPerSecond)) < 1.0;
   }
 
-    // Hopper Commands
+  // Command factories
   public Command setFeederVoltageCommand(Voltage voltage) {
     return Commands.run(() -> setFeederVoltage(voltage), this)
         .withName("Hopper.SetFeederVoltage");
@@ -146,9 +152,7 @@ public class Hopper extends SubsystemBase {
   }
 
   public Command stopAllCommand() {
-  return Commands.run(this::stopAll, this)
-      .withName("Hopper.StopAll");
+    return Commands.run(this::stopAll, this)
+        .withName("Hopper.StopAll");
   }
-
-
 }
