@@ -4,15 +4,18 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.FeetPerSecond;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import java.util.Arrays;
 
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -34,10 +37,20 @@ import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.thriftyclimb.ThriftyClimb;
 import frc.robot.subsystems.thriftyclimb.ThriftyClimbIO;
 import frc.robot.subsystems.thriftyclimb.ThriftyClimbIOSim;
+import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShooterConstants;
+import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIO;
 import frc.robot.subsystems.vision.CameraIOPhotonSim;
 import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.intake.IntakeIO;
+import frc.robot.subsystems.intake.IntakeIOSim;
+import frc.robot.subsystems.intake.IntakeIOTalonFX;
+import frc.robot.subsystems.intake.IntakeConstants; 
+import static edu.wpi.first.units.Units.Volts;
+import frc.robot.util.Mechanism3d;
 
 public class RobotContainer {
 
@@ -45,6 +58,8 @@ public class RobotContainer {
     private Drive drivebase_;
     private AprilTagVision vision_;
     private ThriftyClimb thriftyClimb_;
+    private IntakeSubsystem intake_;
+    private Shooter shooter_;
 
     // Choosers
     private final LoggedDashboardChooser<Command> autoChooser_;
@@ -53,7 +68,6 @@ public class RobotContainer {
     private final CommandXboxController gamepad_ = new CommandXboxController(0);
 
     public RobotContainer() {
-
         /**
          * Subsystem setup
          */
@@ -107,6 +121,8 @@ public class RobotContainer {
                         new CameraIOPhotonSim("front", VisionConstants.frontTransform, drivebase_::getPose, true)
                     );
 
+                    intake_= new IntakeSubsystem(new IntakeIOSim());
+                    
                     thriftyClimb_ = new ThriftyClimb(
                         new ThriftyClimbIOSim()
                     );
@@ -193,6 +209,12 @@ public class RobotContainer {
 
         if (thriftyClimb_ == null) {
             thriftyClimb_ = new ThriftyClimb(new ThriftyClimbIO() {});
+        if (intake_ == null) {
+            intake_ = new IntakeSubsystem(new IntakeIO() {});
+        }
+        
+        if (shooter_ == null) {
+            shooter_ = new Shooter(new ShooterIO() {});
         }
 
         DriveCommands.configure(
@@ -201,6 +223,10 @@ public class RobotContainer {
             () -> -gamepad_.getLeftX(),
             () -> -gamepad_.getRightX()
         );
+
+        // Initialize the visualizers.
+        Mechanism3d.measured.zero();
+        Mechanism3d.setpoints.zero();
 
         // Choosers
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
@@ -220,6 +246,43 @@ public class RobotContainer {
     // Bind robot actions to commands here.
     private void configureBindings() {
         gamepad_.a().onTrue(thriftyClimb_.toggle());
+        //Testing out each of the commands in the simulator
+        gamepad_.a().whileTrue(
+            intake_.setRollerVoltageCommand(IntakeConstants.rollerCollectVoltage)
+        );
+
+        gamepad_.b().whileTrue(
+            intake_.setPivotAngleCommand(IntakeConstants.pivotTargetAngle)
+        );
+
+        gamepad_.x().whileTrue(
+            intake_.deployIntakeCommand()
+        );
+
+        gamepad_.y().whileTrue(
+            intake_.stowIntakeCommand()
+        );
+
+        gamepad_.leftBumper().whileTrue(
+            intake_.stopRollerCommand()
+        );
+
+        gamepad_.rightBumper().whileTrue(
+            intake_.setRollerVelocityCommand(IntakeConstants.rollerMaxVelocity)
+        );
+
+        gamepad_.back().whileTrue(
+            intake_.setPivotVoltageCommand(IntakeConstants.pivotVoltage)
+        );
+
+        gamepad_.rightTrigger().whileTrue(
+            intake_.intakeDeployCommand()
+        );
+
+        gamepad_.leftTrigger().whileTrue(
+            intake_.stopStowCommand()
+        );
+
     }
 
     private void configureDriveBindings() {
@@ -272,6 +335,13 @@ public class RobotContainer {
     private void configureTestModeBindings() {
         gamepad_.back().and(RobotModeTriggers.test()).toggleOnTrue(
             DriveCommands.wheelRadiusCharacterization(drivebase_)
+        );
+
+        LoggedNetworkNumber shooterVelocity = new LoggedNetworkNumber("Tuning/Shooter/TargetShooterRPS", 0);
+        LoggedNetworkNumber hoodAngle = new LoggedNetworkNumber("Tuning/Shooter/TargetHoodAngle", ShooterConstants.SoftwareLimits.hoodMinAngle);
+
+        gamepad_.a().and(RobotModeTriggers.test()).toggleOnTrue(
+            shooter_.runDynamicSetpoint(() -> RotationsPerSecond.of(shooterVelocity.get()), () -> Degrees.of(hoodAngle.get()))
         );
     }
     

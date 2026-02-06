@@ -5,7 +5,7 @@
 
 This project is the source code for Relic, 1425's robot designed for the First Robotics Competition 2026 game, REBUILT.
 
-![Rebuilt](/rebuilt.webp)
+![Rebuilt](/relic.png)
 
 ## Contributing
 While contributing to this project, please create a branch for what you are working on, and follow our repository naming conventions written [here](./STYLE-GUIDE.md).
