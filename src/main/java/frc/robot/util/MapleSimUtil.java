@@ -1,7 +1,11 @@
 package frc.robot.util;
 
+import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import org.ironmaple.simulation.IntakeSimulation;
@@ -12,15 +16,20 @@ import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt;
+import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnFly;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
@@ -34,16 +43,45 @@ public class MapleSimUtil {
     private static boolean shooterRunning = false;
     private static AngularVelocity shooterVelocity = RadiansPerSecond.zero();
 
+    private static final Distance shooterRadius = Centimeters.of(5);
+
     private static final Command run =
         Commands.run(MapleSimUtil::periodic)
             .ignoringDisable(true)
             .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+
+    private static final Command runShooter =
+        Commands.runOnce(() -> {
+            if (MapleSimUtil.getRemainingGamepieces() == 0) return;
+
+            var fuel = new RebuiltFuelOnFly(
+                getPosition().getTranslation(),
+                new Translation2d(), // Initial Shooter Position
+                getFieldChassisSpeeds(),
+                getPosition().getRotation(),
+                Meters.of(0.5), // Initial Height
+                MetersPerSecond.of(shooterVelocity.in(RadiansPerSecond) * shooterRadius.in(Meters)),
+                hoodAngle
+            )
+            .withHitTargetCallBack(() -> System.out.println("Fuel Scored!"))
+            .withProjectileTrajectoryDisplayCallBack(
+                poses -> Logger.recordOutput("MapleSim/Trajectory", poses.toArray(Pose3d[]::new))
+            );
+
+            loseGamepiece();
+
+            SimulatedArena.getInstance().addGamePieceProjectile(fuel);
+        })
+        .andThen(Commands.waitTime(Milliseconds.of(1000 / 10)))
+        .repeatedly();
 
     /** Starts the MapleSim simulation, kicks off a periodic method. */
     public static void start() {
         var rebuilt = (Arena2026Rebuilt) SimulatedArena.getInstance();
         rebuilt.setEfficiencyMode(Constants.spawnLessFuelInSim);
         rebuilt.resetFieldForAuto();
+
+        new Trigger(() -> shooterRunning).whileTrue(runShooter);
 
         CommandScheduler.getInstance().schedule(run);
     }

@@ -20,7 +20,7 @@ public class IntakeIOSim extends IntakeIOTalonFX {
 
         pivotMotorSim= new DCMotorSim(
             LinearSystemId.createDCMotorSystem(
-                DCMotor.getKrakenX60Foc(1), IntakeConstants.PIVOT_MOMENTOFINERTIA.in(KilogramSquareMeters), IntakeConstants.pivotToMotorGearRatio
+                DCMotor.getKrakenX60Foc(1), IntakeConstants.PIVOT_MOMENTOFINERTIA.in(KilogramSquareMeters), IntakeConstants.motorToPivotGearRatio
             ),
             DCMotor.getKrakenX60Foc(1)
         );  
@@ -44,8 +44,8 @@ public class IntakeIOSim extends IntakeIOTalonFX {
         pivotMotorSim.setInputVoltage(pivotMotorSimState.getMotorVoltage());
         pivotMotorSim.update(Robot.defaultPeriodSecs);
 
-        pivotMotorSimState.setRawRotorPosition(pivotMotorSim.getAngularPosition().times(IntakeConstants.pivotToMotorGearRatio));
-        pivotMotorSimState.setRotorVelocity(pivotMotorSim.getAngularVelocity().times(IntakeConstants.pivotToMotorGearRatio));
+        pivotMotorSimState.setRawRotorPosition(pivotMotorSim.getAngularPosition().times(IntakeConstants.motorToPivotGearRatio));
+        pivotMotorSimState.setRotorVelocity(pivotMotorSim.getAngularVelocity().times(IntakeConstants.motorToPivotGearRatio));
         
         rollerMotorSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
 

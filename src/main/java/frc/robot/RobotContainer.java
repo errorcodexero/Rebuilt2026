@@ -9,24 +9,18 @@ import static edu.wpi.first.units.Units.FeetPerSecond;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import java.util.Arrays;
 
-import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
-import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnFly;
-import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -276,30 +270,6 @@ public class RobotContainer {
         // Maple Sim
         if (Constants.getRobot() == RobotType.SIMBOT) {
             MapleSimUtil.start();
-
-            gamepad_.rightTrigger().whileTrue(Commands.runOnce(() -> {
-                if (MapleSimUtil.getRemainingGamepieces() == 0) return;
-
-                var fuel = new RebuiltFuelOnFly(
-                    MapleSimUtil.getPosition().getTranslation(),
-                    new Translation2d(), // Initial Robot Position
-                    MapleSimUtil.getFieldChassisSpeeds(),
-                    MapleSimUtil.getPosition().getRotation(),
-                    Meters.of(0.5), // Initial Height
-                    MetersPerSecond.of(8),
-                    Degrees.of(50)
-                )
-                .withHitTargetCallBack(() -> System.out.println("Fuel Scored!"))
-                .withProjectileTrajectoryDisplayCallBack(
-                    poses -> Logger.recordOutput("MapleSim/Trajectory", poses.toArray(Pose3d[]::new))
-                );
-
-                MapleSimUtil.loseGamepiece();
-
-                SimulatedArena.getInstance().addGamePieceProjectile(fuel);
-            })
-            .andThen(Commands.waitTime(Milliseconds.of(1000 / 15)))
-            .repeatedly());
         }
 
         // Choosers
