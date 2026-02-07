@@ -6,39 +6,54 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.FeetPerSecond;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import java.util.Arrays;
 
+import org.ironmaple.simulation.drivesims.COTS;
+import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.Mode;
+import frc.robot.Constants.RobotType;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.generated.AlphaTunerConstants;
 import frc.robot.generated.BetaTunerConstants;
 import frc.robot.generated.CompTunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
+import frc.robot.subsystems.drive.GyroIOMaple;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
+import frc.robot.subsystems.drive.ModuleIOMaple;
 import frc.robot.subsystems.drive.ModuleIOReplay;
-import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
-import frc.robot.subsystems.intake.IntakeConstants;
+import frc.robot.subsystems.hopper.Hopper;
+import frc.robot.subsystems.hopper.HopperIO;
+import frc.robot.subsystems.hopper.HopperIOSim;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.shooter.HoodIO;
+import frc.robot.subsystems.shooter.HoodIOSim;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.ShooterIO;
+import frc.robot.subsystems.shooter.ShooterIOSim;
 import frc.robot.subsystems.thriftyclimb.ThriftyClimb;
 import frc.robot.subsystems.thriftyclimb.ThriftyClimbIO;
 import frc.robot.subsystems.thriftyclimb.ThriftyClimbIOSim;
@@ -46,6 +61,7 @@ import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIO;
 import frc.robot.subsystems.vision.CameraIOPhotonSim;
 import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.util.MapleSimUtil;
 import frc.robot.util.Mechanism3d;
 
 public class RobotContainer {
@@ -53,9 +69,10 @@ public class RobotContainer {
     // Subsystems
     private Drive drivebase_;
     private AprilTagVision vision_;
-    private ThriftyClimb thriftyClimb_;
     private IntakeSubsystem intake_;
     private Shooter shooter_;
+    private Hopper hopper_;
+    private ThriftyClimb climb_;
 
     // Choosers
     private final LoggedDashboardChooser<Command> autoChooser_;
@@ -101,9 +118,35 @@ public class RobotContainer {
 
                 case SIMBOT:
                     // Sim robot, instantiate physics sim IO implementations
+                    // Create and configure a drivetrain simulation configuration
+                    DriveTrainSimulationConfig config = DriveTrainSimulationConfig.Default()
+                        .withGyro(COTS.ofPigeon2())
+                        .withSwerveModule(COTS.ofMark4(
+                            DCMotor.getKrakenX60(1),
+                            DCMotor.getKrakenX60(1),
+                            COTS.WHEELS.COLSONS.cof,
+                            2
+                        ))
+                        .withTrackLengthTrackWidth(
+                            Meters.of(Math.abs(
+                                CompTunerConstants.FrontLeft.LocationX -
+                                CompTunerConstants.BackLeft.LocationX
+                            )),
+                            Meters.of(Math.abs(
+                                CompTunerConstants.FrontLeft.LocationY -
+                                CompTunerConstants.FrontRight.LocationY
+                            ))
+                        )
+                        .withBumperSize(Inches.of(30.75), Inches.of(37.25));
+
+                    // Add sim drivebase to simulation and where modules can get it.
+                    // CALL THIS BEFORE CREATING THE DRIVEBASE!
+                    MapleSimUtil.createSwerve(config, new Pose2d(2.0, 2.0, Rotation2d.kZero));
+                    MapleSimUtil.createIntake();
+
                     drivebase_ = new Drive(
-                        new GyroIO() {},
-                        ModuleIOSim::new,
+                        new GyroIOMaple(),
+                        ModuleIOMaple::new,
                         CompTunerConstants.FrontLeft,
                         CompTunerConstants.FrontRight,
                         CompTunerConstants.BackLeft,
@@ -114,14 +157,16 @@ public class RobotContainer {
 
                     vision_ = new AprilTagVision(
                         drivebase_::addVisionMeasurement,
-                        new CameraIOPhotonSim("front", VisionConstants.frontTransform, drivebase_::getPose, true)
+                        new CameraIOPhotonSim("front", VisionConstants.frontTransform, MapleSimUtil::getPosition, true)
                     );
 
                     intake_= new IntakeSubsystem(new IntakeIOSim());
+
+                    shooter_ = new Shooter(new ShooterIOSim(), new HoodIOSim());
+
+                    hopper_ = new Hopper(new HopperIOSim());
                     
-                    thriftyClimb_ = new ThriftyClimb(
-                        new ThriftyClimbIOSim()
-                    );
+                    climb_ = new ThriftyClimb(new ThriftyClimbIOSim());
 
                     break;
                 default: // Comp Bot
@@ -202,17 +247,21 @@ public class RobotContainer {
                 cams
             );
         }
-
-        if (thriftyClimb_ == null) {
-            thriftyClimb_ = new ThriftyClimb(new ThriftyClimbIO() {});
-        }
         
         if (intake_ == null) {
             intake_ = new IntakeSubsystem(new IntakeIO() {});
         }
         
         if (shooter_ == null) {
-            shooter_ = new Shooter(new ShooterIO() {});
+            shooter_ = new Shooter(new ShooterIO() {}, new HoodIO() {});
+        }
+
+        if (hopper_ == null) {
+            hopper_ = new Hopper(new HopperIO() {});
+        }
+
+        if (climb_ == null) {
+            climb_ = new ThriftyClimb(new ThriftyClimbIO() {});
         }
 
         DriveCommands.configure(
@@ -225,6 +274,11 @@ public class RobotContainer {
         // Initialize the visualizers.
         Mechanism3d.measured.zero();
         Mechanism3d.setpoints.zero();
+
+        // Maple Sim
+        if (Constants.getRobot() == RobotType.SIMBOT) {
+            MapleSimUtil.start();
+        }
 
         // Choosers
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
@@ -243,44 +297,25 @@ public class RobotContainer {
 
     // Bind robot actions to commands here.
     private void configureBindings() {
-        gamepad_.a().onTrue(thriftyClimb_.toggle());
-        //Testing out each of the commands in the simulator
-        gamepad_.a().whileTrue(
-            intake_.setRollerVoltageCommand(IntakeConstants.rollerCollectVoltage)
-        );
+        // Manually deploying and undeploying the intake.
+        gamepad_.start().onTrue(Commands.either(
+            intake_.deployCmd(),
+            intake_.stowCmd(),
+            intake_::isIntakeStowed
+        ));
 
-        gamepad_.b().whileTrue(
-            intake_.setPivotAngleCommand(IntakeConstants.pivotTargetAngle)
-        );
-
-        gamepad_.x().whileTrue(
-            intake_.deployIntakeCommand()
-        );
-
-        gamepad_.y().whileTrue(
-            intake_.stowIntakeCommand()
-        );
-
-        gamepad_.leftBumper().whileTrue(
-            intake_.stopRollerCommand()
-        );
-
-        gamepad_.rightBumper().whileTrue(
-            intake_.setRollerVelocityCommand(IntakeConstants.rollerMaxVelocity)
-        );
-
-        gamepad_.back().whileTrue(
-            intake_.setPivotVoltageCommand(IntakeConstants.pivotVoltage)
-        );
-
-        gamepad_.rightTrigger().whileTrue(
-            intake_.intakeDeployCommand()
-        );
-
+        // While the left trigger is held, we will run the intake. If the intake is stowed, it will also deploy it.
         gamepad_.leftTrigger().whileTrue(
-            intake_.stopStowCommand()
+            intake_.runIntakeCmd().beforeStarting(
+                intake_.startDeployCmd().onlyIf(intake_::isIntakeStowed)
+            )
         );
 
+        // While the right trigger is held, we will shoot into the hub.
+        gamepad_.rightTrigger().whileTrue(shooter_.shootCmd(hopper_));
+
+        // When the hopper isnt shooting, set it to run its idle velocity.
+        hopper_.setDefaultCommand(hopper_.idleScrambler());
     }
 
     private void configureDriveBindings() {
@@ -339,7 +374,7 @@ public class RobotContainer {
         LoggedNetworkNumber hoodAngle = new LoggedNetworkNumber("Tuning/Shooter/TargetHoodAngle", ShooterConstants.SoftwareLimits.hoodMinAngle);
 
         gamepad_.a().and(RobotModeTriggers.test()).toggleOnTrue(
-            shooter_.runDynamicSetpoint(() -> RotationsPerSecond.of(shooterVelocity.get()), () -> Degrees.of(hoodAngle.get()))
+            shooter_.runDynamicSetpoints(() -> RotationsPerSecond.of(shooterVelocity.get()), () -> Degrees.of(hoodAngle.get()))
         );
     }
     

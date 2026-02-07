@@ -74,14 +74,14 @@ public class HopperIOTalonFX implements HopperIO {
         
         //Status Signals Initialization
         feederAngularVelocitySignal = feederMotor.getVelocity();
-        feederVoltageSignal = feederMotor.getSupplyVoltage();
+        feederVoltageSignal = feederMotor.getMotorVoltage();
         feederCurrentSignal = feederMotor.getStatorCurrent();
 
         scramblerAngularVelocitySignal = scramblerMotor.getVelocity();
-        scramblerVoltageSignal = scramblerMotor.getSupplyVoltage();
+        scramblerVoltageSignal = scramblerMotor.getMotorVoltage();
         scramblerCurrentSignal = scramblerMotor.getStatorCurrent();
 
-        BaseStatusSignal.setUpdateFrequencyForAll(0.0, 
+        BaseStatusSignal.setUpdateFrequencyForAll(50.0, 
             feederAngularVelocitySignal, feederVoltageSignal, feederCurrentSignal, 
             scramblerAngularVelocitySignal, scramblerVoltageSignal, scramblerCurrentSignal);
         
@@ -125,10 +125,10 @@ public class HopperIOTalonFX implements HopperIO {
     }
 
     public void stopFeeder() {
-        feederMotor.setControl(feederVoltageRequest.withOutput(0));
+        feederMotor.setControl(new StaticBrake());
     }
 
     public void stopScrambler() {
-        scramblerMotor.setControl(scramblerVoltageRequest.withOutput(0));
+        scramblerMotor.setControl(new StaticBrake());
     }
 }

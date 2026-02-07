@@ -20,13 +20,13 @@ public class HopperIOSim extends HopperIOTalonFX{
         scramblerGearRatio = HopperConstants.scramblerGearRatio;
         feederSim = new DCMotorSim(
             LinearSystemId.createDCMotorSystem(
-                DCMotor.getKrakenX60Foc(1), 0.001, feederGearRatio
+                DCMotor.getKrakenX60Foc(1), 0.01, feederGearRatio
             ), 
             DCMotor.getKrakenX60Foc(1)
         );
         scramblerSim = new DCMotorSim(
             LinearSystemId.createDCMotorSystem(
-                DCMotor.getKrakenX60Foc(1), 0.001, scramblerGearRatio
+                DCMotor.getKrakenX60Foc(1), 0.01, scramblerGearRatio
             ), 
             DCMotor.getKrakenX60Foc(1)
         );

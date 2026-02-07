@@ -35,6 +35,8 @@ public final class Constants {
     // falling back to REPLAY.
     private static final RobotType robotType = RobotType.SIMBOT;
 
+    public static final boolean spawnLessFuelInSim = true;
+
     public static class DriveConstants {
         public static final double slowModeJoystickMultiplier = 0.4;
     }
@@ -66,7 +68,7 @@ public final class Constants {
         BETA,
 
         /** The Sim Bot */
-        SIMBOT,
+        SIMBOT
     }
 
     // This is only a fallback! This will not change the robot type.

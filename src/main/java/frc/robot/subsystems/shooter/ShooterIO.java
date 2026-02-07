@@ -1,13 +1,11 @@
 package frc.robot.subsystems.shooter;
 
 import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import org.littletonrobotics.junction.AutoLog;
 
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
@@ -35,20 +33,15 @@ public interface ShooterIO {
         public Voltage shooter4Voltage = Volts.zero();
         public Current shooter4Current = Amps.zero();
         public AngularVelocity shooter4Velocity = RadiansPerSecond.zero();
-        
-        public Angle hoodPosition = Radians.zero();
-        public Voltage hoodVoltage = Volts.zero();
-        public Current hoodCurrent = Amps.zero();
-        public AngularVelocity hoodVelocity = RadiansPerSecond.zero();
+
+        public AngularVelocity wheelVelocity = RadiansPerSecond.zero();
     }
 
     public default void updateInputs(ShooterIOInputs inputs) {}
 
-    public default void setShooterVelocity(AngularVelocity vel) {}
+    public default void setVelocity(AngularVelocity vel) {}
 
-    public default void setShooterVoltage(Voltage vol) {}
+    public default void setVoltage(Voltage vol) {}
 
-    public default void stopShooter() {}
-
-    public default void setHoodPosition(Angle pos) {}
+    public default void stop() {}
 }
