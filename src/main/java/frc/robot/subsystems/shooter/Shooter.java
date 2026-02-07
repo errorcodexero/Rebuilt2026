@@ -118,6 +118,10 @@ public class Shooter extends SubsystemBase {
         hoodIO.runPosition(pos);
     }
 
+    public Angle getHoodAngle() {
+        return hoodInputs.position;
+    }
+
     public Command hoodToPosCmd(Angle pos) {
         return runOnce(() -> setHoodAngle(pos)).withName("Set Hood Position");
     }
