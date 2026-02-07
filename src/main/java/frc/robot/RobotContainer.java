@@ -305,11 +305,7 @@ public class RobotContainer {
         ));
 
         // While the left trigger is held, we will run the intake. If the intake is stowed, it will also deploy it.
-        gamepad_.leftTrigger().whileTrue(
-            intake_.runIntakeCmd().beforeStarting(
-                intake_.startDeployCmd().onlyIf(intake_::isIntakeStowed)
-            )
-        );
+        gamepad_.leftTrigger().whileTrue(intake_.intakeSequence());
 
         // While the right trigger is held, we will shoot into the hub.
         gamepad_.rightTrigger().whileTrue(shooter_.shootCmd(hopper_));
