@@ -74,13 +74,13 @@ public class ShooterIOTalonFX implements ShooterIO {
         shooter3Motor.setControl(new Follower(ShooterConstants.shooter1CANID, MotorAlignmentValue.Aligned));
 
         shooter1AngularVelocity = shooter1Motor.getVelocity();
-        shooter1AppliedVolts = shooter1Motor.getSupplyVoltage();
+        shooter1AppliedVolts = shooter1Motor.getMotorVoltage();
         shooter1CurrentAmps = shooter1Motor.getSupplyCurrent();
         shooter2AngularVelocity = shooter2Motor.getVelocity();
-        shooter2AppliedVolts = shooter2Motor.getSupplyVoltage();
+        shooter2AppliedVolts = shooter2Motor.getMotorVoltage();
         shooter2CurrentAmps = shooter2Motor.getSupplyCurrent();
         shooter3AngularVelocity = shooter3Motor.getVelocity();
-        shooter3AppliedVolts = shooter3Motor.getSupplyVoltage();
+        shooter3AppliedVolts = shooter3Motor.getMotorVoltage();
         shooter3CurrentAmps = shooter3Motor.getSupplyCurrent();
         
         // Status Signal Collection, less repetitive code

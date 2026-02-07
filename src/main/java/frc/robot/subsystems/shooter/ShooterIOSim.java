@@ -13,7 +13,7 @@ public class ShooterIOSim extends ShooterIOTalonFX {
 
     private final FlywheelSim flywheelSim = new FlywheelSim(
         LinearSystemId.createFlywheelSystem(
-            DCMotor.getKrakenX60Foc(3), 0.01, ShooterConstants.gearRatio
+            DCMotor.getKrakenX60Foc(3), 0.01, 1.0 / ShooterConstants.gearRatio
         ),
         DCMotor.getKrakenX60Foc(3)
     );
@@ -35,8 +35,8 @@ public class ShooterIOSim extends ShooterIOTalonFX {
 
         for (TalonFXSimState simState : motorStates) {
             simState.setSupplyVoltage(RobotController.getBatteryVoltage());
-            simState.setRotorVelocity(flywheelSim.getAngularVelocity().times(ShooterConstants.gearRatio));
-            simState.setRotorAcceleration(flywheelSim.getAngularAcceleration().times(ShooterConstants.gearRatio));
+            simState.setRotorVelocity(flywheelSim.getAngularVelocity().div(ShooterConstants.gearRatio));
+            simState.setRotorAcceleration(flywheelSim.getAngularAcceleration().div(ShooterConstants.gearRatio));
         }
 
         super.updateInputs(inputs);

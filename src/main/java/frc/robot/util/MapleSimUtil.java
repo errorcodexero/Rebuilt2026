@@ -54,6 +54,7 @@ public class MapleSimUtil {
     private static final Command runShooter =
         Commands.runOnce(() -> {
             if (getRemainingGamepieces() == 0) return;
+            if (shooterVelocity.isEquivalent(RadiansPerSecond.zero())) return;
 
             var fuelLeft = createProjectile(Inches.of(3.7));
             loseGamepiece();
@@ -119,7 +120,7 @@ public class MapleSimUtil {
     public static GamePieceProjectile createProjectile(Distance yOffset) {
         return new RebuiltFuelOnFly(
             getPosition().getTranslation(),
-            new Translation2d(Inches.of(-8), Inches.of(3.7)), // Initial Shooter Position
+            new Translation2d(Inches.of(-8), yOffset), // Initial Shooter Position
             getFieldChassisSpeeds(),
             getPosition().getRotation(),
             Inches.of(18.5), // Initial Height

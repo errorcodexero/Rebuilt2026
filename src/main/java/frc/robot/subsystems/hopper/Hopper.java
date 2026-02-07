@@ -36,7 +36,9 @@ public class Hopper extends SubsystemBase {
             // Set shooter running if feeder and scrambler are both rolling.
             MapleSimUtil.setShooterRunning(
                 inputs.feederVelocity.gt(RadiansPerSecond.zero()) &&
-                inputs.scramblerVelocity.gt(RadiansPerSecond.zero())
+                inputs.scramblerVelocity.gt(RadiansPerSecond.zero()) &&
+                isFeederAtGoal() &&
+                isScramblerAtGoal()
             );
         }
 
@@ -89,8 +91,8 @@ public class Hopper extends SubsystemBase {
      */
     public Command idleScrambler() {
         return startEnd(
-            () -> setFeederVelocity(HopperConstants.feederMaxVelocity.times(0.15)),
-            this::stopFeeder
+            () -> setScramblerVelocity(HopperConstants.scramblerActiveVelocity.times(0.15)),
+            this::stopScrambler
         );
     }
 

@@ -136,7 +136,7 @@ public class Shooter extends SubsystemBase {
      */
     public Command shootCmd(Hopper hopper) {
         return Commands.parallel(
-            runDynamicSetpoints(() -> RPM.of(1000), () -> Degrees.of(45)),
+            runDynamicSetpoints(() -> RPM.of(5000), () -> Degrees.of(30)),
             hopper.forwardFeed()
         );
     }
