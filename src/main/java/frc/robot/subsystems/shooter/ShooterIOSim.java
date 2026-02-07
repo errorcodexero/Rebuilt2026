@@ -13,7 +13,7 @@ public class ShooterIOSim extends ShooterIOTalonFX {
 
     private final FlywheelSim flywheelSim = new FlywheelSim(
         LinearSystemId.createFlywheelSystem(
-            DCMotor.getKrakenX60Foc(3), 0.01, 1.0 / ShooterConstants.gearRatio
+            DCMotor.getKrakenX60Foc(3), 0.0001, 1.0 / ShooterConstants.gearRatio
         ),
         DCMotor.getKrakenX60Foc(3)
     );

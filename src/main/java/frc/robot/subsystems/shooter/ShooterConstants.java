@@ -25,10 +25,10 @@ public class ShooterConstants {
 
     public class PID {
             // shooter
-            public static final double shooterkP = 0.5; 
+            public static final double shooterkP = 0.0; 
             public static final double shooterkI = 0.0;
             public static final double shooterkD = 0.0;
-            public static final double shooterkV = 0.0;
+            public static final double shooterkV = 1/1348.0;;
             public static final double shooterkA = 0.0;
             public static final double shooterkG = 0.0;
             public static final double shooterkS = 0.0;

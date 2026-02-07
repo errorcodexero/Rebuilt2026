@@ -155,6 +155,10 @@ public class Shooter extends SubsystemBase {
         return runEnd(() -> setSetpoints(vel.get(), pos.get()), this::stopShooter);
     }
 
+    public Command setDynamicVoltage(Supplier<Voltage> voltage) {
+        return runEnd(() -> setShooterVoltage(voltage.get()), this::stopShooter);
+    }   
+
     // Sys ID
     public Command shooterSysIdQuasistatic(SysIdRoutine.Direction dir) {
         return shooterIdRoutine().quasistatic(dir);

@@ -11,6 +11,7 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 
 import java.util.Arrays;
 
@@ -28,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.Constants.RobotType;
@@ -370,12 +372,33 @@ public class RobotContainer {
             DriveCommands.wheelRadiusCharacterization(drivebase_)
         );
 
-        LoggedNetworkNumber shooterVelocity = new LoggedNetworkNumber("Tuning/Shooter/TargetShooterRPS", 0);
-        LoggedNetworkNumber hoodAngle = new LoggedNetworkNumber("Tuning/Shooter/TargetHoodAngle", ShooterConstants.SoftwareLimits.hoodMinAngle);
+        LoggedNetworkNumber shooterVoltage = new LoggedNetworkNumber("Tuning/Shooter/Voltage", 0);    
+        gamepad_.a().and(RobotModeTriggers.test()).onTrue(
+            shooter_.setDynamicVoltage(() -> Volts.of(shooterVoltage.get()))
+        );        
+        
+        // LoggedNetworkNumber shooterVelocity = new LoggedNetworkNumber("Tuning/Shooter/TargetShooterRPS", 0);
+        // LoggedNetworkNumber hoodAngle = new LoggedNetworkNumber("Tuning/Shooter/TargetHoodAngle", ShooterConstants.SoftwareLimits.hoodMinAngle);
+        // gamepad_.a().and(RobotModeTriggers.test()).toggleOnTrue(
+        //     shooter_.runDynamicSetpoints(() -> RotationsPerSecond.of(shooterVelocity.get()), () -> Degrees.of(hoodAngle.get()))
+        // );
 
-        gamepad_.a().and(RobotModeTriggers.test()).toggleOnTrue(
-            shooter_.runDynamicSetpoints(() -> RotationsPerSecond.of(shooterVelocity.get()), () -> Degrees.of(hoodAngle.get()))
-        );
+        // gamepad_.a().and(RobotModeTriggers.test()).onTrue(
+        //     shooter_.shooterSysIdQuasistatic(Direction.kForward)
+        // );
+
+        // gamepad_.b().and(RobotModeTriggers.test()).onTrue(
+        //     shooter_.shooterSysIdQuasistatic(Direction.kReverse)
+        // );
+        
+        // gamepad_.x().and(RobotModeTriggers.test()).onTrue(
+        //     shooter_.shooterSysIdDynamic(Direction.kForward)
+        // );
+        
+        // gamepad_.y().and(RobotModeTriggers.test()).onTrue(
+        //     shooter_.shooterSysIdDynamic(Direction.kReverse)
+        // );        
+
     }
     
     public Command getAutonomousCommand() {
