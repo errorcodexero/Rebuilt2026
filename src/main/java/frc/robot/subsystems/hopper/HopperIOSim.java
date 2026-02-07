@@ -42,7 +42,7 @@ public class HopperIOSim extends HopperIOTalonFX{
         feederSimState.setRawRotorPosition(feederSim.getAngularPosition().times(feederGearRatio));
         feederSimState.setRotorVelocity(feederSim.getAngularVelocity().times(feederGearRatio));
 
-       TalonFXSimState scramblerSimState = scramblerMotor.getSimState();
+        TalonFXSimState scramblerSimState = scramblerMotor.getSimState();
         scramblerSim.setInputVoltage(scramblerSimState.getMotorVoltage());
         scramblerSim.update(Robot.defaultPeriodSecs);
 

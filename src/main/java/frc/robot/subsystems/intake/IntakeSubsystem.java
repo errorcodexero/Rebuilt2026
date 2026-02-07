@@ -141,7 +141,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public Command intakeSequence() {
         return runIntakeCmd().beforeStarting(
-            deployCmd().onlyIf(this::isIntakeStowed)
+            deployCmd().unless(this::isIntakeDeployed)
         );
     }
 
