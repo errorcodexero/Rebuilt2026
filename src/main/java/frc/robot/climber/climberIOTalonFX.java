@@ -19,9 +19,10 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
+import frc.robot.climber.climberIO.ClimberInputs;
 
 
-public class ClimberIOTalonFX implements ClimberIO {
+public class climberIOTalonFX implements climberIO {
 
     private final TalonFX armmotor;
     private final TalonFX elevatormotor;
@@ -47,15 +48,15 @@ public class ClimberIOTalonFX implements ClimberIO {
     private final List<BaseStatusSignal> motorOneSignals;
     private final List<BaseStatusSignal> motorTwoSignals;
 
-    public ClimberIOTalonFX() {
+    public void ClimberIOTalonFX() {
         //arm motor configuration 
          armmotor = new TalonFX(ClimberConstants.MotoroneID); 
         TalonFXConfiguration armConfig = new TalonFXConfiguration();
-        armConfig.Slot0;
-        armConfig.slot0;
-        armConfig.slot0;
-        armConfig.slot0;
-        armConfig.slot0;
+        armConfig.Slot0.kP=0.0;
+        armConfig.Slot0.kI=0.0;
+        armConfig.Slot0.kD=0.0;
+        armConfig.Slot0.kS=0.0;
+        armConfig.Slot0.kV=0.0;
         tryUntilOk(5, () -> motorOne.getConfigurator().apply(motorOneConfiguration, 0.25)
          ArmConfigs.CurrentLimits.StatorCurrentLimit = ClimberConstants.armCurrentLimit.in(Amps);
 
@@ -63,10 +64,10 @@ public class ClimberIOTalonFX implements ClimberIO {
         // elevator motor configuration
         elevatormotor = new TalonFX(ClimberConstants.MotortwoID);
         TalonFXConfiguration elevatorConfig = new TalonFXConfiguration();
-        elevatorConfig.Slot0;
-        elevatorConfig.Slot0;
-        elevatorConfig.slot0;
-        elevatorConfig.slot0;
+        elevatorConfig.Slot0.kP=0.0;
+        elevatorConfig.Slot0.kL=0.0; 
+        elevatorConfig.slot0.kS=0.0;
+        elevatorConfig.slot0.kV=0.0;
         tryUntilOk(5, () -> motorTwo.getConfigurator().apply(motorTwoConfiguration, 0.25)
         elevatorConfig.CurrentLimits.StatorCurrentLimit= ClimberConstants.elevatorCurrentLimit.in(Amps);
 

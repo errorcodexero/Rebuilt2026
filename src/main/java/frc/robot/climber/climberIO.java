@@ -10,8 +10,9 @@ import org.littletonrobotics.junction.AutoLog;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
+import frc.robot.Constants;
 
-public interface ClimberIO {
+public interface climberIO {
 
     @AutoLog
     public static class ClimberInputs {
@@ -31,7 +32,7 @@ public interface ClimberIO {
         Angle twoSetpoint = Degrees.zero(); 
     }
 
-    public default void updateInputs(ClimberInputs inputs) {}
+    public default void updateInputs(Constants outputs) {}
 
     public default void applyOutputs(ClimberOutputs outputs) {}
 

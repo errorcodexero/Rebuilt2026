@@ -6,20 +6,21 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.climber.ClimberIO.ClimberInputs;
 
 
 public class climber extends SubsystemBase {
     
     private final climberIO io;
-    private final ClimberInputsAutoLogged inputs = new ClimberInputsAutoLogged(); 
-    private final ClimberConstants outputs = new ClimberOutputs();
+    private final ClimberConstants inputs = new ClimberConstants(); 
+    private final ClimberConstants outputs = new ClimberConstants();
     
-    public climber(ClimberIO io){
-        this.Io=io;
+    public climber(climberIO io){
+        this.io=io;
     }
     @Override 
     public void periodic() {
-        Io.updateInput(Inputs);
+        io.updateInputs(outputs);
         Logger.processInputs(getName(), null);
         
         ///periodic logic function for climber 
