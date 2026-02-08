@@ -115,7 +115,7 @@ public class Shooter extends SubsystemBase {
     // Hood Methods
     private void setHoodAngle(Angle pos) {
         hoodTarget = pos;
-        hoodIO.runPosition(pos);
+        hoodIO.gotoAngle(pos);
     }
 
     public Command hoodToPosCmd(Angle pos) {

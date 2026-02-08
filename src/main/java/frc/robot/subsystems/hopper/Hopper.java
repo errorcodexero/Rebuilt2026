@@ -5,6 +5,8 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.util.function.Supplier;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -148,6 +150,10 @@ public class Hopper extends SubsystemBase {
     
     public boolean isFeederAtGoal() {
         return inputs.feederVelocity.isNear(feederGoal, RotationsPerSecond.one());
+    }
+
+    public Command dynamicFeederVoltageCommand(Supplier<Voltage> v) {
+        return runEnd(() -> setFeederVoltage(v.get()), this::stopFeederCommand);
     }
     
     public Command setFeederVoltageCommand(Voltage voltage) {
