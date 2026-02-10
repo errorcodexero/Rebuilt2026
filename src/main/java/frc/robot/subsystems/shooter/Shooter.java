@@ -11,6 +11,7 @@ import static edu.wpi.first.units.Units.Volts;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -175,5 +176,12 @@ public class Shooter extends SubsystemBase {
                 this);
 
         return new SysIdRoutine(cfg, mfg);
+    }
+
+    public Command testCommand() {
+        LoggedNetworkNumber shooterVelocity = new LoggedNetworkNumber("Tuning/Shooter/VelocityRPS");
+        LoggedNetworkNumber hoodAngle = new LoggedNetworkNumber("Tuning/Shooter/HoodDegrees");
+
+        return runDynamicSetpoints(() -> RotationsPerSecond.of(shooterVelocity.get()), () -> Degrees.of(hoodAngle.get()));
     }
 }
