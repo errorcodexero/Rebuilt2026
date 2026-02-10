@@ -6,9 +6,16 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Servo;
 
 public class HoodIOServo implements HoodIO {
+    private static double leftOffset = 8.0 ;
+    private static double rightOffset = 0.0 ;
     
     private Servo hoodLeft;
     private Servo hoodRight;
+
+    public HoodIOServo() {
+        hoodLeft = new Servo(ShooterConstants.HoodPWMs.hoodLeftPWMPort);
+        hoodRight = new Servo(ShooterConstants.HoodPWMs.hoodRightPWMPort);
+    }   
 
     @Override
     public void updateInputs(HoodInputs inputs) {
@@ -16,9 +23,9 @@ public class HoodIOServo implements HoodIO {
     }
 
     @Override
-    public void runPosition(Angle angle) {
+    public void gotoAngle(Angle angle) {
         double degrees = angle.in(Degrees);
-        hoodLeft.setAngle(degrees);
-        hoodRight.setAngle(degrees);
+        hoodLeft.set((degrees + leftOffset)/ 300.0);
+        hoodRight.set(1.0 - (degrees - rightOffset)/ 300.0);
     }
 }

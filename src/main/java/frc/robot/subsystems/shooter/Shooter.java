@@ -116,7 +116,7 @@ public class Shooter extends SubsystemBase {
     // Hood Methods
     private void setHoodAngle(Angle pos) {
         hoodTarget = pos;
-        hoodIO.runPosition(pos);
+        hoodIO.gotoAngle(pos);
     }
 
     public Command hoodToPosCmd(Angle pos) {
@@ -155,6 +155,10 @@ public class Shooter extends SubsystemBase {
     public Command runDynamicSetpoints(Supplier<AngularVelocity> vel, Supplier<Angle> pos ) {
         return runEnd(() -> setSetpoints(vel.get(), pos.get()), this::stopShooter);
     }
+
+    public Command setDynamicVoltage(Supplier<Voltage> voltage) {
+        return runEnd(() -> setShooterVoltage(voltage.get()), this::stopShooter);
+    }   
 
     // Sys ID
     public Command shooterSysIdQuasistatic(SysIdRoutine.Direction dir) {

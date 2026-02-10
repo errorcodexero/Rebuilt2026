@@ -5,10 +5,14 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.util.function.Supplier;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -19,6 +23,9 @@ public class Hopper extends SubsystemBase {
     
     private final HopperIO io;
     private final HopperIOInputsAutoLogged inputs = new HopperIOInputsAutoLogged();
+
+    private final Alert feederAlert = new Alert("Feeder Motor Disconnected!", AlertType.kError);
+    private final Alert scramblerAlert = new Alert("Scrambler Motor Disconnected!", AlertType.kError);
     
     private AngularVelocity scramblerGoal = RotationsPerSecond.of(0.0);
     private AngularVelocity feederGoal = RotationsPerSecond.of(0.0);
@@ -41,6 +48,9 @@ public class Hopper extends SubsystemBase {
                 isScramblerAtGoal()
             );
         }
+
+        feederAlert.set(!inputs.feederConnected);
+        scramblerAlert.set(!inputs.scramblerConnected);
 
         Logger.recordOutput("Hopper/ScramblerGoal", scramblerGoal);
         Logger.recordOutput("Hopper/FeederGoal", feederGoal);
@@ -148,6 +158,10 @@ public class Hopper extends SubsystemBase {
     
     public boolean isFeederAtGoal() {
         return inputs.feederVelocity.isNear(feederGoal, RotationsPerSecond.one());
+    }
+
+    public Command dynamicFeederVoltageCommand(Supplier<Voltage> v) {
+        return runEnd(() -> setFeederVoltage(v.get()), this::stopFeederCommand);
     }
     
     public Command setFeederVoltageCommand(Voltage voltage) {

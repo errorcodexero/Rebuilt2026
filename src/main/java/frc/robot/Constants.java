@@ -33,7 +33,7 @@ public final class Constants {
     // Sets the currently running robot. Change to SIMBOT when running the
     // desktop physics simulation so AdvantageKit runs in SIM mode instead of
     // falling back to REPLAY.
-    private static final RobotType robotType = RobotType.SIMBOT;
+    private static final RobotType robotType = RobotType.COMPETITION;
 
     public static final boolean spawnLessFuelInSim = true;
 
@@ -66,6 +66,8 @@ public final class Constants {
 
         /** The Beta Bot (with wood base) */
         BETA,
+
+        COMPETITION, // The competition robot (with aluminum base)
 
         /** The Sim Bot */
         SIMBOT
