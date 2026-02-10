@@ -292,18 +292,7 @@ public class RobotContainer {
         testBindings_.addOption("Shooter Setpoints", shooter_.testCommand());
 
         // Sets the selected test binding to be triggered when the A button is pressed in test mode.
-        RobotModeTriggers.test().and(gamepad_.a()).toggleOnTrue(Commands.defer(
-            testBindings_::get,
-            Set.of(
-                // Requires all subsystems to ensure it doesnt interrupt any other command.
-                drivebase_,
-                vision_,
-                intake_,
-                shooter_,
-                hopper_,
-                climb_
-            )
-        ));
+        RobotModeTriggers.test().and(gamepad_.a()).toggleOnTrue(Commands.deferredProxy(testBindings_::get));
 
         configureBindings();
         configureDriveBindings();
