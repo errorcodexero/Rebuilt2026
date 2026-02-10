@@ -9,15 +9,12 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Volts;
 
 import java.util.Arrays;
-import java.util.Set;
 
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import com.ctre.phoenix6.CANBus;
 
@@ -26,7 +23,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.DriveConstants;
@@ -301,7 +297,7 @@ public class RobotContainer {
 
         testBindings_.addDefaultOption("Swerve Wheel Radius", DriveCommands.wheelRadiusCharacterization(drivebase_));
         testBindings_.addOption("Swerve Feedforward", DriveCommands.feedforwardCharacterization(drivebase_));
-        testBindings_.addOption("Shooter Setpoints", shooter_.testCommand());
+        testBindings_.addOption("Shooter Setpoints", shooter_.testCommand(hopper_));
 
         // Sets the selected test binding to be triggered when the A button is pressed in test mode.
         RobotModeTriggers.test().and(gamepad_.a()).toggleOnTrue(Commands.deferredProxy(testBindings_::get));
@@ -375,21 +371,8 @@ public class RobotContainer {
         // Reset gyro to 0° when Y & B button is pressed
         gamepad_.y().and(gamepad_.b()).onTrue(drivebase_.resetGyroCmd());
     }
-
-    private void configureTestModeBindings() {
-        gamepad_.back().and(RobotModeTriggers.test()).toggleOnTrue(
-            DriveCommands.wheelRadiusCharacterization(drivebase_)
-        );
-
-        LoggedNetworkNumber shooterVelocity = new LoggedNetworkNumber("Tuning/Shooter/TargetShooterRPS", 0);
-        LoggedNetworkNumber hoodAngle = new LoggedNetworkNumber("Tuning/Shooter/TargetHoodAngle", ShooterConstants.SoftwareLimits.hoodMinAngle);
-
-        gamepad_.a().and(RobotModeTriggers.test()).toggleOnTrue(
-            shooter_.runDynamicSetpoints(() -> RotationsPerSecond.of(shooterVelocity.get()), () -> Degrees.of(hoodAngle.get()))
-        );
-    }
     
     public Command getAutonomousCommand() {
-        return DriveCommands.feedforwardCharacterization(drivebase_);
+        return autoChooser_.get();
     }
 }

@@ -182,10 +182,14 @@ public class Shooter extends SubsystemBase {
         return new SysIdRoutine(cfg, mfg);
     }
 
-    public Command testCommand() {
-        LoggedNetworkNumber shooterVelocity = new LoggedNetworkNumber("Tuning/Shooter/VelocityRPS");
-        LoggedNetworkNumber hoodAngle = new LoggedNetworkNumber("Tuning/Shooter/HoodDegrees");
-
-        return runDynamicSetpoints(() -> RotationsPerSecond.of(shooterVelocity.get()), () -> Degrees.of(hoodAngle.get()));
+    public Command testCommand(Hopper hopper) {
+        LoggedNetworkNumber shooterVelocity = new LoggedNetworkNumber("Tuning/Shooter/TargetShooterRPS", 0);
+        LoggedNetworkNumber hoodAngle = new LoggedNetworkNumber("Tuning/Shooter/TargetHoodAngle", ShooterConstants.SoftwareLimits.hoodMinAngle);
+        LoggedNetworkNumber feederVoltage = new LoggedNetworkNumber("Tuning/Shooter/Feeder", 0.0) ;
+        
+        return Commands.parallel(
+            runDynamicSetpoints(() -> RotationsPerSecond.of(shooterVelocity.get()), () -> Degrees.of(hoodAngle.get())),
+            hopper.dynamicFeederVoltageCommand(() -> Volts.of(feederVoltage.get()))
+        );
     }
 }
