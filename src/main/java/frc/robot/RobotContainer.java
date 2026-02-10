@@ -190,11 +190,9 @@ public class RobotContainer {
                     // );
 
                     shooter_ = new Shooter(new ShooterIOTalonFX(roborioCANBus), new HoodIOServo());
-                    hopper_ = new Hopper(new HopperIOSim());                    
+                    hopper_ = new Hopper(new HopperIOSim());
+                   
                     break;
-
-                default:
-                    break ;
             }
         }
 
