@@ -41,9 +41,8 @@ public class AutoCommands {
 
             DriveCommands.followPathCommand("ShootToClimb", fieldside),
 
-            
-
-
+            climber.toggle(), //run first to set to climb height
+            climber.toggle() //run again to set to stowed height and lift off the floor
         );
     }
     
