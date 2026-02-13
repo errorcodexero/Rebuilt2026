@@ -323,6 +323,9 @@ public class RobotContainer {
 
         // When the hopper isnt shooting, set it to run its idle velocity.
         hopper_.setDefaultCommand(hopper_.idleScrambler());
+
+        // When the shooter isnt shooting, get it ready to shoot.
+        shooter_.setDefaultCommand(shooter_.awaitShooting(drivebase_::getPose));
     }
 
     private void configureDriveBindings() {
