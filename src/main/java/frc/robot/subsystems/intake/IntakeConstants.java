@@ -22,8 +22,8 @@ public final class IntakeConstants {
     public static final int currentLimit= 40; 
     public static final Time currentLimitTime= Seconds.of(1); //Temporary
 
-    public static final double pivotKP= 0.5; //later for turning
-    public static final double pivotKD= 0.04; //later for turning
+    public static final double pivotKP= 0.62; //later for turning
+    public static final double pivotKD= 0.05; //later for turning
     public static final double pivotKV= 0; //later for turning
     public static final double pivotKI= 0; //later for turning
     public static final double pivotKA= 0; //later for turning
@@ -39,6 +39,7 @@ public final class IntakeConstants {
     public static final double rollerKG= 0; //change later
 
     public static final Angle stowedAngle= Degrees.of(0); //Temporary angle
+    public static final Angle waitingAngle= Degrees.of(89);
     public static final Angle deployedAngle= Degrees.of(125); //Temporary angle
     public static final Angle pivotMinAngle= Degrees.of(-15); //Temporary angle
     public static final Angle pivotMaxAngle= Degrees.of(130); //Temporary angle
