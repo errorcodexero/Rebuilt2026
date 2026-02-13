@@ -383,7 +383,11 @@ public class RobotContainer {
 
     private void setupAutos(){
         //autoChooser_.addDefaultOption("Do Nothing", Commands.none());
-        autoChooser_.DefaultaddOption( "Depot, Shoot, Climb", AutoCommands.DepotShootClimbAuto(drivebase_, intake_, hopper_, shooter_, climb_, true, Volts.of(4)));
+        //autoChooser_.addDefaultOption( "Depot, Shoot, Climb", AutoCommands.DepotShootClimbAuto(drivebase_, intake_, hopper_, shooter_, climb_, true, Volts.of(4)));
+        autoChooser_.addDefaultOption("TEST: Drive Forward",
+            drivebase_.runVelocityCmd(MetersPerSecond.of(1.0), MetersPerSecond.of(0), RadiansPerSecond.zero())
+            .withTimeout(2.0)
+        );
         
     }
     
