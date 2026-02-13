@@ -4,32 +4,25 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.FeetPerSecond;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Volts;
 
 import java.util.Arrays;
 
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import com.ctre.phoenix6.CANBus;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.net.WebServer;
-import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.DriveConstants;
@@ -56,7 +49,6 @@ import frc.robot.subsystems.shooter.HoodIO;
 import frc.robot.subsystems.shooter.HoodIOServo;
 import frc.robot.subsystems.shooter.HoodIOSim;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterIOSim;
 import frc.robot.subsystems.shooter.ShooterIOTalonFX;
@@ -80,10 +72,11 @@ public class RobotContainer {
     private Hopper hopper_;
     private ThriftyClimb climb_;
 
-    private CANBus roborioCANBus = new CANBus("rio");
+    private CANBus roborioCANBus = new CANBus();
 
     // Choosers
     private final LoggedDashboardChooser<Command> autoChooser_;
+    private final LoggedDashboardChooser<Command> testBindings_;
 
     // Trigger Devices
     private final CommandXboxController gamepad_ = new CommandXboxController(0);
@@ -291,19 +284,26 @@ public class RobotContainer {
             MapleSimUtil.start();
         }
 
-        // Choosers
+        // AutoModes
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
+
         autoChooser_.onChange(auto -> {
             System.err.println("Auto \"" + auto.getName() + "\" selected!");
             // This should be used to set up robot position setting, initialization, etc.
         });
 
-        // Publish Deploy Directory (for layout/asset downloading)
-        WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
+        // Test Bindings
+        testBindings_ = new LoggedDashboardChooser<>("Test Mode Choices");
+
+        testBindings_.addDefaultOption("Swerve Wheel Radius", DriveCommands.wheelRadiusCharacterization(drivebase_));
+        testBindings_.addOption("Swerve Feedforward", DriveCommands.feedforwardCharacterization(drivebase_));
+        testBindings_.addOption("Shooter Setpoints", shooter_.testCommand(hopper_));
+
+        // Sets the selected test binding to be triggered when the A button is pressed in test mode.
+        RobotModeTriggers.test().and(gamepad_.a()).toggleOnTrue(Commands.deferredProxy(testBindings_::get));
 
         configureBindings();
         configureDriveBindings();
-        configureTestModeBindings();
     }
 
     // Bind robot actions to commands here.
@@ -323,6 +323,9 @@ public class RobotContainer {
 
         // When the hopper isnt shooting, set it to run its idle velocity.
         hopper_.setDefaultCommand(hopper_.idleScrambler());
+
+        // When the shooter isnt shooting, get it ready to shoot.
+        shooter_.setDefaultCommand(shooter_.awaitShooting(drivebase_::getPose));
     }
 
     private void configureDriveBindings() {
@@ -371,65 +374,8 @@ public class RobotContainer {
         // Reset gyro to 0° when Y & B button is pressed
         gamepad_.y().and(gamepad_.b()).onTrue(drivebase_.resetGyroCmd());
     }
-
-    private void configureTestModeBindings() {
-        gamepad_.back().and(RobotModeTriggers.test()).toggleOnTrue(
-            DriveCommands.wheelRadiusCharacterization(drivebase_)
-        );
-
-        // LoggedNetworkNumber shooterVoltage = new LoggedNetworkNumber("Tuning/Shooter/Voltage", 0);    
-        // gamepad_.a().and(RobotModeTriggers.test()).onTrue(
-        //     shooter_.setDynamicVoltage(() -> Volts.of(shooterVoltage.get()))
-        // );        
-        
-        LoggedNetworkNumber shooterVelocity = new LoggedNetworkNumber("Tuning/Shooter/TargetShooterRPS", 0);
-        LoggedNetworkNumber hoodAngle = new LoggedNetworkNumber("Tuning/Shooter/TargetHoodAngle", ShooterConstants.SoftwareLimits.hoodMinAngle);
-        LoggedNetworkNumber feederVoltage = new LoggedNetworkNumber("Tuning/Shooter/Feeder", 0.0) ;
-        gamepad_.a().and(RobotModeTriggers.test()).toggleOnTrue(
-            new ParallelCommandGroup(
-                shooter_.runDynamicSetpoints(() -> RotationsPerSecond.of(shooterVelocity.get()), () -> Degrees.of(hoodAngle.get())),
-                hopper_.dynamicFeederVoltageCommand(() -> Volts.of(feederVoltage.get()))
-            )
-        );
-
-        // gamepad_.a().and(RobotModeTriggers.test()).toggleOnTrue(
-        //     shooter_.runDynamicSetpoints(() -> RotationsPerSecond.of(shooterVelocity.get()), () -> Degrees.of(hoodAngle.get()))
-        // );        
-
-        // gamepad_.b().and(RobotModeTriggers.test()).onTrue(
-        //     new SequentialCommandGroup(
-        //         this.shooter_.hoodToPosCmd(Degrees.of(5.0)),
-        //         new WaitCommand(3.0),
-        //         this.shooter_.hoodToPosCmd(Degrees.of(80.0)),
-        //         new WaitCommand(3.0),
-        //         this.shooter_.hoodToPosCmd(Degrees.of(45.0)),
-        //         new WaitCommand(3.0),
-        //         this.shooter_.hoodToPosCmd(Degrees.of(80.0)),
-        //         new WaitCommand(3.0),
-        //         this.shooter_.hoodToPosCmd(Degrees.of(5.0)),
-        //         new WaitCommand(3.0)         
-        //     )
-        // ) ;
-
-        // gamepad_.a().and(RobotModeTriggers.test()).onTrue(
-        //     shooter_.shooterSysIdQuasistatic(Direction.kForward)
-        // );
-
-        // gamepad_.b().and(RobotModeTriggers.test()).onTrue(
-        //     shooter_.shooterSysIdQuasistatic(Direction.kReverse)
-        // );
-        
-        // gamepad_.x().and(RobotModeTriggers.test()).onTrue(
-        //     shooter_.shooterSysIdDynamic(Direction.kForward)
-        // );
-        
-        // gamepad_.y().and(RobotModeTriggers.test()).onTrue(
-        //     shooter_.shooterSysIdDynamic(Direction.kReverse)
-        // );        
-
-    }
     
     public Command getAutonomousCommand() {
-        return DriveCommands.feedforwardCharacterization(drivebase_);
+        return autoChooser_.get();
     }
 }

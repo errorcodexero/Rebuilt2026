@@ -13,8 +13,11 @@
 
 package frc.robot;
 
+import java.util.Set;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -43,6 +46,17 @@ public final class Constants {
     
     public static class FieldConstants {
         public static final AprilTagFieldLayout layout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
+
+        public static final Set<Pose2d> trenches = Set.of(
+            getTagPose(7),
+            getTagPose(12),
+            getTagPose(23),
+            getTagPose(28)
+        );
+
+        private static Pose2d getTagPose(int id) {
+            return layout.getTagPose(id).orElseThrow().toPose2d();
+        }
     }
 
     /**

@@ -83,6 +83,11 @@ public class IntakeSubsystem extends SubsystemBase {
         setPivotAngle(IntakeConstants.deployedAngle);
     }
 
+    private void waiting(){
+        setPivotAngle(IntakeConstants.waitingAngle);
+    }
+    
+
     public Angle getPivotAngle(){
         return inputs.PivotAngle;
     }
@@ -108,7 +113,7 @@ public class IntakeSubsystem extends SubsystemBase {
      * @return
      */
     public Command stowCmd() {
-        return Commands.runOnce(() -> stow())
+        return runOnce(() -> stow())
             .andThen(Commands.waitUntil(() -> isIntakeStowed())
             .withTimeout(2)).withName("Stow Intake");
     }
@@ -142,7 +147,7 @@ public class IntakeSubsystem extends SubsystemBase {
     public Command intakeSequence() {
         return runIntakeCmd().beforeStarting(
             deployCmd().unless(this::isIntakeDeployed)
-        );
+        ).finallyDo(interrupted -> waiting());
     }
 
     ////////////////////////////
