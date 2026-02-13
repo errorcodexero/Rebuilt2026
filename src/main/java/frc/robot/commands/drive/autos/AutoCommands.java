@@ -17,17 +17,17 @@ public class AutoCommands {
             //Drive to the first shooting position and shoot preloaded balls   
             DriveCommands.followPathCommand("Start to Shoot1"),
             shooter.shootCmd(hopper).withTimeout(1),
+
             //Drive to the collect position in the NZ and collect the balles while moving, bringing down the hood to clear the trench
             Commands.parallel(
                 DriveCommands.followPathCommand("Shoot1 to Collect"),
                 shooter.hoodToPosCmd(angle),
                 intake.intakeSequence()
             ),
-            //Drive to the second shooting position and shooting, while bringing intake back in
-            Commands.parallel(
-                DriveCommands.followPathCommand("Collect to Shoot2")
-                //Add command to stop intake/put it into waiting position
-            ).withDeadline(shooter.shootCmd(hopper).withTimeout(4)),
+            
+            //Drive to the second shooting position and shooting
+            DriveCommands.followPathCommand("Collect to Shoot2").withDeadline(shooter.shootCmd(hopper).withTimeout(4)),
+            
             //Drive to the climb position, then climb
             DriveCommands.followPathCommand("Shoot2 to Climb"),
             climb.toggle(),
