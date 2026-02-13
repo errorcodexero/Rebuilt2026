@@ -382,10 +382,8 @@ public class RobotContainer {
     }
 
     private void setupAutos(){
-        autoChooser_.addDefaultOption("Do Nothing", Commands.none());
-        autoChooser_.addOption( "Depot, Shoot, Climb", AutoCommands.DepotShootClimbAuto(drivebase_, intake_, hopper_, shooter_, climb_, true, Volts.of(4)));
-        SmartDashboard.putData("Auto Mode", autoChooser_);
-
+        //autoChooser_.addDefaultOption("Do Nothing", Commands.none());
+        autoChooser_.DefaultaddOption( "Depot, Shoot, Climb", AutoCommands.DepotShootClimbAuto(drivebase_, intake_, hopper_, shooter_, climb_, true, Volts.of(4)));
         
     }
     
