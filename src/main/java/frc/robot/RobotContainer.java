@@ -11,6 +11,7 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 
 import java.util.Arrays;
 
@@ -18,7 +19,9 @@ import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
-
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -63,6 +66,7 @@ import frc.robot.subsystems.vision.CameraIOPhotonSim;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.MapleSimUtil;
 import frc.robot.util.Mechanism3d;
+import frc.robot.commands.drive.auto.AutoCommands;
 
 public class RobotContainer {
 
@@ -282,9 +286,11 @@ public class RobotContainer {
 
         // Choosers
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
+    
+
         autoChooser_.onChange(auto -> {
             System.err.println("Auto \"" + auto.getName() + "\" selected!");
-            // This should be used to set up robot position setting, initialization, etc.
+            // This should be used to sbet up robot position setting, initialization, etc.
         });
 
         // Publish Deploy Directory (for layout/asset downloading)
@@ -293,6 +299,7 @@ public class RobotContainer {
         configureBindings();
         configureDriveBindings();
         configureTestModeBindings();
+        setupAutos();
     }
 
     // Bind robot actions to commands here.
@@ -373,8 +380,16 @@ public class RobotContainer {
             shooter_.runDynamicSetpoints(() -> RotationsPerSecond.of(shooterVelocity.get()), () -> Degrees.of(hoodAngle.get()))
         );
     }
+
+    private void setupAutos(){
+        autoChooser_.addDefaultOption("Do Nothing", Commands.none());
+        autoChooser_.addOption( "Depot, Shoot, Climb", AutoCommands.DepotShootClimbAuto(drivebase_, intake_, hopper_, shooter_, climb_, true, Volts.of(4)));
+        SmartDashboard.putData("Auto Mode", autoChooser_);
+
+        
+    }
     
     public Command getAutonomousCommand() {
-        return DriveCommands.feedforwardCharacterization(drivebase_);
+        return autoChooser_.get();
     }
 }

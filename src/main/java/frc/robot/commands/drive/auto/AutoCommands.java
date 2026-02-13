@@ -18,12 +18,10 @@ import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.thriftyclimb.ThriftyClimb;
 import frc.robot.subsystems.vision.AprilTagVision;
-
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 
 public class AutoCommands {
-    public Command DepotShootClimbAuto(Drive drive, IntakeSubsystem intake, Hopper hopper, Shooter shooter, ThriftyClimb climber, boolean fieldside, Voltage feedervoltage, AngularVelocity feedervelocity){
+    public static Command DepotShootClimbAuto(Drive drive, IntakeSubsystem intake, Hopper hopper, Shooter shooter, ThriftyClimb climber, boolean fieldside, Voltage feedervoltage){
         return Commands.sequence(
             Commands.parallel(
                 DriveCommands.followPathCommand("GoToDepot", fieldside),
@@ -34,10 +32,9 @@ public class AutoCommands {
 
             DriveCommands.followPathCommand("GoToShoot", fieldside),
 
-            Commands.parallel(
-                hopper.setFeederVoltageCommand(feedervoltage),
-                shooter.runToVelocityCmd(feedervelocity)
-            ).withTimeout(2.5),
+            shooter.shootCmd(hopper).withTimeout(2.5),
+
+            shooter.stopCmd(),
 
             DriveCommands.followPathCommand("ShootToClimb", fieldside),
 
