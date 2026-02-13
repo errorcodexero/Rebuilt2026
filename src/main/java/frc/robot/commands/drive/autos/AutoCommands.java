@@ -1,6 +1,5 @@
 package frc.robot.commands.drive.autos;
 
-import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
@@ -24,7 +23,7 @@ public class AutoCommands {
                 shooter.hoodToPosCmd(angle),
                 intake.intakeSequence()
             ),
-            
+
             //Drive to the second shooting position and shooting
             DriveCommands.followPathCommand("Collect to Shoot2").withDeadline(shooter.shootCmd(hopper).withTimeout(4)),
             
