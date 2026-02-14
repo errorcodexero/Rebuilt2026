@@ -157,7 +157,9 @@ public class RobotContainer {
 
                     vision_ = new AprilTagVision(
                         drivebase_::addVisionMeasurement,
-                        new CameraIOPhotonSim("front", VisionConstants.frontTransform, MapleSimUtil::getPosition, true)
+                        new CameraIOPhotonSim("front", VisionConstants.frontTransform, MapleSimUtil::getPosition, true),
+                        new CameraIOPhotonSim("backleft", VisionConstants.backLeftTransform, MapleSimUtil::getPosition, true),
+                        new CameraIOPhotonSim("backright", VisionConstants.backRightTransform, MapleSimUtil::getPosition, true)
                     );
 
                     intake_= new IntakeSubsystem(new IntakeIOSim());
@@ -240,11 +242,11 @@ public class RobotContainer {
 
         if (vision_ == null) {
             int numCams = switch (Constants.getRobot()) {
-                default -> 1;
+                default -> 3;
             };
 
             CameraIO[] cams = new CameraIO[numCams];
-            Arrays.fill(cams, new CameraIO() {});
+            Arrays.setAll(cams, i -> new CameraIO() {});
 
             vision_ = new AprilTagVision(
                 drivebase_::addVisionMeasurement,

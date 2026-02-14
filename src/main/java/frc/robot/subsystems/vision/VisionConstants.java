@@ -18,8 +18,18 @@ public class VisionConstants {
 
     // Transforms
     public static final Transform3d frontTransform = new Transform3d(
-        new Translation3d(Meters.of(0.1975), Meters.of(-0.2032), Meters.of(0.205)),
+        new Translation3d(Inches.of(0.125), Meters.of(-0.2032), Inches.of(20.7)),
         new Rotation3d(Degrees.zero(), Degrees.of(-20), Degrees.zero())
+    );
+
+    public static final Transform3d backLeftTransform = new Transform3d(
+        new Translation3d(Meters.of(-0.155), Meters.of(0.318), Meters.of(0.213)),
+        new Rotation3d(Degrees.zero(), Degrees.of(-30), Degrees.of(150))
+    );
+
+    public static final Transform3d backRightTransform = new Transform3d(
+        new Translation3d(Meters.of(-0.155), Meters.of(-0.318), Meters.of(0.213)),
+        new Rotation3d(Degrees.zero(), Degrees.of(-30), Degrees.of(210))
     );
 
     // Odometry Filtering Configuration
