@@ -31,7 +31,7 @@ public interface climberIO {
       public Angle twoSetpoint = Degrees.zero(); 
     }
 
-    public default void updateInputs(climberIOinputs inputs) {}
+    public default void updateInputs(ClimberInputs inputs) {}
 
     public default void applyOutputs(ClimberOutputs outputs) {}
 

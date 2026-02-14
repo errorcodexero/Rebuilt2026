@@ -66,8 +66,6 @@ public class climberIOTalonFX implements climberIO {
          motorTwoSignals = List.of(motorTwoPosition, motorTwoVoltage, motorTwoCurrent);
     }
 
-
-
     public void ClimberIOTalonFX() {
         //arm motor configuration 
          armmotor = new TalonFX(climberconstants.MotoroneID); 
@@ -89,7 +87,7 @@ public class climberIOTalonFX implements climberIO {
         elevatorConfig.Slot0.kL=0.0; 
         elevatorConfig.slot0.kS=0.0;
         elevatorConfig.slot0.kV=0.0;
-        tryUntilOk(5, () -> motorTwo.getConfigurator().apply(motorTwoConfiguration, 0.25)
+        tryUntilOk(5, () -> motorTwo.getConfigurator().apply(motorTwoConfiguration, 0.25);
         elevatorConfig.CurrentLimits.StatorCurrentLimit= ClimberConstants.elevatorCurrentLimit.in(Amps);
         tryUntilOk(5, () -> elevatormotor.getConfigurator().apply(armConfig, 0.25));
 

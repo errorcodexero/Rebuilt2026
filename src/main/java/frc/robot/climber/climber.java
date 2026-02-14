@@ -6,12 +6,14 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.climber.climberIO.ClimberInputs;
+import frc.robot.climber.climberIO.ClimberOutputs;
 
 
 public class climber extends SubsystemBase {
     
     private final climberIO IO;
-    private final climberIOinputs inputs = new climberIO.ClimberOutputs();
+    private final ClimberInputs inputs = new ClimberInputs();
 
      public climber(climberIO io) {
         this.IO=io;
@@ -22,13 +24,13 @@ public class climber extends SubsystemBase {
         IO.updateInputs(inputs);
         Logger.processInputs(getName(), null);
 
-        IO.applyOutputs(outputs);
+        IO.applyOutputs(inputs);
+        
     }
-
 
     public Command motorOneAngle(Angle angle){
         return Commands.runOnce(()-> {
-            outputs.oneSetPoint= angle;
+            inputs.oneSetPoint= angle;
         });
     }
 }
