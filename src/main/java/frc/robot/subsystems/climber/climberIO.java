@@ -1,4 +1,4 @@
-package frc.robot.climber;
+package frc.robot.subsystems.climber;
 
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.units.measure.Angle;
@@ -16,10 +16,10 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 
-public interface climberIO {
+public interface ClimberIO {
 
     @AutoLog
-    public static class ClimberIOInputs {
+    public class ClimberIOInputs {
       public Voltage deployVolts = Volts.zero();
       public Current deployCurrent = Amps.zero();
       public Angle deployPosition = Radians.zero();
