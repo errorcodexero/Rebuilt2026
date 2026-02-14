@@ -1,7 +1,17 @@
 package frc.robot.subsystems.climber;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
+import static edu.wpi.first.units.Units.Volts;
+
+import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.MomentOfInertia;
+import edu.wpi.first.units.measure.AngularAcceleration;
 
 public class ClimberConstants {
 
@@ -21,6 +31,8 @@ public class ClimberConstants {
     public static final double climbKS= 0.0; //For now
     public static final double climbKV= 0.0; //For now
     public static final double climbKG= 0.0; //For now
+
+    public static final 
 
     public static final MomentOfInertia MOI=  KilogramSquareMeters.zero();
     public static final double gearatio =0.0; 
