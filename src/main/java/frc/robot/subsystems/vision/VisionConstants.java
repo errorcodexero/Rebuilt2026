@@ -18,8 +18,8 @@ public class VisionConstants {
 
     // Transforms
     public static final Transform3d frontTransform = new Transform3d(
-        new Translation3d(Inches.of(0.125), Meters.of(-0.2032), Inches.of(20.7)),
-        new Rotation3d(Degrees.zero(), Degrees.of(-20), Degrees.zero())
+        new Translation3d(Meters.of(-0.03), Meters.of(-0.003), Meters.of(0.526)),
+        new Rotation3d(Degrees.zero(), Degrees.of(-28), Degrees.zero())
     );
 
     public static final Transform3d backLeftTransform = new Transform3d(

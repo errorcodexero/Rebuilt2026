@@ -1,54 +1,100 @@
 {
-    "name": "Relic",
-    "rotations": [
-      {"axis": "x", "degrees": 90},
-      {"axis": "z", "degrees": 90}
-    ],
-    "position": [0, 0, 0],
-    "disableSimplification": true,
-    "dynamicColoring": true,
-    "cameras": [
-      {
-        "name": "Front Camera",
-        "rotations": [
-          {
-            "axis": "y",
-            "degrees": -20
-          }
-        ],
-        "position": [
-          0.3048,
-          0.12,
-          0.12
-        ],
-        "resolution": [
-          1280,
-          960
-        ],
-        "fov": 83
-      }
-    ],
-    "components": [
-      {
-        "zeroedRotations": [
-          {"axis": "x", "degrees": 90},
-          {"axis": "z", "degrees": 90}
-        ],
-        "zeroedPosition": [0.098, 0, -0.457]
-      },
-      {
-        "zeroedRotations": [
-          {"axis": "x", "degrees": 90},
-          {"axis": "z", "degrees": 90}
-        ],
-        "zeroedPosition": [-0.252, 0, -0.207]
-      },
-      {
-        "zeroedRotations": [
-          {"axis": "x", "degrees": 90},
-          {"axis": "z", "degrees": 90}
-        ],
-        "zeroedPosition": [-0.252, 0, -0.207]
-      }
-    ]
-  }
+  "name": "Relic",
+  "rotations": [
+    {"axis": "x", "degrees": 90},
+    {"axis": "z", "degrees": 90}
+  ],
+  "position": [0, 0, 0],
+  "disableSimplification": true,
+  "dynamicColoring": true,
+  "cameras": [
+    {
+      "name": "Shooter Camera",
+      "rotations": [
+        {
+          "axis": "y",
+          "degrees": -28
+        }
+      ],
+      "position": [
+        -0.03,
+        -0.003,
+        0.526
+      ],
+      "resolution": [
+        1280,
+        960
+      ],
+      "fov": 83
+    },
+    {
+      "name": "Back Left Camera",
+      "rotations": [
+        {
+          "axis": "y",
+          "degrees": -30
+        },
+        {
+          "axis": "z",
+          "degrees": 150
+        }
+      ],
+      "position": [
+        -0.155,
+        0.318,
+        0.213
+      ],
+      "resolution": [
+        1280,
+        960
+      ],
+      "fov": 83
+    },
+    {
+      "name": "Back Right Camera",
+      "rotations": [
+        {
+          "axis": "y",
+          "degrees": -30
+        },
+        {
+          "axis": "z",
+          "degrees": 210
+        }
+      ],
+      "position": [
+        -0.155,
+        -0.318,
+        0.213
+      ],
+      "resolution": [
+        1280,
+        960
+      ],
+      "fov": 83
+    }
+  ],
+  "components": [
+    {
+      "zeroedRotations": [
+        {"axis": "x", "degrees": 90},
+        {"axis": "z", "degrees": 90}
+      ],
+      "zeroedPosition": [0.098, 0, -0.457]
+    },
+    {
+      "zeroedRotations": [
+        {"axis": "x", "degrees": 90},
+        {"axis": "z", "degrees": 90}
+      ],
+      "zeroedPosition": [-0.252, 0, -0.207]
+    },
+    {
+      "zeroedRotations": [
+        {"axis": "x", "degrees": 90},
+        {"axis": "z", "degrees": 90}
+      ],
+      "zeroedPosition": [-0.252, 0, -0.207]
+    }
+  ]
+}
