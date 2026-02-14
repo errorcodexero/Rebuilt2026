@@ -145,7 +145,7 @@ public class RobotContainer {
 
                     // Add sim drivebase to simulation and where modules can get it.
                     // CALL THIS BEFORE CREATING THE DRIVEBASE!
-                    MapleSimUtil.createSwerve(config, new Pose2d(2.0, 2.0, Rotation2d.kZero));
+                    MapleSimUtil.createSwerve(config, new Pose2d(3.564, 5.668, Rotation2d.fromDegrees(142.647)));
                     MapleSimUtil.createIntake();
 
                     drivebase_ = new Drive(
@@ -287,9 +287,11 @@ public class RobotContainer {
         // Choosers
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
     
-
+        autoChooser_.addDefaultOption( "Depot, Shoot, Climb", AutoCommands.DepotShootClimbAuto(drivebase_, intake_, hopper_, shooter_, climb_, true, Volts.of(4)));
         autoChooser_.onChange(auto -> {
+            
             System.err.println("Auto \"" + auto.getName() + "\" selected!");
+            drivebase_.setPose(new Pose2d(3.564, 5.668, Rotation2d.fromDegrees(142.647)));
             // This should be used to sbet up robot position setting, initialization, etc.
         });
 
@@ -299,7 +301,6 @@ public class RobotContainer {
         configureBindings();
         configureDriveBindings();
         configureTestModeBindings();
-        setupAutos();
     }
 
     // Bind robot actions to commands here.
@@ -379,16 +380,6 @@ public class RobotContainer {
         gamepad_.a().and(RobotModeTriggers.test()).toggleOnTrue(
             shooter_.runDynamicSetpoints(() -> RotationsPerSecond.of(shooterVelocity.get()), () -> Degrees.of(hoodAngle.get()))
         );
-    }
-
-    private void setupAutos(){
-        //autoChooser_.addDefaultOption("Do Nothing", Commands.none());
-        autoChooser_.addDefaultOption( "Depot, Shoot, Climb", AutoCommands.DepotShootClimbAuto(drivebase_, intake_, hopper_, shooter_, climb_, true, Volts.of(4)));
-        /*autoChooser_.addDefaultOption("TEST: Drive Forward",
-            drivebase_.runVelocityCmd(MetersPerSecond.of(1.0), MetersPerSecond.of(0), RadiansPerSecond.zero())
-            .withTimeout(2.0)
-        );
-        */
     }
     
     public Command getAutonomousCommand() {

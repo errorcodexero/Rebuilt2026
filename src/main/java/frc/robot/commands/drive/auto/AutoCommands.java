@@ -24,19 +24,19 @@ public class AutoCommands {
     public static Command DepotShootClimbAuto(Drive drive, IntakeSubsystem intake, Hopper hopper, Shooter shooter, ThriftyClimb climber, boolean fieldside, Voltage feedervoltage){
         return Commands.sequence(
             Commands.parallel(
-                DriveCommands.initialFollowPathCommand(drive,"GoToDepot", false),
+                DriveCommands.initialFollowPathCommand(drive,"GoToDepot"),
                 intake.deployCmd()
             ),
             Commands.runOnce(()-> System.err.println("DRIVE POSE AFTER RESET:" + drive.getPose())),
-            DriveCommands.followPathCommand("Collect", false).deadlineWith(intake.intakeSequence()),
+            DriveCommands.followPathCommand("Collect").deadlineWith(intake.intakeSequence()),
 
-            DriveCommands.followPathCommand("GoToShoot", false),
+            DriveCommands.followPathCommand("GoToShoot"),
 
             shooter.shootCmd(hopper).withTimeout(2.5),
 
             shooter.stopCmd(),
 
-            DriveCommands.followPathCommand("ShootToClimb", false),
+            DriveCommands.followPathCommand("ShootToClimb"),
 
             climber.toggle(), //run first to set to climb height
             Commands.waitSeconds(1),
