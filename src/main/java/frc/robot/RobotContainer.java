@@ -288,11 +288,11 @@ public class RobotContainer {
         autoChooser_.onChange(auto -> {
             
             System.err.println("Auto \"" + auto.getName() + "\" selected!");
-            drivebase_.setPose(new Pose2d(3.564, 5.668, Rotation2d.fromDegrees(142.647)));
+            drivebase_.setPose(new Pose2d(3.564, 5.668, Rotation2d.fromDegrees(-90.0)));
             // This should be used to sbet up robot position setting, initialization, etc.
         });
 
-        // Publish Deploy Directory (for layout/asset downloading)
+        // Publish Deploy Directory (for layout/asset downloading)a
         WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
 
         configureBindings();
