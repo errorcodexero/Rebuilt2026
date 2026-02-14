@@ -11,7 +11,6 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Volts;
 
 import java.util.Arrays;
 
@@ -19,9 +18,7 @@ import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -35,6 +32,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.Constants.RobotType;
 import frc.robot.commands.drive.DriveCommands;
+import frc.robot.commands.drive.auto.AutoCommands;
 import frc.robot.generated.AlphaTunerConstants;
 import frc.robot.generated.BetaTunerConstants;
 import frc.robot.generated.CompTunerConstants;
@@ -66,7 +64,6 @@ import frc.robot.subsystems.vision.CameraIOPhotonSim;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.MapleSimUtil;
 import frc.robot.util.Mechanism3d;
-import frc.robot.commands.drive.auto.AutoCommands;
 
 public class RobotContainer {
 
