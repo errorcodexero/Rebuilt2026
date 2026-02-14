@@ -6,16 +6,15 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.climber.climberIO.ClimberInputs;
-import frc.robot.climber.climberIO.ClimberOutputs;
 
 
-public class climber extends SubsystemBase {
+
+public class Climber extends SubsystemBase {
     
     private final climberIO IO;
     private final ClimberInputs inputs = new ClimberInputs();
 
-     public climber(climberIO io) {
+     public Climber(climberIO io) {
         this.IO=io;
     }
 
