@@ -20,12 +20,12 @@
         "y": 0.8705777777777768
       },
       "prevControl": {
-        "x": 6.625310521774494,
-        "y": 1.3291866699439865
+        "x": 6.700203137297331,
+        "y": 1.2304936311197117
       },
       "nextControl": {
-        "x": 5.692226992508508,
-        "y": 0.4765469933244141
+        "x": 5.63399762752076,
+        "y": 0.5651601423487547
       },
       "isLocked": false,
       "linkedName": null
@@ -52,15 +52,20 @@
         "y": 0.9713555555555557
       },
       "prevControl": {
-        "x": 4.45032605440521,
-        "y": 0.5703541065968624
+        "x": 4.332135231316728,
+        "y": 0.5006049822064053
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": "Shoot2"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.960923623445824,
+      "rotationDegrees": 90.0
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -77,10 +82,10 @@
     "rotation": 59.058463533677475
   },
   "reversed": false,
-  "folder": "Neutral Zone Climb",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 90.0
   },
   "useDefaultConstraints": true
 }

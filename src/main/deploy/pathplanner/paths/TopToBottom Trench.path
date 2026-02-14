@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.993910352536805,
-        "y": 7.123817473336218
+        "x": 5.488533333333334,
+        "y": 7.2095
       },
       "isLocked": false,
       "linkedName": null
@@ -36,12 +36,12 @@
         "y": 1.162833333333333
       },
       "prevControl": {
-        "x": 7.190594268566315,
-        "y": 1.709184725467117
+        "x": 7.11846681669461,
+        "y": 1.7688724285106445
       },
       "nextControl": {
-        "x": 6.115665027577804,
-        "y": 0.5641108841396616
+        "x": 6.113355555555555,
+        "y": 0.38684444444444344
       },
       "isLocked": false,
       "linkedName": null
@@ -63,11 +63,11 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 0.95,
-      "rotationDegrees": 90.0
+      "rotationDegrees": -89.93959334929717
     },
     {
       "waypointRelativePos": 1.8105263157894893,
-      "rotationDegrees": 90.0
+      "rotationDegrees": -92.49088973843378
     }
   ],
   "constraintZones": [],
@@ -86,7 +86,7 @@
     "rotation": 76.29303899592018
   },
   "reversed": false,
-  "folder": "Neutral Zone Collect",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0
