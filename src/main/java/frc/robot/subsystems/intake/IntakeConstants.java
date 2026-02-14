@@ -52,6 +52,7 @@ public final class IntakeConstants {
 
     public static final AngularVelocity rollerMaxVelocity= DegreesPerSecond.of(360); //Temporary speed to be changed as needed 
     public static final Voltage rollerCollectVoltage= Volts.of(6); //Temporary voltage
+    public static final Voltage rollerEjectVoltage= Volts.of(-6); //Temporary voltage
 
     public static final Angle pivotTolerance = Degrees.of(5); //Tolerance to compare current angle to target
 

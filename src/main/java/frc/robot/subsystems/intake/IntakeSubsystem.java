@@ -70,7 +70,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     private void eject(){
-        io.setRollerVoltage()
+        io.setRollerVoltage(IntakeConstants.rollerEjectVoltage);
     }
 
     /**
@@ -150,6 +150,12 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public Command intakeSequence() {
         return runIntakeCmd().beforeStarting(
+            deployCmd().unless(this::isIntakeDeployed)
+        ).finallyDo(interrupted -> waiting());
+    }
+
+    public Command ejectSequence() {
+        return runOnce(this::eject).beforeStarting(
             deployCmd().unless(this::isIntakeDeployed)
         ).finallyDo(interrupted -> waiting());
     }
