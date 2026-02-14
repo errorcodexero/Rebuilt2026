@@ -19,25 +19,23 @@ import edu.wpi.first.units.measure.Voltage;
 public interface climberIO {
 
     @AutoLog
-    public static class ClimberInputs {
-       public boolean oneConnected = false;
-       public Voltage oneVolts = Volts.zero();
-       public Current oneCurrent = Amps.zero();
-       public Angle onePosition = Radians.zero();
+    public static class ClimberIOInputs {
+      public Voltage deployVolts = Volts.zero();
+      public Current deployCurrent = Amps.zero();
+      public Angle deployPosition = Radians.zero();
 
-       public  boolean twoConnected = false;
-      public Voltage twoVolts = Volts.zero();
-       public Current twoCurrent = Amps.zero();
-       public Angle twoPosition = Radians.zero();
+      public Voltage climbVolts = Volts.zero();
+      public Current climbCurrent = Amps.zero();
+      public Angle climbPosition = Radians.zero();
     }
+      
+    public default void updateInputs(ClimberIOInputsAutoLogged inputs) {}
 
-    public static class ClimberOutputs implements climberIOinputs {
-      public Angle oneSetpoint = Degrees.zero();
-      public Angle twoSetpoint = Degrees.zero(); 
-    }
+    public default void setDeployment(Angle deploymentAngle) {}
 
-    public default void updateInputs(ClimberInputs inputs) {}
+    public default void setClimb(Angle climbAngle) {}
 
-    public default void applyOutputs(ClimberOutputs outputs) {}
+    public default void stopDeployment() {}
 
+    public default void stopClimb() {}
 }
