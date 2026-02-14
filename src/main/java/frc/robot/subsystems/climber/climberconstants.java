@@ -41,7 +41,7 @@ public class ClimberConstants {
     public static final MomentOfInertia deployMOI=  KilogramSquareMeters.of(0.0); //For now
     public static final MomentOfInertia climbMOI= KilogramSquareMeters.of(0.0); //For now
 
-     //doubles the gear ratio 
+     //doubles the gear ratio for now 
     public static final double gearatio =0.0;
     
 }

@@ -1,4 +1,4 @@
-  package frc.robot.climber;
+  package frc.robot.subsystems.climber;
 
 import static edu.wpi.first.units.Units.Amps;
 import static frc.robot.util.PhoenixUtil.tryUntilOk;
@@ -19,13 +19,13 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.climber.climberIO.ClimberInputs;
+//import frc.robot.climber.climberIO.ClimberInputs;
 
 
 public class climberIOTalonFX implements climberIO {
 
-    private final TalonFX armmotor;
-    private final TalonFX elevatormotor;
+    private final TalonFX Climbmotor ;
+    private final TalonFX deployClimb ;
 
     /// arm motor control requests 
        private final VoltageOut armVoltageRequest = new VoltageOut(0);
@@ -47,49 +47,51 @@ public class climberIOTalonFX implements climberIO {
 
     private final List<BaseStatusSignal> motorOneSignals;
     private final List<BaseStatusSignal> motorTwoSignals;
-
-    public climberIOTalonFX(int armID, int elevatorID){
-        armmotor = new TalonFX(armID);
-        elevatormotor = new TalonFX(elevatorID);
+    private TalonFX deployMotor;
+    private TalonFX deployClimber; 
+    
+        public climberIOTalonFX(int motorID, int climbID){
+        deployMotor= new TalonFX(motorID);
+        deployClimb  = new TalonFX(climbID);
 
         //status signal initilzation 
-       motorOnePosition = armmotor.getPosition();
-       motorOneVoltage = armmotor.getMotorVoltage();
-       motorOneCurrent = armmotor.getSupplyCurrent();
+       motorOnePosition = deployMotor.getPosition();
+       motorOneVoltage = deployMotor.getMotorVoltage();
+       motorOneCurrent = deployMotor.getSupplyCurrent();
         
-      motorOneSignals = List.of( motorOnePosition, motorOneVoltage, motorOneCurrent );
+      motorOneSignals = List.of(motorOnePosition, motorOneVoltage, motorOneCurrent );
       ;
-         motorTwoPosition = elevatormotor.getPosition();
-         motorTwoVoltage = elevatormotor.getMotorVoltage();
-         motorTwoCurrent = elevatormotor.getSupplyCurrent();
+         motorTwoPosition = deployClimb .getPosition();
+         motorTwoVoltage = deployClimb .getMotorVoltage();
+         motorTwoCurrent = deployClimb .getSupplyCurrent();
 
          motorTwoSignals = List.of(motorTwoPosition, motorTwoVoltage, motorTwoCurrent);
     }
 
     public void ClimberIOTalonFX() {
         //arm motor configuration 
-         armmotor = new TalonFX(climberconstants.MotoroneID); 
-        TalonFXConfiguration armConfig = new TalonFXConfiguration();
-        armConfig.Slot0.kP=0.0;
-        armConfig.Slot0.kI=0.0;
-        armConfig.Slot0.kD=0.0;
-        armConfig.Slot0.kS=0.0;
-        armConfig.Slot0.kV=0.0;
+         deployMotor= new TalonFX(ClimberConstants.deployMotorID); 
+        TalonFXConfiguration motorConfig  = new TalonFXConfiguration();
+        motorConfig .Slot0.kP=0.0;
+        motorConfig .Slot0.kI=0.0;
+        motorConfig .Slot0.kD=0.0;
+        motorConfig .Slot0.kS=0.0;
+        motorConfig .Slot0.kV=0.0;
         tryUntilOk(5, () -> motorOne.getConfigurator().apply(motorOneConfiguration, 0.25));
-         ArmConfigs.CurrentLimits.StatorCurrentLimit = ClimberConstants.armCurrentLimit.in(Amps);
-        tryUntilOk(5, () -> armmotor.getConfigurator().apply(armConfig, 0.25));
+         motorConfig s.CurrentLimits.StatorCurrentLimit = ClimberConstants.armCurrentLimit.in(Amps);
+        tryUntilOk(5, () -> armmotor.getConfigurator().apply(motorConfig , 0.25));
 
 
         // elevator motor configuration
-        elevatormotor = new TalonFX(ClimberConstants.MotortwoID);
-        TalonFXConfiguration elevatorConfig = new TalonFXConfiguration();
-        elevatorConfig.Slot0.kP=0.0;
-        elevatorConfig.Slot0.kL=0.0; 
-        elevatorConfig.slot0.kS=0.0;
-        elevatorConfig.slot0.kV=0.0;
+        deployClimb  = new TalonFX(ClimberConstants.climbMotorID);
+        TalonFXConfiguration climbConfig = new TalonFXConfiguration();
+        climbConfig.Slot0.kP=0.0;
+        climbConfig.Slot0.kL=0.0; 
+        climbConfig.slot0.kS=0.0;
+        climbConfig.slot0.kV=0.0;
         tryUntilOk(5, () -> motorTwo.getConfigurator().apply(motorTwoConfiguration, 0.25);
-        elevatorConfig.CurrentLimits.StatorCurrentLimit= ClimberConstants.elevatorCurrentLimit.in(Amps);
-        tryUntilOk(5, () -> elevatormotor.getConfigurator().apply(armConfig, 0.25));
+        climbConfig.CurrentLimits.StatorCurrentLimit= ClimberConstants.elevatorCurrentLimit.in(Amps);
+        tryUntilOk(5, () -> deployClimb .getConfigurator().apply(motorConfig , 0.25));
 
            
         TalonFXConfiguration motorOneConfiguration = new TalonFXConfiguration();

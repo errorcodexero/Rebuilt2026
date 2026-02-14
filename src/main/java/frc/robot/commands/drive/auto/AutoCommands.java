@@ -16,7 +16,7 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.thriftyclimb.ThriftyClimb;
+import frc.robot.subsystems.CurrentClimb;
 import frc.robot.subsystems.vision.AprilTagVision;
 import edu.wpi.first.units.measure.Voltage;
 
