@@ -69,6 +69,10 @@ public class IntakeSubsystem extends SubsystemBase {
         io.stopRoller();
     }
 
+    private void eject(){
+        io.setRollerVoltage()
+    }
+
     /**
      * Stows the intake and hopper.
      */
