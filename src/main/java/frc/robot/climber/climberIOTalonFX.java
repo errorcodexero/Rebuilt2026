@@ -1,4 +1,4 @@
-  package frc.robot.subsystems.climber;
+  package frc.robot.climber;
 
 import static edu.wpi.first.units.Units.Amps;
 import static frc.robot.util.PhoenixUtil.tryUntilOk;
@@ -48,17 +48,38 @@ public class climberIOTalonFX implements climberIO {
     private final List<BaseStatusSignal> motorOneSignals;
     private final List<BaseStatusSignal> motorTwoSignals;
 
+    public climberIOTalonFX(int armID, int elevatorID){
+        armmotor = new TalonFX(armID);
+        elevatormotor = new TalonFX(elevatorID);
+
+        //status signal initilzation 
+       motorOnePosition = armmotor.getPosition();
+       motorOneVoltage = armmotor.getMotorVoltage();
+       motorOneCurrent = armmotor.getSupplyCurrent();
+        
+      motorOneSignals = List.of( motorOnePosition, motorOneVoltage, motorOneCurrent );
+      ;
+         motorTwoPosition = elevatormotor.getPosition();
+         motorTwoVoltage = elevatormotor.getMotorVoltage();
+         motorTwoCurrent = elevatormotor.getSupplyCurrent();
+
+         motorTwoSignals = List.of(motorTwoPosition, motorTwoVoltage, motorTwoCurrent);
+    }
+
+
+
     public void ClimberIOTalonFX() {
         //arm motor configuration 
-         armmotor = new TalonFX(ClimberConstants.MotoroneID); 
+         armmotor = new TalonFX(climberconstants.MotoroneID); 
         TalonFXConfiguration armConfig = new TalonFXConfiguration();
         armConfig.Slot0.kP=0.0;
         armConfig.Slot0.kI=0.0;
         armConfig.Slot0.kD=0.0;
         armConfig.Slot0.kS=0.0;
         armConfig.Slot0.kV=0.0;
-        tryUntilOk(5, () -> motorOne.getConfigurator().apply(motorOneConfiguration, 0.25)
+        tryUntilOk(5, () -> motorOne.getConfigurator().apply(motorOneConfiguration, 0.25));
          ArmConfigs.CurrentLimits.StatorCurrentLimit = ClimberConstants.armCurrentLimit.in(Amps);
+        tryUntilOk(5, () -> armmotor.getConfigurator().apply(armConfig, 0.25));
 
 
         // elevator motor configuration
@@ -70,12 +91,9 @@ public class climberIOTalonFX implements climberIO {
         elevatorConfig.slot0.kV=0.0;
         tryUntilOk(5, () -> motorTwo.getConfigurator().apply(motorTwoConfiguration, 0.25)
         elevatorConfig.CurrentLimits.StatorCurrentLimit= ClimberConstants.elevatorCurrentLimit.in(Amps);
+        tryUntilOk(5, () -> elevatormotor.getConfigurator().apply(armConfig, 0.25));
 
-        //status signal initilzation 
-        
-         
-
-       
+           
         TalonFXConfiguration motorOneConfiguration = new TalonFXConfiguration();
         motorOneConfiguration.Feedback.FeedbackRemoteSensorID = 3;
         motorOneConfiguration.Feedback.SensorToMechanismRatio = 1;
@@ -108,34 +126,6 @@ public class climberIOTalonFX implements climberIO {
         tryUntilOk(5, () -> BaseStatusSignal.setUpdateFrequencyForAll(50, motorOneSignals));
         tryUntilOk(5, () -> BaseStatusSignal.setUpdateFrequencyForAll(50, motorTwoSignals));
     }
-
-    @Override
-    public void updateInputs(ClimberInputs inputs) {
-        var motorOneStatus = BaseStatusSignal.refreshAll(motorOneSignals);
-        var motorTwoStatus = BaseStatusSignal.refreshAll(motorTwoSignals);
-
-        inputs.oneConnected = oneIsOkDebounce.calculate(motorOneStatus.isOK());
-        inputs.twoConnected = twoIsOkDebounce.calculate(motorTwoStatus.isOK());
-
-        inputs.onePosition = motorOnePosition.getValue();
-        inputs.oneVolts = motorOneVoltage.getValue();
-        inputs.oneCurrent = motorOneCurrent.getValue();
-
-        inputs.twoPosition = motorTwoPosition.getValue();
-        inputs.twoVolts = motorTwoVoltage.getValue();
-        inputs.twoCurrent = motorTwoCurrent.getValue();
-    }
-
-    @Override
-    public void applyOutputs(ClimberOutputs outputs) {
-        motorOne.setControl(new PositionVoltage(outputs.oneSetpoint));
-        motorTwo.setControl(new PositionVoltage(outputs.twoSetpoint));
-    }
 }
+     
 
-// climber goes above swerve 
-// limelight also goes on climber 
-// climber attaches to the shooter 
-// cammera has to face the front to see the limelights
-// swerve io follows a closed loop system 
-// inside heckshaft drives the intake (arm)
