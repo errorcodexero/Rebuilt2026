@@ -4,29 +4,35 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.FeetPerSecond;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+<<<<<<< HEAD
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
+=======
+>>>>>>> d2d0fa37105c5e9da167dfd6496e6c74d7c84482
 
 import java.util.Arrays;
 
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+<<<<<<< HEAD
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+=======
+
+import com.ctre.phoenix6.CANBus;
+
+>>>>>>> d2d0fa37105c5e9da167dfd6496e6c74d7c84482
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.net.WebServer;
-import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -52,11 +58,12 @@ import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.shooter.HoodIO;
+import frc.robot.subsystems.shooter.HoodIOServo;
 import frc.robot.subsystems.shooter.HoodIOSim;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterIOSim;
+import frc.robot.subsystems.shooter.ShooterIOTalonFX;
 import frc.robot.subsystems.thriftyclimb.ThriftyClimb;
 import frc.robot.subsystems.thriftyclimb.ThriftyClimbIO;
 import frc.robot.subsystems.thriftyclimb.ThriftyClimbIOSim;
@@ -78,8 +85,11 @@ public class RobotContainer {
     private Hopper hopper_;
     private ThriftyClimb climb_;
 
+    private CANBus roborioCANBus = new CANBus();
+
     // Choosers
     private final LoggedDashboardChooser<Command> autoChooser_;
+    private final LoggedDashboardChooser<Command> testBindings_;
 
     // Trigger Devices
     private final CommandXboxController gamepad_ = new CommandXboxController(0);
@@ -91,7 +101,6 @@ public class RobotContainer {
         if (Constants.getMode() != Mode.REPLAY) {
             switch (Constants.getRobot()) {
                 case ALPHA:
-
                     drivebase_ = new Drive(
                         new GyroIOPigeon2(AlphaTunerConstants.DrivetrainConstants.Pigeon2Id, AlphaTunerConstants.kCANBus),
                         ModuleIOTalonFX::new,
@@ -173,18 +182,22 @@ public class RobotContainer {
                     climb_ = new ThriftyClimb(new ThriftyClimbIOSim());
 
                     break;
-                default: // Comp Bot
-                    drivebase_ = new Drive(
-                        new GyroIOPigeon2(CompTunerConstants.DrivetrainConstants.Pigeon2Id, CompTunerConstants.kCANBus),
-                        ModuleIOTalonFX::new,
-                        CompTunerConstants.FrontLeft,
-                        CompTunerConstants.FrontRight,
-                        CompTunerConstants.BackLeft,
-                        CompTunerConstants.BackRight,
-                        CompTunerConstants.kCANBus,
-                        CompTunerConstants.kSpeedAt12Volts
-                    );
 
+                case COMPETITION:
+                    // drivebase_ = new Drive(
+                    //     new GyroIOPigeon2(CompTunerConstants.DrivetrainConstants.Pigeon2Id, CompTunerConstants.kCANBus),
+                    //     ModuleIOTalonFX::new,
+                    //     CompTunerConstants.FrontLeft,
+                    //     CompTunerConstants.FrontRight,
+                    //     CompTunerConstants.BackLeft,
+                    //     CompTunerConstants.BackRight,
+                    //     CompTunerConstants.kCANBus,
+                    //     CompTunerConstants.kSpeedAt12Volts
+                    // );
+
+                    shooter_ = new Shooter(new ShooterIOTalonFX(roborioCANBus), new HoodIOServo());
+                    hopper_ = new Hopper(new HopperIOSim());
+                   
                     break;
             }
         }
@@ -284,10 +297,14 @@ public class RobotContainer {
             MapleSimUtil.start();
         }
 
-        // Choosers
+        // AutoModes
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
+<<<<<<< HEAD
     
         autoChooser_.addDefaultOption( "Depot, Shoot, Climb", AutoCommands.DepotShootClimbAuto(drivebase_, intake_, hopper_, shooter_, climb_, true, Volts.of(4)));
+=======
+
+>>>>>>> d2d0fa37105c5e9da167dfd6496e6c74d7c84482
         autoChooser_.onChange(auto -> {
             
             System.err.println("Auto \"" + auto.getName() + "\" selected!");
@@ -295,12 +312,18 @@ public class RobotContainer {
             // This should be used to sbet up robot position setting, initialization, etc.
         });
 
-        // Publish Deploy Directory (for layout/asset downloading)
-        WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
+        // Test Bindings
+        testBindings_ = new LoggedDashboardChooser<>("Test Mode Choices");
+
+        testBindings_.addDefaultOption("Swerve Wheel Radius", DriveCommands.wheelRadiusCharacterization(drivebase_));
+        testBindings_.addOption("Swerve Feedforward", DriveCommands.feedforwardCharacterization(drivebase_));
+        testBindings_.addOption("Shooter Setpoints", shooter_.testCommand(hopper_));
+
+        // Sets the selected test binding to be triggered when the A button is pressed in test mode.
+        RobotModeTriggers.test().and(gamepad_.a()).toggleOnTrue(Commands.deferredProxy(testBindings_::get));
 
         configureBindings();
         configureDriveBindings();
-        configureTestModeBindings();
     }
 
     // Bind robot actions to commands here.
@@ -320,6 +343,9 @@ public class RobotContainer {
 
         // When the hopper isnt shooting, set it to run its idle velocity.
         hopper_.setDefaultCommand(hopper_.idleScrambler());
+
+        // When the shooter isnt shooting, get it ready to shoot.
+        shooter_.setDefaultCommand(shooter_.awaitShooting(drivebase_::getPose));
     }
 
     private void configureDriveBindings() {
@@ -367,19 +393,6 @@ public class RobotContainer {
 
         // Reset gyro to 0° when Y & B button is pressed
         gamepad_.y().and(gamepad_.b()).onTrue(drivebase_.resetGyroCmd());
-    }
-
-    private void configureTestModeBindings() {
-        gamepad_.back().and(RobotModeTriggers.test()).toggleOnTrue(
-            DriveCommands.wheelRadiusCharacterization(drivebase_)
-        );
-
-        LoggedNetworkNumber shooterVelocity = new LoggedNetworkNumber("Tuning/Shooter/TargetShooterRPS", 0);
-        LoggedNetworkNumber hoodAngle = new LoggedNetworkNumber("Tuning/Shooter/TargetHoodAngle", ShooterConstants.SoftwareLimits.hoodMinAngle);
-
-        gamepad_.a().and(RobotModeTriggers.test()).toggleOnTrue(
-            shooter_.runDynamicSetpoints(() -> RotationsPerSecond.of(shooterVelocity.get()), () -> Degrees.of(hoodAngle.get()))
-        );
     }
     
     public Command getAutonomousCommand() {

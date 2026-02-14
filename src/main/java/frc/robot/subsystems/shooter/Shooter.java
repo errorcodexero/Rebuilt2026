@@ -1,6 +1,7 @@
 package frc.robot.subsystems.shooter;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -11,10 +12,13 @@ import static edu.wpi.first.units.Units.Volts;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -22,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.util.MapleSimUtil;
@@ -98,31 +103,11 @@ public class Shooter extends SubsystemBase {
             .plus(shooterInputs.shooter4Current);
     }
 
-    public Command runToVelocityCmd(AngularVelocity vel) {
-        return runOnce(() -> setShooterVelocity(vel))
-            .andThen(Commands.waitUntil(this::isShooterReady)).withName("Set Shooter Velocity");
-    }
-
-    public Command stopCmd() {
-        return runOnce(() -> stopShooter())
-            .andThen(Commands.waitUntil(this::isShooterReady)).withName("Stop Shooter");
-    }
-
-    public Command runVoltageCmd(Voltage vol) {
-        return runOnce(() -> setShooterVoltage(vol)).withName("Set Shooter Voltage");
-    }
-
-    // Hood Methods
     private void setHoodAngle(Angle pos) {
         hoodTarget = pos;
-        hoodIO.runPosition(pos);
+        hoodIO.gotoAngle(pos);
     }
 
-    public Command hoodToPosCmd(Angle pos) {
-        return runOnce(() -> setHoodAngle(pos)).withName("Set Hood Position");
-    }
-
-    // Both
     private void setSetpoints(AngularVelocity vel, Angle pos) {
         shooterTarget = vel;
         setShooterVelocity(shooterTarget);
@@ -141,8 +126,46 @@ public class Shooter extends SubsystemBase {
         );
     }
 
+    /**
+     * The command that the shooter can run whenever its not shooting to manage
+     * things like going to different hood angles to get ready to shoot,
+     * or lowering the hood under the trench.
+     * @return A command that does so.
+     */
+    public Command awaitShooting(Supplier<Pose2d> robotPose) {
+        return runDynamicSetpoints(() -> RadiansPerSecond.zero(), () -> {
+            Pose2d pose = robotPose.get();
+            Pose2d nearestTrench = pose.nearest(FieldConstants.trenches);
+            Distance nearestDistance = Meters.of(pose.getTranslation().getDistance(nearestTrench.getTranslation()));
+
+            if (nearestDistance.lte(ShooterConstants.allowedTrenchDistance)) {
+                return Degrees.zero();
+            }
+
+            return Degrees.of(45); // TODO: replace this with whatever determines shooter angle
+        });
+    }
+
     public Command runToSetpointsCmd(AngularVelocity vel, Angle pos) {
         return runOnce(() -> setSetpoints(vel, pos)).andThen(Commands.waitUntil(this::isShooterReady));
+    }
+
+    public Command runToVelocityCmd(AngularVelocity vel) {
+        return runOnce(() -> setShooterVelocity(vel))
+            .andThen(Commands.waitUntil(this::isShooterReady)).withName("Set Shooter Velocity");
+    }
+
+    public Command stopCmd() {
+        return runOnce(() -> stopShooter())
+            .andThen(Commands.waitUntil(this::isShooterReady)).withName("Stop Shooter");
+    }
+
+    public Command runVoltageCmd(Voltage vol) {
+        return runOnce(() -> setShooterVoltage(vol)).withName("Set Shooter Voltage");
+    }
+
+    public Command hoodToPosCmd(Angle pos) {
+        return runOnce(() -> setHoodAngle(pos)).withName("Set Hood Position");
     }
 
     /**
@@ -154,6 +177,10 @@ public class Shooter extends SubsystemBase {
     public Command runDynamicSetpoints(Supplier<AngularVelocity> vel, Supplier<Angle> pos ) {
         return runEnd(() -> setSetpoints(vel.get(), pos.get()), this::stopShooter);
     }
+
+    public Command setDynamicVoltage(Supplier<Voltage> voltage) {
+        return runEnd(() -> setShooterVoltage(voltage.get()), this::stopShooter);
+    }   
 
     // Sys ID
     public Command shooterSysIdQuasistatic(SysIdRoutine.Direction dir) {
@@ -175,5 +202,16 @@ public class Shooter extends SubsystemBase {
                 this);
 
         return new SysIdRoutine(cfg, mfg);
+    }
+
+    public Command testCommand(Hopper hopper) {
+        LoggedNetworkNumber shooterVelocity = new LoggedNetworkNumber("Tuning/Shooter/TargetShooterRPS", 0);
+        LoggedNetworkNumber hoodAngle = new LoggedNetworkNumber("Tuning/Shooter/TargetHoodAngle", ShooterConstants.SoftwareLimits.hoodMinAngle);
+        LoggedNetworkNumber feederVoltage = new LoggedNetworkNumber("Tuning/Shooter/Feeder", 0.0) ;
+        
+        return Commands.parallel(
+            runDynamicSetpoints(() -> RotationsPerSecond.of(shooterVelocity.get()), () -> Degrees.of(hoodAngle.get())),
+            hopper.dynamicFeederVoltageCommand(() -> Volts.of(feederVoltage.get()))
+        );
     }
 }

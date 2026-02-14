@@ -13,7 +13,9 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import com.ctre.phoenix6.SignalLogger;
 
+import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -49,6 +51,7 @@ public class Robot extends LoggedRobot {
             case SIM:
                 // Running a physics simulator, log to NT
                 Logger.addDataReceiver(new NT4Publisher());
+                Logger.addDataReceiver(new WPILOGWriter());
                 
                 // Silence Joystick Warnings
                 DriverStation.silenceJoystickConnectionWarning(RobotBase.isSimulation());
@@ -65,6 +68,9 @@ public class Robot extends LoggedRobot {
         
         // Start AdvantageKit
         Logger.start();
+
+        // Publish Deploy Directory (for layout/asset downloading)
+        WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
 
         // Disable CTRE hoot files
         SignalLogger.enableAutoLogging(false);

@@ -7,10 +7,11 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.StatusSignalCollection;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -42,7 +43,6 @@ public class ShooterIOTalonFX implements ShooterIO {
         shooter1Motor = new TalonFX(ShooterConstants.shooter1CANID, shooterCANBus);
         shooter2Motor = new TalonFX(ShooterConstants.shooter2CANID, shooterCANBus);
         shooter3Motor = new TalonFX(ShooterConstants.shooter3CANID, shooterCANBus);
-        //shooter4Motor = new TalonFX(ShooterConstants.shooter4CANID, shooterCANBus);
 
         final TalonFXConfiguration shooterConfigs = new TalonFXConfiguration();
 
@@ -63,6 +63,8 @@ public class ShooterIOTalonFX implements ShooterIO {
         // Current Limits
         shooterConfigs.CurrentLimits.StatorCurrentLimit = ShooterConstants.currentLimit;
         shooterConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
+
+        shooterConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive ;
 
         // Similar to our checkError function
         tryUntilOk(5, () -> shooter1Motor.getConfigurator().apply(shooterConfigs, 0.25));
@@ -122,7 +124,8 @@ public class ShooterIOTalonFX implements ShooterIO {
 
     public void setVelocity(AngularVelocity vel) {
         AngularVelocity velocity = vel.div(ShooterConstants.gearRatio);
-        shooter1Motor.setControl(new MotionMagicVelocityVoltage(velocity));
+        // shooter1Motor.setControl(new MotionMagicVelocityVoltage(velocity)) ;
+        shooter1Motor.setControl(new VelocityVoltage(velocity));
     }
 
     public void setVoltage(Voltage vol) {
