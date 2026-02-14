@@ -32,11 +32,28 @@ public class ClimberConstants {
     public static final double climbKV= 0.0; //For now
     public static final double climbKG= 0.0; //For now
 
+<<<<<<< HEAD
     public static final AngularVelocity depolyCruiseVelocity=DegreesPerSecond.of(90);
     public static final AngularAcceleration deployAngularAcceleration= DegreesPerSecondPerSecond.of(180);
     public static final double deployJerk = 0;
 
+=======
+    public static final Angle deployMinAngle= Degrees.of(0.0); //For now
+    public static final Angle deployMaxAngle= Degrees.of(0.0); //For now
+    public static final Angle stowedAngle= Degrees.of(0.0); //For now
+    public static final Angle deployedAngle= Degrees.of(0.0); //For now
+>>>>>>> cce73e6 (Constants)
 
+    public static final Angle climbMinAngle= Degrees.of(0.0); //For now
+    public static final Angle climbMaxAngle= Degrees.of(0.0); //For now
+    public static final Angle climbStartAngle= Degrees.of(0.0); //For now
+    public static final Angle climbEndAngle= Degrees.of(0.0); //For now
+    
+    public static final Voltage deployMaxVoltage= Volts.of(0.0); //For now
+    public static final Voltage climbMaxVoltage= Volts.of(0.0); //For now
+
+    public static final AngularVelocity deployMaxAngularVelocity= DegreesPerSecond.of(0.0); //For now
+    public static final AngularVelocity climbMaxAngularVelocity= DegreesPerSecond.of(0.0); //For now
 
     public static final MomentOfInertia deployMOI=  KilogramSquareMeters.of(0.0); //For now
     public static final MomentOfInertia climbMOI= KilogramSquareMeters.of(0.0); //For now
