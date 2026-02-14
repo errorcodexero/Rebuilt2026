@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 package frc.robot.subsystems.intake;
 
 import edu.wpi.first.units.measure.Voltage;
@@ -39,4 +40,6 @@ public interface IntakeIO {
     public default void stopRoller() {}
 
 }
+=======
+>>>>>>> 8f60337 (Created rough outline of constants for intake)
 
