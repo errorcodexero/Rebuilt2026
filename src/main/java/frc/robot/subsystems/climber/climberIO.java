@@ -31,11 +31,11 @@ public interface climberIO {
       
     public default void updateInputs(ClimberIOInputsAutoLogged inputs) {}
 
-    public default void setDeployment(Angle deploymentAngle) {}
+    public default void setDeploy(Angle deploymentAngle) {}
 
     public default void setClimb(Angle climbAngle) {}
 
-    public default void stopDeployment() {}
+    public default void stopDeploy() {}
 
     public default void stopClimb() {}
 }
