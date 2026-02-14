@@ -15,12 +15,15 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -29,6 +32,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.subsystems.hopper.Hopper;
+import frc.robot.subsystems.shooter.ShooterConstants.Positions.HubDistance;
 import frc.robot.util.MapleSimUtil;
 import frc.robot.util.Mechanism3d;
 
@@ -99,8 +103,7 @@ public class Shooter extends SubsystemBase {
     public Current getShooterCurrent() {
         return (shooterInputs.shooter1Current)
             .plus(shooterInputs.shooter2Current)
-            .plus(shooterInputs.shooter3Current)
-            .plus(shooterInputs.shooter4Current);
+            .plus(shooterInputs.shooter3Current);
     }
 
     private void setHoodAngle(Angle pos) {
@@ -142,7 +145,25 @@ public class Shooter extends SubsystemBase {
                 return Degrees.zero();
             }
 
-            return Degrees.of(45); // TODO: replace this with whatever determines shooter angle
+            Translation2d hubTranslation =
+                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                ? ShooterConstants.Positions.blueHubPose
+                : ShooterConstants.Positions.redHubPose;
+
+            Distance distanceToHub = Meters.of(pose.getTranslation().getDistance(hubTranslation));
+
+            switch(HubDistance.fromDistance(distanceToHub)) {
+                case LOW:
+                    return Degrees.of(ShooterConstants.Positions.hoodLOW);
+                case MEDIUM:
+                    return Degrees.of(ShooterConstants.Positions.hoodMEDIUM);
+                case HIGH:
+                    return Degrees.of(ShooterConstants.Positions.hoodHIGH);
+                default:  
+                    return Degrees.of(ShooterConstants.Positions.hoodLOW);  
+                    
+            }
+            
         });
     }
 
@@ -166,6 +187,54 @@ public class Shooter extends SubsystemBase {
 
     public Command hoodToPosCmd(Angle pos) {
         return runOnce(() -> setHoodAngle(pos)).withName("Set Hood Position");
+    }
+
+    /**
+     * Calculates Velocity and Hood Angle based on distance and Shoots
+     * 
+     * 
+     */
+    public Command shooterSetpointSupplier(Supplier<Pose2d> pose, Hopper hopper) {
+        
+        return Commands.parallel(
+                defer(() -> {
+
+                    // constructing
+                    Translation2d hubTranslation =
+                        DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                        ? ShooterConstants.Positions.blueHubPose
+                        : ShooterConstants.Positions.redHubPose;
+
+                    ShooterConstants.Positions.initMap();
+        
+                    return runDynamicSetpoints(() -> {
+                        Distance distanceToHub = Meters.of(pose.get().getTranslation().getDistance(hubTranslation));
+                        var vel = ShooterConstants.Positions.distMap.get(distanceToHub.baseUnitMagnitude());
+
+                        return RotationsPerSecond.of(vel);
+                    },
+
+                    () -> {
+                        // periodic
+                        Distance distanceToHub = Meters.of(pose.get().getTranslation().getDistance(hubTranslation));
+
+                        switch(HubDistance.fromDistance(distanceToHub)) {
+                            case LOW:
+                                return Degrees.of(ShooterConstants.Positions.hoodLOW);
+                            
+                            case MEDIUM:
+                                return Degrees.of(ShooterConstants.Positions.hoodMEDIUM);
+                                
+                            case HIGH:
+                                return Degrees.of(ShooterConstants.Positions.hoodHIGH);
+                            
+                            default: 
+                                return Degrees.of(ShooterConstants.Positions.hoodMEDIUM);
+                        }   
+                });
+            }),
+            hopper.forwardFeed()
+        );
     }
 
     /**
