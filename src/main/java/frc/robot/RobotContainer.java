@@ -9,27 +9,21 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
-<<<<<<< HEAD
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
-=======
->>>>>>> d2d0fa37105c5e9da167dfd6496e6c74d7c84482
 
 import java.util.Arrays;
 
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-<<<<<<< HEAD
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-=======
 
 import com.ctre.phoenix6.CANBus;
 
->>>>>>> d2d0fa37105c5e9da167dfd6496e6c74d7c84482
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -83,7 +77,7 @@ public class RobotContainer {
     private IntakeSubsystem intake_;
     private Shooter shooter_;
     private Hopper hopper_;
-    private ThriftyClimb climb_;
+    private Climber climber_;
 
     private CANBus roborioCANBus = new CANBus();
 
@@ -277,8 +271,8 @@ public class RobotContainer {
             hopper_ = new Hopper(new HopperIO() {});
         }
 
-        if (climb_ == null) {
-            climb_ = new ThriftyClimb(new ThriftyClimbIO() {});
+        if (climber_ == null) {
+            climber_ = new Climber(new climberIO() {}); 
         }
 
         DriveCommands.configure(
@@ -299,12 +293,6 @@ public class RobotContainer {
 
         // AutoModes
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
-<<<<<<< HEAD
-    
-        autoChooser_.addDefaultOption( "Depot, Shoot, Climb", AutoCommands.DepotShootClimbAuto(drivebase_, intake_, hopper_, shooter_, climb_, true, Volts.of(4)));
-=======
-
->>>>>>> d2d0fa37105c5e9da167dfd6496e6c74d7c84482
         autoChooser_.onChange(auto -> {
             
             System.err.println("Auto \"" + auto.getName() + "\" selected!");
