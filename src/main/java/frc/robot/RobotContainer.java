@@ -29,6 +29,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.Constants.RobotType;
 import frc.robot.commands.drive.DriveCommands;
+import frc.robot.commands.drive.autos.AutoCommands;
 import frc.robot.generated.AlphaTunerConstants;
 import frc.robot.generated.BetaTunerConstants;
 import frc.robot.generated.CompTunerConstants;
@@ -375,6 +376,11 @@ public class RobotContainer {
         gamepad_.y().and(gamepad_.b()).onTrue(drivebase_.resetGyroCmd());
     }
     
+    public void setupAutos(){
+        autoChooser_.addDefaultOption("Neutral Zone Climb Auto", AutoCommands.NZClimbAuto(drivebase_, shooter_, intake_, hopper_, climb_, null));
+        
+    }
+
     public Command getAutonomousCommand() {
         return autoChooser_.get();
     }

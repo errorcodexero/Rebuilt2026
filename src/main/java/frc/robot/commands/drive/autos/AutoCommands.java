@@ -8,16 +8,17 @@ import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.thriftyclimb.ThriftyClimb;
 
+
 import edu.wpi.first.units.measure.Angle;
 
 public class AutoCommands {
-    public Command NZClimbAuto(Drive drive, Shooter shooter, IntakeSubsystem intake, Hopper hopper, ThriftyClimb climb, Angle angle ){
+    public static Command NZClimbAuto(Drive drive, Shooter shooter, IntakeSubsystem intake, Hopper hopper, ThriftyClimb climb, Angle angle ){
         return Commands.sequence(
             //Drive to the first shooting position and shoot preloaded balls   
             DriveCommands.followPathCommand("Start to Shoot1"),
             shooter.shootCmd(hopper).withTimeout(1),
 
-            //Drive to the collect position in the NZ and collect the balles while moving, bringing down the hood to clear the trench
+            //Drive to the collect position in the NZ and collect the ball s while moving, bringing down the hood to clear the trench
             Commands.parallel(
                 DriveCommands.followPathCommand("Shoot1 to Collect"),
                 shooter.hoodToPosCmd(angle),
@@ -25,11 +26,13 @@ public class AutoCommands {
             ),
 
             //Drive to the second shooting position and shooting
-            DriveCommands.followPathCommand("Collect to Shoot2").withDeadline(shooter.shootCmd(hopper).withTimeout(4)),
+            DriveCommands.followPathCommand("Collect to Shoot2"),
+            shooter.shootCmd(hopper).withTimeout(4),
             
             //Drive to the climb position, then climb
             DriveCommands.followPathCommand("Shoot2 to Climb"),
             climb.toggle(),
+            Commands.waitSeconds(1),
             climb.toggle()
         ); 
     }
