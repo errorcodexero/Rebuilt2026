@@ -20,7 +20,10 @@ import com.ctre.phoenix6.CANBus;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -49,6 +52,7 @@ import frc.robot.subsystems.shooter.HoodIO;
 import frc.robot.subsystems.shooter.HoodIOServo;
 import frc.robot.subsystems.shooter.HoodIOSim;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterIOSim;
 import frc.robot.subsystems.shooter.ShooterIOTalonFX;
@@ -315,11 +319,27 @@ public class RobotContainer {
             intake_::isIntakeStowed
         ));
 
+        
+
         // While the left trigger is held, we will run the intake. If the intake is stowed, it will also deploy it.
         gamepad_.leftTrigger().whileTrue(intake_.intakeSequence());
 
         // While the right trigger is held, we will shoot into the hub.
-        gamepad_.rightTrigger().whileTrue(shooter_.shootCmd(hopper_));
+        gamepad_.rightTrigger().whileTrue(Commands.parallel(DriveCommands.joystickDriveAtAngle(drivebase_,
+                () -> 0,
+                () -> 0, 
+                () -> {
+                    Translation2d hub =
+                            DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                            ? ShooterConstants.Positions.blueHubPose
+                            : ShooterConstants.Positions.redHubPose;
+                    
+                    var hubTranslation = drivebase_.getPose().getTranslation().minus(hub);
+                    var rotation = new Rotation2d(hubTranslation.getX(), hubTranslation.getY());
+
+                    return rotation;
+                }),
+            shooter_.shooterSetpointSupplier(() -> drivebase_.getPose(), hopper_)));
 
         // When the hopper isnt shooting, set it to run its idle velocity.
         hopper_.setDefaultCommand(hopper_.idleScrambler());
