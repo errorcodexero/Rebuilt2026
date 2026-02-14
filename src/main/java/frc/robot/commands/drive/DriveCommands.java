@@ -592,12 +592,17 @@ public class DriveCommands {
       if (initPosePath.getStartingHolonomicPose().isEmpty()) {
         return Commands.none();
       }
+        Pose2d startPose= initPosePath.getStartingHolonomicPose().orElseThrow();
 
       return Commands.sequence(
+        Commands.runOnce(()->System.err.println("AUTO START POSE: " + startPose)),
           setPoseCommand(
               drive,
-              initPosePath.getStartingHolonomicPose().orElseThrow(), false),
-          AutoBuilder.followPath(path.get()));
+              startPose, false),
+          Commands.runOnce(() -> System.err.println("DRIVE POSE AFTER RESET: " + drive.getPose())),
+          AutoBuilder.followPath(initPosePath)
+          );
+      
     }
 
     return Commands.none();

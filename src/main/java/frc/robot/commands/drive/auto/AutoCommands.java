@@ -23,23 +23,23 @@ import edu.wpi.first.units.measure.Voltage;
 public class AutoCommands {
     public static Command DepotShootClimbAuto(Drive drive, IntakeSubsystem intake, Hopper hopper, Shooter shooter, ThriftyClimb climber, boolean fieldside, Voltage feedervoltage){
         return Commands.sequence(
-            Commands.runOnce(() -> DriveCommands.resetPoseToPathStart("GoToDepot", fieldside));
             Commands.parallel(
-                DriveCommands.followPathCommand("GoToDepot", fieldside),
+                DriveCommands.initialFollowPathCommand(drive,"GoToDepot", false),
                 intake.deployCmd()
-            ),   
+            ),
+            Commands.runOnce(()-> System.err.println("DRIVE POSE AFTER RESET:" + drive.getPose())),
+            DriveCommands.followPathCommand("Collect", false).deadlineWith(intake.intakeSequence()),
 
-            DriveCommands.followPathCommand("Collect", fieldside).deadlineWith(intake.intakeSequence()),
-
-            DriveCommands.followPathCommand("GoToShoot", fieldside),
+            DriveCommands.followPathCommand("GoToShoot", false),
 
             shooter.shootCmd(hopper).withTimeout(2.5),
 
             shooter.stopCmd(),
 
-            DriveCommands.followPathCommand("ShootToClimb", fieldside),
+            DriveCommands.followPathCommand("ShootToClimb", false),
 
             climber.toggle(), //run first to set to climb height
+            Commands.waitSeconds(1),
             climber.toggle() //run again to set to stowed height and lift off the floor
         );
     }
