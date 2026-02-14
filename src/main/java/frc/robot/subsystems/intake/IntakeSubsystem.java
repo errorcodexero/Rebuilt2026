@@ -154,8 +154,12 @@ public class IntakeSubsystem extends SubsystemBase {
         ).finallyDo(interrupted -> waiting());
     }
 
+    public Command runEjectCmd() {
+        return startEnd(this::eject, this::stopIntaking);
+    }
+
     public Command ejectSequence() {
-        return runOnce(this::eject).beforeStarting(
+        return runEjectCmd().beforeStarting(
             deployCmd().unless(this::isIntakeDeployed)
         ).finallyDo(interrupted -> waiting());
     }
