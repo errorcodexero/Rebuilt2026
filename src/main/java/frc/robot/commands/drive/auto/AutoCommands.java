@@ -23,6 +23,7 @@ import edu.wpi.first.units.measure.Voltage;
 public class AutoCommands {
     public static Command DepotShootClimbAuto(Drive drive, IntakeSubsystem intake, Hopper hopper, Shooter shooter, ThriftyClimb climber, boolean fieldside, Voltage feedervoltage){
         return Commands.sequence(
+            Commands.runOnce(() -> drive.resetGyroCmd()),
             Commands.parallel(
                 DriveCommands.initialFollowPathCommand(drive,"GoToDepot"),
                 intake.deployCmd()
