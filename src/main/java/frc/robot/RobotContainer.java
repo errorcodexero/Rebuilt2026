@@ -294,9 +294,7 @@ public class RobotContainer {
         // AutoModes
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
         autoChooser_.onChange(auto -> {
-            
             System.err.println("Auto \"" + auto.getName() + "\" selected!");
-            drivebase_.setPose(new Pose2d(3.564, 5.668, Rotation2d.fromDegrees(142.647)));
             // This should be used to sbet up robot position setting, initialization, etc.
         });
 
