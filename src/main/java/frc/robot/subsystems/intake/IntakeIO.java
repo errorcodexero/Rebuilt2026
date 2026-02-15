@@ -26,7 +26,7 @@ public interface IntakeIO {
         public Current PivotCurrentAmps= Amps.of(0); 
     }
     
-    public default void updateInputs(IntakeIOInputsAutoLogged inputs) {}
+    public default void updateInputs(IntakeIOInputs inputs) {}
 
     public default void setRollerVoltage(Voltage volts) {}
 

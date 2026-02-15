@@ -25,19 +25,27 @@ public interface ClimberIO {
       public Angle deployPosition = Degrees.of(0);
       public AngularVelocity deployVelocity = DegreesPerSecond.of(0);
 
-      public Voltage climbVolts = Volts.of(0);
-      public Current climbCurrent = Amps.of(0);
-      public Angle climbPosition = Degrees.of(0);
-      public AngularVelocity climbVelocity = DegreesPerSecond.of(0);
+      public Voltage twistVolts = Volts.of(0);
+      public Current twistCurrent = Amps.of(0);
+      public Angle twistPosition = Degrees.of(0);
+      public AngularVelocity twistVelocity = DegreesPerSecond.of(0);
     }
       
     public default void updateInputs(ClimberIOInputs inputs) {}
 
     public default void setDeployAngle(Angle deploymentAngle) {}
 
-    public default void setClimbAngle(Angle climbAngle) {}
+    public default void setDeployVelocity(AngularVelocity deployVelocity) {}
+
+    public default void setDeployVoltage(Voltage deployVoltage) {}
+
+    public default void setTwistAngle(Angle climbAngle) {}
+
+    public default void setTwistVelocity(AngularVelocity climbVelocity) {}
+
+    public default void setTwistVoltage(Voltage climbVoltage) {}
 
     public default void stopDeploy() {}
 
-    public default void stopClimb() {}
+    public default void stopTwist() {}
 }

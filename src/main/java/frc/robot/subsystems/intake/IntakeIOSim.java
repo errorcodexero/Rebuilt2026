@@ -34,7 +34,7 @@ public class IntakeIOSim extends IntakeIOTalonFX {
     }
 
     @Override
-    public void updateInputs(IntakeIOInputsAutoLogged inputs){
+    public void updateInputs(IntakeIOInputs inputs){
         //Get the simulation states of each motor
         TalonFXSimState pivotMotorSimState= pivotMotor.getSimState();
         TalonFXSimState rollerMotorSimState= rollerMotor.getSimState();

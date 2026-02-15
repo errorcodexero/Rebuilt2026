@@ -128,7 +128,7 @@ public class IntakeIOTalonFX implements IntakeIO {
         
     }
     @Override
-    public void updateInputs(IntakeIOInputsAutoLogged inputs) {
+    public void updateInputs(IntakeIOInputs inputs) {
         BaseStatusSignal.refreshAll(
             pivotAngleSignal,
             pivotAngularVelocitySignal,
