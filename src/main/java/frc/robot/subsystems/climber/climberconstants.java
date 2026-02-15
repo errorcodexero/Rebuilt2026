@@ -82,4 +82,9 @@ public class ClimberConstants {
         public static final double deployGearRatio =0.0;
         public static final double twistGearRatio= 0.0;
     }
+
+    public class Tolerances{
+        public static final Angle deployTolerance= Degrees.of(5);
+        public static final Angle twistTolerance= Degrees.of(5);
+    }
 }
