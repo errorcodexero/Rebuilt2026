@@ -113,5 +113,25 @@ public class Climber extends SubsystemBase {
         .withTimeout(2).withName("Stow Climber");
     }
 
+    public Command initializeTwist(){
+        return Commands.runOnce(this::startTwist);
+    }
+
+    public Command startClimb(){
+        return Commands.runOnce(this::climb);
+    }
+
+    public Command intializeClimber(){
+        return initializeTwist().andThen(Commands.waitUntil(()->isTwistAtStart()))
+        .withTimeout(2).withName("Initialize Climber");
+    }
+
+    public Command climbCommand() {
+        return startClimb().andThen(Commands.waitUntil(() -> isTwistAtEnd()))
+        .withTimeout(2).withName("Climb");
+    }
+
     
+
+
 }
