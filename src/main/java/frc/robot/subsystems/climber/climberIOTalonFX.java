@@ -126,65 +126,68 @@ public class ClimberIOTalonFX implements ClimberIO {
         BaseStatusSignal.setUpdateFrequencyForAll(50, deployPositionSig, twistPositionSig);
 
         ParentDevice.optimizeBusUtilizationForAll(deployMotor, twistMotor);
+    }
+    @Override
+    public void updateInputs(ClimberIOInputs inputs) {
+        BaseStatusSignal.refreshAll(
+            deployPositionSig,
+            deployVoltageSig,
+            deployCurrentSig,
+            deployVelocitySig,
+            twistPositionSig,
+            twistVoltageSig,
+            twistCurrentSig,
+            twistVelocitySig
+        );
 
-        @Override
+        inputs.deployPosition= deployPositionSig.getValue();
+        inputs.deployVolts= deployVoltageSig.getValue();
+        inputs.deployCurrent= deployCurrentSig.getValue();
+        inputs.deployVelocity= deployVelocitySig.getValue();
 
-        public void updateInputs(ClimberIOInputs inputs) {
-            BaseStatusSignal.refreshAll(
-                deployPositionSig,
-                deployVoltageSig,
-                deployCurrentSig,
-                deployVelocitySig,
-                twistPositionSig,
-                twistVoltageSig,
-                twistCurrentSig,
-                twistVelocitySig
-            );
-
-            inputs.deployPosition= deployPositionSig.getValue();
-            inputs.deployVolts= deployVoltageSig.getValue();
-            inputs.deployCurrent= deployCurrentSig.getValue();
-            inputs.deployVelocity= deployVelocitySig.getValue();
-
-            inputs.twistPosition= twistPositionSig.getValue();
-            inputs.twistVolts= twistVoltageSig.getValue();
-            inputs.twistCurrent= twistCurrentSig.getValue();
-            inputs.twistVelocity= twistVelocitySig.getValue();
-        }
+        inputs.twistPosition= twistPositionSig.getValue();
+        inputs.twistVolts= twistVoltageSig.getValue();
+        inputs.twistCurrent= twistCurrentSig.getValue();
+        inputs.twistVelocity= twistVelocitySig.getValue();
+    }
         
-        @Override
-        public void setDeployAngle(Angle angle) {
-            deployMotor.setControl(deployAngleRequest.withPosition(angle));
-        }
+    @Override
+    public void setDeployAngle(Angle angle) {
+        deployMotor.setControl(deployAngleRequest.withPosition(angle));
+    }
 
-        @Override
-        public void setDeployVelocity(AngularVelocity velocity) {
-            deployMotor.setControl(deployVelocityRequest.withVelocity(velocity));
-        }
+    @Override
+    public void setDeployVelocity(AngularVelocity velocity) {
+        deployMotor.setControl(deployVelocityRequest.withVelocity(velocity));
+    }
 
-        @Override
-        public void setTwistAngle(Angle angle) {
-            twistMotor.setControl(twistAngleRequest.withPosition(angle));
-        }
+    @Override
+    public void setDeployVoltage(Voltage voltage) {
+        deployMotor.setControl(deployVoltageRequest.withOutput(voltage));
+    }
+    
+    @Override
+    public void setTwistAngle(Angle angle) {
+        twistMotor.setControl(twistAngleRequest.withPosition(angle));
+    }
 
-        @Override
-        public void setTwistVelocity(AngularVelocity velocity) {
-            twistMotor.setControl(twistVelocityRequest.withVelocity(velocity));
-        }
+    @Override
+    public void setTwistVelocity(AngularVelocity velocity) {
+        twistMotor.setControl(twistVelocityRequest.withVelocity(velocity));
+    }
 
-        @Override
-        public void setTwistVoltage(Voltage voltage) {
-            twistMotor.setControl(twistVoltageRequest.withOutput(voltage));
-        }
+    @Override
+    public void setTwistVoltage(Voltage voltage) {
+        twistMotor.setControl(twistVoltageRequest.withOutput(voltage));
+    }
 
-        @Override
-        public void stopTwist() {
-            twistMotor.setControl(twistVoltageRequest.withOutput(Volts.of(0)));
-        }
+    @Override
+    public void stopTwist() {
+        twistMotor.setControl(twistVoltageRequest.withOutput(Volts.of(0)));
+    }
 
-        @Override
-        public void stopDeploy() {
-            deployMotor.setControl(deployVoltageRequest.withOutput(Volts.of(0)));
-        }
+    @Override
+    public void stopDeploy() {
+        deployMotor.setControl(deployVoltageRequest.withOutput(Volts.of(0)));
     }
 }
