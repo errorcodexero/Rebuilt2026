@@ -48,8 +48,8 @@ public class ShooterConstants {
         public class MotionMagic {
 
             // shooter
-            public static final double shooterkMaxVelocity = 0.0;
-            public static final double shooterkMaxAcceleration = 300.0;
+            public static final double shooterkMaxVelocity = 1000.0;
+            public static final double shooterkMaxAcceleration = 3000.0;
             public static final double shooterkJerk = 0.0;
 
             // hood

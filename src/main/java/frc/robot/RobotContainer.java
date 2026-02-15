@@ -334,7 +334,7 @@ public class RobotContainer {
                             ? ShooterConstants.Positions.blueHubPose
                             : ShooterConstants.Positions.redHubPose;
                     
-                    var hubTranslation = drivebase_.getPose().getTranslation().minus(hub);
+                    var hubTranslation = hub.minus(drivebase_.getPose().getTranslation());
                     var rotation = new Rotation2d(hubTranslation.getX(), hubTranslation.getY());
 
                     return rotation;
