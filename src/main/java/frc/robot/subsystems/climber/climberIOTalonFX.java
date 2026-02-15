@@ -3,13 +3,9 @@
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.util.PhoenixUtil.tryUntilOk;
 
-import java.util.List;
-
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
@@ -22,19 +18,16 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.units.measure.AngularVelocity;
 
-import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.StatusSignal; 
 import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.CANBus; 
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
 //import frc.robot.climber.climberIO.ClimberInputs;
 
 
 public class ClimberIOTalonFX implements ClimberIO {
     //Motor object creation
-    private final TalonFX deployMotor;
-    private final TalonFX twistMotor; 
+    public final TalonFX deployMotor;
+    public final TalonFX twistMotor; 
 
     //Deploy motor control requests
     private final MotionMagicVoltage deployAngleRequest= new MotionMagicVoltage(Degrees.of(0));

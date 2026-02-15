@@ -5,14 +5,12 @@ import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Volts;
-import static edu.wpi.first.units.Units.Amps;
 
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.AngularAcceleration;
-import edu.wpi.first.units.measure.Current;
 
 public class ClimberConstants {
     public class CANID {

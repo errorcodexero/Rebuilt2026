@@ -9,18 +9,12 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Volts;
 
 import java.util.Arrays;
 
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.ctre.phoenix6.CANBus;
 
@@ -58,16 +52,15 @@ import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterIOSim;
 import frc.robot.subsystems.shooter.ShooterIOTalonFX;
-import frc.robot.subsystems.thriftyclimb.ThriftyClimb;
-import frc.robot.subsystems.thriftyclimb.ThriftyClimbIO;
-import frc.robot.subsystems.thriftyclimb.ThriftyClimbIOSim;
+import frc.robot.subsystems.climber.Climber;
+import frc.robot.subsystems.climber.ClimberIO;
+import frc.robot.subsystems.climber.ClimberIOSim;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIO;
 import frc.robot.subsystems.vision.CameraIOPhotonSim;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.MapleSimUtil;
 import frc.robot.util.Mechanism3d;
-import frc.robot.commands.drive.auto.AutoCommands;
 
 public class RobotContainer {
 
@@ -173,7 +166,7 @@ public class RobotContainer {
 
                     hopper_ = new Hopper(new HopperIOSim());
                     
-                    climb_ = new ThriftyClimb(new ThriftyClimbIOSim());
+                    climber_ = new Climber(new ClimberIOSim());
 
                     break;
 
@@ -272,7 +265,7 @@ public class RobotContainer {
         }
 
         if (climber_ == null) {
-            climber_ = new Climber(new climberIO() {}); 
+            climber_ = new Climber(new ClimberIO() {});
         }
 
         DriveCommands.configure(
