@@ -20,20 +20,22 @@ public interface ClimberIO {
 
     @AutoLog
     public class ClimberIOInputs {
-      public Voltage deployVolts = Volts.zero();
-      public Current deployCurrent = Amps.zero();
-      public Angle deployPosition = Radians.zero();
+      public Voltage deployVolts = Volts.of(0);
+      public Current deployCurrent = Amps.of(0);
+      public Angle deployPosition = Degrees.of(0);
+      public AngularVelocity deployVelocity = DegreesPerSecond.of(0);
 
-      public Voltage climbVolts = Volts.zero();
-      public Current climbCurrent = Amps.zero();
-      public Angle climbPosition = Radians.zero();
+      public Voltage climbVolts = Volts.of(0);
+      public Current climbCurrent = Amps.of(0);
+      public Angle climbPosition = Degrees.of(0);
+      public AngularVelocity climbVelocity = DegreesPerSecond.of(0);
     }
       
-    public default void updateInputs(ClimberIOInputsAutoLogged inputs) {}
+    public default void updateInputs(ClimberIOInputs inputs) {}
 
-    public default void setDeploy(Angle deploymentAngle) {}
+    public default void setDeployAngle(Angle deploymentAngle) {}
 
-    public default void setClimb(Angle climbAngle) {}
+    public default void setClimbAngle(Angle climbAngle) {}
 
     public default void stopDeploy() {}
 
