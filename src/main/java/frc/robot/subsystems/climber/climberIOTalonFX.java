@@ -22,7 +22,7 @@ import edu.wpi.first.units.measure.Voltage;
 //import frc.robot.climber.climberIO.ClimberInputs;
 
 
-public class climberIOTalonFX implements climberIO {
+public class ClimberIOTalonFX implements ClimberIO {
 
     private final TalonFX Climbmotor ;
     private final TalonFX deployClimb ;
