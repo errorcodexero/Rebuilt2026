@@ -4,16 +4,14 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.units.measure.AngularVelocity;
+import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.Units.Seconds;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.Constants;
-import frc.robot.Constants.Mode;
-import frc.robot.util.MapleSimUtil;
-import frc.robot.util.Mechanism3d;
-
-
 
 public class Climber extends SubsystemBase {
     
@@ -39,6 +37,10 @@ public class Climber extends SubsystemBase {
         Logger.recordOutput("Climber/TwistMotor_EndAngleSetpoint", twistEndAngle);
     }
 
+
+    //////////////////
+    //Primary Methods/
+    //////////////////
     public void setDeployMotorAngle(Angle angle) {
         io.setDeployAngle(angle);
     }
@@ -91,6 +93,35 @@ public class Climber extends SubsystemBase {
         return isTwistAtAngle(twistEndAngle);
     }
 
+
+    /////////////////////
+    //Secondary Methods//
+    /////////////////////
+    
+    public void setDeployVoltage(Voltage voltage){
+        io.setDeployVoltage(voltage);
+    }
+
+    public void setTwistVoltage(Voltage voltage){
+        io.setTwistVoltage(voltage);
+    }
+    
+    public void setDeployVelocity(AngularVelocity velocity){
+        io.setDeployVelocity(velocity);
+    }
+
+    public void setTwistVelocity(AngularVelocity velocity){
+        io.setTwistVelocity(velocity);
+    }
+
+    public void stopDeploy(){
+        io.stopDeploy();
+    }
+
+    public void stopTwist(){
+        io.stopTwist();
+    }
+
     /////////////
     ///Commands//
     /////////////
@@ -121,7 +152,7 @@ public class Climber extends SubsystemBase {
         return Commands.runOnce(this::climb);
     }
 
-    public Command intializeClimber(){
+    public Command initializeClimber(){
         return initializeTwist().andThen(Commands.waitUntil(()->isTwistAtStart()))
         .withTimeout(2).withName("Initialize Climber");
     }
@@ -131,7 +162,98 @@ public class Climber extends SubsystemBase {
         .withTimeout(2).withName("Climb");
     }
 
+    public Command stopTwistCommand() {
+        return Commands.runOnce(this::stopTwist);
+    }
+
+    public Command stopDeployCommmand(){
+        return Commands.runOnce(this::stopDeploy);
+    }
+
+    public Command resetClimber(){
+        return Commands.sequence(
+            initializeClimber(),
+            stowClimber()
+        );
+    }
+
+    /////////////////////////////////////////////////////
+    ///Commands that aren't necessary, but can be used///
+    /////////////////////////////////////////////////////
     
+    public Command setDeployVoltageCommand(Voltage voltage) {
+        return Commands.runOnce(() -> setDeployVoltage(voltage));
+    }
 
+    public Command setTwistVoltageCommand(Voltage voltage) {
+        return Commands.runOnce(() -> setTwistVoltage(voltage));
+    }
 
+    public Command setDeployVelocityCommand(AngularVelocity velocity) {
+        return Commands.runOnce(() -> setDeployVelocity(velocity));
+    }
+
+    public Command setTwistVelocityCommand(AngularVelocity velocity) {
+        return Commands.runOnce(() -> setTwistVelocity(velocity));
+    }
+
+    //////////////////////////////////
+    ///Sys ID Routine Configuration///
+    //////////////////////////////////
+    
+    public final SysIdRoutine deploySysIdRoutine(){
+        final Voltage stepVoltage_deploy= Volts.of(4); //This is temporary for the dynamic step voltage
+        final Time timeOut_deploy= Seconds.of(10); //10 second timeout is considered default according Phoenix 6 documentation
+        return new SysIdRoutine(
+            new SysIdRoutine.Config(
+                null, //Default ramp rate of the voltage of 1 V/s, according to Phoenix 6 documentation
+                stepVoltage_deploy,
+                timeOut_deploy,
+                (state) -> Logger.recordOutput("state", state.toString()) //Logging the state of the routine
+            ),
+            new SysIdRoutine.Mechanism(
+                (Voltage voltage)-> io.setDeployVoltage(voltage),
+                null,
+                this
+            )
+        );
+    }
+
+    public final SysIdRoutine twistSysIdRoutine(){
+        final Voltage stepVoltage_twist= Volts.of(4); //This is temporary for the dynamic step voltage
+        final Time timeOut_twist= Seconds.of(10); //10 second timeout is considered default according Phoenix 6 documentation
+        return new SysIdRoutine(
+            new SysIdRoutine.Config(
+                null, //Default ramp rate of the voltage of 1 V/s, according to Phoenix 6 documentation
+                stepVoltage_twist,
+                timeOut_twist,
+                (state) -> Logger.recordOutput("state", state.toString()) //Logging the state of the routine
+            ),
+            new SysIdRoutine.Mechanism(
+                (Voltage voltage)-> io.setTwistVoltage(voltage),
+                null,
+                this
+            )
+        );
+    }
+
+    ////////////////////
+    ///Sys ID Commands//
+    ////////////////////
+    
+    public Command deploySysIdQuasistaticCommand(SysIdRoutine.Direction direction){
+        return deploySysIdRoutine().quasistatic(direction);
+    }
+    
+    public Command twistSysIdQuasistaticCommand(SysIdRoutine.Direction direction){
+        return twistSysIdRoutine().quasistatic(direction);
+    }
+    
+    public Command deploySysIdDynamicCommand(SysIdRoutine.Direction direction){
+        return deploySysIdRoutine().dynamic(direction);
+    }
+
+    public Command twistSysIdDynamicCommand(SysIdRoutine.Direction direction){
+        return twistSysIdRoutine().dynamic(direction);
+    }    
 }
