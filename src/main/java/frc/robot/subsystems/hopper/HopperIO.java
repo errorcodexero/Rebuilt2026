@@ -12,11 +12,12 @@ import edu.wpi.first.units.measure.Voltage;
 public interface HopperIO {
     @AutoLog
     public static class HopperIOInputs {
-
+        public boolean feederConnected = false;
         public AngularVelocity feederVelocity = DegreesPerSecond.of(0);
         public Voltage feederVoltage = Volts.of(0.0);
         public Current feederCurrent = Amps.of(0.0);
 
+        public boolean scramblerConnected = false;
         public AngularVelocity scramblerVelocity = DegreesPerSecond.of(0);
         public Voltage scramblerVoltage = Volts.of(0.0);
         public Current scramblerCurrent = Amps.of(0.0);

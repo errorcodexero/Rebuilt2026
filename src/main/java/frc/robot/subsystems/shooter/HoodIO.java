@@ -12,5 +12,5 @@ public interface HoodIO {
 
     public default void updateInputs(HoodInputs inputs) {};
 
-    public default void runPosition(Angle angle) {};
+    public default void gotoAngle(Angle angle) {};
 }
