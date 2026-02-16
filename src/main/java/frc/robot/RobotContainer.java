@@ -320,6 +320,10 @@ public class RobotContainer {
         // While the right trigger is held, we will shoot into the hub.
         gamepad_.rightTrigger().whileTrue(shooter_.shootCmd(hopper_));
 
+        gamepad_.rightBumper().whileTrue(climber_.initializeClimber());
+
+        gamepad_.leftTrigger().and(gamepad_.rightTrigger()).whileTrue(climber_.climbCommand());
+
         // When the hopper isnt shooting, set it to run its idle velocity.
         hopper_.setDefaultCommand(hopper_.idleScrambler());
 

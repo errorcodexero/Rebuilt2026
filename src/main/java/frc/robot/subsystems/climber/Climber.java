@@ -154,7 +154,7 @@ public class Climber extends SubsystemBase {
 
     public Command initializeClimber(){
         return initializeTwist().andThen(Commands.waitUntil(()->isTwistAtStart()))
-        .withTimeout(2).withName("Initialize Climber");
+        .beforeStarting(deployClimber().unless(this::isDeployed)).withName("Initialize and Deploy Climber");
     }
 
     public Command climbCommand() {
