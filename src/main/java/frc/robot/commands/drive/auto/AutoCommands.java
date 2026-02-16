@@ -17,10 +17,8 @@ public class AutoCommands {
                 DriveCommands.initialFollowPathCommand(drive,"GoToDepot"),
                 intake.deployCmd()
             ),
-            Commands.parallel(
-                DriveCommands.followPathCommand("Collect"),
-                intake.intakeSequence()
-            ),
+            Commands.runOnce(()-> System.err.println("DRIVE POSE AFTER RESET:" + drive.getPose())),
+            DriveCommands.followPathCommand("Collect").deadlineWith(intake.intakeSequence()).withTimeout(1),
 
             DriveCommands.followPathCommand("GoToShoot"),
 
