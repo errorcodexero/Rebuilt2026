@@ -46,14 +46,14 @@ public class ClimberConstants {
 
         public class AngleSetpoints {
         public static final Angle deployMinAngle= Degrees.of(0.0); //For now
-        public static final Angle deployMaxAngle= Degrees.of(0.0); //For now
-        public static final Angle stowedAngle= Degrees.of(0.0); //For now
-        public static final Angle deployedAngle= Degrees.of(0.0); //For now
+        public static final Angle deployMaxAngle= Degrees.of(100); //For now
+        public static final Angle stowedAngle= Degrees.of(45); //For now
+        public static final Angle deployedAngle= Degrees.of(90); //For now
 
         public static final Angle twistMinAngle= Degrees.of(0.0); //For now
-        public static final Angle twistMaxAngle= Degrees.of(0.0); //For now
-        public static final Angle twistStartAngle= Degrees.of(0.0); //For now
-        public static final Angle twistEndAngle= Degrees.of(0.0); //For now
+        public static final Angle twistMaxAngle= Degrees.of(360); //For now
+        public static final Angle twistStartAngle= Degrees.of(20); //For now
+        public static final Angle twistEndAngle= Degrees.of(340); //For now
     }
 
     public class CurrentLimits {
