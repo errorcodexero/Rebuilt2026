@@ -18,8 +18,10 @@ public class AutoCommands {
                 intake.deployCmd()
             ),
             Commands.runOnce(()-> System.err.println("DRIVE POSE AFTER RESET:" + drive.getPose())),
-            DriveCommands.followPathCommand("Collect").deadlineWith(intake.intakeSequence()).withTimeout(1), //For some reason the robot would get stuck on the tower, so the time out is to let the robot have a little time to go to the hub
-
+            DriveCommands.followPathCommand("Collect")
+                .deadlineWith(
+                    intake.runIntakeCmd()
+            ), 
             DriveCommands.followPathCommand("GoToShoot"),
 
             shooter.shootCmd(hopper).withTimeout(2.5),
