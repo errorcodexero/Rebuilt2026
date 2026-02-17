@@ -1,5 +1,6 @@
 package frc.robot.subsystems.intake; 
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -41,7 +42,7 @@ public class IntakeSubsystem extends SubsystemBase {
         Mechanism3d.setpoints.setIntake(setpointAngle);
 
         if (Constants.getMode() == Mode.SIM) {
-            MapleSimUtil.setIntakeRunning(isIntakeDeployed() && inputs.RollerAngularVelocity.gt(RadiansPerSecond.zero()));
+            MapleSimUtil.setIntakeRunning(inputs.PivotAngle.gt(Degrees.of(125)) && inputs.RollerAngularVelocity.gt(RadiansPerSecond.zero()));
         }
     }
 
