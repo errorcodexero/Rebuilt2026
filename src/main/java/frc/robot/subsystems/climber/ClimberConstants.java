@@ -19,8 +19,8 @@ public class ClimberConstants {
     }
     
     public class PID {
-        public static final double deployKP= 0.0; //For now
-        public static final double deployKI= 0.0; //For now
+        public static final double deployKP= 0.5; //For now
+        public static final double deployKI= 0.04; //For now
         public static final double deployKD= 0.0; //For now
         public static final double deployKS= 0.0; //For now
         public static final double deployKV= 0.0; //For now
@@ -72,13 +72,13 @@ public class ClimberConstants {
     }
 
     public class MOI{
-        public static final MomentOfInertia deployMOI=  KilogramSquareMeters.of(0.0); //For now
-        public static final MomentOfInertia twistMOI= KilogramSquareMeters.of(0.0); //For now
+        public static final MomentOfInertia deployMOI=  KilogramSquareMeters.of(0.01); //For now
+        public static final MomentOfInertia twistMOI= KilogramSquareMeters.of(0.01); //For now
     }
 
     public class GearRatios{
-        public static final double deployGearRatio =0.0;
-        public static final double twistGearRatio= 0.0;
+        public static final double deployGearRatio =1; //For now
+        public static final double twistGearRatio= 1; //For now
     }
 
     public class Tolerances{

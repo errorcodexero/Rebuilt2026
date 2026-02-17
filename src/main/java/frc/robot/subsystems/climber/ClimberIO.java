@@ -28,18 +28,18 @@ public interface ClimberIO {
       
     public default void updateInputs(ClimberIOInputs inputs) {}
 
-    public default void setDeployAngle(Angle deploymentAngle) {}
+    public default void setDeployAngle(Angle angle) {}
 
-    public default void setDeployVelocity(AngularVelocity deployVelocity) {}
+    public default void setDeployVelocity(AngularVelocity velocity) {}
 
-    public default void setDeployVoltage(Voltage deployVoltage) {}
+    public default void setDeployVoltage(Voltage volts) {}
 
-    public default void setTwistAngle(Angle climbAngle) {}
+    public default void setTwistAngle(Angle angle) {}
 
-    public default void setTwistVelocity(AngularVelocity climbVelocity) {}
+    public default void setTwistVelocity(AngularVelocity velocity) {}
 
-    public default void setTwistVoltage(Voltage climbVoltage) {}
-
+    public default void setTwistVoltage(Voltage volts) {}
+    
     public default void stopDeploy() {}
 
     public default void stopTwist() {}

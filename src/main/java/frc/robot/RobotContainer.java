@@ -286,11 +286,6 @@ public class RobotContainer {
 
         // AutoModes
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
-<<<<<<< HEAD
-=======
-    
-        autoChooser_.addDefaultOption( "Depot, Shoot, Climb", AutoCommands.DepotShootClimbAuto(drivebase_, intake_, hopper_, shooter_, climb_, true));
->>>>>>> 25b8f7b (Finished automode)
         autoChooser_.onChange(auto -> {
             System.err.println("Auto \"" + auto.getName() + "\" selected!");
             // This should be used to sbet up robot position setting, initialization, etc.
