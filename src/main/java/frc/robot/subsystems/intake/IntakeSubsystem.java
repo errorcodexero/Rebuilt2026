@@ -70,6 +70,10 @@ public class IntakeSubsystem extends SubsystemBase {
         io.stopRoller();
     }
 
+    private void eject(){
+        io.setRollerVoltage(IntakeConstants.rollerEjectVoltage);
+    }
+
     /**
      * Stows the intake and hopper.
      */
@@ -120,6 +124,14 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     /**
+     * Command that stops the rollers, mainly for in automodes
+     * @return
+     */
+    public Command stopIntake(){
+        return runOnce(() -> stopIntaking()).withName("Stop Rollers");
+    }
+
+    /**
      * Command that deploys the intake and ends when it gets there.
      * @return
      */
@@ -147,6 +159,16 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public Command intakeSequence() {
         return runIntakeCmd().beforeStarting(
+            deployCmd().unless(this::isIntakeDeployed)
+        ).finallyDo(interrupted -> waiting());
+    }
+
+    public Command runEjectCmd() {
+        return startEnd(this::eject, this::stopIntaking);
+    }
+
+    public Command ejectSequence() {
+        return runEjectCmd().beforeStarting(
             deployCmd().unless(this::isIntakeDeployed)
         ).finallyDo(interrupted -> waiting());
     }
