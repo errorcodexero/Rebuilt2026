@@ -40,22 +40,22 @@ public class ClimberIOTalonFX implements ClimberIO {
     private final VelocityVoltage twistVelocityRequest= new VelocityVoltage(DegreesPerSecond.of(0));
         
     //Deploy motor status signals
-    private final StatusSignal<Angle> deployPositionSig;
-    private final StatusSignal<Voltage> deployVoltageSig;
-    private final StatusSignal<Current> deployCurrentSig;
-    private final StatusSignal<AngularVelocity> deployVelocitySig;
+    private StatusSignal<Angle> deployPositionSig;
+    private StatusSignal<Voltage> deployVoltageSig;
+    private StatusSignal<Current> deployCurrentSig;
+    private StatusSignal<AngularVelocity> deployVelocitySig;
 
     //Twist motor status signals
-    private final StatusSignal<Angle> twistPositionSig;
-    private final StatusSignal<Voltage> twistVoltageSig;
-    private final StatusSignal<Current> twistCurrentSig;
-    private final StatusSignal<AngularVelocity> twistVelocitySig;
+    private StatusSignal<Angle> twistPositionSig;
+    private StatusSignal<Voltage> twistVoltageSig;
+    private StatusSignal<Current> twistCurrentSig;
+    private StatusSignal<AngularVelocity> twistVelocitySig;
     
     public ClimberIOTalonFX(CANBus deployBus, CANBus twistBus){
         deployMotor= new TalonFX(ClimberConstants.CANID.deployMotorID, deployBus);
         twistMotor = new TalonFX(ClimberConstants.CANID.twistMotorID, twistBus);
 
-        TalonFXConfiguration deployConfig= new TalonFXConfiguration();
+        final TalonFXConfiguration deployConfig= new TalonFXConfiguration();
 
         deployConfig.MotorOutput.NeutralMode= NeutralModeValue.Brake;
 
@@ -80,7 +80,7 @@ public class ClimberIOTalonFX implements ClimberIO {
 
         tryUntilOk(5, () -> deployMotor.getConfigurator().apply(deployConfig, 0.25));
 
-        TalonFXConfiguration twistConfig= new TalonFXConfiguration();
+        final TalonFXConfiguration twistConfig= new TalonFXConfiguration();
 
         twistConfig.MotorOutput.NeutralMode= NeutralModeValue.Brake;
 
