@@ -5,7 +5,6 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.FeetPerSecond;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
@@ -144,7 +143,6 @@ public class RobotContainer {
 
                     // Add sim drivebase to simulation and where modules can get it.
                     // CALL THIS BEFORE CREATING THE DRIVEBASE!
-                    //This one is for 
                     MapleSimUtil.createSwerve(config, new Pose2d(2.0, 2.0, Rotation2d.kZero)); 
                     MapleSimUtil.createIntake();
 
@@ -291,7 +289,7 @@ public class RobotContainer {
         // AutoModes
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
 
-        autoChooser_.addDefaultOption("Neutral Zone Climb Auto", AutoCommands.NZClimbAuto(drivebase_, shooter_, intake_, hopper_, climb_, Degrees.zero()));
+        autoChooser_.addOption("Neutral Zone Climb Auto", AutoCommands.NZClimbAuto(drivebase_, shooter_, intake_, hopper_, climb_, Degrees.zero()));
 
         autoChooser_.onChange(auto -> {
             System.out.println("Auto \"" + auto.getName() + "\" selected!");
