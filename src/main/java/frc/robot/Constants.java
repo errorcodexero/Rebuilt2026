@@ -39,6 +39,7 @@ public final class Constants {
     private static final RobotType robotType = RobotType.COMPETITION;
 
     public static final boolean spawnLessFuelInSim = true;
+    public static final boolean shootOnMove = true; 
 
     public static class DriveConstants {
         public static final double slowModeJoystickMultiplier = 0.4;

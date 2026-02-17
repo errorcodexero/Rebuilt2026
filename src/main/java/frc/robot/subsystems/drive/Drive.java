@@ -13,6 +13,7 @@
 
 package frc.robot.subsystems.drive;
 
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -59,6 +60,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
@@ -219,10 +221,8 @@ public class Drive extends SubsystemBase {
             for (var module : modules) {
                 module.stop();
             }
-        }
         
-        // Log empty setpoint states when disabled
-        if (DriverStation.isDisabled()) {
+            // Log empty setpoint states when disabled
             Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
             Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
         }
@@ -471,6 +471,17 @@ public class Drive extends SubsystemBase {
 
     public RobotConfig getPathplannerConfig() {
         return PP_CONFIG;
+    }
+
+    public Trigger whenRobotIsInAllianceZone(Alliance alliance) {
+        return new Trigger(() -> {
+            Pose2d pose = getPose();
+            if (alliance == Alliance.Blue) {
+                return pose.getMeasureX().lt(Inches.of(156.0));
+            } else {
+                return pose.getMeasureX().gt(Inches.of(651.22 - 156.0));
+            }
+        });
     }
     
     /** Returns an array of module translations. */

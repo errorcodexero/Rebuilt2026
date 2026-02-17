@@ -194,21 +194,17 @@ public class Shooter extends SubsystemBase {
      * 
      * 
      */
-    public Command shooterSetpointSupplier(Supplier<Pose2d> pose, Hopper hopper) {
+    public Command shooterSetpointSupplier(Supplier<Translation2d> dist, Hopper hopper) {
         
         return Commands.parallel(
                 defer(() -> {
 
                     // constructing
-                    Translation2d hubTranslation =
-                        DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                        ? ShooterConstants.Positions.blueHubPose
-                        : ShooterConstants.Positions.redHubPose;
 
                     ShooterConstants.Positions.initMap();
         
                     return runDynamicSetpoints(() -> {
-                        Distance distanceToHub = Meters.of(pose.get().getTranslation().getDistance(hubTranslation));
+                        Distance distanceToHub = Meters.of(Math.sqrt(dist.get().getX() * dist.get().getX() + dist.get().getY() * dist.get().getY()));
                         var vel = ShooterConstants.Positions.distMap.get(distanceToHub.baseUnitMagnitude());
 
                         return RotationsPerSecond.of(vel);
@@ -216,7 +212,7 @@ public class Shooter extends SubsystemBase {
 
                     () -> {
                         // periodic
-                        Distance distanceToHub = Meters.of(pose.get().getTranslation().getDistance(hubTranslation));
+                        Distance distanceToHub = Meters.of(Math.sqrt(dist.get().getX() * dist.get().getX() + dist.get().getY() * dist.get().getY()));
 
                         switch(HubDistance.fromDistance(distanceToHub)) {
                             case LOW:

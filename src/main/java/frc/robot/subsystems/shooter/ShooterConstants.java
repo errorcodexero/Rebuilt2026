@@ -25,6 +25,8 @@ public class ShooterConstants {
 
     public static final Distance allowedTrenchDistance = Meters.of(1.0);
 
+    public static final Time hangTimeOnShot = Seconds.of(7/4.5);
+
     public class PID {
             // shooter
             public static final double shooterkP = 0.5; 
