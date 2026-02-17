@@ -39,7 +39,4 @@ public class AutoCommands {
             climb.toggle()
         ); 
     }
-    public static Command StraightLine(Drive drive){
-        return DriveCommands.followPathCommand("Straight Line");
-    }
 }

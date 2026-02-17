@@ -145,8 +145,7 @@ public class RobotContainer {
                     // Add sim drivebase to simulation and where modules can get it.
                     // CALL THIS BEFORE CREATING THE DRIVEBASE!
                     //This one is for 
-                    MapleSimUtil.createSwerve(config, new Pose2d(3.523, 1.888, Rotation2d.fromDegrees(90))); 
-                    //MapleSimUtil.createSwerve(config, new Pose2d(2.837, 6.235, Rotation2d.fromDegrees(-90))); 
+                    MapleSimUtil.createSwerve(config, new Pose2d(2.0, 2.0, Rotation2d.kZero)); 
                     MapleSimUtil.createIntake();
 
                     drivebase_ = new Drive(
@@ -293,7 +292,6 @@ public class RobotContainer {
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
 
         autoChooser_.addDefaultOption("Neutral Zone Climb Auto", AutoCommands.NZClimbAuto(drivebase_, shooter_, intake_, hopper_, climb_, Degrees.zero()));
-        autoChooser_.addOption("Straight Line Auto", AutoCommands.StraightLine(drivebase_));
 
         autoChooser_.onChange(auto -> {
             System.out.println("Auto \"" + auto.getName() + "\" selected!");
