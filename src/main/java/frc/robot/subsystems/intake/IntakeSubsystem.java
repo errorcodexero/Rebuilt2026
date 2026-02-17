@@ -123,6 +123,14 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     /**
+     * Command that stops the rollers, mainly for in automodes
+     * @return
+     */
+    public Command stopIntake(){
+        return runOnce(() -> stopIntaking()).withName("Stop Rollers");
+    }
+
+    /**
      * Command that deploys the intake and ends when it gets there.
      * @return
      */
