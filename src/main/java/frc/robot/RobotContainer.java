@@ -288,8 +288,8 @@ public class RobotContainer {
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
 
         autoChooser_.onChange(auto -> {
-            System.err.println("Auto \"" + auto.getName() + "\" selected!");
-            // This should be used to set up robot position setting, initialization, etc.
+            System.out.println("Auto \"" + auto.getName() + "\" selected!");
+            // Anything you may want to do when the auto is selected.
         });
 
         // Test Bindings
