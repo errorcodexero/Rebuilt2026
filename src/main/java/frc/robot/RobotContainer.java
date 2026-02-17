@@ -17,6 +17,7 @@ import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.ctre.phoenix6.CANBus;
+import com.fasterxml.jackson.core.util.BufferRecycler.Gettable;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -310,6 +311,27 @@ public class RobotContainer {
         configureDriveBindings();
     }
 
+    private Translation2d getTarget(){
+        Translation2d target =
+            DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+            ? ShooterConstants.Positions.blueHubPose
+            : ShooterConstants.Positions.redHubPose;
+        return target;
+    }
+
+    // ONLY USE IN CONFIGURE BINDINGS
+    private Translation2d getVirtualTarget() {
+        Translation2d virtualTarget =
+            getTarget().minus(
+                new Translation2d( 
+                    MetersPerSecond.of(drivebase_.getChassisSpeeds().vxMetersPerSecond).times(ShooterConstants.hangTimeOnShot), 
+                    MetersPerSecond.of(drivebase_.getChassisSpeeds().vyMetersPerSecond).times(ShooterConstants.hangTimeOnShot)
+                    )
+                );
+
+        return virtualTarget;
+    }
+
     // Bind robot actions to commands here.
     private void configureBindings() {
         // Manually deploying and undeploying the intake.
@@ -331,27 +353,16 @@ public class RobotContainer {
         shooter_.setDefaultCommand(shooter_.awaitShooting(drivebase_::getPose));
 
         if(Constants.shootOnMove) {
-            Translation2d target =
-                                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                                ? ShooterConstants.Positions.blueHubPose
-                                : ShooterConstants.Positions.redHubPose;
 
-            Translation2d virtualTarget =
-                                target.plus(
-                                    new Translation2d( 
-                                        MetersPerSecond.of(drivebase_.getChassisSpeeds().vxMetersPerSecond).times(ShooterConstants.hangTimeOnShot), 
-                                        MetersPerSecond.of(drivebase_.getChassisSpeeds().vyMetersPerSecond).times(ShooterConstants.hangTimeOnShot)
-                                        )
-                                    );
             // while in alliance zone, point drivebase at virtual target, but still allow translational driving
             
-            drivebase_.whenRobotIsInAllianceZone(DriverStation.getAlliance().get()).whileTrue(
+            drivebase_.whenRobotIsInAllianceZone(DriverStation.getAlliance().isPresent() ? DriverStation.getAlliance().get() : Alliance.Blue).whileTrue(
                 DriveCommands.joystickDriveAtAngle(
                         drivebase_,
                         () -> gamepad_.getLeftY(),
                         () -> gamepad_.getLeftX(),
                         () -> {
-                            var hubTranslation = virtualTarget.minus(drivebase_.getPose().getTranslation());
+                            var hubTranslation = getVirtualTarget().minus(drivebase_.getPose().getTranslation());
                             var rotation = new Rotation2d(hubTranslation.getX(), hubTranslation.getY());
 
                             return rotation;
@@ -359,39 +370,37 @@ public class RobotContainer {
 
             // While the right trigger is held, we will shoot into the hub.
             // i wish i knew if this shoot command would interrrupt the other aim scommand, so this is kind of a "just in case", but if it is unnesecary it will be removed. 
-            gamepad_.rightTrigger().whileTrue(
+            //CHANGE BACK TO RIGHT TRIGGER!
+            gamepad_.a().whileTrue(
                 Commands.parallel(
                     DriveCommands.joystickDriveAtAngle(
                         drivebase_,
                         () -> gamepad_.getLeftY(),
                         () -> gamepad_.getLeftX(),
                         () -> {
-                            var hubTranslation = virtualTarget.minus(drivebase_.getPose().getTranslation());
+                            var hubTranslation = getVirtualTarget().minus(drivebase_.getPose().getTranslation());
                             var rotation = new Rotation2d(hubTranslation.getX(), hubTranslation.getY());
 
                             return rotation;
                     }),
-                shooter_.shooterSetpointSupplier(() -> virtualTarget.minus(drivebase_.getPose().getTranslation()), hopper_))
+                shooter_.shooterSetpointSupplier(() -> getVirtualTarget().minus(drivebase_.getPose().getTranslation()), hopper_))
             );
 
             
         } else {
 
-            Translation2d target =
-                                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                                ? ShooterConstants.Positions.blueHubPose
-                                : ShooterConstants.Positions.redHubPose;
+            
             // While the right trigger is held, we will shoot into the hub.
             gamepad_.rightTrigger().whileTrue(Commands.parallel(DriveCommands.joystickDriveAtAngle(drivebase_,
                     () -> 0,
                     () -> 0, 
                     () -> {
-                        var hubTranslation = target.minus(drivebase_.getPose().getTranslation());
+                        var hubTranslation = getTarget().minus(drivebase_.getPose().getTranslation());
                         var rotation = new Rotation2d(hubTranslation.getX(), hubTranslation.getY());
 
                         return rotation;
                     }),
-                shooter_.shooterSetpointSupplier(() -> target.minus(drivebase_.getPose().getTranslation()), hopper_)));
+                shooter_.shooterSetpointSupplier(() -> getTarget().minus(drivebase_.getPose().getTranslation()), hopper_)));
 
         }
     }
