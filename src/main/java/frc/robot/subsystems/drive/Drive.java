@@ -62,8 +62,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.Constants.RobotType;
 import frc.robot.generated.BetaTunerConstants;
 import frc.robot.util.LocalADStarAK;
+import frc.robot.util.MapleSimUtil;
 
 public class Drive extends SubsystemBase {
     // These Constants should be the same for every drivebase, so just use the comp bot constants.
@@ -448,6 +450,9 @@ public class Drive extends SubsystemBase {
     /** Resets the current odometry pose. */
     public void setPose(Pose2d pose) {
         poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
+        if (Constants.getRobot() == RobotType.SIMBOT) {
+            MapleSimUtil.setPosition(pose);
+        }
     }
     
     /** Adds a new timestamped vision measurement. */
