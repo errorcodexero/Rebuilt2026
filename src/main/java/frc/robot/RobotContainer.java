@@ -322,7 +322,7 @@ public class RobotContainer {
 
         gamepad_.rightBumper().whileTrue(climber_.initializeClimber());
 
-        gamepad_.leftTrigger().and(gamepad_.rightTrigger()).whileTrue(climber_.climbCommand());
+        gamepad_.leftTrigger().and(gamepad_.rightTrigger()).whileTrue(climber_.climbL3Command());
 
         // When the hopper isnt shooting, set it to run its idle velocity.
         hopper_.setDefaultCommand(hopper_.idleScrambler());

@@ -20,7 +20,8 @@ public class Climber extends SubsystemBase {
     private final Angle deployDeployedAngle = ClimberConstants.AngleSetpoints.deployedAngle;
     private final Angle deployStowedAngle = ClimberConstants.AngleSetpoints.stowedAngle;
     private final Angle twistStartAngle= ClimberConstants.AngleSetpoints.twistStartAngle;
-    private final Angle twistEndAngle= ClimberConstants.AngleSetpoints.twistEndAngle;
+    private final Angle twistL3Angle= ClimberConstants.AngleSetpoints.twistL3Angle;
+    private final Angle twistL1Angle= ClimberConstants.AngleSetpoints.twistL1Angle;
 
      public Climber(ClimberIO io) {
         this.io=io;
@@ -34,7 +35,8 @@ public class Climber extends SubsystemBase {
         Logger.recordOutput("Climber/DeployMotor_DeployedAngleSetpoint", deployDeployedAngle);
         Logger.recordOutput("Climber/DeployMotor_StowedAngleSetpoint", deployStowedAngle);
         Logger.recordOutput("Climber/TwistMotor_StartAngleSetpoint", twistStartAngle);
-        Logger.recordOutput("Climber/TwistMotor_EndAngleSetpoint", twistEndAngle);
+        Logger.recordOutput("Climber/TwistMotor_L3AngleSetpoint", twistL3Angle);
+        Logger.recordOutput("Climber/TwistMotor_L1AngleSetpoint", twistL1Angle);
     }
 
 
@@ -65,8 +67,12 @@ public class Climber extends SubsystemBase {
         setTwistMotorAngle(twistStartAngle);
     }
 
-    public void climb(){
-        setTwistMotorAngle(twistEndAngle);
+    public void climbL3(){
+        setTwistMotorAngle(twistL3Angle);
+    }
+
+    public void climbL1(){
+        setTwistMotorAngle(twistL1Angle);
     }
 
     public boolean isDeployAtAngle(Angle angle) {
@@ -89,8 +95,12 @@ public class Climber extends SubsystemBase {
         return isTwistAtAngle(twistStartAngle);
     }
 
-    public boolean isTwistAtEnd() {
-        return isTwistAtAngle(twistEndAngle);
+    public boolean isTwistAtL3() {
+        return isTwistAtAngle(twistL3Angle);
+    }
+
+    public boolean isTwistAtL1(){ 
+        return isTwistAtAngle(twistL1Angle);
     }
 
 
@@ -148,8 +158,12 @@ public class Climber extends SubsystemBase {
         return Commands.runOnce(this::startTwist);
     }
 
-    public Command startClimb(){
-        return Commands.runOnce(this::climb);
+    public Command startClimbL3(){
+        return Commands.runOnce(this::climbL3);
+    }
+
+    public Command startClimbL1(){
+        return Commands.runOnce(this::climbL1);
     }
 
     public Command initializeClimber(){
@@ -157,9 +171,14 @@ public class Climber extends SubsystemBase {
         .beforeStarting(deployClimber().unless(this::isDeployed)).withName("Initialize and Deploy Climber");
     }
 
-    public Command climbCommand() {
-        return startClimb().andThen(Commands.waitUntil(() -> isTwistAtEnd()))
-        .withTimeout(2).withName("Climb");
+    public Command climbL3Command() {
+        return startClimbL3().andThen(Commands.waitUntil(() -> isTwistAtL3()))
+        .withTimeout(2).withName("Climb L3");
+    }
+
+    public Command climbL1Command() {
+        return startClimbL1().andThen(Commands.waitUntil(() -> isTwistAtL1()))
+        .withTimeout(2).withName("Climb L1");
     }
 
     public Command stopTwistCommand() {

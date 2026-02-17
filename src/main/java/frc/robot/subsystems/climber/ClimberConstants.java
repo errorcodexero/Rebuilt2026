@@ -53,7 +53,8 @@ public class ClimberConstants {
         public static final Angle twistMinAngle= Degrees.of(0.0); //For now
         public static final Angle twistMaxAngle= Degrees.of(360); //For now
         public static final Angle twistStartAngle= Degrees.of(20); //For now
-        public static final Angle twistEndAngle= Degrees.of(340); //For now
+        public static final Angle twistL3Angle= Degrees.of(340); //For now
+        public static final Angle twistL1Angle= Degrees.of(90); //For now
     }
 
     public class CurrentLimits {
