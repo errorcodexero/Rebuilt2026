@@ -326,6 +326,9 @@ public class RobotContainer {
 
         // When the shooter isnt shooting, get it ready to shoot.
         shooter_.setDefaultCommand(shooter_.awaitShooting(drivebase_::getPose));
+
+        //While the A button is held, the intake will run the eject sequence. If it the intake is stowed, it will also deploy it.
+        gamepad_.a().whileTrue(intake_.ejectSequence());
     }
 
     private void configureDriveBindings() {
