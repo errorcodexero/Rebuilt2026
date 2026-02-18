@@ -391,7 +391,7 @@ public class RobotContainer {
 
                             return rotation;
                     }),
-                shooter_.shooterSetpointSupplier(() -> getVirtualTarget().minus(drivebase_.getPose().getTranslation()), hopper_))
+                Commands.sequence(Commands.waitTime(ShooterConstants.dbRotationDelay), shooter_.shooterSetpointSupplier(() -> getVirtualTarget().minus(drivebase_.getPose().getTranslation()), hopper_)))
             );
 
         } else {
