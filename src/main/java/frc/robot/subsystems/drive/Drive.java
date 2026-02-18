@@ -17,6 +17,7 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BiFunction;
@@ -473,14 +474,10 @@ public class Drive extends SubsystemBase {
         return PP_CONFIG;
     }
 
-    public Trigger whenRobotIsInAllianceZone(Alliance alliance) {
+    public Trigger whenRobotIsInAllianceZone() {
         return new Trigger(() -> {
             Pose2d pose = getPose();
-            if (alliance == Alliance.Blue) {
-                return pose.getMeasureX().lt(Inches.of(156.0));
-            } else {
-                return pose.getMeasureX().gt(Inches.of(651.22 - 156.0));
-            }
+            return pose.getMeasureX().lt(Inches.of(156.0)) || pose.getMeasureX().gt(Inches.of(651.22 - 156.0));
         });
     }
     

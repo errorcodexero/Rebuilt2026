@@ -11,6 +11,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import java.util.Arrays;
+import java.util.logging.Logger;
 
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
@@ -29,6 +30,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.Constants.RobotType;
@@ -324,8 +326,8 @@ public class RobotContainer {
         Translation2d virtualTarget =
             getTarget().minus(
                 new Translation2d( 
-                    MetersPerSecond.of(drivebase_.getChassisSpeeds().vxMetersPerSecond).times(ShooterConstants.hangTimeOnShot), 
-                    MetersPerSecond.of(drivebase_.getChassisSpeeds().vyMetersPerSecond).times(ShooterConstants.hangTimeOnShot)
+                    MetersPerSecond.of(drivebase_.getFieldChassisSpeeds().vxMetersPerSecond).times(ShooterConstants.hangTimeOnShot), 
+                    MetersPerSecond.of(drivebase_.getFieldChassisSpeeds().vyMetersPerSecond).times(ShooterConstants.hangTimeOnShot)
                     )
                 );
 
@@ -356,27 +358,33 @@ public class RobotContainer {
 
             // while in alliance zone, point drivebase at virtual target, but still allow translational driving
             
-            drivebase_.whenRobotIsInAllianceZone(DriverStation.getAlliance().isPresent() ? DriverStation.getAlliance().get() : Alliance.Blue).whileTrue(
-                DriveCommands.joystickDriveAtAngle(
+            new Trigger(() -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? drivebase_.getPose().getMeasureX().lt(Inches.of(156.0)) : drivebase_.getPose().getMeasureX().gt(Inches.of(651.22 - 156.0))).whileTrue(
+                Commands.parallel(
+                    DriveCommands.joystickDriveAtAngle(
                         drivebase_,
-                        () -> gamepad_.getLeftY(),
-                        () -> gamepad_.getLeftX(),
+                        () -> -gamepad_.getLeftY(),
+                        () -> -gamepad_.getLeftX(),
                         () -> {
                             var hubTranslation = getVirtualTarget().minus(drivebase_.getPose().getTranslation());
                             var rotation = new Rotation2d(hubTranslation.getX(), hubTranslation.getY());
 
                             return rotation;
-                    }));
+                    }), 
+                    Commands.run(() -> {
+                        org.littletonrobotics.junction.Logger.recordOutput("Shooter/Target", getVirtualTarget());
+                    })
+                )
+            );
 
             // While the right trigger is held, we will shoot into the hub.
-            // i wish i knew if this shoot command would interrrupt the other aim scommand, so this is kind of a "just in case", but if it is unnesecary it will be removed. 
+            // i wish i knew if this shoot command would interrrupt the other aim command, so this is kind of a "just in case", but if it is unnesecary it will be removed. 
             //CHANGE BACK TO RIGHT TRIGGER!
             gamepad_.a().whileTrue(
                 Commands.parallel(
                     DriveCommands.joystickDriveAtAngle(
                         drivebase_,
-                        () -> gamepad_.getLeftY(),
-                        () -> gamepad_.getLeftX(),
+                        () -> -gamepad_.getLeftY(),
+                        () -> -gamepad_.getLeftX(),
                         () -> {
                             var hubTranslation = getVirtualTarget().minus(drivebase_.getPose().getTranslation());
                             var rotation = new Rotation2d(hubTranslation.getX(), hubTranslation.getY());
@@ -386,12 +394,11 @@ public class RobotContainer {
                 shooter_.shooterSetpointSupplier(() -> getVirtualTarget().minus(drivebase_.getPose().getTranslation()), hopper_))
             );
 
-            
         } else {
 
             
             // While the right trigger is held, we will shoot into the hub.
-            gamepad_.rightTrigger().whileTrue(Commands.parallel(DriveCommands.joystickDriveAtAngle(drivebase_,
+            gamepad_.a().whileTrue(Commands.parallel(DriveCommands.joystickDriveAtAngle(drivebase_,
                     () -> 0,
                     () -> 0, 
                     () -> {
@@ -403,6 +410,7 @@ public class RobotContainer {
                 shooter_.shooterSetpointSupplier(() -> getTarget().minus(drivebase_.getPose().getTranslation()), hopper_)));
 
         }
+
     }
 
     private void configureDriveBindings() {
