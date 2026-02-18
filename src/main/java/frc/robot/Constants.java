@@ -36,10 +36,12 @@ public final class Constants {
     // Sets the currently running robot. Change to SIMBOT when running the
     // desktop physics simulation so AdvantageKit runs in SIM mode instead of
     // falling back to REPLAY.
-    private static final RobotType robotType = RobotType.SIMBOT;
+    private static final RobotType robotType = RobotType.COMPETITION;
 
     public static final boolean spawnLessFuelInSim = true;
-    public static final boolean shootOnMove = true; 
+    public static final boolean shootOnMove = false; // if true, we will allow the driver to shoot while moving, but with reduced max speed. if false, we will not allow the driver to shoot while moving.
+    public static final double shootOnMoveMaxSpeed = 1.0/3.0;
+    public static final double aimOnMoveMaxSpeed = 2.0/3.0;
 
     public static class DriveConstants {
         public static final double slowModeJoystickMultiplier = 0.4;

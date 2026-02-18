@@ -362,8 +362,8 @@ public class RobotContainer {
                 Commands.parallel(
                     DriveCommands.joystickDriveAtAngle(
                         drivebase_,
-                        () -> -gamepad_.getLeftY(),
-                        () -> -gamepad_.getLeftX(),
+                        () -> -gamepad_.getLeftY() * Constants.aimOnMoveMaxSpeed,
+                        () -> -gamepad_.getLeftX() * Constants.aimOnMoveMaxSpeed,
                         () -> {
                             var hubTranslation = getVirtualTarget().minus(drivebase_.getPose().getTranslation());
                             var rotation = new Rotation2d(hubTranslation.getX(), hubTranslation.getY());
@@ -379,12 +379,12 @@ public class RobotContainer {
             // While the right trigger is held, we will shoot into the hub.
             // i wish i knew if this shoot command would interrrupt the other aim command, so this is kind of a "just in case", but if it is unnesecary it will be removed. 
             //CHANGE BACK TO RIGHT TRIGGER!
-            gamepad_.a().whileTrue(
+            gamepad_.rightTrigger().whileTrue(
                 Commands.parallel(
                     DriveCommands.joystickDriveAtAngle(
                         drivebase_,
-                        () -> -gamepad_.getLeftY(),
-                        () -> -gamepad_.getLeftX(),
+                        () -> -gamepad_.getLeftY() * Constants.shootOnMoveMaxSpeed,
+                        () -> -gamepad_.getLeftX() * Constants.shootOnMoveMaxSpeed,
                         () -> {
                             var hubTranslation = getVirtualTarget().minus(drivebase_.getPose().getTranslation());
                             var rotation = new Rotation2d(hubTranslation.getX(), hubTranslation.getY());
@@ -398,7 +398,7 @@ public class RobotContainer {
 
             
             // While the right trigger is held, we will shoot into the hub.
-            gamepad_.a().whileTrue(Commands.parallel(DriveCommands.joystickDriveAtAngle(drivebase_,
+            gamepad_.rightTrigger().whileTrue(Commands.parallel(DriveCommands.joystickDriveAtAngle(drivebase_,
                     () -> 0,
                     () -> 0, 
                     () -> {
