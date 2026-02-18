@@ -295,8 +295,8 @@ public class RobotContainer {
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
 
         autoChooser_.onChange(auto -> {
-            System.err.println("Auto \"" + auto.getName() + "\" selected!");
-            // This should be used to set up robot position setting, initialization, etc.
+            System.out.println("Auto \"" + auto.getName() + "\" selected!");
+            // Anything you may want to do when the auto is selected.
         });
 
         // Test Bindings
@@ -410,6 +410,9 @@ public class RobotContainer {
                 shooter_.shooterSetpointSupplier(() -> getTarget().minus(drivebase_.getPose().getTranslation()), hopper_)));
 
         }
+
+        //While the A button is held, the intake will run the eject sequence. If it the intake is stowed, it will also deploy it.
+        gamepad_.a().whileTrue(intake_.ejectSequence());
 
     }
 
