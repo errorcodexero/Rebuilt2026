@@ -18,7 +18,6 @@ import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.ctre.phoenix6.CANBus;
-import com.fasterxml.jackson.core.util.BufferRecycler.Gettable;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -314,24 +313,19 @@ public class RobotContainer {
     }
 
     private Translation2d getTarget(){
-        Translation2d target =
-            DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+        return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
             ? ShooterConstants.Positions.blueHubPose
             : ShooterConstants.Positions.redHubPose;
-        return target;
     }
 
     // ONLY USE IN CONFIGURE BINDINGS
     private Translation2d getVirtualTarget() {
-        Translation2d virtualTarget =
-            getTarget().minus(
+        return getTarget().minus(
                 new Translation2d( 
                     MetersPerSecond.of(drivebase_.getFieldChassisSpeeds().vxMetersPerSecond).times(ShooterConstants.hangTimeOnShot), 
                     MetersPerSecond.of(drivebase_.getFieldChassisSpeeds().vyMetersPerSecond).times(ShooterConstants.hangTimeOnShot)
                     )
                 );
-
-        return virtualTarget;
     }
 
     // Bind robot actions to commands here.
@@ -377,6 +371,8 @@ public class RobotContainer {
         // While the right trigger is held, we will shoot into the hub.
         // i wish i knew if this shoot command would interrrupt the other aim command, so this is kind of a "just in case", but if it is unnesecary it will be removed. 
         //CHANGE BACK TO RIGHT TRIGGER!
+        // we might want to limit the acceleration on this while shooting, but idk how to do that and hopefully it wont matter too much. 
+        // just realized we could interrupt this with POV driving, but we would still be shooting, so we might want to create a block for that, but this too probably wont come up that much and i think i am not that numb-skulled to actually do this so idk
         gamepad_.rightTrigger().whileTrue(
             Commands.parallel(
                 DriveCommands.joystickDriveAtAngle(
@@ -389,7 +385,11 @@ public class RobotContainer {
 
                         return rotation;
                 }),
-            Commands.sequence(Commands.waitTime(ShooterConstants.dbRotationDelay), shooter_.shooterSetpointSupplier(() -> getVirtualTarget().minus(drivebase_.getPose().getTranslation()), hopper_)))
+                Commands.sequence(
+                    Commands.waitTime(ShooterConstants.dbRotationDelay), 
+                    shooter_.shooterSetpointSupplier(() -> getVirtualTarget().minus(drivebase_.getPose().getTranslation()), hopper_)
+                )
+            )
         );
 
         //While the A button is held, the intake will run the eject sequence. If it the intake is stowed, it will also deploy it.
