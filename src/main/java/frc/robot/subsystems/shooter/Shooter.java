@@ -135,7 +135,7 @@ public class Shooter extends SubsystemBase {
      * or lowering the hood under the trench.
      * @return A command that does so.
      */
-    public Command awaitShooting(Supplier<Pose2d> robotPose) {
+    public Command awaitShooting(Supplier<Pose2d> robotPose, Supplier<Translation2d> targetPose) {
         return runDynamicSetpoints(() -> RadiansPerSecond.zero(), () -> {
             Pose2d pose = robotPose.get();
             Pose2d nearestTrench = pose.nearest(FieldConstants.trenches);
@@ -145,10 +145,7 @@ public class Shooter extends SubsystemBase {
                 return Degrees.zero();
             }
 
-            Translation2d hubTranslation =
-                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                ? ShooterConstants.Positions.blueHubPose
-                : ShooterConstants.Positions.redHubPose;
+            Translation2d hubTranslation = targetPose.get(); 
 
             Distance distanceToHub = Meters.of(pose.getTranslation().getDistance(hubTranslation));
 

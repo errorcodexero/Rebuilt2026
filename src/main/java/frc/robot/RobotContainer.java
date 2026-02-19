@@ -11,6 +11,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import java.util.Arrays;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 import org.ironmaple.simulation.drivesims.COTS;
@@ -346,7 +347,7 @@ public class RobotContainer {
         hopper_.setDefaultCommand(hopper_.idleScrambler());
 
         // When the shooter isnt shooting, get it ready to shoot.
-        shooter_.setDefaultCommand(shooter_.awaitShooting(drivebase_::getPose));
+        shooter_.setDefaultCommand(shooter_.awaitShooting(drivebase_::getPose, this::getVirtualTarget));
         // while in alliance zone, point drivebase at virtual target, but still allow translational driving
         //lowkey we are not gonna need this but like maybe so idk imma just keep it
 
