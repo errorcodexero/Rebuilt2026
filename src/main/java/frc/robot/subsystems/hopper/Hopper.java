@@ -123,6 +123,9 @@ public class Hopper extends SubsystemBase {
      * Runs the scrambler at its active speed, and the feeder.
      * @return
      */
+
+    // idk how to do this but like we should run the feeder motor backwards for about 0.5 secs to get arid of the balls stuck in there after we stop shooting
+    // theoretically this would improve consistency
     public Command forwardFeed() {
         return feed(HopperConstants.scramblerActiveVelocity, HopperConstants.feedingVelocity);
     }

@@ -353,63 +353,44 @@ public class RobotContainer {
 
         // When the shooter isnt shooting, get it ready to shoot.
         shooter_.setDefaultCommand(shooter_.awaitShooting(drivebase_::getPose));
+        // while in alliance zone, point drivebase at virtual target, but still allow translational driving
+        //lowkey we are not gonna need this but like maybe so idk imma just keep it
 
-        if(Constants.shootOnMove) {
+        // new Trigger(() -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? drivebase_.getPose().getMeasureX().lt(Inches.of(156.0)) : drivebase_.getPose().getMeasureX().gt(Inches.of(651.22 - 156.0))).whileTrue(
+        //     Commands.parallel(
+        //         DriveCommands.joystickDriveAtAngle(
+        //             drivebase_,
+        //             () -> -gamepad_.getLeftY() * Constants.aimOnMoveMaxSpeed,
+        //             () -> -gamepad_.getLeftX() * Constants.aimOnMoveMaxSpeed,
+        //             () -> {
+        //                 var hubTranslation = getVirtualTarget().minus(drivebase_.getPose().getTranslation());
+        //                 var rotation = new Rotation2d(hubTranslation.getX(), hubTranslation.getY());
 
-            // while in alliance zone, point drivebase at virtual target, but still allow translational driving
-            
-            // new Trigger(() -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? drivebase_.getPose().getMeasureX().lt(Inches.of(156.0)) : drivebase_.getPose().getMeasureX().gt(Inches.of(651.22 - 156.0))).whileTrue(
-            //     Commands.parallel(
-            //         DriveCommands.joystickDriveAtAngle(
-            //             drivebase_,
-            //             () -> -gamepad_.getLeftY() * Constants.aimOnMoveMaxSpeed,
-            //             () -> -gamepad_.getLeftX() * Constants.aimOnMoveMaxSpeed,
-            //             () -> {
-            //                 var hubTranslation = getVirtualTarget().minus(drivebase_.getPose().getTranslation());
-            //                 var rotation = new Rotation2d(hubTranslation.getX(), hubTranslation.getY());
+        //                 return rotation;
+        //         }), 
+        //         Commands.run(() -> {
+        //             org.littletonrobotics.junction.Logger.recordOutput("Shooter/Target", getVirtualTarget());
+        //         })
+        //     )
+        // );
 
-            //                 return rotation;
-            //         }), 
-            //         Commands.run(() -> {
-            //             org.littletonrobotics.junction.Logger.recordOutput("Shooter/Target", getVirtualTarget());
-            //         })
-            //     )
-            // );
-
-            // While the right trigger is held, we will shoot into the hub.
-            // i wish i knew if this shoot command would interrrupt the other aim command, so this is kind of a "just in case", but if it is unnesecary it will be removed. 
-            //CHANGE BACK TO RIGHT TRIGGER!
-            gamepad_.rightTrigger().whileTrue(
-                Commands.parallel(
-                    DriveCommands.joystickDriveAtAngle(
-                        drivebase_,
-                        () -> -gamepad_.getLeftY() * Constants.shootOnMoveMaxSpeed,
-                        () -> -gamepad_.getLeftX() * Constants.shootOnMoveMaxSpeed,
-                        () -> {
-                            var hubTranslation = getVirtualTarget().minus(drivebase_.getPose().getTranslation());
-                            var rotation = new Rotation2d(hubTranslation.getX(), hubTranslation.getY());
-
-                            return rotation;
-                    }),
-                Commands.sequence(Commands.waitTime(ShooterConstants.dbRotationDelay), shooter_.shooterSetpointSupplier(() -> getVirtualTarget().minus(drivebase_.getPose().getTranslation()), hopper_)))
-            );
-
-        } else {
-
-            
-            // While the right trigger is held, we will shoot into the hub.
-            gamepad_.rightTrigger().whileTrue(Commands.parallel(DriveCommands.joystickDriveAtAngle(drivebase_,
-                    () -> 0,
-                    () -> 0, 
+        // While the right trigger is held, we will shoot into the hub.
+        // i wish i knew if this shoot command would interrrupt the other aim command, so this is kind of a "just in case", but if it is unnesecary it will be removed. 
+        //CHANGE BACK TO RIGHT TRIGGER!
+        gamepad_.rightTrigger().whileTrue(
+            Commands.parallel(
+                DriveCommands.joystickDriveAtAngle(
+                    drivebase_,
+                    () -> -gamepad_.getLeftY() * Constants.shootOnMoveMaxSpeed,
+                    () -> -gamepad_.getLeftX() * Constants.shootOnMoveMaxSpeed,
                     () -> {
-                        var hubTranslation = getTarget().minus(drivebase_.getPose().getTranslation());
+                        var hubTranslation = getVirtualTarget().minus(drivebase_.getPose().getTranslation());
                         var rotation = new Rotation2d(hubTranslation.getX(), hubTranslation.getY());
 
                         return rotation;
-                    }),
-                shooter_.shooterSetpointSupplier(() -> getTarget().minus(drivebase_.getPose().getTranslation()), hopper_)));
-
-        }
+                }),
+            Commands.sequence(Commands.waitTime(ShooterConstants.dbRotationDelay), shooter_.shooterSetpointSupplier(() -> getVirtualTarget().minus(drivebase_.getPose().getTranslation()), hopper_)))
+        );
 
         //While the A button is held, the intake will run the eject sequence. If it the intake is stowed, it will also deploy it.
         gamepad_.a().whileTrue(intake_.ejectSequence());
