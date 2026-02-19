@@ -62,13 +62,15 @@ public class ShooterConstants {
         }
 
         public class SoftwareLimits {
-            public static final double hoodMaxAngle = 0.0;
+            public static final double hoodMaxAngle = Positions.hoodHIGH;
             public static final double hoodMinAngle = 0.0;
         }
 
         public class Positions {
             public static final Translation2d blueHubPose = new Translation2d(4.5974,4.034536);
             public static final Translation2d redHubPose = new Translation2d(11.938,4.034536);
+
+            //why are these not all Distances/Angles?
 
             // Hood Setpoints
             public static final double hoodLOW = 0;
@@ -87,6 +89,9 @@ public class ShooterConstants {
             public static final double dist7 = 7;
             public static final double dist8 = 8;
             public static final double dist9 = 9;
+
+            public static final double distLowMid = 3.5;
+            public static final double distMidHigh = 6.5;
 
             // Tested Velocities
             public static final double low1 = 10;
@@ -116,9 +121,9 @@ public class ShooterConstants {
             }
         
             public enum HubDistance {
-                LOW(Meters.of(2)), // 0-2 m
-                MEDIUM(Meters.of(3)), //  in
-                HIGH(Meters.of(4)); // 96+ in
+                LOW(Meters.of(Positions.distLowMid)), // 0-2 m
+                MEDIUM(Meters.of(Positions.distMidHigh)), //  in
+                HIGH(Meters.of(Positions.distMidHigh)); // 96+ in
 
                 private final Distance maxDistance;
 
