@@ -40,7 +40,7 @@ public class ClimberIOSim extends ClimberIOTalonFX {
 
         deployMotorSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
 
-        deployMotorSim.setInputVoltage(RobotController.getBatteryVoltage());
+        deployMotorSim.setInputVoltage(deployMotorSimState.getMotorVoltage());
         deployMotorSim.update(Robot.defaultPeriodSecs);
 
         deployMotorSimState.setRawRotorPosition(deployMotorSim.getAngularPosition().times(ClimberConstants.GearRatios.deployGearRatio));
@@ -48,7 +48,7 @@ public class ClimberIOSim extends ClimberIOTalonFX {
 
         twistMotorSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
 
-        twistMotorSim.setInputVoltage(RobotController.getBatteryVoltage());
+        twistMotorSim.setInputVoltage(twistMotorSimState.getMotorVoltage());
         twistMotorSim.update(Robot.defaultPeriodSecs);
         
         twistMotorSimState.setRawRotorPosition(twistMotorSim.getAngularPosition().times(ClimberConstants.GearRatios.twistGearRatio));
