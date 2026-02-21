@@ -473,13 +473,6 @@ public class Drive extends SubsystemBase {
     public RobotConfig getPathplannerConfig() {
         return PP_CONFIG;
     }
-
-    public Trigger whenRobotIsInAllianceZone() {
-        return new Trigger(() -> {
-            Pose2d pose = getPose();
-            return pose.getMeasureX().lt(Inches.of(156.0)) || pose.getMeasureX().gt(Inches.of(651.22 - 156.0));
-        });
-    }
     
     /** Returns an array of module translations. */
     public Translation2d[] getModuleTranslations() {

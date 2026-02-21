@@ -351,24 +351,6 @@ public class RobotContainer {
         // while in alliance zone, point drivebase at virtual target, but still allow translational driving
         //lowkey we are not gonna need this but like maybe so idk imma just keep it
 
-        // new Trigger(() -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? drivebase_.getPose().getMeasureX().lt(Inches.of(156.0)) : drivebase_.getPose().getMeasureX().gt(Inches.of(651.22 - 156.0))).whileTrue(
-        //     Commands.parallel(
-        //         DriveCommands.joystickDriveAtAngle(
-        //             drivebase_,
-        //             () -> -gamepad_.getLeftY() * Constants.aimOnMoveMaxSpeed,
-        //             () -> -gamepad_.getLeftX() * Constants.aimOnMoveMaxSpeed,
-        //             () -> {
-        //                 var hubTranslation = getVirtualTarget().minus(drivebase_.getPose().getTranslation());
-        //                 var rotation = new Rotation2d(hubTranslation.getX(), hubTranslation.getY());
-
-        //                 return rotation;
-        //         }), 
-        //         Commands.run(() -> {
-        //             org.littletonrobotics.junction.Logger.recordOutput("Shooter/Target", getVirtualTarget());
-        //         })
-        //     )
-        // );
-
         // While the right trigger is held, we will shoot into the hub.
         // i wish i knew if this shoot command would interrrupt the other aim command, so this is kind of a "just in case", but if it is unnesecary it will be removed. 
         //CHANGE BACK TO RIGHT TRIGGER!
