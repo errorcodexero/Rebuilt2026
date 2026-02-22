@@ -18,18 +18,26 @@ public class AutoCommands {
                 intake.deployCmd()
             ),
             Commands.runOnce(()-> System.err.println("DRIVE POSE AFTER RESET:" + drive.getPose())),
-            DriveCommands.followPathCommand("Collect")
-                .deadlineFor(
-                    intake.intakeSequence()
-            ), 
+
+            DriveCommands.followPathCommand("Collect").deadlineFor(intake.runIntakeCmd()),
+
             DriveCommands.followPathCommand("GoToShoot"),
 
             shooter.shootCmd(hopper).withTimeout(2.5),
 
             shooter.stopCmd(),
 
+            DriveCommands.followPathCommand("GoToOutpost"), 
+
+            Commands.waitSeconds(2),
+
+            DriveCommands.followPathCommand("OutpostToShoot"),
+
+            shooter.shootCmd(hopper).withTimeout(2),
+
+            shooter.stopCmd(),
+
             DriveCommands.followPathCommand("ShootToClimb")
         );
     }
-    
 }
