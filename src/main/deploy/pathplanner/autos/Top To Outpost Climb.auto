@@ -7,19 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "GoToCollectDepot"
+            "pathName": "TopToBottom Trench"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "GoToShoot"
+            "pathName": "BottomTrenchToOutpost"
           }
         },
         {
-          "type": "wait",
+          "type": "path",
           "data": {
-            "waitTime": 4.0
+            "pathName": "OutpostToShoot"
           }
         },
         {

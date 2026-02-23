@@ -16,12 +16,12 @@ public class ShooterIOSim extends ShooterIOTalonFX {
             DCMotor.getKrakenX60Foc(3), 0.0001, 1.0 / ShooterConstants.gearRatio
         ),
         DCMotor.getKrakenX60Foc(3)
-    );
+     );
 
     public ShooterIOSim() {
         super(new CANBus());
     }
-
+ 
     @Override
     public void updateInputs(ShooterIOInputs inputs) {
         TalonFXSimState[] motorStates = {

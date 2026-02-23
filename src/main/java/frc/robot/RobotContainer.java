@@ -29,6 +29,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.Constants.RobotType;
 import frc.robot.commands.drive.DriveCommands;
+import frc.robot.commands.drive.auto.AutoCommands;
 import frc.robot.generated.AlphaTunerConstants;
 import frc.robot.generated.BetaTunerConstants;
 import frc.robot.generated.CompTunerConstants;
@@ -53,8 +54,8 @@ import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterIOSim;
 import frc.robot.subsystems.shooter.ShooterIOTalonFX;
 import frc.robot.subsystems.thriftyclimb.ThriftyClimb;
-import frc.robot.subsystems.thriftyclimb.ThriftyClimbIO;
 import frc.robot.subsystems.thriftyclimb.ThriftyClimbIOSim;
+import frc.robot.subsystems.thriftyclimb.ThriftyClimbIO;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIO;
 import frc.robot.subsystems.vision.CameraIOPhotonSim;
@@ -141,7 +142,7 @@ public class RobotContainer {
 
                     // Add sim drivebase to simulation and where modules can get it.
                     // CALL THIS BEFORE CREATING THE DRIVEBASE!
-                    MapleSimUtil.createSwerve(config, new Pose2d(2.0, 2.0, Rotation2d.kZero));
+                    MapleSimUtil.createSwerve(config, new Pose2d(3.564, 5.668, Rotation2d.fromDegrees(142.647)));
                     MapleSimUtil.createIntake();
 
                     drivebase_ = new Drive(
@@ -278,7 +279,7 @@ public class RobotContainer {
         // Initialize the visualizers.
         Mechanism3d.measured.zero();
         Mechanism3d.setpoints.zero();
-
+ 
         // Maple Sim
         if (Constants.getRobot() == RobotType.SIMBOT) {
             MapleSimUtil.start();
@@ -286,13 +287,12 @@ public class RobotContainer {
 
         // AutoModes
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
-
+    
+        autoChooser_.addDefaultOption( "Depot, Shoot, Climb", AutoCommands.DepotShootClimbAuto(drivebase_, intake_, hopper_, shooter_, climb_, true));
         autoChooser_.onChange(auto -> {
             System.out.println("Auto \"" + auto.getName() + "\" selected!");
             // Anything you may want to do when the auto is selected.
         });
-
-        // Test Bindings
         testBindings_ = new LoggedDashboardChooser<>("Test Mode Choices");
 
         testBindings_.addDefaultOption("Swerve Wheel Radius", DriveCommands.wheelRadiusCharacterization(drivebase_));

@@ -593,16 +593,20 @@ public class DriveCommands {
       if (initPosePath.getStartingHolonomicPose().isEmpty()) {
         return Commands.none();
       }
+        Pose2d startPose= initPosePath.getStartingHolonomicPose().orElseThrow();
 
       var startingPose = initPosePath.getStartingHolonomicPose().orElseThrow();
 
       return Commands.sequence(
+        Commands.runOnce(()->System.err.println("AUTO START POSE: " + startPose)),
           setPoseCommand(
               drive,
               startingPose,
               false
+          ).alongWith(
+            Commands.runOnce(() -> MapleSimUtil.placeRobotOnField(startingPose))
+              .onlyIf(() -> Constants.getMode() == Mode.SIM)
           ),
-          Commands.runOnce(() -> MapleSimUtil.placeRobotOnField(startingPose)),
           AutoBuilder.followPath(path.get()));
     }
 
