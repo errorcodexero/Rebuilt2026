@@ -62,6 +62,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.util.MapleSimUtil;
 
 public class DriveCommands {
   private static final double kStoppedVelocity = 0.15 ;
@@ -594,15 +595,19 @@ public class DriveCommands {
       }
         Pose2d startPose= initPosePath.getStartingHolonomicPose().orElseThrow();
 
+      var startingPose = initPosePath.getStartingHolonomicPose().orElseThrow();
+
       return Commands.sequence(
         Commands.runOnce(()->System.err.println("AUTO START POSE: " + startPose)),
           setPoseCommand(
               drive,
-              startPose, false),
-          Commands.runOnce(() -> System.err.println("DRIVE POSE AFTER RESET: " + drive.getPose())),
-          AutoBuilder.followPath(initPosePath)
-          );
-      
+              startingPose,
+              false
+          ).alongWith(
+            Commands.runOnce(() -> MapleSimUtil.placeRobotOnField(startingPose))
+              .onlyIf(() -> Constants.getMode() == Mode.SIM)
+          ),
+          AutoBuilder.followPath(path.get()));
     }
 
     return Commands.none();

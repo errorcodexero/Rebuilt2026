@@ -290,10 +290,8 @@ public class RobotContainer {
     
         autoChooser_.addDefaultOption( "Depot, Shoot, Climb", AutoCommands.DepotShootClimbAuto(drivebase_, intake_, hopper_, shooter_, climb_, true));
         autoChooser_.onChange(auto -> {
-            
-            System.err.println("Auto \"" + auto.getName() + "\" selected!");
-            drivebase_.setPose(new Pose2d(3.564, 5.668, Rotation2d.fromDegrees(-90.0)));
-            // This should be used to sbet up robot position setting, initialization, etc.
+            System.out.println("Auto \"" + auto.getName() + "\" selected!");
+            // Anything you may want to do when the auto is selected.
         });
         testBindings_ = new LoggedDashboardChooser<>("Test Mode Choices");
 
@@ -328,6 +326,9 @@ public class RobotContainer {
 
         // When the shooter isnt shooting, get it ready to shoot.
         shooter_.setDefaultCommand(shooter_.awaitShooting(drivebase_::getPose));
+
+        //While the A button is held, the intake will run the eject sequence. If it the intake is stowed, it will also deploy it.
+        gamepad_.a().whileTrue(intake_.ejectSequence());
     }
 
     private void configureDriveBindings() {
