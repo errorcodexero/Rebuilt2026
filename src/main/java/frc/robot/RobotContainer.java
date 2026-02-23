@@ -288,12 +288,13 @@ public class RobotContainer {
         // AutoModes
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
     
-        autoChooser_.addDefaultOption( "Depot, Shoot, Climb", AutoCommands.DepotShootClimbAuto(drivebase_, intake_, hopper_, shooter_, climb_, true));
-
+        //autoChooser_.addDefaultOption( "Depot, Shoot, Climb", AutoCommands.DepotShootClimbAuto(drivebase_, intake_, hopper_, shooter_, climb_, true));
+        autoChooser_.addDefaultOption("TopToBottom Trench, Shoot, Outpost, Shoot, Climb", AutoCommands.TopToOutpostClimbAuto(drivebase_, intake_, hopper_, shooter_, climb_, true));
         autoChooser_.onChange(auto -> {
             
             System.err.println("Auto \"" + auto.getName() + "\" selected!");
-            drivebase_.setPose(new Pose2d(3.564, 5.668, Rotation2d.fromDegrees(-90.0)));
+            //drivebase_.setPose(new Pose2d(3.564, 5.668, Rotation2d.fromDegrees(-90.0)));
+            drivebase_.setPose(new Pose2d(4.511, 7.401, Rotation2d.fromDegrees(-90.0)));
             // This should be used to sbet up robot position setting, initialization, etc.
         });
         testBindings_ = new LoggedDashboardChooser<>("Test Mode Choices");

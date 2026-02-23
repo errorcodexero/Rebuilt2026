@@ -7,13 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "GoToDepot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": null
+            "pathName": "GoToCollectDepot"
           }
         },
         {

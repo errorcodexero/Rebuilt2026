@@ -13,13 +13,8 @@ public class AutoCommands {
     public static Command DepotShootClimbAuto(Drive drive, IntakeSubsystem intake, Hopper hopper, Shooter shooter, ThriftyClimb climber, boolean fieldside){
         return Commands.sequence(
             Commands.runOnce(() -> drive.resetGyroCmd()),
-            Commands.parallel(
-                DriveCommands.initialFollowPathCommand(drive,"GoToDepot"),
-                intake.deployCmd()
-            ),
-            Commands.runOnce(()-> System.err.println("DRIVE POSE AFTER RESET:" + drive.getPose())),
 
-            DriveCommands.followPathCommand("Collect").deadlineFor(intake.runIntakeCmd()),
+            DriveCommands.followPathCommand("GoToCollectDepot").deadlineFor(intake.intakeSequence()),
 
             DriveCommands.followPathCommand("GoToShoot"),
 
