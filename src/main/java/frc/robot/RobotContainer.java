@@ -11,8 +11,6 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import java.util.Arrays;
-import java.util.function.Supplier;
-import java.util.logging.Logger;
 
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
@@ -22,15 +20,11 @@ import com.ctre.phoenix6.CANBus;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.Constants.RobotType;
@@ -313,21 +307,8 @@ public class RobotContainer {
         configureDriveBindings();
     }
 
-    private Translation2d getTarget(){
-        return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-            ? ShooterConstants.Positions.blueHubPose
-            : ShooterConstants.Positions.redHubPose;
-    }
-
     // ONLY USE IN CONFIGURE BINDINGS
-    private Translation2d getVirtualTarget() {
-        return getTarget().minus(
-                new Translation2d( 
-                    MetersPerSecond.of(drivebase_.getFieldChassisSpeeds().vxMetersPerSecond).times(ShooterConstants.hangTimeOnShot), 
-                    MetersPerSecond.of(drivebase_.getFieldChassisSpeeds().vyMetersPerSecond).times(ShooterConstants.hangTimeOnShot)
-                    )
-                );
-    }
+    
 
     // Bind robot actions to commands here.
     private void configureBindings() {
@@ -347,7 +328,7 @@ public class RobotContainer {
         hopper_.setDefaultCommand(hopper_.idleScrambler());
 
         // When the shooter isnt shooting, get it ready to shoot.
-        shooter_.setDefaultCommand(shooter_.awaitShooting(drivebase_::getPose, this::getVirtualTarget));
+        shooter_.setDefaultCommand(shooter_.awaitShooting(drivebase_::getPose, drivebase_::getVirtualTarget));
         // while in alliance zone, point drivebase at virtual target, but still allow translational driving
         //lowkey we are not gonna need this but like maybe so idk imma just keep it
 
@@ -358,21 +339,12 @@ public class RobotContainer {
         // just realized we could interrupt this with POV driving, but we would still be shooting, so we might want to create a block for that, but this too probably wont come up that much and i think i am not that numb-skulled to actually do this so idk
         gamepad_.rightTrigger().whileTrue(
             Commands.parallel(
-                DriveCommands.joystickDriveAtAngle(
-                    drivebase_,
-                    () -> -gamepad_.getLeftY() * Constants.shootOnMoveMaxSpeed,
-                    () -> -gamepad_.getLeftX() * Constants.shootOnMoveMaxSpeed,
-                    () -> {
-                        var hubTranslation = getVirtualTarget().minus(drivebase_.getPose().getTranslation());
-                        var rotation = new Rotation2d(hubTranslation.getX(), hubTranslation.getY());
-
-                        return rotation;
-                }),
+                DriveCommands.pointAtShootingTarget(drivebase_, gamepad_, true),
                 Commands.sequence(
                     Commands.waitTime(ShooterConstants.dbRotationDelay), 
-                    shooter_.shooterSetpointSupplier(() -> getVirtualTarget().minus(drivebase_.getPose().getTranslation()), hopper_)
+                    shooter_.shooterSetpointSupplier(() -> drivebase_.getVirtualTarget().minus(drivebase_.getPose().getTranslation()), hopper_)
                 )
-            )
+            )   
         );
 
         //While the A button is held, the intake will run the eject sequence. If it the intake is stowed, it will also deploy it.

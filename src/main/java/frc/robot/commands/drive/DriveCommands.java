@@ -58,6 +58,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Mode;
@@ -237,6 +238,20 @@ public class DriveCommands {
 
         // Reset PID controller when command starts
         .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
+  }
+  
+  public static Command pointAtShootingTarget(Drive drive, CommandXboxController gamepad, boolean shootOnMove){
+    var shootOnMoveSpeed = shootOnMove ? Constants.shootOnMoveMaxSpeed : 0.0 ;
+    return joystickDriveAtAngle(
+                    drive,
+                    () -> -gamepad.getLeftY() * shootOnMoveSpeed,
+                    () -> -gamepad.getLeftX() * shootOnMoveSpeed,
+                    () -> {
+                        var hubTranslation = drive.getVirtualTarget().minus(drive.getPose().getTranslation());
+                        var rotation = new Rotation2d(hubTranslation.getX(), hubTranslation.getY());
+
+                        return rotation;
+                });
   }
 
   /**

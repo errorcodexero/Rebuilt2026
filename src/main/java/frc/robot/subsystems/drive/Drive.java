@@ -12,12 +12,9 @@
 // GNU General Public License for more details.
 
 package frc.robot.subsystems.drive;
-
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
-import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BiFunction;
@@ -61,11 +58,11 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.generated.BetaTunerConstants;
+import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.util.LocalADStarAK;
 
 public class Drive extends SubsystemBase {
@@ -472,6 +469,19 @@ public class Drive extends SubsystemBase {
 
     public RobotConfig getPathplannerConfig() {
         return PP_CONFIG;
+    }
+
+    public Translation2d getVirtualTarget() {
+        return (
+                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                ? ShooterConstants.Positions.blueHubPose
+                : ShooterConstants.Positions.redHubPose
+            ).minus(
+                new Translation2d( 
+                    MetersPerSecond.of(getFieldChassisSpeeds().vxMetersPerSecond).times(ShooterConstants.hangTimeOnShot), 
+                    MetersPerSecond.of(getFieldChassisSpeeds().vyMetersPerSecond).times(ShooterConstants.hangTimeOnShot)
+                )
+            );
     }
     
     /** Returns an array of module translations. */
