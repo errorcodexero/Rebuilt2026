@@ -241,11 +241,10 @@ public class DriveCommands {
   }
   
   public static Command pointAtShootingTarget(Drive drive, CommandXboxController gamepad, boolean shootOnMove){
-    var shootOnMoveSpeed = shootOnMove ? Constants.shootOnMoveMaxSpeed : 0.0 ;
     return joystickDriveAtAngle(
                     drive,
-                    () -> -gamepad.getLeftY() * shootOnMoveSpeed,
-                    () -> -gamepad.getLeftX() * shootOnMoveSpeed,
+                    () -> shootOnMove ? -gamepad.getLeftY() * Constants.shootOnMoveMaxSpeed : 0.0,
+                    () -> shootOnMove ? -gamepad.getLeftX() * Constants.shootOnMoveMaxSpeed : 0.0,
                     () -> {
                         var hubTranslation = drive.getVirtualTarget().minus(drive.getPose().getTranslation());
                         var rotation = new Rotation2d(hubTranslation.getX(), hubTranslation.getY());

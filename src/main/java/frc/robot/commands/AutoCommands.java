@@ -17,11 +17,11 @@ public class AutoCommands {
 
             DriveCommands.initialFollowPathCommand(drive,"TopToBottom Trench").deadlineFor(intake.intakeSequence()),
 
-            shooter.shootCmd(hopper).withTimeout(3.8),
+            shooter.shootCmd(drive, hopper, null, false).withTimeout(3.8),
         
             DriveCommands.followPathCommand("BottomToTop").deadlineFor(intake.intakeSequence()),
 
-            shooter.shootCmd(hopper).withTimeout(2.5)
+            shooter.shootCmd(drive, hopper, null, false).withTimeout(2.5)
         );
     }
     

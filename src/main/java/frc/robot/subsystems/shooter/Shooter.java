@@ -25,10 +25,13 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Mode;
+import frc.robot.commands.drive.DriveCommands;
+import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.subsystems.shooter.ShooterConstants.Positions.HubDistance;
 import frc.robot.util.MapleSimUtil;
@@ -120,11 +123,14 @@ public class Shooter extends SubsystemBase {
      * Shoot balls from the shooter until the command ends.
      * @return
      */
-    public Command shootCmd(Hopper hopper) {
+    public Command shootCmd(Drive drive, Hopper hopper, CommandXboxController gamepad, boolean shootOnMove) {
         return Commands.parallel(
-            runDynamicSetpoints(() -> RPM.of(5000), () -> Degrees.of(30)),
-            hopper.forwardFeed()
-        );
+                DriveCommands.pointAtShootingTarget(drive, gamepad, true),
+                Commands.sequence(
+                    Commands.waitTime(ShooterConstants.dbRotationDelay), 
+                    shooterSetpointSupplier(() -> drive.getVirtualTarget().minus(drive.getPose().getTranslation()), hopper)
+                )
+            );
     }
 
     /**

@@ -39,7 +39,7 @@ public final class Constants {
     private static final RobotType robotType = RobotType.COMPETITION;
 
     public static final boolean spawnLessFuelInSim = true;
-    //public static final boolean shootOnMove = false; // if true, we will allow the driver to shoot while moving, but with reduced max speed. if false, we will not allow the driver to shoot while moving.
+    public static final boolean shootOnMove = false; // if true, we will allow the driver to shoot while moving, but with reduced max speed. if false, we will not allow the driver to shoot while moving.
     //change to 0 if it really doesnt work, bc the db velocity will go to 0 and the target will just be the hub
     //but I think it will work so yeah trust me butch <insert prayge hare>
     public static final double shootOnMoveMaxSpeed = 1.0/3.0; 

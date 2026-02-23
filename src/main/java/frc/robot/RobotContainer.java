@@ -338,13 +338,7 @@ public class RobotContainer {
         // we might want to limit the acceleration on this while shooting, but idk how to do that and hopefully it wont matter too much. 
         // just realized we could interrupt this with POV driving, but we would still be shooting, so we might want to create a block for that, but this too probably wont come up that much and i think i am not that numb-skulled to actually do this so idk
         gamepad_.rightTrigger().whileTrue(
-            Commands.parallel(
-                DriveCommands.pointAtShootingTarget(drivebase_, gamepad_, true),
-                Commands.sequence(
-                    Commands.waitTime(ShooterConstants.dbRotationDelay), 
-                    shooter_.shooterSetpointSupplier(() -> drivebase_.getVirtualTarget().minus(drivebase_.getPose().getTranslation()), hopper_)
-                )
-            )   
+            shooter_.shootCmd(drivebase_, hopper_, gamepad_, Constants.shootOnMove)
         );
 
         //While the A button is held, the intake will run the eject sequence. If it the intake is stowed, it will also deploy it.
