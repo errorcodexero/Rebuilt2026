@@ -12,5 +12,7 @@ public interface HoodIO {
 
     public default void updateInputs(HoodInputs inputs) {};
 
-    public default void gotoAngle(Angle angle) {};
+    public default void goToAngle(Angle angle) {};
+
+    public default void applyCalibration(double left, double right) {};
 }
