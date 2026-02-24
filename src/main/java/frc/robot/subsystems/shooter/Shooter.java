@@ -116,7 +116,7 @@ public class Shooter extends SubsystemBase {
 
     private void setHoodAngle(Angle pos) {
         hoodTarget = pos;
-        hoodIO.gotoAngle(pos);
+        hoodIO.goToAngle(pos);
     }
 
     private void setSetpoints(AngularVelocity vel, Angle pos) {
@@ -224,5 +224,22 @@ public class Shooter extends SubsystemBase {
             runDynamicSetpoints(() -> RotationsPerSecond.of(shooterVelocity.get()), () -> Degrees.of(hoodAngle.get())),
             hopper.dynamicFeederVoltageCommand(() -> Volts.of(feederVoltage.get()))
         );
+    }
+
+    /**
+     * Command that allows you to tune the hood calibration values. These will persist throughout the
+     * robot run, but will need to be set in the constants to persist between robot reboots.
+     * @return
+     */
+    public Command hoodCalibration() {
+        return defer(() -> {
+            LoggedNetworkNumber leftOffset = new LoggedNetworkNumber("Tuning/Hood/LeftOffset", 0.0);
+            LoggedNetworkNumber rightOffset = new LoggedNetworkNumber("Tuning/Hood/RightOffset", 0.0);
+
+            return run(() -> {
+                hoodIO.applyCalibration(leftOffset.get(), rightOffset.get());
+                hoodIO.goToAngle(Degrees.zero());
+            });
+        });
     }
 }
