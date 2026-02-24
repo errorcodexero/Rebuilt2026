@@ -26,14 +26,10 @@ public interface ShooterIO {
         public Voltage shooter3Voltage = Volts.zero();
         public Current shooter3Current = Amps.zero();
         public AngularVelocity shooter3Velocity = RadiansPerSecond.zero();
-
-<<<<<<< michael-shooting-while-moving
-=======
+        
         public Voltage shooter4Voltage = Volts.zero();
         public Current shooter4Current = Amps.zero();
         public AngularVelocity shooter4Velocity = RadiansPerSecond.zero();
-
->>>>>>> main
         public AngularVelocity wheelVelocity = RadiansPerSecond.zero();
     }
 
