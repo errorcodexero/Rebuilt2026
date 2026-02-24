@@ -105,7 +105,9 @@ public class ShooterIOTalonFX implements ShooterIO {
 
     @Override
     public void updateInputs(ShooterIOInputs inputs) {
-        signals.refreshAll();
+        var status = signals.refreshAll();
+
+        inputs.allConnected = status.isOK();
 
         inputs.shooter1Velocity = shooter1AngularVelocity.getValue();
         inputs.shooter2Velocity = shooter2AngularVelocity.getValue();
