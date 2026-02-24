@@ -13,7 +13,7 @@ public class HoodIOSim implements HoodIO {
     }
 
     @Override
-    public void gotoAngle(Angle angle) {
+    public void goToAngle(Angle angle) {
         setpointAngle = angle;
     }
 }

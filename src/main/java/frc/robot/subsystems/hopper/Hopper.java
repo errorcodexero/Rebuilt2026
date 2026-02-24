@@ -164,7 +164,7 @@ public class Hopper extends SubsystemBase {
     }
 
     public Command dynamicFeederVoltageCommand(Supplier<Voltage> v) {
-        return runEnd(() -> setFeederVoltage(v.get()), this::stopFeederCommand);
+        return runEnd(() -> setFeederVoltage(v.get()), this::stopFeeder);
     }
     
     public Command setFeederVoltageCommand(Voltage voltage) {

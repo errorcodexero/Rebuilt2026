@@ -14,6 +14,8 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
@@ -22,6 +24,8 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -45,6 +49,11 @@ public class Shooter extends SubsystemBase {
     private final HoodIO hoodIO;
     private final HoodInputsAutoLogged hoodInputs = new HoodInputsAutoLogged();
 
+    private final Debouncer statusDebounce = new Debouncer(0.5, DebounceType.kFalling);
+
+    private final Alert disconnectionAlert =
+        new Alert("One or more shooter motors are disconnected!", AlertType.kError);
+
     private AngularVelocity shooterTarget = RadiansPerSecond.zero();
     private Angle hoodTarget = Radians.zero();
 
@@ -59,6 +68,8 @@ public class Shooter extends SubsystemBase {
         Logger.processInputs("Shooter", shooterInputs);
         hoodIO.updateInputs(hoodInputs);
         Logger.processInputs("Shooter/Hood", hoodInputs);
+
+        disconnectionAlert.set(!statusDebounce.calculate(shooterInputs.allConnected));
 
         Mechanism3d.measured.setHood(hoodInputs.position);
         Mechanism3d.setpoints.setHood(hoodTarget);
@@ -109,7 +120,7 @@ public class Shooter extends SubsystemBase {
 
     private void setHoodAngle(Angle pos) {
         hoodTarget = pos;
-        hoodIO.gotoAngle(pos);
+        hoodIO.goToAngle(pos);
     }
 
     private void setSetpoints(AngularVelocity vel, Angle pos) {
@@ -279,5 +290,22 @@ public class Shooter extends SubsystemBase {
             runDynamicSetpoints(() -> RotationsPerSecond.of(shooterVelocity.get()), () -> Degrees.of(hoodAngle.get())),
             hopper.dynamicFeederVoltageCommand(() -> Volts.of(feederVoltage.get()))
         );
+    }
+
+    /**
+     * Command that allows you to tune the hood calibration values. These will persist throughout the
+     * robot run, but will need to be set in the constants to persist between robot reboots.
+     * @return
+     */
+    public Command hoodCalibration() {
+        return defer(() -> {
+            LoggedNetworkNumber leftOffset = new LoggedNetworkNumber("Tuning/Hood/LeftOffset", 0.0);
+            LoggedNetworkNumber rightOffset = new LoggedNetworkNumber("Tuning/Hood/RightOffset", 0.0);
+
+            return run(() -> {
+                hoodIO.applyCalibration(leftOffset.get(), rightOffset.get());
+                hoodIO.goToAngle(Degrees.zero());
+            });
+        });
     }
 }
