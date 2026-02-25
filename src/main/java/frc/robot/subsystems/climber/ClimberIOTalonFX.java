@@ -32,7 +32,7 @@ public class ClimberIOTalonFX implements ClimberIO {
     //Deploy motor control requests
     private final MotionMagicVoltage deployAngleRequest= new MotionMagicVoltage(Degrees.of(0));
     private final VoltageOut deployVoltageRequest= new VoltageOut(Volts.of(0));
-    private final VelocityVoltage deployVelocityRequest= new VelocityVoltage(DegreesPerSecond.of(0));
+    private final VelocityVoltage deployVelocityRequest= new VelocityVoltage(DegreesPerSecond.of(0));//for now 
 
     //Twist motor control requests
     private final MotionMagicVoltage twistAngleRequest= new MotionMagicVoltage(Degrees.of(0));
@@ -182,5 +182,6 @@ public class ClimberIOTalonFX implements ClimberIO {
     @Override
     public void stopDeploy() {
         deployMotor.setControl(deployVoltageRequest.withOutput(Volts.of(0)));
+        deployMotor.setControl(deployPositionSig.withOutput(Volts.of(0)));
     }
 }
