@@ -42,6 +42,7 @@ import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.subsystems.hopper.HopperIO;
 import frc.robot.subsystems.hopper.HopperIOSim;
+import frc.robot.subsystems.hopper.HopperIOTalonFX;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeSubsystem;
@@ -183,7 +184,7 @@ public class RobotContainer {
                     // );
 
                     shooter_ = new Shooter(new ShooterIOTalonFX(roborioCANBus), new HoodIOServo());
-                    hopper_ = new Hopper(new HopperIOSim());
+                    hopper_ = new Hopper(new HopperIOTalonFX());
                    
                     break;
             }

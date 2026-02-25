@@ -6,8 +6,8 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Servo;
 
 public class HoodIOServo implements HoodIO {
-    private double leftOffset = 8.0;
-    private double rightOffset = 0.0;
+    private double leftOffset = 0.0;
+    private double rightOffset = 8.0;
     
     private Servo hoodLeft;
     private Servo hoodRight;
@@ -26,7 +26,7 @@ public class HoodIOServo implements HoodIO {
     public void goToAngle(Angle angle) {
         double degrees = angle.in(Degrees);
         hoodLeft.set((degrees + leftOffset) / 300.0);
-        hoodRight.set(1.0 - (degrees - rightOffset) / 300.0);
+        hoodRight.set(1.0 - (degrees + rightOffset) / 300.0);
     }
 
     @Override

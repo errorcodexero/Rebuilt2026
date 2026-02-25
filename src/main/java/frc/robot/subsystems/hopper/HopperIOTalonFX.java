@@ -23,15 +23,15 @@ public class HopperIOTalonFX implements HopperIO {
     
     //Creating Motor Objects
     protected final TalonFX feederMotor;
-    protected final TalonFX scramblerMotor;
+    // protected final TalonFX scramblerMotor;
 
     //Feeder Control Requests
     private final VoltageOut feederVoltageRequest = new VoltageOut(0);
     private final VelocityVoltage feederVelocityRequest  = new VelocityVoltage(0.0);
 
     //Scrambler Control Requests
-    private final VoltageOut scramblerVoltageRequest = new VoltageOut(0);
-    private final VelocityVoltage scramblerVelocityRequest  = new VelocityVoltage(0.0);
+    // private final VoltageOut scramblerVoltageRequest = new VoltageOut(0);
+    // private final VelocityVoltage scramblerVelocityRequest  = new VelocityVoltage(0.0);
 
     //Feeder Status Signals
     private final StatusSignal<AngularVelocity> feederAngularVelocitySignal;
@@ -39,12 +39,12 @@ public class HopperIOTalonFX implements HopperIO {
     private final StatusSignal<Current> feederCurrentSignal; 
 
     //Scrambler Status Signals
-    private final StatusSignal<AngularVelocity> scramblerAngularVelocitySignal;   
-    private final StatusSignal<Voltage> scramblerVoltageSignal;
-    private final StatusSignal<Current> scramblerCurrentSignal;
+    // private final StatusSignal<AngularVelocity> scramblerAngularVelocitySignal;   
+    // private final StatusSignal<Voltage> scramblerVoltageSignal;
+    // private final StatusSignal<Current> scramblerCurrentSignal;
 
     private final Debouncer feederConnectedDebounce = new Debouncer(0.5, DebounceType.kFalling);
-    private final Debouncer scramblerConnectedDebounce = new Debouncer(0.5, DebounceType.kFalling);
+    // private final Debouncer scramblerConnectedDebounce = new Debouncer(0.5, DebounceType.kFalling);
 
     public HopperIOTalonFX() {
         
@@ -71,34 +71,34 @@ public class HopperIOTalonFX implements HopperIO {
         feederCurrentSignal = feederMotor.getStatorCurrent();        
 
         // Scrambler Motor Configuration
-        scramblerMotor = new TalonFX(HopperConstants.scramblerMotorCANID);
+        // scramblerMotor = new TalonFX(HopperConstants.scramblerMotorCANID);
 
-        TalonFXConfiguration scramblerConfig = new TalonFXConfiguration();
+        // TalonFXConfiguration scramblerConfig = new TalonFXConfiguration();
 
-        scramblerConfig.Slot0.kP = HopperConstants.scramblerKP;
-        scramblerConfig.Slot0.kI = HopperConstants.scramblerKI;
-        scramblerConfig.Slot0.kD = HopperConstants.scramblerKD;
-        scramblerConfig.Slot0.kS = HopperConstants.scramblerKS;
-        scramblerConfig.Slot0.kV = HopperConstants.scramblerKV;
-        scramblerConfig.Slot0.kA = HopperConstants.scramblerKA;
+        // scramblerConfig.Slot0.kP = HopperConstants.scramblerKP;
+        // scramblerConfig.Slot0.kI = HopperConstants.scramblerKI;
+        // scramblerConfig.Slot0.kD = HopperConstants.scramblerKD;
+        // scramblerConfig.Slot0.kS = HopperConstants.scramblerKS;
+        // scramblerConfig.Slot0.kV = HopperConstants.scramblerKV;
+        // scramblerConfig.Slot0.kA = HopperConstants.scramblerKA;
 
-        tryUntilOk(5, () -> scramblerMotor.getConfigurator().apply(scramblerConfig, 0.25));
+        // tryUntilOk(5, () -> scramblerMotor.getConfigurator().apply(scramblerConfig, 0.25));
 
-        scramblerConfig.CurrentLimits.StatorCurrentLimit = HopperConstants.scramblerCurrentLimit.in(Amps);
+        // scramblerConfig.CurrentLimits.StatorCurrentLimit = HopperConstants.scramblerCurrentLimit.in(Amps);
 
-        scramblerAngularVelocitySignal = scramblerMotor.getVelocity();
-        scramblerVoltageSignal = scramblerMotor.getMotorVoltage();
-        scramblerCurrentSignal = scramblerMotor.getStatorCurrent();
+        // scramblerAngularVelocitySignal = scramblerMotor.getVelocity();
+        // scramblerVoltageSignal = scramblerMotor.getMotorVoltage();
+        // scramblerCurrentSignal = scramblerMotor.getStatorCurrent();
 
         BaseStatusSignal.setUpdateFrequencyForAll(50.0, 
             feederAngularVelocitySignal, feederVoltageSignal, feederCurrentSignal);
         
         feederMotor.optimizeBusUtilization();
         
-        BaseStatusSignal.setUpdateFrequencyForAll(50.0,
-            scramblerAngularVelocitySignal, scramblerVoltageSignal, scramblerCurrentSignal);
+        // BaseStatusSignal.setUpdateFrequencyForAll(50.0,
+        //     scramblerAngularVelocitySignal, scramblerVoltageSignal, scramblerCurrentSignal);
         
-        scramblerMotor.optimizeBusUtilization();
+        // scramblerMotor.optimizeBusUtilization();
     }
     
     @Override
@@ -106,18 +106,18 @@ public class HopperIOTalonFX implements HopperIO {
         StatusCode feederStatus = BaseStatusSignal.refreshAll(
             feederAngularVelocitySignal, feederVoltageSignal, feederCurrentSignal);
         
-        StatusCode scramblerStatus = BaseStatusSignal.refreshAll(
-            scramblerAngularVelocitySignal, scramblerVoltageSignal, scramblerCurrentSignal);
+        // StatusCode scramblerStatus = BaseStatusSignal.refreshAll(
+        //     scramblerAngularVelocitySignal, scramblerVoltageSignal, scramblerCurrentSignal);
         
         inputs.feederConnected = feederConnectedDebounce.calculate(feederStatus.isOK());
         inputs.feederVelocity = feederAngularVelocitySignal.getValue();
         inputs.feederVoltage = feederVoltageSignal.getValue();
         inputs.feederCurrent = feederCurrentSignal.getValue();
 
-        inputs.scramblerConnected = scramblerConnectedDebounce.calculate(scramblerStatus.isOK());
-        inputs.scramblerVelocity = scramblerAngularVelocitySignal.getValue();
-        inputs.scramblerVoltage = scramblerVoltageSignal.getValue();
-        inputs.scramblerCurrent = scramblerCurrentSignal.getValue();
+        // inputs.scramblerConnected = scramblerConnectedDebounce.calculate(scramblerStatus.isOK());
+        // inputs.scramblerVelocity = scramblerAngularVelocitySignal.getValue();
+        // inputs.scramblerVoltage = scramblerVoltageSignal.getValue();
+        // inputs.scramblerCurrent = scramblerCurrentSignal.getValue();
     }
 
     @Override
@@ -132,12 +132,12 @@ public class HopperIOTalonFX implements HopperIO {
 
     @Override
     public void setScramblerVoltage(Voltage voltage) {
-        scramblerMotor.setControl(scramblerVoltageRequest.withOutput(voltage));
+        // scramblerMotor.setControl(scramblerVoltageRequest.withOutput(voltage));
     }
 
     @Override
     public void setScramblerVelocity(AngularVelocity velocity) {
-        scramblerMotor.setControl(scramblerVelocityRequest.withVelocity(velocity));
+        // scramblerMotor.setControl(scramblerVelocityRequest.withVelocity(velocity));
     }
 
     public void stopFeeder() {
@@ -145,6 +145,6 @@ public class HopperIOTalonFX implements HopperIO {
     }
 
     public void stopScrambler() {
-        scramblerMotor.setControl(new StaticBrake());
+        // scramblerMotor.setControl(new StaticBrake());
     }
 }

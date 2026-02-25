@@ -153,7 +153,7 @@ public class Shooter extends SubsystemBase {
                 return Degrees.zero();
             }
 
-            return Degrees.of(45); // TODO: replace this with whatever determines shooter angle
+            return Degrees.of(45);
         });
     }
 
@@ -237,6 +237,7 @@ public class Shooter extends SubsystemBase {
             LoggedNetworkNumber rightOffset = new LoggedNetworkNumber("Tuning/Hood/RightOffset", 0.0);
 
             return run(() -> {
+                System.out.println("Hood " + leftOffset.get() + " " + rightOffset.get()) ;
                 hoodIO.applyCalibration(leftOffset.get(), rightOffset.get());
                 hoodIO.goToAngle(Degrees.zero());
             });
