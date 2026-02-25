@@ -131,7 +131,7 @@ public class RobotContainer {
 
                     intake_= new IntakeSubsystem(new IntakeIOSim());
 
-                    shooter_ = new Shooter(new ShooterIOSim(), new HoodIOServo());
+                    shooter_ = new Shooter(new ShooterIOSim(), new HoodIOSim());
 
                     hopper_ = new Hopper(new HopperIOSim());
                     
@@ -151,7 +151,7 @@ public class RobotContainer {
                         CompTunerConstants.kSpeedAt12Volts
                     );
 
-                    shooter_ = new Shooter(new ShooterIOTalonFX(roborioCANBus), new HoodIOSim());
+                    shooter_ = new Shooter(new ShooterIOTalonFX(roborioCANBus), new HoodIOServo());
                     // hopper_ = new Hopper(new HopperIOSim());
                    
                     break;
