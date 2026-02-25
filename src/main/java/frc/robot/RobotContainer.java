@@ -131,7 +131,7 @@ public class RobotContainer {
 
                     intake_= new IntakeSubsystem(new IntakeIOSim());
 
-                    shooter_ = new Shooter(new ShooterIOSim(), new HoodIOSim());
+                    shooter_ = new Shooter(new ShooterIOSim(), new HoodIOServo());
 
                     hopper_ = new Hopper(new HopperIOSim());
                     
@@ -151,7 +151,7 @@ public class RobotContainer {
                         CompTunerConstants.kSpeedAt12Volts
                     );
 
-                    shooter_ = new Shooter(new ShooterIOTalonFX(roborioCANBus), new HoodIOServo());
+                    shooter_ = new Shooter(new ShooterIOTalonFX(roborioCANBus), new HoodIOSim());
                     // hopper_ = new Hopper(new HopperIOSim());
                    
                     break;
@@ -275,7 +275,7 @@ public class RobotContainer {
 
     private void configureDriveBindings() {
         // Default command, normal field-relative drive
-        drivebase_.setDefaultCommand(DriveCommands.joystickDrive());
+        drivebase_.setDefaultCommand(DriveCommands.joystickDrive().withName("JoystickDrive"));
 
         // Slow Mode, during left bumper
         gamepad_.leftBumper().whileTrue(

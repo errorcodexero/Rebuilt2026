@@ -31,7 +31,7 @@ public class CompTunerConstants {
     // output type specified by SwerveModuleConstants.DriveMotorClosedLoopOutput
     private static final Slot0Configs driveGains = new Slot0Configs()
         .withKP(0.1).withKI(0).withKD(0)
-        .withKS(0).withKV(0.124);
+        .withKS(0.20460).withKV(0.72323);
 
     // The closed-loop output type to use for the steer motors;
     // This affects the PID/FF gains for the steer motors
@@ -74,7 +74,7 @@ public class CompTunerConstants {
 
     // Theoretical free speed (m/s) at 12 V applied output;
     // This needs to be tuned to your individual robot
-    public static final LinearVelocity kSpeedAt12Volts = MetersPerSecond.of(0.00);
+    public static final LinearVelocity kSpeedAt12Volts = MetersPerSecond.of(5.23);
 
     // Every 1 rotation of the azimuth results in kCoupleRatio drive motor turns;
     // This may need to be tuned to your individual robot
@@ -82,7 +82,7 @@ public class CompTunerConstants {
 
     private static final double kDriveGearRatio = 5.902777777777778;
     private static final double kSteerGearRatio = 18.75;
-    private static final Distance kWheelRadius = Inches.of(0);
+    private static final Distance kWheelRadius = Inches.of(1.777);
 
     private static final boolean kInvertLeftSide = false;
     private static final boolean kInvertRightSide = true;
@@ -191,15 +191,16 @@ public class CompTunerConstants {
             kBackRightXPos, kBackRightYPos, kInvertRightSide, kBackRightSteerMotorInverted, kBackRightEncoderInverted
         );
 
-    // /**
-    //  * Creates a CommandSwerveDrivetrain instance.
-    //  * This should only be called once in your robot program,.
-    //  */
+    /**
+     * Creates a CommandSwerveDrivetrain instance.
+     * This should only be called once in your robot program,.
+     */
     // public static CommandSwerveDrivetrain createDrivetrain() {
     //     return new CommandSwerveDrivetrain(
     //         DrivetrainConstants, FrontLeft, FrontRight, BackLeft, BackRight
     //     );
     // }
+
 
     /**
      * Swerve Drive class utilizing CTR Electronics' Phoenix 6 API with the selected device types.
