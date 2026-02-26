@@ -61,12 +61,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
-<<<<<<< michael-shooting-while-moving
-import frc.robot.generated.BetaTunerConstants;
 import frc.robot.subsystems.shooter.ShooterConstants;
-=======
 import frc.robot.generated.CompTunerConstants;
->>>>>>> main
 import frc.robot.util.LocalADStarAK;
 
 public class Drive extends SubsystemBase {
