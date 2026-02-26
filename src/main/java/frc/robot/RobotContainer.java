@@ -53,8 +53,6 @@ import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterIOSim;
 import frc.robot.subsystems.shooter.ShooterIOTalonFX;
 import frc.robot.subsystems.thriftyclimb.ThriftyClimb;
-import frc.robot.subsystems.thriftyclimb.ThriftyClimbIO;
-import frc.robot.subsystems.thriftyclimb.ThriftyClimbIOSim;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIO;
 import frc.robot.subsystems.vision.CameraIOPhotonSim;
