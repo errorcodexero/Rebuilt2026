@@ -135,7 +135,7 @@ public class Shooter extends SubsystemBase {
      */
     public Command shootCmd(Drive drive, Hopper hopper, CommandXboxController gamepad, boolean shootOnMove) {
         return Commands.parallel(
-                DriveCommands.pointAtShootingTarget(drive, gamepad, true),
+                DriveCommands.pointAtShootingTarget(drive, gamepad, shootOnMove),
                 Commands.sequence(
                     Commands.waitTime(ShooterConstants.dbRotationDelay), 
                     shooterSetpointSupplier(() -> drive.getVirtualTarget().minus(drive.getPose().getTranslation()), hopper)

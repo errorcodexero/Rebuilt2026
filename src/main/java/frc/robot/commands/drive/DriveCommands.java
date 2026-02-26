@@ -60,6 +60,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.subsystems.drive.Drive;
@@ -240,7 +241,7 @@ public class DriveCommands {
         .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
   }
   
-  public static Command pointAtShootingTarget(Drive drive, CommandXboxController gamepad, boolean shootOnMove){
+  public static Command pointAtTarget(Drive drive, CommandXboxController gamepad, Supplier<Translation2d> target, boolean shootOnMove){
     return joystickDriveAtAngle(
                     drive,
                     () -> shootOnMove ? -gamepad.getLeftY() * Constants.shootOnMoveMaxSpeed : 0.0,
@@ -251,6 +252,30 @@ public class DriveCommands {
 
                         return rotation;
                 });
+  }
+
+  private static Translation2d getTarget(Drive drive) {
+    Translation2d target;
+
+    boolean blueDS = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue;
+
+    boolean robotInAllianceZone = blueDS ? 
+      drive.getPose().getMeasureX().lt(DriveConstants.allianceZoneBlue):
+      drive.getPose().getMeasureX().gt(DriveConstants.allianceZoneRed);
+
+    if(robotInAllianceZone){
+      target = drive.getVirtualTarget();
+    }else if(drive.getPose().getMeasureY().gt(DriveConstants.fieldWidth.div(2.0))){
+        target = blueDS ? DriveConstants.blueLeftFerryTarget : DriveConstants.redLeftFerryTarget ;
+    }else{
+        target = blueDS ? DriveConstants.blueRightFerryTarget : DriveConstants.redRightFerryTarget ;
+    }
+
+    return target;
+  }
+
+  public static Command pointAtShootingTarget(Drive drive, CommandXboxController gamepad, boolean shootOnMove){
+    return pointAtTarget(drive, gamepad, () -> getTarget(drive), shootOnMove);
   }
 
   /**
