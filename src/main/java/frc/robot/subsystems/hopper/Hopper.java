@@ -101,10 +101,21 @@ public class Hopper extends SubsystemBase {
      */
     public Command idleScrambler() {
         return startEnd(
-            () -> setScramblerVelocity(HopperConstants.scramblerActiveVelocity.times(0.15)),
+            () -> setScramblerVelocity(HopperConstants.scramblerIdleVelocity),
             this::stopScrambler
         );
     }
+
+    /**
+     * Runs the scrambler at backwards to move balls out of the shooter/feeder
+     * @return
+     */
+    public Command reverseScrambler() {
+        return startEnd(
+            () -> setScramblerVelocity(HopperConstants.scramblerActiveVelocity.times(-1)),
+            this::stopScrambler
+        );
+    }    
 
     /**
      * Runs the feeder and scrambler at specified speeds.

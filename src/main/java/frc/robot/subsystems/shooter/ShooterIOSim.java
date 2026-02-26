@@ -18,8 +18,8 @@ public class ShooterIOSim extends ShooterIOTalonFX {
         DCMotor.getKrakenX60Foc(3)
     );
 
-    public ShooterIOSim() {
-        super(new CANBus());
+    public ShooterIOSim(CANBus canBus) {
+        super(canBus);
     }
 
     @Override

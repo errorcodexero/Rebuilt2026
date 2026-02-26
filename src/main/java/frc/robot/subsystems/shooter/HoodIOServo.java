@@ -24,6 +24,10 @@ public class HoodIOServo implements HoodIO {
 
     @Override
     public void goToAngle(Angle angle) {
+        if (angle.lt(ShooterConstants.hoodMinAngle) || angle.gt(ShooterConstants.hoodMaxAngle)) {
+            return;
+        }
+
         double degrees = angle.in(Degrees);
         hoodLeft.set((degrees + leftOffset) / 300.0);
         hoodRight.set(1.0 - (degrees - rightOffset) / 300.0);
