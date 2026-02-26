@@ -54,9 +54,9 @@ import frc.robot.subsystems.shooter.ShooterIOSim;
 import frc.robot.subsystems.shooter.ShooterIOTalonFX;
 import frc.robot.subsystems.thriftyclimb.ThriftyClimb;
 import frc.robot.subsystems.thriftyclimb.ThriftyClimbIO;
-import frc.robot.subsystems.thriftyclimb.ThriftyClimbIOSim;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIO;
+import frc.robot.subsystems.vision.CameraIOLimelight4;
 import frc.robot.subsystems.vision.CameraIOPhotonSim;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.MapleSimUtil;
@@ -149,6 +149,13 @@ public class RobotContainer {
                         CompTunerConstants.kSpeedAt12Volts
                     );
 
+                    vision_ = new AprilTagVision(
+                        drivebase_::addVisionMeasurement,
+                        new CameraIOLimelight4("limelight-front", drivebase_::getRotation),
+                        new CameraIOLimelight4("limelight-backleft", drivebase_::getRotation),
+                        new CameraIOLimelight4("limelight-backright", drivebase_::getRotation)
+                    );
+
                     shooter_ = new Shooter(new ShooterIOTalonFX(roborioCANBus), new HoodIOServo());
                     hopper_ = new Hopper(new HopperIOTalonFX(roborioCANBus));
                     intake_ = new IntakeSubsystem(new IntakeIOTalonFX(roborioCANBus));
@@ -180,7 +187,7 @@ public class RobotContainer {
 
         if (vision_ == null) {
             int numCams = switch (Constants.getRobot()) {
-                default -> 1;
+                default -> 3;
             };
 
             CameraIO[] cams = new CameraIO[numCams];
@@ -202,6 +209,10 @@ public class RobotContainer {
 
         if (hopper_ == null) {
             hopper_ = new Hopper(new HopperIO() {});
+        }
+
+        if (climb_ == null) {
+            climb_ = new ThriftyClimb(new ThriftyClimbIO() {});
         }
 
         DriveCommands.configure(
