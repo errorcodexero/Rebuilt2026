@@ -2,6 +2,7 @@ package frc.robot.subsystems.intake;
 
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -9,14 +10,13 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.Robot;
-import frc.robot.generated.CompTunerConstants;
 
 public class IntakeIOSim extends IntakeIOTalonFX {
     public final DCMotorSim pivotMotorSim;
     public final DCMotorSim rollerMotorSim;
     
-    public IntakeIOSim() {
-        super(CompTunerConstants.kCANBus, CompTunerConstants.kCANBus); // This needs to be changed
+    public IntakeIOSim(CANBus canbus) {
+        super(canbus); // This needs to be changed
 
         pivotMotorSim= new DCMotorSim(
             LinearSystemId.createDCMotorSystem(
