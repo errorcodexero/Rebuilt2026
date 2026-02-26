@@ -471,12 +471,16 @@ public class Drive extends SubsystemBase {
         return PP_CONFIG;
     }
 
-    public Translation2d getVirtualTarget() {
+    public Translation2d getHubTranslation(){
         return (
                 DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
                 ? ShooterConstants.Positions.blueHubPose
                 : ShooterConstants.Positions.redHubPose
-            ).minus(
+            );
+    }
+
+    public Translation2d getVirtualTarget() {
+        return getHubTranslation().minus(
                 new Translation2d( 
                     MetersPerSecond.of(getFieldChassisSpeeds().vxMetersPerSecond).times(ShooterConstants.hangTimeOnShot), 
                     MetersPerSecond.of(getFieldChassisSpeeds().vyMetersPerSecond).times(ShooterConstants.hangTimeOnShot)
