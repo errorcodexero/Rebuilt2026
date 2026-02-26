@@ -7,37 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "GoToDepot"
+            "pathName": "TrenchToNZ"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Collect"
+            "pathName": "NZtoShoot1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "GoToShoot"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 4.0
+            "pathName": "Shoot1 to Hub"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "ShootToOutpost"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "OutpostToNZ"
+            "pathName": "HubToShoot2"
           }
         }
       ]
