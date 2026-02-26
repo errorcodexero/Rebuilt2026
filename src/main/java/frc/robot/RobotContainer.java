@@ -289,7 +289,7 @@ public class RobotContainer {
         // AutoModes
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
 
-        autoChooser_.addOption("Neutral Zone Climb Auto", AutoCommands.NZClimbAuto(drivebase_, shooter_, intake_, hopper_, climb_, Degrees.zero()));
+        autoChooser_.addOption("Neutral Zone Climb Auto", AutoCommands.NZCollectAuto(drivebase_, shooter_, intake_, hopper_));
 
         autoChooser_.onChange(auto -> {
             System.out.println("Auto \"" + auto.getName() + "\" selected!");
