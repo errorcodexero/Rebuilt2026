@@ -58,13 +58,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": -90.18724044293081
   },
   "reversed": false,
-  "folder": "Depot Climb",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 89.0036521034951
+    "rotation": -91.00508600525419
   },
   "useDefaultConstraints": false
 }

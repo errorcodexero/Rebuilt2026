@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.3016555555555556,
-        "y": 0.9713555555555557
+        "x": 7.8165,
+        "y": 4.478422222222222
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.728165500014941,
-        "y": 1.7093464300164145
+        "x": 7.786266666666666,
+        "y": 5.536588888888889
       },
       "isLocked": false,
-      "linkedName": "Shoot2"
+      "linkedName": "NZNoClimb"
     },
     {
       "anchor": {
-        "x": 0.7419,
-        "y": 2.664422222222222
+        "x": 4.259044444444445,
+        "y": 7.441288888888889
       },
       "prevControl": {
-        "x": 1.2085026323659471,
-        "y": 1.7916777703204518
+        "x": 5.982344444444445,
+        "y": 7.804088888888889
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "ShootLoc1"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": -85.68397248013444
   },
   "reversed": false,
-  "folder": null,
+  "folder": "NoClimbAutos",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 59.058463533677475
+    "rotation": -90.0
   },
   "useDefaultConstraints": true
 }

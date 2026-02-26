@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Amps;
 import static frc.robot.util.PhoenixUtil.tryUntilOk;
 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -46,10 +47,10 @@ public class HopperIOTalonFX implements HopperIO {
     private final Debouncer feederConnectedDebounce = new Debouncer(0.5, DebounceType.kFalling);
     private final Debouncer scramblerConnectedDebounce = new Debouncer(0.5, DebounceType.kFalling);
 
-    public HopperIOTalonFX() {
+    public HopperIOTalonFX(CANBus canBus) {
         
         //Feeder Motor Configuration
-        feederMotor = new TalonFX(HopperConstants.feederMotorCANID);
+        feederMotor = new TalonFX(HopperConstants.feederMotorCANID, canBus);
         TalonFXConfiguration feederConfig = new TalonFXConfiguration();
 
         feederConfig.Slot0.kP = HopperConstants.feederKP;
@@ -60,10 +61,11 @@ public class HopperIOTalonFX implements HopperIO {
         feederConfig.Slot0.kA = HopperConstants.feederKA;
 
         feederConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive ;
+        feederConfig.CurrentLimits.StatorCurrentLimit = HopperConstants.feederCurrentLimit.in(Amps);
 
         tryUntilOk(5, () -> feederMotor.getConfigurator().apply(feederConfig, 0.25));
 
-        feederConfig.CurrentLimits.StatorCurrentLimit = HopperConstants.feederCurrentLimit.in(Amps);
+
 
         //Status Signals Initialization
         feederAngularVelocitySignal = feederMotor.getVelocity();
@@ -81,10 +83,10 @@ public class HopperIOTalonFX implements HopperIO {
         scramblerConfig.Slot0.kS = HopperConstants.scramblerKS;
         scramblerConfig.Slot0.kV = HopperConstants.scramblerKV;
         scramblerConfig.Slot0.kA = HopperConstants.scramblerKA;
-
+        scramblerConfig.CurrentLimits.StatorCurrentLimit = HopperConstants.scramblerCurrentLimit.in(Amps);
         tryUntilOk(5, () -> scramblerMotor.getConfigurator().apply(scramblerConfig, 0.25));
 
-        scramblerConfig.CurrentLimits.StatorCurrentLimit = HopperConstants.scramblerCurrentLimit.in(Amps);
+
 
         scramblerAngularVelocitySignal = scramblerMotor.getVelocity();
         scramblerVoltageSignal = scramblerMotor.getMotorVoltage();

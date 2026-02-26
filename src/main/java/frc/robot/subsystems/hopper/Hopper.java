@@ -101,10 +101,21 @@ public class Hopper extends SubsystemBase {
      */
     public Command idleScrambler() {
         return startEnd(
-            () -> setScramblerVelocity(HopperConstants.scramblerActiveVelocity.times(0.15)),
+            () -> setScramblerVelocity(HopperConstants.scramblerIdleVelocity),
             this::stopScrambler
         );
     }
+
+    /**
+     * Runs the scrambler at backwards to move balls out of the shooter/feeder
+     * @return
+     */
+    public Command reverseScrambler() {
+        return startEnd(
+            () -> setScramblerVelocity(HopperConstants.scramblerActiveVelocity.times(-1)),
+            this::stopScrambler
+        );
+    }    
 
     /**
      * Runs the feeder and scrambler at specified speeds.
@@ -161,7 +172,7 @@ public class Hopper extends SubsystemBase {
     }
 
     public Command dynamicFeederVoltageCommand(Supplier<Voltage> v) {
-        return runEnd(() -> setFeederVoltage(v.get()), this::stopFeederCommand);
+        return runEnd(() -> setFeederVoltage(v.get()), this::stopFeeder);
     }
     
     public Command setFeederVoltageCommand(Voltage voltage) {

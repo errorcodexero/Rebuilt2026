@@ -29,8 +29,6 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.Constants.RobotType;
 import frc.robot.commands.drive.DriveCommands;
-import frc.robot.generated.AlphaTunerConstants;
-import frc.robot.generated.BetaTunerConstants;
 import frc.robot.generated.CompTunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -42,8 +40,10 @@ import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.subsystems.hopper.HopperIO;
 import frc.robot.subsystems.hopper.HopperIOSim;
+import frc.robot.subsystems.hopper.HopperIOTalonFX;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOSim;
+import frc.robot.subsystems.intake.IntakeIOTalonFX;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.shooter.HoodIO;
 import frc.robot.subsystems.shooter.HoodIOServo;
@@ -54,9 +54,9 @@ import frc.robot.subsystems.shooter.ShooterIOSim;
 import frc.robot.subsystems.shooter.ShooterIOTalonFX;
 import frc.robot.subsystems.thriftyclimb.ThriftyClimb;
 import frc.robot.subsystems.thriftyclimb.ThriftyClimbIO;
-import frc.robot.subsystems.thriftyclimb.ThriftyClimbIOSim;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIO;
+import frc.robot.subsystems.vision.CameraIOLimelight4;
 import frc.robot.subsystems.vision.CameraIOPhotonSim;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.MapleSimUtil;
@@ -87,35 +87,6 @@ public class RobotContainer {
          */
         if (Constants.getMode() != Mode.REPLAY) {
             switch (Constants.getRobot()) {
-                case ALPHA:
-                    drivebase_ = new Drive(
-                        new GyroIOPigeon2(AlphaTunerConstants.DrivetrainConstants.Pigeon2Id, AlphaTunerConstants.kCANBus),
-                        ModuleIOTalonFX::new,
-                        AlphaTunerConstants.FrontLeft,
-                        AlphaTunerConstants.FrontRight,
-                        AlphaTunerConstants.BackLeft,
-                        AlphaTunerConstants.BackRight,
-                        AlphaTunerConstants.kCANBus,
-                        AlphaTunerConstants.kSpeedAt12Volts
-                    );
-
-                    break;
-
-                case BETA:
-
-                    drivebase_ = new Drive(
-                        new GyroIOPigeon2(BetaTunerConstants.DrivetrainConstants.Pigeon2Id, BetaTunerConstants.kCANBus),
-                        ModuleIOTalonFX::new,
-                        BetaTunerConstants.FrontLeft,
-                        BetaTunerConstants.FrontRight,
-                        BetaTunerConstants.BackLeft,
-                        BetaTunerConstants.BackRight,
-                        BetaTunerConstants.kCANBus,
-                        BetaTunerConstants.kSpeedAt12Volts
-                    );
-
-                    break;
-
                 case SIMBOT:
                     // Sim robot, instantiate physics sim IO implementations
                     // Create and configure a drivetrain simulation configuration
@@ -162,30 +133,34 @@ public class RobotContainer {
                         new CameraIOPhotonSim("backright", VisionConstants.backRightTransform, MapleSimUtil::getPosition, true)
                     );
 
-                    intake_= new IntakeSubsystem(new IntakeIOSim());
-
-                    shooter_ = new Shooter(new ShooterIOSim(), new HoodIOSim());
-
-                    hopper_ = new Hopper(new HopperIOSim());
+                    intake_= new IntakeSubsystem(new IntakeIOSim(roborioCANBus));
+                    shooter_ = new Shooter(new ShooterIOSim(roborioCANBus), new HoodIOSim());
+                    hopper_ = new Hopper(new HopperIOSim(roborioCANBus));
                     
-                    climb_ = new ThriftyClimb(new ThriftyClimbIOSim());
-
                     break;
 
                 case COMPETITION:
-                    // drivebase_ = new Drive(
-                    //     new GyroIOPigeon2(CompTunerConstants.DrivetrainConstants.Pigeon2Id, CompTunerConstants.kCANBus),
-                    //     ModuleIOTalonFX::new,
-                    //     CompTunerConstants.FrontLeft,
-                    //     CompTunerConstants.FrontRight,
-                    //     CompTunerConstants.BackLeft,
-                    //     CompTunerConstants.BackRight,
-                    //     CompTunerConstants.kCANBus,
-                    //     CompTunerConstants.kSpeedAt12Volts
-                    // );
+                    drivebase_ = new Drive(
+                        new GyroIOPigeon2(CompTunerConstants.DrivetrainConstants.Pigeon2Id, CompTunerConstants.kCANBus),
+                        ModuleIOTalonFX::new,
+                        CompTunerConstants.FrontLeft,
+                        CompTunerConstants.FrontRight,
+                        CompTunerConstants.BackLeft,
+                        CompTunerConstants.BackRight,
+                        CompTunerConstants.kCANBus,
+                        CompTunerConstants.kSpeedAt12Volts
+                    );
+
+                    vision_ = new AprilTagVision(
+                        drivebase_::addVisionMeasurement,
+                        new CameraIOLimelight4("limelight-front", drivebase_::getRotation),
+                        new CameraIOLimelight4("limelight-backleft", drivebase_::getRotation),
+                        new CameraIOLimelight4("limelight-backright", drivebase_::getRotation)
+                    );
 
                     shooter_ = new Shooter(new ShooterIOTalonFX(roborioCANBus), new HoodIOServo());
-                    hopper_ = new Hopper(new HopperIOSim());
+                    hopper_ = new Hopper(new HopperIOTalonFX(roborioCANBus));
+                    intake_ = new IntakeSubsystem(new IntakeIOTalonFX(roborioCANBus));
                    
                     break;
             }
@@ -196,34 +171,6 @@ public class RobotContainer {
          */
         if (drivebase_ == null) { // This will be null in replay, or whenever a case above leaves a subsystem uninstantiated.
             switch (Constants.getRobot()) {
-                case ALPHA:
-                    drivebase_ = new Drive(
-                        new GyroIO() {},
-                        ModuleIOReplay::new,
-                        AlphaTunerConstants.FrontLeft,
-                        AlphaTunerConstants.FrontRight,
-                        AlphaTunerConstants.BackLeft,
-                        AlphaTunerConstants.BackRight,
-                        AlphaTunerConstants.kCANBus,
-                        AlphaTunerConstants.kSpeedAt12Volts
-                    );
-
-                    break;
-
-                case BETA:
-                    drivebase_ = new Drive(
-                        new GyroIO() {},
-                        ModuleIOReplay::new,
-                        BetaTunerConstants.FrontLeft,
-                        BetaTunerConstants.FrontRight,
-                        BetaTunerConstants.BackLeft,
-                        BetaTunerConstants.BackRight,
-                        BetaTunerConstants.kCANBus,
-                        BetaTunerConstants.kSpeedAt12Volts
-                    );
-
-                    break;
-                    
                 default: // SimBot or Comp Bot
                     drivebase_ = new Drive(
                         new GyroIO() {},
@@ -266,10 +213,6 @@ public class RobotContainer {
             hopper_ = new Hopper(new HopperIO() {});
         }
 
-        if (climb_ == null) {
-            climb_ = new ThriftyClimb(new ThriftyClimbIO() {});
-        }
-
         DriveCommands.configure(
             drivebase_,
             () -> -gamepad_.getLeftY(),
@@ -290,8 +233,8 @@ public class RobotContainer {
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
 
         autoChooser_.onChange(auto -> {
-            System.err.println("Auto \"" + auto.getName() + "\" selected!");
-            // This should be used to set up robot position setting, initialization, etc.
+            System.out.println("Auto \"" + auto.getName() + "\" selected!");
+            // Anything you may want to do when the auto is selected.
         });
 
         // Test Bindings
@@ -300,6 +243,7 @@ public class RobotContainer {
         testBindings_.addDefaultOption("Swerve Wheel Radius", DriveCommands.wheelRadiusCharacterization(drivebase_));
         testBindings_.addOption("Swerve Feedforward", DriveCommands.feedforwardCharacterization(drivebase_));
         testBindings_.addOption("Shooter Setpoints", shooter_.testCommand(hopper_));
+        testBindings_.addOption("Hood Calibration", shooter_.hoodCalibration());
 
         // Sets the selected test binding to be triggered when the A button is pressed in test mode.
         RobotModeTriggers.test().and(gamepad_.a()).toggleOnTrue(Commands.deferredProxy(testBindings_::get));
@@ -328,11 +272,14 @@ public class RobotContainer {
 
         // When the shooter isnt shooting, get it ready to shoot.
         shooter_.setDefaultCommand(shooter_.awaitShooting(drivebase_::getPose));
+
+        //While the A button is held, the intake will run the eject sequence. If it the intake is stowed, it will also deploy it.
+        gamepad_.a().whileTrue(intake_.ejectSequence());
     }
 
     private void configureDriveBindings() {
         // Default command, normal field-relative drive
-        drivebase_.setDefaultCommand(DriveCommands.joystickDrive());
+        drivebase_.setDefaultCommand(DriveCommands.joystickDrive().withName("JoystickDrive"));
 
         // Slow Mode, during left bumper
         gamepad_.leftBumper().whileTrue(

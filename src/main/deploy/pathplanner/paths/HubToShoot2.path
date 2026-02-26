@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.792467345685915,
-        "y": 3.954804658518082
+        "x": 5.8311777777777785,
+        "y": 4.0652333333333335
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.5457901150609237,
-        "y": 3.8902843554289808
+        "x": 5.982344444444445,
+        "y": 5.6676
       },
       "isLocked": false,
-      "linkedName": "ShootPoint"
+      "linkedName": "Hub"
     },
     {
       "anchor": {
-        "x": 1.4993756218701133,
-        "y": 3.760007585288223
+        "x": 4.238888888888889,
+        "y": 7.3909
       },
       "prevControl": {
-        "x": 1.8821959573459077,
-        "y": 3.805647730269615
+        "x": 6.788566666666666,
+        "y": 7.723466666666667
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "ShootLoc2"
     }
   ],
   "rotationTargets": [],
@@ -33,7 +33,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.2,
+    "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -90.0
   },
   "reversed": false,
-  "folder": "Depot",
+  "folder": "NoClimbAutos",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 12.15799065484797
+    "rotation": -90.0
   },
   "useDefaultConstraints": true
 }
