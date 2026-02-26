@@ -40,8 +40,10 @@ import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.subsystems.hopper.HopperIO;
 import frc.robot.subsystems.hopper.HopperIOSim;
+import frc.robot.subsystems.hopper.HopperIOTalonFX;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOSim;
+import frc.robot.subsystems.intake.IntakeIOTalonFX;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.shooter.HoodIO;
 import frc.robot.subsystems.shooter.HoodIOServo;
@@ -129,14 +131,10 @@ public class RobotContainer {
                         new CameraIOPhotonSim("front", VisionConstants.frontTransform, MapleSimUtil::getPosition, true)
                     );
 
-                    intake_= new IntakeSubsystem(new IntakeIOSim());
-
-                    shooter_ = new Shooter(new ShooterIOSim(), new HoodIOSim());
-
-                    hopper_ = new Hopper(new HopperIOSim());
+                    intake_= new IntakeSubsystem(new IntakeIOSim(roborioCANBus));
+                    shooter_ = new Shooter(new ShooterIOSim(roborioCANBus), new HoodIOSim());
+                    hopper_ = new Hopper(new HopperIOSim(roborioCANBus));
                     
-                    climb_ = new ThriftyClimb(new ThriftyClimbIOSim());
-
                     break;
 
                 case COMPETITION:
@@ -152,7 +150,8 @@ public class RobotContainer {
                     );
 
                     shooter_ = new Shooter(new ShooterIOTalonFX(roborioCANBus), new HoodIOServo());
-                    // hopper_ = new Hopper(new HopperIOSim());
+                    hopper_ = new Hopper(new HopperIOTalonFX(roborioCANBus));
+                    intake_ = new IntakeSubsystem(new IntakeIOTalonFX(roborioCANBus));
                    
                     break;
             }
@@ -203,10 +202,6 @@ public class RobotContainer {
 
         if (hopper_ == null) {
             hopper_ = new Hopper(new HopperIO() {});
-        }
-
-        if (climb_ == null) {
-            climb_ = new ThriftyClimb(new ThriftyClimbIO() {});
         }
 
         DriveCommands.configure(

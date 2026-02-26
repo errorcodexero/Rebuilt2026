@@ -1,9 +1,11 @@
 package frc.robot.subsystems.shooter;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
@@ -22,6 +24,10 @@ public class ShooterConstants {
     public static final AngularVelocity shooterTolerance = RotationsPerSecond.of(1.0);
 
     public static final Distance allowedTrenchDistance = Meters.of(1.0);
+
+    public static final Angle hoodParkedAngle = Degrees.of(5.0) ;
+    public static final Angle hoodMaxAngle = Degrees.of(75.0) ;
+    public static final Angle hoodMinAngle = Degrees.of(0.0) ;
 
     public class PID {
         // shooter

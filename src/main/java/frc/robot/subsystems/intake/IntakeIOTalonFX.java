@@ -48,10 +48,10 @@ public class IntakeIOTalonFX implements IntakeIO {
     private StatusSignal<Voltage> rollerAppliedVoltsSignal;
     private StatusSignal<Current> rollerCurrentAmpsSignal; 
 
-    public IntakeIOTalonFX(CANBus pivotBus, CANBus rollerBus) {
+    public IntakeIOTalonFX(CANBus canbus) {
         // Initialize motor objects
-        rollerMotor = new TalonFX(IntakeConstants.rollerMotorCANID, rollerBus);
-        pivotMotor = new TalonFX(IntakeConstants.pivotMotorCANID, pivotBus);
+        rollerMotor = new TalonFX(IntakeConstants.rollerMotorCANID, canbus);
+        pivotMotor = new TalonFX(IntakeConstants.pivotMotorCANID, canbus);
 
         // Configuration for the pivot motor
         final TalonFXConfiguration pivotConfigs= new TalonFXConfiguration();
