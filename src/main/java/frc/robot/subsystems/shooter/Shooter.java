@@ -200,6 +200,7 @@ public class Shooter extends SubsystemBase {
 
     public Command hoodToPosCmd(Angle pos) {
         return runOnce(() -> setHoodAngle(pos)).withName("Set Hood Position");
+    }
     public Command runSetpoints(AngularVelocity vel, Angle pos) {
         return startEnd(() -> setSetpoints(vel, pos), this::stopShooter);
     }
@@ -318,16 +319,16 @@ public class Shooter extends SubsystemBase {
     }
 
 
-    /**
-     * Shoot balls from the shooter until the command ends.
-     * @return
-     */
-    public Command shootCmd(Hopper hopper) {
-        return Commands.parallel(
-            runDynamicSetpoints(() -> RPM.of(5000), () -> Degrees.of(30)),
-            hopper.forwardFeed()
-        );
-    }
+    // /**
+    //  * Shoot balls from the shooter until the command ends.
+    //  * @return
+    //  */
+    // public Command shootCmd(Hopper hopper) {
+    //     return Commands.parallel(
+    //         runDynamicSetpoints(() -> RevolutionsPerSecond.of(5000.0/60.0), () -> Degrees.of(30)),
+    //         hopper.forwardFeed()
+    //     );
+    // }
 
     /**
      * The command that the shooter can run whenever its not shooting to manage
