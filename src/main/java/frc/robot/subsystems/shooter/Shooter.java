@@ -157,16 +157,16 @@ public class Shooter extends SubsystemBase {
                     (pose.getX() >= zone.getX() && zone.getX() ==  ShooterConstants.Positions.redSpinUpZone.getX())) {
                     switch(HubDistance.fromDistance(distanceToHub)) {
                         case LOW:
-                            vel = ShooterConstants.Positions.distMapLow.get(distanceToHub.baseUnitMagnitude());
+                            vel = ShooterConstants.Positions.distMapLow.get(distanceToHub.magnitude());
                         
                         case MEDIUM:
-                            vel = ShooterConstants.Positions.distMapMed.get(distanceToHub.baseUnitMagnitude());
+                            vel = ShooterConstants.Positions.distMapMed.get(distanceToHub.magnitude());
                             
                         case HIGH:
-                            vel = ShooterConstants.Positions.distMapHigh.get(distanceToHub.baseUnitMagnitude());
+                            vel = ShooterConstants.Positions.distMapHigh.get(distanceToHub.magnitude());
                         
                         default: 
-                            vel = ShooterConstants.Positions.distMapHigh.get(distanceToHub.baseUnitMagnitude());
+                            vel = ShooterConstants.Positions.distMapHigh.get(distanceToHub.magnitude());
                     }
                 }
                 return RotationsPerSecond.of(vel);
@@ -230,7 +230,7 @@ public class Shooter extends SubsystemBase {
      * 
      * 
      */
-    public Command shooterSetpointSupplier(Supplier<Pose2d> pose, Hopper hopper) {
+    public Command shoot(Supplier<Pose2d> pose, Hopper hopper) {
         
         return Commands.parallel(
                 defer(() -> {
@@ -248,16 +248,16 @@ public class Shooter extends SubsystemBase {
                         var vel = 0.0;
                         switch(HubDistance.fromDistance(distanceToHub)) {
                             case LOW:
-                                vel = ShooterConstants.Positions.distMapLow.get(distanceToHub.baseUnitMagnitude());
+                                vel = ShooterConstants.Positions.distMapLow.get(distanceToHub.magnitude());
                             
                             case MEDIUM:
-                                vel = ShooterConstants.Positions.distMapMed.get(distanceToHub.baseUnitMagnitude());
+                                vel = ShooterConstants.Positions.distMapMed.get(distanceToHub.magnitude());
                                 
                             case HIGH:
-                                vel = ShooterConstants.Positions.distMapHigh.get(distanceToHub.baseUnitMagnitude());
+                                vel = ShooterConstants.Positions.distMapHigh.get(distanceToHub.magnitude());
                             
                             default: 
-                                vel = ShooterConstants.Positions.distMapHigh.get(distanceToHub.baseUnitMagnitude());
+                                vel = ShooterConstants.Positions.distMapHigh.get(distanceToHub.magnitude());
                         }
 
                         return RotationsPerSecond.of(vel);

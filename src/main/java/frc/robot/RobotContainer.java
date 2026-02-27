@@ -86,315 +86,315 @@ public class RobotContainer {
     // Trigger Devices
     private final CommandXboxController gamepad_ = new CommandXboxController(0);
     
-        public RobotContainer() {
-            /**
-             * Subsystem setup
-             */
-            if (Constants.getMode() != Mode.REPLAY) {
-                switch (Constants.getRobot()) {
-                    case ALPHA:
-                        drivebase_ = new Drive(
-                            new GyroIOPigeon2(AlphaTunerConstants.DrivetrainConstants.Pigeon2Id, AlphaTunerConstants.kCANBus),
-                            ModuleIOTalonFX::new,
-                            AlphaTunerConstants.FrontLeft,
-                            AlphaTunerConstants.FrontRight,
-                            AlphaTunerConstants.BackLeft,
-                            AlphaTunerConstants.BackRight,
-                            AlphaTunerConstants.kCANBus,
-                            AlphaTunerConstants.kSpeedAt12Volts
-                        );
-    
-                        break;
-    
-                    case BETA:
-    
-                        drivebase_ = new Drive(
-                            new GyroIOPigeon2(BetaTunerConstants.DrivetrainConstants.Pigeon2Id, BetaTunerConstants.kCANBus),
-                            ModuleIOTalonFX::new,
-                            BetaTunerConstants.FrontLeft,
-                            BetaTunerConstants.FrontRight,
-                            BetaTunerConstants.BackLeft,
-                            BetaTunerConstants.BackRight,
-                            BetaTunerConstants.kCANBus,
-                            BetaTunerConstants.kSpeedAt12Volts
-                        );
-    
-                        break;
-    
-                    case SIMBOT:
-                        // Sim robot, instantiate physics sim IO implementations
-                        // Create and configure a drivetrain simulation configuration
-                        DriveTrainSimulationConfig config = DriveTrainSimulationConfig.Default()
-                            .withGyro(COTS.ofPigeon2())
-                            .withSwerveModule(COTS.ofMark4(
-                                DCMotor.getKrakenX60(1),
-                                DCMotor.getKrakenX60(1),
-                                COTS.WHEELS.COLSONS.cof,
-                                2
+    public RobotContainer() {
+        /**
+         * Subsystem setup
+         */
+        if (Constants.getMode() != Mode.REPLAY) {
+            switch (Constants.getRobot()) {
+                case ALPHA:
+                    drivebase_ = new Drive(
+                        new GyroIOPigeon2(AlphaTunerConstants.DrivetrainConstants.Pigeon2Id, AlphaTunerConstants.kCANBus),
+                        ModuleIOTalonFX::new,
+                        AlphaTunerConstants.FrontLeft,
+                        AlphaTunerConstants.FrontRight,
+                        AlphaTunerConstants.BackLeft,
+                        AlphaTunerConstants.BackRight,
+                        AlphaTunerConstants.kCANBus,
+                        AlphaTunerConstants.kSpeedAt12Volts
+                    );
+
+                    break;
+
+                case BETA:
+
+                    drivebase_ = new Drive(
+                        new GyroIOPigeon2(BetaTunerConstants.DrivetrainConstants.Pigeon2Id, BetaTunerConstants.kCANBus),
+                        ModuleIOTalonFX::new,
+                        BetaTunerConstants.FrontLeft,
+                        BetaTunerConstants.FrontRight,
+                        BetaTunerConstants.BackLeft,
+                        BetaTunerConstants.BackRight,
+                        BetaTunerConstants.kCANBus,
+                        BetaTunerConstants.kSpeedAt12Volts
+                    );
+
+                    break;
+
+                case SIMBOT:
+                    // Sim robot, instantiate physics sim IO implementations
+                    // Create and configure a drivetrain simulation configuration
+                    DriveTrainSimulationConfig config = DriveTrainSimulationConfig.Default()
+                        .withGyro(COTS.ofPigeon2())
+                        .withSwerveModule(COTS.ofMark4(
+                            DCMotor.getKrakenX60(1),
+                            DCMotor.getKrakenX60(1),
+                            COTS.WHEELS.COLSONS.cof,
+                            2
+                        ))
+                        .withTrackLengthTrackWidth(
+                            Meters.of(Math.abs(
+                                CompTunerConstants.FrontLeft.LocationX -
+                                CompTunerConstants.BackLeft.LocationX
+                            )),
+                            Meters.of(Math.abs(
+                                CompTunerConstants.FrontLeft.LocationY -
+                                CompTunerConstants.FrontRight.LocationY
                             ))
-                            .withTrackLengthTrackWidth(
-                                Meters.of(Math.abs(
-                                    CompTunerConstants.FrontLeft.LocationX -
-                                    CompTunerConstants.BackLeft.LocationX
-                                )),
-                                Meters.of(Math.abs(
-                                    CompTunerConstants.FrontLeft.LocationY -
-                                    CompTunerConstants.FrontRight.LocationY
-                                ))
-                            )
-                            .withBumperSize(Inches.of(30.75), Inches.of(37.25));
-    
-                        // Add sim drivebase to simulation and where modules can get it.
-                        // CALL THIS BEFORE CREATING THE DRIVEBASE!
-                        MapleSimUtil.createSwerve(config, new Pose2d(2.0, 2.0, Rotation2d.kZero));
-                        MapleSimUtil.createIntake();
-    
-                        drivebase_ = new Drive(
-                            new GyroIOMaple(),
-                            ModuleIOMaple::new,
-                            CompTunerConstants.FrontLeft,
-                            CompTunerConstants.FrontRight,
-                            CompTunerConstants.BackLeft,
-                            CompTunerConstants.BackRight,
-                            CompTunerConstants.kCANBus,
-                            CompTunerConstants.kSpeedAt12Volts
-                        );
-    
-                        vision_ = new AprilTagVision(
-                            drivebase_::addVisionMeasurement,
-                            new CameraIOPhotonSim("front", VisionConstants.frontTransform, MapleSimUtil::getPosition, true)
-                        );
-    
-                        intake_= new IntakeSubsystem(new IntakeIOSim());
-    
-                        shooter_ = new Shooter(new ShooterIOSim(), new HoodIOSim());
-    
-                        hopper_ = new Hopper(new HopperIOSim());
-                        
-                        climb_ = new ThriftyClimb(new ThriftyClimbIOSim());
-    
-                        break;
-    
-                    case COMPETITION:
-                        // drivebase_ = new Drive(
-                        //     new GyroIOPigeon2(CompTunerConstants.DrivetrainConstants.Pigeon2Id, CompTunerConstants.kCANBus),
-                        //     ModuleIOTalonFX::new,
-                        //     CompTunerConstants.FrontLeft,
-                        //     CompTunerConstants.FrontRight,
-                        //     CompTunerConstants.BackLeft,
-                        //     CompTunerConstants.BackRight,
-                        //     CompTunerConstants.kCANBus,
-                        //     CompTunerConstants.kSpeedAt12Volts
-                        // );
-    
-                        shooter_ = new Shooter(new ShooterIOTalonFX(roborioCANBus), new HoodIOServo());
-                        hopper_ = new Hopper(new HopperIOSim());
-                       
-                        break;
-                }
-            }
-    
-            /**
-             * Empty subsystem setup (required in replay)
-             */
-            if (drivebase_ == null) { // This will be null in replay, or whenever a case above leaves a subsystem uninstantiated.
-                switch (Constants.getRobot()) {
-                    case ALPHA:
-                        drivebase_ = new Drive(
-                            new GyroIO() {},
-                            ModuleIOReplay::new,
-                            AlphaTunerConstants.FrontLeft,
-                            AlphaTunerConstants.FrontRight,
-                            AlphaTunerConstants.BackLeft,
-                            AlphaTunerConstants.BackRight,
-                            AlphaTunerConstants.kCANBus,
-                            AlphaTunerConstants.kSpeedAt12Volts
-                        );
-    
-                        break;
-    
-                    case BETA:
-                        drivebase_ = new Drive(
-                            new GyroIO() {},
-                            ModuleIOReplay::new,
-                            BetaTunerConstants.FrontLeft,
-                            BetaTunerConstants.FrontRight,
-                            BetaTunerConstants.BackLeft,
-                            BetaTunerConstants.BackRight,
-                            BetaTunerConstants.kCANBus,
-                            BetaTunerConstants.kSpeedAt12Volts
-                        );
-    
-                        break;
-                        
-                    default: // SimBot or Comp Bot
-                        drivebase_ = new Drive(
-                            new GyroIO() {},
-                            ModuleIOReplay::new,
-                            CompTunerConstants.FrontLeft,
-                            CompTunerConstants.FrontRight,
-                            CompTunerConstants.BackLeft,
-                            CompTunerConstants.BackRight,
-                            CompTunerConstants.kCANBus,
-                            CompTunerConstants.kSpeedAt12Volts
-                        );
-    
-                        break;
-                }
-            }
-    
-            if (vision_ == null) {
-                int numCams = switch (Constants.getRobot()) {
-                    default -> 1;
-                };
-    
-                CameraIO[] cams = new CameraIO[numCams];
-                Arrays.fill(cams, new CameraIO() {});
-    
-                vision_ = new AprilTagVision(
-                    drivebase_::addVisionMeasurement,
-                    cams
-                );
-            }
-            
-            if (intake_ == null) {
-                intake_ = new IntakeSubsystem(new IntakeIO() {});
-            }
-            
-            if (shooter_ == null) {
-                shooter_ = new Shooter(new ShooterIO() {}, new HoodIO() {});
-            }
-    
-            if (hopper_ == null) {
-                hopper_ = new Hopper(new HopperIO() {});
-            }
-    
-            if (climb_ == null) {
-                climb_ = new ThriftyClimb(new ThriftyClimbIO() {});
-            }
-    
-            DriveCommands.configure(
-                drivebase_,
-                () -> -gamepad_.getLeftY(),
-                () -> -gamepad_.getLeftX(),
-                () -> -gamepad_.getRightX()
-            );
-    
-            // Initialize the visualizers.
-            Mechanism3d.measured.zero();
-            Mechanism3d.setpoints.zero();
-    
-            // Maple Sim
-            if (Constants.getRobot() == RobotType.SIMBOT) {
-                MapleSimUtil.start();
-            }
-    
-            // AutoModes
-            autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
-    
-            autoChooser_.onChange(auto -> {
-                System.err.println("Auto \"" + auto.getName() + "\" selected!");
-                // This should be used to set up robot position setting, initialization, etc.
-            });
-    
-            // Test Bindings
-            testBindings_ = new LoggedDashboardChooser<>("Test Mode Choices");
-    
-            testBindings_.addDefaultOption("Swerve Wheel Radius", DriveCommands.wheelRadiusCharacterization(drivebase_));
-            testBindings_.addOption("Swerve Feedforward", DriveCommands.feedforwardCharacterization(drivebase_));
-            testBindings_.addOption("Shooter Setpoints", shooter_.testCommand(hopper_));
-    
-            // Sets the selected test binding to be triggered when the A button is pressed in test mode.
-            RobotModeTriggers.test().and(gamepad_.a()).toggleOnTrue(Commands.deferredProxy(testBindings_::get));
-    
-            configureBindings();
-            configureDriveBindings();
-        }
-    
-        // Bind robot actions to commands here.
-        private void configureBindings() {
-            // Manually deploying and undeploying the intake.
-            gamepad_.start().onTrue(Commands.either(
-                intake_.deployCmd(),
-                intake_.stowCmd(),
-                intake_::isIntakeStowed
-            ));
-    
-            
-    
-            // While the left trigger is held, we will run the intake. If the intake is stowed, it will also deploy it.
-            gamepad_.leftTrigger().whileTrue(intake_.intakeSequence());
-    
-            // While the right trigger is held, we will shoot into the hub or ferry.
-            gamepad_.rightTrigger().whileTrue(new ConditionalCommand(Commands.parallel(DriveCommands.joystickDriveAtAngle(drivebase_,
-                    () -> 0,
-                    () -> 0, 
-                    () -> {
-                        Translation2d hub =
-                                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                                ? ShooterConstants.Positions.blueHubPose
-                                : ShooterConstants.Positions.redHubPose;
-                        
-                        var hubTranslation = hub.minus(drivebase_.getPose().getTranslation());
-                        var rotation = new Rotation2d(hubTranslation.getX(), hubTranslation.getY());
-    
-                        return rotation;
-                    }).andThen(drivebase_.stopWithXCmd()),
-                    Commands.waitSeconds(.5).andThen(shooter_.shooterSetpointSupplier(() -> drivebase_.getPose(), hopper_))
-                ),
+                        )
+                        .withBumperSize(Inches.of(30.75), Inches.of(37.25));
 
-                Commands.parallel(DriveCommands.joystickDriveAtAngle(drivebase_,
-                    () -> gamepad_.getLeftX(),
-                    () -> gamepad_.getLeftY(), 
-                    () -> {
+                    // Add sim drivebase to simulation and where modules can get it.
+                    // CALL THIS BEFORE CREATING THE DRIVEBASE!
+                    MapleSimUtil.createSwerve(config, new Pose2d(2.0, 2.0, Rotation2d.kZero));
+                    MapleSimUtil.createIntake();
 
-                        var rotation = new Rotation2d();
+                    drivebase_ = new Drive(
+                        new GyroIOMaple(),
+                        ModuleIOMaple::new,
+                        CompTunerConstants.FrontLeft,
+                        CompTunerConstants.FrontRight,
+                        CompTunerConstants.BackLeft,
+                        CompTunerConstants.BackRight,
+                        CompTunerConstants.kCANBus,
+                        CompTunerConstants.kSpeedAt12Volts
+                    );
 
-                        var targetTranslation = new Translation2d();
-                        
-                        Translation2d rightTarget =
-                                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                                ? ShooterConstants.Positions.blueTargetRight
-                                : ShooterConstants.Positions.redTargetRight;
+                    vision_ = new AprilTagVision(
+                        drivebase_::addVisionMeasurement,
+                        new CameraIOPhotonSim("front", VisionConstants.frontTransform, MapleSimUtil::getPosition, true)
+                    );
 
-                        Translation2d leftTarget =
-                                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                                ? ShooterConstants.Positions.blueTargetLeft
-                                : ShooterConstants.Positions.redTargetLeft;
+                    intake_= new IntakeSubsystem(new IntakeIOSim());
 
-                        if (drivebase_.getPose().getY() < 4.034536) {
-                            targetTranslation = rightTarget.minus(drivebase_.getPose().getTranslation());
-                        }
-                        else {
-                            targetTranslation = leftTarget.minus(drivebase_.getPose().getTranslation());
-                        }
-                        rotation = new Rotation2d(targetTranslation.getX(), targetTranslation.getY());
+                    shooter_ = new Shooter(new ShooterIOSim(), new HoodIOSim());
 
-                        return rotation;
-                    }),
-                    Commands.waitSeconds(.5).andThen(shooter_.shooterSetpointSupplier(() -> drivebase_.getPose(), hopper_))
-                ),
-
-                () -> { 
-                    var zone =
-                        DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                        ? ShooterConstants.Positions.blueAllianceZone
-                        : ShooterConstants.Positions.redAllianceZone;
+                    hopper_ = new Hopper(new HopperIOSim());
                     
-                    if ((drivebase_.getPose().getX() <= zone.getX() && zone.getX() == ShooterConstants.Positions.blueAllianceZone.getX()) ||
-                        (drivebase_.getPose().getX() >= zone.getX() && zone.getX() == ShooterConstants.Positions.redAllianceZone.getX())) {
-                        return true;
+                    climb_ = new ThriftyClimb(new ThriftyClimbIOSim());
+
+                    break;
+
+                case COMPETITION:
+                    // drivebase_ = new Drive(
+                    //     new GyroIOPigeon2(CompTunerConstants.DrivetrainConstants.Pigeon2Id, CompTunerConstants.kCANBus),
+                    //     ModuleIOTalonFX::new,
+                    //     CompTunerConstants.FrontLeft,
+                    //     CompTunerConstants.FrontRight,
+                    //     CompTunerConstants.BackLeft,
+                    //     CompTunerConstants.BackRight,
+                    //     CompTunerConstants.kCANBus,
+                    //     CompTunerConstants.kSpeedAt12Volts
+                    // );
+
+                    shooter_ = new Shooter(new ShooterIOTalonFX(roborioCANBus), new HoodIOServo());
+                    hopper_ = new Hopper(new HopperIOSim());
+                    
+                    break;
+            }
+        }
+
+        /**
+         * Empty subsystem setup (required in replay)
+         */
+        if (drivebase_ == null) { // This will be null in replay, or whenever a case above leaves a subsystem uninstantiated.
+            switch (Constants.getRobot()) {
+                case ALPHA:
+                    drivebase_ = new Drive(
+                        new GyroIO() {},
+                        ModuleIOReplay::new,
+                        AlphaTunerConstants.FrontLeft,
+                        AlphaTunerConstants.FrontRight,
+                        AlphaTunerConstants.BackLeft,
+                        AlphaTunerConstants.BackRight,
+                        AlphaTunerConstants.kCANBus,
+                        AlphaTunerConstants.kSpeedAt12Volts
+                    );
+
+                    break;
+
+                case BETA:
+                    drivebase_ = new Drive(
+                        new GyroIO() {},
+                        ModuleIOReplay::new,
+                        BetaTunerConstants.FrontLeft,
+                        BetaTunerConstants.FrontRight,
+                        BetaTunerConstants.BackLeft,
+                        BetaTunerConstants.BackRight,
+                        BetaTunerConstants.kCANBus,
+                        BetaTunerConstants.kSpeedAt12Volts
+                    );
+
+                    break;
+                    
+                default: // SimBot or Comp Bot
+                    drivebase_ = new Drive(
+                        new GyroIO() {},
+                        ModuleIOReplay::new,
+                        CompTunerConstants.FrontLeft,
+                        CompTunerConstants.FrontRight,
+                        CompTunerConstants.BackLeft,
+                        CompTunerConstants.BackRight,
+                        CompTunerConstants.kCANBus,
+                        CompTunerConstants.kSpeedAt12Volts
+                    );
+
+                    break;
+            }
+        }
+
+        if (vision_ == null) {
+            int numCams = switch (Constants.getRobot()) {
+                default -> 1;
+            };
+
+            CameraIO[] cams = new CameraIO[numCams];
+            Arrays.fill(cams, new CameraIO() {});
+
+            vision_ = new AprilTagVision(
+                drivebase_::addVisionMeasurement,
+                cams
+            );
+        }
+        
+        if (intake_ == null) {
+            intake_ = new IntakeSubsystem(new IntakeIO() {});
+        }
+        
+        if (shooter_ == null) {
+            shooter_ = new Shooter(new ShooterIO() {}, new HoodIO() {});
+        }
+
+        if (hopper_ == null) {
+            hopper_ = new Hopper(new HopperIO() {});
+        }
+
+        if (climb_ == null) {
+            climb_ = new ThriftyClimb(new ThriftyClimbIO() {});
+        }
+
+        DriveCommands.configure(
+            drivebase_,
+            () -> -gamepad_.getLeftY(),
+            () -> -gamepad_.getLeftX(),
+            () -> -gamepad_.getRightX()
+        );
+
+        // Initialize the visualizers.
+        Mechanism3d.measured.zero();
+        Mechanism3d.setpoints.zero();
+
+        // Maple Sim
+        if (Constants.getRobot() == RobotType.SIMBOT) {
+            MapleSimUtil.start();
+        }
+
+        // AutoModes
+        autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
+
+        autoChooser_.onChange(auto -> {
+            System.err.println("Auto \"" + auto.getName() + "\" selected!");
+            // This should be used to set up robot position setting, initialization, etc.
+        });
+
+        // Test Bindings
+        testBindings_ = new LoggedDashboardChooser<>("Test Mode Choices");
+
+        testBindings_.addDefaultOption("Swerve Wheel Radius", DriveCommands.wheelRadiusCharacterization(drivebase_));
+        testBindings_.addOption("Swerve Feedforward", DriveCommands.feedforwardCharacterization(drivebase_));
+        testBindings_.addOption("Shooter Setpoints", shooter_.testCommand(hopper_));
+
+        // Sets the selected test binding to be triggered when the A button is pressed in test mode.
+        RobotModeTriggers.test().and(gamepad_.a()).toggleOnTrue(Commands.deferredProxy(testBindings_::get));
+
+        configureBindings();
+        configureDriveBindings();
+    }
+    
+    // Bind robot actions to commands here.
+    private void configureBindings() {
+        // Manually deploying and undeploying the intake.
+        gamepad_.start().onTrue(Commands.either(
+            intake_.deployCmd(),
+            intake_.stowCmd(),
+            intake_::isIntakeStowed
+        ));
+
+        
+
+        // While the left trigger is held, we will run the intake. If the intake is stowed, it will also deploy it.
+        gamepad_.leftTrigger().whileTrue(intake_.intakeSequence());
+
+        // While the right trigger is held, we will shoot into the hub or ferry.
+        gamepad_.rightTrigger().whileTrue(new ConditionalCommand(Commands.parallel(DriveCommands.joystickDriveAtAngle(drivebase_,
+                () -> 0,
+                () -> 0, 
+                () -> {
+                    Translation2d hub =
+                            DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                            ? ShooterConstants.Positions.blueHubPose
+                            : ShooterConstants.Positions.redHubPose;
+                    
+                    var hubTranslation = hub.minus(drivebase_.getPose().getTranslation());
+                    var rotation = new Rotation2d(hubTranslation.getX(), hubTranslation.getY());
+
+                    return rotation;
+                }).andThen(drivebase_.stopWithXCmd()),
+                Commands.waitSeconds(.5).andThen(shooter_.shoot(() -> drivebase_.getPose(), hopper_))
+            ),
+
+            Commands.parallel(DriveCommands.joystickDriveAtAngle(drivebase_,
+                () -> gamepad_.getLeftX(),
+                () -> gamepad_.getLeftY(), 
+                () -> {
+
+                    var rotation = new Rotation2d();
+
+                    var targetTranslation = new Translation2d();
+                    
+                    Translation2d rightTarget =
+                            DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                            ? ShooterConstants.Positions.blueTargetRight
+                            : ShooterConstants.Positions.redTargetRight;
+
+                    Translation2d leftTarget =
+                            DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                            ? ShooterConstants.Positions.blueTargetLeft
+                            : ShooterConstants.Positions.redTargetLeft;
+
+                    if (drivebase_.getPose().getY() < 4.034536) {
+                        targetTranslation = rightTarget.minus(drivebase_.getPose().getTranslation());
                     }
-                    return false;
-                }
-            ));
+                    else {
+                        targetTranslation = leftTarget.minus(drivebase_.getPose().getTranslation());
+                    }
+                    rotation = new Rotation2d(targetTranslation.getX(), targetTranslation.getY());
+
+                    return rotation;
+                }),
+                Commands.waitSeconds(.5).andThen(shooter_.shoot(() -> drivebase_.getPose(), hopper_))
+            ),
+
+            () -> { 
+                var zone =
+                    DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                    ? ShooterConstants.Positions.blueAllianceZone
+                    : ShooterConstants.Positions.redAllianceZone;
                 
-    
-            // When the hopper isnt shooting, set it to run its idle velocity.
-            hopper_.setDefaultCommand(hopper_.idleScrambler());
-    
-            // When the shooter isnt shooting, get it ready to shoot.
-            shooter_.setDefaultCommand(shooter_.awaitShooting(drivebase_::getPose));
+                if ((drivebase_.getPose().getX() <= zone.getX() && zone.getX() == ShooterConstants.Positions.blueAllianceZone.getX()) ||
+                    (drivebase_.getPose().getX() >= zone.getX() && zone.getX() == ShooterConstants.Positions.redAllianceZone.getX())) {
+                    return true;
+                }
+                return false;
+            }
+        ));
+            
+
+        // When the hopper isnt shooting, set it to run its idle velocity.
+        hopper_.setDefaultCommand(hopper_.idleScrambler());
+
+        // When the shooter isnt shooting, get it ready to shoot.
+        shooter_.setDefaultCommand(shooter_.awaitShooting(drivebase_::getPose));
     }
 
     private void configureDriveBindings() {
