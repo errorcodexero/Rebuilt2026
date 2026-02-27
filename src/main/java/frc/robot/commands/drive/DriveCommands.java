@@ -247,7 +247,7 @@ public class DriveCommands {
                     () -> shootOnMove ? -gamepad.getLeftY() * Constants.shootOnMoveMaxSpeed : 0.0,
                     () -> shootOnMove ? -gamepad.getLeftX() * Constants.shootOnMoveMaxSpeed : 0.0,
                     () -> {
-                        var hubTranslation = (shootOnMove ? drive.getVirtualTarget() : drive.getHubTranslation()).minus(drive.getPose().getTranslation());
+                        var hubTranslation = (shootOnMove ? drive.getVirtualTarget() : DriveConstants.getHubTranslation(DriverStation.getAlliance().orElse(Alliance.Blue))).minus(drive.getPose().getTranslation());
                         var rotation = new Rotation2d(hubTranslation.getX(), hubTranslation.getY());
 
                         return rotation;

@@ -60,10 +60,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.generated.CompTunerConstants;
 import frc.robot.util.LocalADStarAK;
+import frc.robot.util.VirtualTarget;
 
 public class Drive extends SubsystemBase {
     // These Constants should be the same for every drivebase, so just use the comp bot constants.
@@ -471,21 +473,10 @@ public class Drive extends SubsystemBase {
         return PP_CONFIG;
     }
 
-    public Translation2d getHubTranslation(){
-        return (
-                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                ? ShooterConstants.Positions.blueHubPose
-                : ShooterConstants.Positions.redHubPose
-            );
-    }
+    
 
     public Translation2d getVirtualTarget() {
-        return getHubTranslation().minus(
-                new Translation2d( 
-                    MetersPerSecond.of(getFieldChassisSpeeds().vxMetersPerSecond).times(ShooterConstants.hangTimeOnShot), 
-                    MetersPerSecond.of(getFieldChassisSpeeds().vyMetersPerSecond).times(ShooterConstants.hangTimeOnShot)
-                )
-            );
+        return VirtualTarget.getVirtualTargetFromTarget(this, DriveConstants.getHubTranslation(DriverStation.getAlliance().orElse(Alliance.Blue)), ShooterConstants.hangTimeOnShot);
     }
     
     /** Returns an array of module translations. */

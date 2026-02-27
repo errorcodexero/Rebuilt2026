@@ -24,7 +24,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
+import frc.robot.subsystems.shooter.ShooterConstants;
 
 /**
 * This class defines the runtime mode used by AdvantageKit. The mode is always "real" when running
@@ -62,6 +64,13 @@ public final class Constants {
         public static final Translation2d blueRightFerryTarget = new Translation2d(allianceZoneBlue.div(2.0), fieldWidth.times(1.0/6.0));
         public static final Translation2d redLeftFerryTarget = new Translation2d(fieldLength.minus(allianceZoneBlue.div(2.0)), fieldWidth.times(5.0/6.0));
         public static final Translation2d redRightFerryTarget = new Translation2d(fieldLength.minus(allianceZoneBlue.div(2.0)), fieldWidth.times(1.0/6.0));
+        public static Translation2d getHubTranslation(Alliance alliance){
+            return (
+                    alliance == Alliance.Blue
+                    ? ShooterConstants.Positions.blueHubPose
+                    : ShooterConstants.Positions.redHubPose
+                );
+        }
     }
     
     public static class FieldConstants {
