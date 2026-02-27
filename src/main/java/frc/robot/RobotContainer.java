@@ -127,7 +127,9 @@ public class RobotContainer {
 
                     vision_ = new AprilTagVision(
                         drivebase_::addVisionMeasurement,
-                        new CameraIOPhotonSim("front", VisionConstants.frontTransform, MapleSimUtil::getPosition, true)
+                        new CameraIOPhotonSim("front", VisionConstants.frontTransform, MapleSimUtil::getPosition, true),
+                        new CameraIOPhotonSim("backleft", VisionConstants.backLeftTransform, MapleSimUtil::getPosition, true),
+                        new CameraIOPhotonSim("backright", VisionConstants.backRightTransform, MapleSimUtil::getPosition, true)
                     );
 
                     intake_= new IntakeSubsystem(new IntakeIOSim(roborioCANBus));
@@ -190,7 +192,7 @@ public class RobotContainer {
             };
 
             CameraIO[] cams = new CameraIO[numCams];
-            Arrays.fill(cams, new CameraIO() {});
+            Arrays.setAll(cams, i -> new CameraIO() {});
 
             vision_ = new AprilTagVision(
                 drivebase_::addVisionMeasurement,
