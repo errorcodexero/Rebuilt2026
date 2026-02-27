@@ -64,7 +64,9 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.util.MapleSimUtil;
+import frc.robot.util.VirtualTarget;
 
 public class DriveCommands {
   private static final double kStoppedVelocity = 0.15 ;
@@ -264,7 +266,7 @@ public class DriveCommands {
       drive.getPose().getMeasureX().gt(DriveConstants.allianceZoneRed);
 
     if(robotInAllianceZone){
-      target = drive.getVirtualTarget();
+      target = DriveConstants.getHubTranslation(DriverStation.getAlliance().orElse(Alliance.Blue));
     }else if(drive.getPose().getMeasureY().gt(DriveConstants.fieldWidth.div(2.0))){
         target = blueDS ? DriveConstants.blueLeftFerryTarget : DriveConstants.redLeftFerryTarget ;
     }else{
@@ -274,8 +276,9 @@ public class DriveCommands {
     return target;
   }
 
+  // make sure this isnt bad with intellisense later
   public static Command pointAtShootingTarget(Drive drive, CommandXboxController gamepad, boolean shootOnMove){
-    return pointAtTarget(drive, gamepad, () -> getTarget(drive), shootOnMove);
+    return pointAtTarget(drive, gamepad, () -> VirtualTarget.getVirtualTargetFromTarget(drive, getTarget(drive), ShooterConstants.hangTimeOnShot), shootOnMove);
   }
 
   /**
