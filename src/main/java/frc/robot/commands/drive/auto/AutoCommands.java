@@ -14,19 +14,19 @@ public class AutoCommands {
         return Commands.sequence(
             Commands.runOnce(() -> drive.resetGyroCmd()),
 
-            DriveCommands.initialFollowPathCommand(drive, "GoToCollectDepot").deadlineFor(intake.intakeSequence()),
+            DriveCommands.initialFollowPathCommand(drive, "GoToCollectDepot",fieldside).deadlineFor(intake.intakeSequence()),
 
-            DriveCommands.followPathCommand("GoToShoot"),
+            DriveCommands.followPathCommand("GoToShoot", fieldside),
 
             shooter.shootCmd(hopper).withTimeout(2.5),
 
             shooter.stopCmd(),
 
-            DriveCommands.followPathCommand("GoToOutpost"), 
+            DriveCommands.followPathCommand("GoToOutpost",fieldside), 
 
             Commands.waitSeconds(2),
 
-            DriveCommands.followPathCommand("OutpostToNZ").deadlineFor(intake.intakeSequence())
+            DriveCommands.followPathCommand("OutpostToNZ",fieldside).deadlineFor(intake.intakeSequence())
         );
     }
 }
