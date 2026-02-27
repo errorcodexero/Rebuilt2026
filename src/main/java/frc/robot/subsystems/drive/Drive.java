@@ -361,20 +361,14 @@ public class Drive extends SubsystemBase {
         return runOnce(() -> stopWithX());
     }
     
-    public Command stopCmd() {
-        return runOnce(() -> stop());
-    }
-    
     public Command runVelocityCmd(ChassisSpeeds speeds) {
-        return run(() -> {
+        return startEnd(() -> {
             runVelocity(speeds);
-        });
+        }, this::stop);
     }
     
     public Command runVelocityCmd(LinearVelocity x, LinearVelocity y, AngularVelocity omega) {
-        return run(() -> {
-            runVelocity(x, y, omega);
-        });
+        return runVelocityCmd(new ChassisSpeeds(x, y, omega));
     }
     
     /** Returns the module states (turn angles and drive velocities) for all of the modules. */

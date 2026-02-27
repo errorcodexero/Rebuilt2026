@@ -640,8 +640,10 @@ public class DriveCommands {
               drive,
               startingPose,
               false
+          ).alongWith(
+            Commands.runOnce(() -> MapleSimUtil.placeRobotOnField(startingPose))
+              .onlyIf(() -> Constants.getMode() == Mode.SIM)
           ),
-          Commands.runOnce(() -> MapleSimUtil.placeRobotOnField(startingPose)),
           AutoBuilder.followPath(path.get()));
     }
 

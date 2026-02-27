@@ -130,7 +130,9 @@ public class Shooter extends SubsystemBase {
     }
 
     /**
-     * Shoot balls from the shooter until the command ends.
+     * Runs specified setpoints until the command ends, then stops.
+     * @param vel
+     * @param pos
      * @return
      */
     public Command shootCmd(Drive drive, Hopper hopper, CommandXboxController gamepad, boolean shootOnMove) {
@@ -198,6 +200,8 @@ public class Shooter extends SubsystemBase {
 
     public Command hoodToPosCmd(Angle pos) {
         return runOnce(() -> setHoodAngle(pos)).withName("Set Hood Position");
+    public Command runSetpoints(AngularVelocity vel, Angle pos) {
+        return startEnd(() -> setSetpoints(vel, pos), this::stopShooter);
     }
 
     /**
@@ -254,7 +258,12 @@ public class Shooter extends SubsystemBase {
         return runEnd(() -> setSetpoints(vel.get(), pos.get()), this::stopShooter);
     }
 
-    public Command setDynamicVoltage(Supplier<Voltage> voltage) {
+    /**
+     * Runs supplied voltage until the command ends, then stops.
+     * @param voltage
+     * @return
+     */
+    public Command runDynamicVoltage(Supplier<Voltage> voltage) {
         return runEnd(() -> setShooterVoltage(voltage.get()), this::stopShooter);
     }   
 
@@ -305,6 +314,38 @@ public class Shooter extends SubsystemBase {
                 hoodIO.applyCalibration(leftOffset.get(), rightOffset.get());
                 hoodIO.goToAngle(Degrees.zero());
             });
+        });
+    }
+
+
+    /**
+     * Shoot balls from the shooter until the command ends.
+     * @return
+     */
+    public Command shootCmd(Hopper hopper) {
+        return Commands.parallel(
+            runDynamicSetpoints(() -> RPM.of(5000), () -> Degrees.of(30)),
+            hopper.forwardFeed()
+        );
+    }
+
+    /**
+     * The command that the shooter can run whenever its not shooting to manage
+     * things like going to different hood angles to get ready to shoot,
+     * or lowering the hood under the trench.
+     * @return A command that does so.
+     */
+    public Command awaitShooting(Supplier<Pose2d> robotPose) {
+        return runDynamicSetpoints(() -> RadiansPerSecond.zero(), () -> {
+            Pose2d pose = robotPose.get();
+            Pose2d nearestTrench = pose.nearest(FieldConstants.trenches);
+            Distance nearestDistance = Meters.of(pose.getTranslation().getDistance(nearestTrench.getTranslation()));
+
+            if (nearestDistance.lte(ShooterConstants.allowedTrenchDistance)) {
+                return Degrees.zero();
+            }
+
+            return Degrees.of(45); // TODO: replace this with whatever determines shooter angle
         });
     }
 }

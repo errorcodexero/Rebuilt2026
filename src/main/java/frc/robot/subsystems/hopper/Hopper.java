@@ -178,28 +178,4 @@ public class Hopper extends SubsystemBase {
         return runEnd(() -> setFeederVoltage(v.get()), this::stopFeeder);
     }
     
-    public Command setFeederVoltageCommand(Voltage voltage) {
-        return runOnce(() -> setFeederVoltage(voltage))
-            .withName("Hopper.SetFeederVoltage");
-    }
-    
-    public Command setScramblerVoltageCommand(Voltage voltage) {
-        return runOnce(() -> setScramblerVoltage(voltage))
-            .withName("Hopper.SetScramblerVoltage");
-    }
-    
-    public Command stopFeederCommand() {
-        return runOnce(this::stopFeeder)
-            .withName("Hopper.StopFeeder");
-    }
-    
-    public Command stopScramblerCommand() {
-        return runOnce(this::stopScrambler)
-            .withName("Hopper.StopScrambler");
-    }
-    
-    public Command stopAllCommand() {
-        return runOnce(this::stopAll)
-            .withName("Hopper.StopAll");
-    }
 }
