@@ -136,33 +136,69 @@ public class Shooter extends SubsystemBase {
      * @return A command that does so.
      */
     public Command awaitShooting(Supplier<Pose2d> robotPose) {
-        return runDynamicSetpoints(() -> RadiansPerSecond.zero(), () -> {
-            Pose2d pose = robotPose.get();
-            Pose2d nearestTrench = pose.nearest(FieldConstants.trenches);
-            Distance nearestDistance = Meters.of(pose.getTranslation().getDistance(nearestTrench.getTranslation()));
+        return runDynamicSetpoints(() -> {
 
-            if (nearestDistance.lte(ShooterConstants.allowedTrenchDistance)) {
-                return Degrees.zero();
-            }
+                Translation2d zone =
+                    DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                    ? ShooterConstants.Positions.blueSpinUpZone
+                    : ShooterConstants.Positions.redSpinUpZone;
 
-            Translation2d hubTranslation =
-                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                ? ShooterConstants.Positions.blueHubPose
-                : ShooterConstants.Positions.redHubPose;
+                Pose2d pose = robotPose.get();
 
-            Distance distanceToHub = Meters.of(pose.getTranslation().getDistance(hubTranslation));
+                Translation2d hubTranslation =
+                    DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                    ? ShooterConstants.Positions.blueHubPose
+                    : ShooterConstants.Positions.redHubPose;
+            
+                Distance distanceToHub = Meters.of(pose.getTranslation().getDistance(hubTranslation));
+                var vel = 0.0;
 
-            switch(HubDistance.fromDistance(distanceToHub)) {
-                case LOW:
-                    return Degrees.of(ShooterConstants.Positions.hoodLOW);
-                case MEDIUM:
-                    return Degrees.of(ShooterConstants.Positions.hoodMEDIUM);
-                case HIGH:
-                    return Degrees.of(ShooterConstants.Positions.hoodHIGH);
-                default:  
-                    return Degrees.of(ShooterConstants.Positions.hoodLOW);  
-                    
-            }
+                if ((pose.getX() <= zone.getX() && zone.getX() == ShooterConstants.Positions.blueSpinUpZone.getX()) || 
+                    (pose.getX() >= zone.getX() && zone.getX() ==  ShooterConstants.Positions.redSpinUpZone.getX())) {
+                    switch(HubDistance.fromDistance(distanceToHub)) {
+                        case LOW:
+                            vel = ShooterConstants.Positions.distMapLow.get(distanceToHub.baseUnitMagnitude());
+                        
+                        case MEDIUM:
+                            vel = ShooterConstants.Positions.distMapMed.get(distanceToHub.baseUnitMagnitude());
+                            
+                        case HIGH:
+                            vel = ShooterConstants.Positions.distMapHigh.get(distanceToHub.baseUnitMagnitude());
+                        
+                        default: 
+                            vel = ShooterConstants.Positions.distMapHigh.get(distanceToHub.baseUnitMagnitude());
+                    }
+                }
+                return RotationsPerSecond.of(vel);
+            },
+                                
+            () -> {
+                Pose2d pose = robotPose.get();
+                Pose2d nearestTrench = pose.nearest(FieldConstants.trenches);
+                Distance nearestDistance = Meters.of(pose.getTranslation().getDistance(nearestTrench.getTranslation()));
+
+                if (nearestDistance.lte(ShooterConstants.allowedTrenchDistance)) {
+                    return Degrees.zero();
+                }
+
+                Translation2d hubTranslation =
+                    DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                    ? ShooterConstants.Positions.blueHubPose
+                    : ShooterConstants.Positions.redHubPose;
+
+                Distance distanceToHub = Meters.of(pose.getTranslation().getDistance(hubTranslation));
+
+                switch(HubDistance.fromDistance(distanceToHub)) {
+                    case LOW:
+                        return Degrees.of(ShooterConstants.Positions.hoodLOW);
+                    case MEDIUM:
+                        return Degrees.of(ShooterConstants.Positions.hoodMEDIUM);
+                    case HIGH:
+                        return Degrees.of(ShooterConstants.Positions.hoodHIGH);
+                    default:  
+                        return Degrees.of(ShooterConstants.Positions.hoodLOW);  
+                        
+                }
             
         });
     }
@@ -209,7 +245,20 @@ public class Shooter extends SubsystemBase {
         
                     return runDynamicSetpoints(() -> {
                         Distance distanceToHub = Meters.of(pose.get().getTranslation().getDistance(hubTranslation));
-                        var vel = ShooterConstants.Positions.distMap.get(distanceToHub.baseUnitMagnitude());
+                        var vel = 0.0;
+                        switch(HubDistance.fromDistance(distanceToHub)) {
+                            case LOW:
+                                vel = ShooterConstants.Positions.distMapLow.get(distanceToHub.baseUnitMagnitude());
+                            
+                            case MEDIUM:
+                                vel = ShooterConstants.Positions.distMapMed.get(distanceToHub.baseUnitMagnitude());
+                                
+                            case HIGH:
+                                vel = ShooterConstants.Positions.distMapHigh.get(distanceToHub.baseUnitMagnitude());
+                            
+                            default: 
+                                vel = ShooterConstants.Positions.distMapHigh.get(distanceToHub.baseUnitMagnitude());
+                        }
 
                         return RotationsPerSecond.of(vel);
                     },

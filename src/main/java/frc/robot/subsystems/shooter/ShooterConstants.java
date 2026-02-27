@@ -1,18 +1,20 @@
 package frc.robot.subsystems.shooter;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
 
 public class ShooterConstants {
 
-    public static final int shooter1CANID = 0;
+   public static final int shooter1CANID = 0;
     public static final int shooter2CANID = 1;
     public static final int shooter3CANID = 2;
 
@@ -25,24 +27,19 @@ public class ShooterConstants {
 
     public static final Distance allowedTrenchDistance = Meters.of(1.0);
 
+    public static final Angle hoodParkedAngle = Degrees.of(5.0) ;
+    public static final Angle hoodMaxAngle = Degrees.of(75.0) ;
+    public static final Angle hoodMinAngle = Degrees.of(0.0) ;
+
     public class PID {
             // shooter
-            public static final double shooterkP = 0.5; 
+            public static final double shooterkP = 0.0; 
             public static final double shooterkI = 0.0;
             public static final double shooterkD = 0.0;
-            public static final double shooterkV = 0.0;
+            public static final double shooterkV = 0.117;
             public static final double shooterkA = 0.0;
             public static final double shooterkG = 0.0;
             public static final double shooterkS = 0.0;
-
-            // hood
-            public static final double hoodkP = 0.0; 
-            public static final double hoodkI = 0.0;
-            public static final double hoodkD = 0.0;
-            public static final double hoodkV = 0.0;
-            public static final double hoodkA = 0.0;
-            public static final double hoodkG = 0.0;
-            public static final double hoodkS = 0.0;
         }
 
         public class MotionMagic {
@@ -51,11 +48,6 @@ public class ShooterConstants {
             public static final double shooterkMaxVelocity = 1000.0;
             public static final double shooterkMaxAcceleration = 3000.0;
             public static final double shooterkJerk = 0.0;
-
-            // hood
-            public static final double hoodkMaxVelocity = 0.0;
-            public static final double hoodkMaxAcceleration = 300.0;
-            public static final double hoodkJerk = 0.0;
         }
 
         public class SoftwareLimits {
@@ -66,6 +58,18 @@ public class ShooterConstants {
         public class Positions {
             public static final Translation2d blueHubPose = new Translation2d(4.5974,4.034536);
             public static final Translation2d redHubPose = new Translation2d(11.938,4.034536);
+
+            public static final Translation2d blueAllianceZone = new Translation2d(4.5974,0);
+            public static final Translation2d redAllianceZone = new Translation2d(11.938,0);
+
+            public static final Translation2d blueSpinUpZone = new Translation2d(6.5974,0);
+            public static final Translation2d redSpinUpZone = new Translation2d(9.938,0);
+
+            public static final Translation2d blueTargetLeft = new Translation2d(2,6);
+            public static final Translation2d blueTargetRight = new Translation2d(2,2);
+
+            public static final Translation2d redTargetLeft = new Translation2d(14,6);
+            public static final Translation2d redTargetRight = new Translation2d(14,2);
 
             // Hood Setpoints
             public static final double hoodLOW = 0;
@@ -98,18 +102,25 @@ public class ShooterConstants {
             public static final double high2 = 80;
             public static final double high3 = 90;
 
-            public static final InterpolatingDoubleTreeMap distMap = new InterpolatingDoubleTreeMap();
+            public static final InterpolatingDoubleTreeMap distMapLow = new InterpolatingDoubleTreeMap();
+            public static final InterpolatingDoubleTreeMap distMapMed = new InterpolatingDoubleTreeMap();
+            public static final InterpolatingDoubleTreeMap distMapHigh = new InterpolatingDoubleTreeMap();
 
             public static void initMap() {
-                distMap.put(dist1, low1);
-                distMap.put(dist2, low2);
-                distMap.put(dist3, low3);
-                distMap.put(dist4, med1);
-                distMap.put(dist5, med2);
-                distMap.put(dist6, med3);
-                distMap.put(dist7, high1);
-                distMap.put(dist8, high2);
-                distMap.put(dist9, high3);
+                // Hood Low
+                distMapLow.put(dist1, low1);
+                distMapLow.put(dist2, low2);
+                distMapLow.put(dist3, low3);
+
+                // Hood Med
+                distMapMed.put(dist4, med1);
+                distMapMed.put(dist5, med2);
+                distMapMed.put(dist6, med3);
+
+                // Hood High
+                distMapHigh.put(dist7, high1);
+                distMapHigh.put(dist8, high2);
+                distMapHigh.put(dist9, high3);
             }
         
             public enum HubDistance {
