@@ -14,7 +14,7 @@ public class AutoCommands {
         return Commands.sequence(
             Commands.runOnce(() -> drive.resetGyroCmd()),
 
-            DriveCommands.followPathCommand("GoToCollectDepot").deadlineFor(intake.intakeSequence()),
+            DriveCommands.initialFollowPathCommand(drive, "GoToCollectDepot").deadlineFor(intake.intakeSequence()),
 
             DriveCommands.followPathCommand("GoToShoot"),
 
@@ -26,13 +26,7 @@ public class AutoCommands {
 
             Commands.waitSeconds(2),
 
-            DriveCommands.followPathCommand("OutpostToShoot"),
-
-            shooter.shootCmd(hopper).withTimeout(2),
-
-            shooter.stopCmd(),
-
-            DriveCommands.followPathCommand("ShootToClimb")
+            DriveCommands.followPathCommand("OutpostToNZ").deadlineFor(intake.intakeSequence())
         );
     }
 }

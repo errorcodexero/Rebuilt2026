@@ -450,9 +450,6 @@ public class Drive extends SubsystemBase {
     /** Resets the current odometry pose. */
     public void setPose(Pose2d pose) {
         poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
-        if (Constants.getRobot() == RobotType.SIMBOT) {
-            MapleSimUtil.setPosition(pose);
-        }
     }
     
     /** Adds a new timestamped vision measurement. */
