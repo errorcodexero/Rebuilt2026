@@ -1,26 +1,28 @@
 package frc.robot.subsystems.intake;
 
-import static frc.robot.util.PhoenixUtil.tryUntilOk;
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.configs.*;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.controls.VoltageOut;
-import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+import static frc.robot.util.PhoenixUtil.tryUntilOk;
 
-import edu.wpi.first.units.measure.Voltage;
+import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.hardware.ParentDevice;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
-import com.ctre.phoenix6.controls.VelocityVoltage;
-
-import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.StatusSignal;     
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.hardware.ParentDevice;
-import com.ctre.phoenix6.CANBus; 
+import edu.wpi.first.units.measure.Voltage; 
 
 
 public class IntakeIOTalonFX implements IntakeIO {
@@ -36,6 +38,12 @@ public class IntakeIOTalonFX implements IntakeIO {
     //Roller motor control requests
     private final VoltageOut rollerVoltageRequest = new VoltageOut(Volts.of(0));
     private final VelocityVoltage rollerVelocityRequest= new VelocityVoltage(DegreesPerSecond.of(0));
+
+    private final Debouncer pivotConnectedDebounce =
+        new Debouncer(0.25, DebounceType.kFalling);
+
+    private final Debouncer rollerConnectedDebounce =
+        new Debouncer(0.25, DebounceType.kFalling);
 
     //Pivot status signals
     private StatusSignal<Angle> pivotAngleSignal;
@@ -129,23 +137,29 @@ public class IntakeIOTalonFX implements IntakeIO {
     }
     @Override
     public void updateInputs(IntakeIOInputsAutoLogged inputs) {
-        BaseStatusSignal.refreshAll(
+        var pivotStatus = BaseStatusSignal.refreshAll(
             pivotAngleSignal,
             pivotAngularVelocitySignal,
-            rollerAngularVelocitySignal,
-            rollerAppliedVoltsSignal,
             pivotAppliedVoltsSignal,
-            rollerCurrentAmpsSignal,
             pivotCurrentAmpsSignal
         );
 
+        var rollerStatus = BaseStatusSignal.refreshAll(
+            rollerAngularVelocitySignal,
+            rollerAppliedVoltsSignal,
+            rollerCurrentAmpsSignal
+        );
+
+        inputs.pivotConnected = pivotConnectedDebounce.calculate(pivotStatus.isOK());
         inputs.PivotAngle = pivotAngleSignal.getValue();
         inputs.PivotAngularVelocity = pivotAngularVelocitySignal.getValue();
+        inputs.PivotAppliedVolts = pivotAppliedVoltsSignal.getValue();
+        inputs.PivotCurrentAmps = pivotCurrentAmpsSignal.getValue();
+
+        inputs.rollerConnected = rollerConnectedDebounce.calculate(rollerStatus.isOK());
         inputs.RollerAngularVelocity = rollerAngularVelocitySignal.getValue();
         inputs.RollerAppliedVolts = rollerAppliedVoltsSignal.getValue();
-        inputs.PivotAppliedVolts = pivotAppliedVoltsSignal.getValue();
         inputs.RollerCurrentAmps = rollerCurrentAmpsSignal.getValue();
-        inputs.PivotCurrentAmps = pivotCurrentAmpsSignal.getValue();
     }
 
     @Override
