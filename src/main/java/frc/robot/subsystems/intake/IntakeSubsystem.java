@@ -123,29 +123,13 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     /**
-     * Command that stops the rollers, mainly for in automodes
-     * @return
-     */
-    public Command stopIntake(){
-        return runOnce(() -> stopIntaking()).withName("Stop Rollers");
-    }
-
-    /**
      * Command that deploys the intake and ends when it gets there.
      * @return
      */
     public Command deployCmd() {
-        return startDeployCmd()
+        return runOnce(this::deploy)
             .andThen(Commands.waitUntil(this::isIntakeDeployed)
             .withTimeout(2)).withName("Deploy Intake");
-    }
-
-    /**
-     * Command that starts the deployment of the intake, but doesnt wait until its done. 
-     * @return
-     */
-    public Command startDeployCmd() {
-        return runOnce(this::deploy);
     }
 
     /**
