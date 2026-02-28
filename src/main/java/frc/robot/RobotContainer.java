@@ -275,7 +275,7 @@ public class RobotContainer {
         //While the A button is held, the intake will run the eject sequence. If it the intake is stowed, it will also deploy it.
         gamepad_.a().whileTrue(intake_.ejectSequence());
 
-        gamepad_.leftTrigger().and(gamepad_.rightTrigger()).whileTrue(shooter_.ferryOnMove(drivebase_, hopper_, ()-> gamepad_.getLeftY(), ()-> gamepad_.getLeftX(), intake_));
+        gamepad_.leftBumper().whileTrue(shooter_.ferryOnMove(drivebase_, hopper_, ()-> gamepad_.getLeftY(), ()-> gamepad_.getLeftX(), intake_));
     }
 
     private void configureDriveBindings() {
@@ -291,7 +291,7 @@ public class RobotContainer {
                 () -> -gamepad_.getRightX() * DriveConstants.slowModeJoystickMultiplier));
 
         // Switch to X pattern / brake while X button is pressed
-        gamepad_.x().whileTrue(drivebase_.stopWithXCmd());
+        gamepad_.x().whileTrue(drivebase_.stopWithXCmd()); 
 
         // Robot Relative
         gamepad_.povUp().whileTrue(
