@@ -27,6 +27,8 @@ public class ShooterConstants {
 
     public static final Distance allowedTrenchDistance = Meters.of(1.0);
 
+    public static final double timeBeforeShoot = 0.2;
+
     public static final Angle hoodParkedAngle = Degrees.of(5.0) ;
     public static final Angle hoodMaxAngle = Degrees.of(75.0) ;
     public static final Angle hoodMinAngle = Degrees.of(0.0) ;
@@ -56,20 +58,23 @@ public class ShooterConstants {
         }
 
         public class Positions {
+            // Field Positions
             public static final Translation2d blueHubPose = new Translation2d(4.5974,4.034536);
             public static final Translation2d redHubPose = new Translation2d(11.938,4.034536);
 
-            public static final Translation2d blueAllianceZone = new Translation2d(4.5974,0);
-            public static final Translation2d redAllianceZone = new Translation2d(11.938,0);
+            public static final Distance allianceZone = Meters.of(4.5974);
+            public static final Distance spinUpZone = Meters.of(6.0);
 
-            public static final Translation2d blueSpinUpZone = new Translation2d(6.5974,0);
-            public static final Translation2d redSpinUpZone = new Translation2d(9.938,0);
+            public static final Distance blueAllianceWall = Meters.of(0);
+            public static final Distance redAllianceWall = Meters.of(15);
 
             public static final Translation2d blueTargetLeft = new Translation2d(2,6);
             public static final Translation2d blueTargetRight = new Translation2d(2,2);
 
             public static final Translation2d redTargetLeft = new Translation2d(14,6);
             public static final Translation2d redTargetRight = new Translation2d(14,2);
+
+            public static final double centerLineY = 4.034536;
 
             // Hood Setpoints
             public static final double hoodLOW = 0;

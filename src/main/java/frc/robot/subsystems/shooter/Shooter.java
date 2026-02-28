@@ -138,10 +138,10 @@ public class Shooter extends SubsystemBase {
     public Command awaitShooting(Supplier<Pose2d> robotPose) {
         return runDynamicSetpoints(() -> {
 
-                Translation2d zone =
+                Distance zone =
                     DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                    ? ShooterConstants.Positions.blueSpinUpZone
-                    : ShooterConstants.Positions.redSpinUpZone;
+                    ? ShooterConstants.Positions.blueAllianceWall
+                    : ShooterConstants.Positions.redAllianceWall;
 
                 Pose2d pose = robotPose.get();
 
@@ -153,8 +153,7 @@ public class Shooter extends SubsystemBase {
                 Distance distanceToHub = Meters.of(pose.getTranslation().getDistance(hubTranslation));
                 var vel = 0.0;
 
-                if ((pose.getX() <= zone.getX() && zone.getX() == ShooterConstants.Positions.blueSpinUpZone.getX()) || 
-                    (pose.getX() >= zone.getX() && zone.getX() ==  ShooterConstants.Positions.redSpinUpZone.getX())) {
+                if ((Math.abs(pose.getX() - zone.magnitude()) < ShooterConstants.Positions.spinUpZone.magnitude())) {
                     switch(HubDistance.fromDistance(distanceToHub)) {
                         case LOW:
                             vel = ShooterConstants.Positions.distMapLow.get(distanceToHub.magnitude());

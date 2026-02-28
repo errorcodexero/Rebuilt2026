@@ -20,13 +20,9 @@ import com.ctre.phoenix6.CANBus;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.DriveConstants;
@@ -53,7 +49,7 @@ import frc.robot.subsystems.shooter.HoodIO;
 import frc.robot.subsystems.shooter.HoodIOServo;
 import frc.robot.subsystems.shooter.HoodIOSim;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.ShooterConstants;
+import frc.robot.subsystems.shooter.ShooterCommands;
 import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterIOSim;
 import frc.robot.subsystems.shooter.ShooterIOTalonFX;
@@ -326,68 +322,7 @@ public class RobotContainer {
         gamepad_.leftTrigger().whileTrue(intake_.intakeSequence());
 
         // While the right trigger is held, we will shoot into the hub or ferry.
-        gamepad_.rightTrigger().whileTrue(new ConditionalCommand(Commands.parallel(DriveCommands.joystickDriveAtAngle(drivebase_,
-                () -> 0,
-                () -> 0, 
-                () -> {
-                    Translation2d hub =
-                            DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                            ? ShooterConstants.Positions.blueHubPose
-                            : ShooterConstants.Positions.redHubPose;
-                    
-                    var hubTranslation = hub.minus(drivebase_.getPose().getTranslation());
-                    var rotation = new Rotation2d(hubTranslation.getX(), hubTranslation.getY());
-
-                    return rotation;
-                }).andThen(drivebase_.stopWithXCmd()),
-                Commands.waitSeconds(.5).andThen(shooter_.shoot(() -> drivebase_.getPose(), hopper_))
-            ),
-
-            Commands.parallel(DriveCommands.joystickDriveAtAngle(drivebase_,
-                () -> gamepad_.getLeftX(),
-                () -> gamepad_.getLeftY(), 
-                () -> {
-
-                    var rotation = new Rotation2d();
-
-                    var targetTranslation = new Translation2d();
-                    
-                    Translation2d rightTarget =
-                            DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                            ? ShooterConstants.Positions.blueTargetRight
-                            : ShooterConstants.Positions.redTargetRight;
-
-                    Translation2d leftTarget =
-                            DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                            ? ShooterConstants.Positions.blueTargetLeft
-                            : ShooterConstants.Positions.redTargetLeft;
-
-                    if (drivebase_.getPose().getY() < 4.034536) {
-                        targetTranslation = rightTarget.minus(drivebase_.getPose().getTranslation());
-                    }
-                    else {
-                        targetTranslation = leftTarget.minus(drivebase_.getPose().getTranslation());
-                    }
-                    rotation = new Rotation2d(targetTranslation.getX(), targetTranslation.getY());
-
-                    return rotation;
-                }),
-                Commands.waitSeconds(.5).andThen(shooter_.shoot(() -> drivebase_.getPose(), hopper_))
-            ),
-
-            () -> { 
-                var zone =
-                    DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                    ? ShooterConstants.Positions.blueAllianceZone
-                    : ShooterConstants.Positions.redAllianceZone;
-                
-                if ((drivebase_.getPose().getX() <= zone.getX() && zone.getX() == ShooterConstants.Positions.blueAllianceZone.getX()) ||
-                    (drivebase_.getPose().getX() >= zone.getX() && zone.getX() == ShooterConstants.Positions.redAllianceZone.getX())) {
-                    return true;
-                }
-                return false;
-            }
-        ));
+        gamepad_.rightTrigger().whileTrue(ShooterCommands.Shoot( () -> drivebase_.getPose(), shooter_, hopper_, drivebase_));
             
 
         // When the hopper isnt shooting, set it to run its idle velocity.
