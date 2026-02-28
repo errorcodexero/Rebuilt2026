@@ -249,8 +249,9 @@ public class DriveCommands {
                     () -> shootOnMove ? -gamepad.getLeftY() * Constants.shootOnMoveMaxSpeed : 0.0,
                     () -> shootOnMove ? -gamepad.getLeftX() * Constants.shootOnMoveMaxSpeed : 0.0,
                     () -> {
-                        var hubTranslation = (shootOnMove ? drive.getVirtualTarget() : DriveConstants.getHubTranslation(DriverStation.getAlliance().orElse(Alliance.Blue))).minus(drive.getPose().getTranslation());
-                        var rotation = new Rotation2d(hubTranslation.getX(), hubTranslation.getY());
+                        Logger.recordOutput("Drive/Target", target.get());
+                        var translation = target.get().minus(drive.getPose().getTranslation());
+                        var rotation = new Rotation2d(translation.getX(), translation.getY());
 
                         return rotation;
                 });
@@ -278,7 +279,7 @@ public class DriveCommands {
 
   // make sure this isnt bad with intellisense later
   public static Command pointAtShootingTarget(Drive drive, CommandXboxController gamepad, boolean shootOnMove){
-    return pointAtTarget(drive, gamepad, () -> VirtualTarget.getVirtualTargetFromTarget(drive, getTarget(drive), ShooterConstants.hangTimeOnShot), shootOnMove);
+    return pointAtTarget(drive, gamepad, () -> (shootOnMove ? VirtualTarget.getVirtualTargetFromTarget(drive, getTarget(drive), ShooterConstants.hangTimeOnShot) : getTarget(drive)), shootOnMove);
   }
 
   /**
