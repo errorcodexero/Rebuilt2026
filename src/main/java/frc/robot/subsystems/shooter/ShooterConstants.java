@@ -93,50 +93,35 @@ public class ShooterConstants {
             public static final double hoodHIGH = 2;
 
             // Tested Distances 
-            public static final double dist1 = 1;
-            public static final double dist2 = 2;
-            public static final double dist3 = 3;
+            public static final double lowDist[] = {1, 2, 3};
+            public static final double lowVelocities[] = {10, 20, 30};
 
-            public static final double dist4 = 4;
-            public static final double dist5 = 5;
-            public static final double dist6 = 6;
+            public static final double medDist[] = {4, 5, 6};
+            public static final double medVelocities[] = {40, 50, 60};
 
-            public static final double dist7 = 7;
-            public static final double dist8 = 8;
-            public static final double dist9 = 9;
-
-            // Tested Velocities
-            public static final double low1 = 10;
-            public static final double low2 = 20;
-            public static final double low3 = 30;
-
-            public static final double med1 = 40;
-            public static final double med2 = 50;
-            public static final double med3 = 60;
-
-            public static final double high1 = 70;
-            public static final double high2 = 80;
-            public static final double high3 = 90;
+            public static final double highDist[] = {7, 8, 9};
+            public static final double highVelocities[] = {70, 80, 90};
 
             public static final InterpolatingDoubleTreeMap distMapLow = new InterpolatingDoubleTreeMap();
             public static final InterpolatingDoubleTreeMap distMapMed = new InterpolatingDoubleTreeMap();
             public static final InterpolatingDoubleTreeMap distMapHigh = new InterpolatingDoubleTreeMap();
 
             public static void initMap() {
-                // Hood Low
-                distMapLow.put(dist1, low1);
-                distMapLow.put(dist2, low2);
-                distMapLow.put(dist3, low3);
+                if (lowDist.length != lowVelocities.length || medDist.length != medVelocities.length || highDist.length != highVelocities.length) {
+                    throw new IllegalArgumentException("Distance and velocity arrays must be of the same length");
+                }
 
-                // Hood Med
-                distMapMed.put(dist4, med1);
-                distMapMed.put(dist5, med2);
-                distMapMed.put(dist6, med3);
+                for(int i = 0 ; i < lowDist.length; i++) {
+                    distMapLow.put(lowDist[i], lowVelocities[i]);
+                }
 
-                // Hood High
-                distMapHigh.put(dist7, high1);
-                distMapHigh.put(dist8, high2);
-                distMapHigh.put(dist9, high3);
+                for(int i = 0 ; i < medDist.length; i++) {
+                    distMapMed.put(medDist[i], medVelocities[i]);
+                }
+
+                for(int i = 0 ; i < highDist.length; i++) {
+                    distMapHigh.put(highDist[i], highVelocities[i]);
+                }
             }
         
             public enum HubDistance {

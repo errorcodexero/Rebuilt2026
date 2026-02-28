@@ -16,20 +16,23 @@ public class RobotCommands {
     public static Command shoot(Shooter shooter, Hopper hopper, Drive drive) {
         return new ConditionalCommand(
                 // On true
-                Commands.parallel(DriveCommands.joystickDriveAtAngle(drive,
-                    () -> 0,
-                    () -> 0, 
-                    () -> {
-                        Translation2d hub =
-                                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                                ? ShooterConstants.Positions.blueHubPose
-                                : ShooterConstants.Positions.redHubPose;
-                        
-                        var hubTranslation = hub.minus(drive.getPose().getTranslation());
-                        var rotation = new Rotation2d(hubTranslation.getX(), hubTranslation.getY());
+                Commands.parallel(
+                    // Parallel one
+                    DriveCommands.joystickDriveAtAngle(drive,
+                            () -> 0,
+                            () -> 0, 
+                            () -> {
+                                Translation2d hub =
+                                        DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                                        ? ShooterConstants.Positions.blueHubPose
+                                        : ShooterConstants.Positions.redHubPose;
+                                
+                                var hubTranslation = hub.minus(drive.getPose().getTranslation());
+                                var rotation = new Rotation2d(hubTranslation.getX(), hubTranslation.getY());
 
-                        return rotation;
-                    }).andThen(drive.stopWithXCmd()),
+                                return rotation;
+                            }).andThen(drive.stopWithXCmd()),
+                    // Parallel two
                     Commands.waitUntil(() -> Math.abs(drive.getChassisSpeeds().omegaRadiansPerSecond) < .001).andThen(shooter.shoot(() -> drive.getPose(), hopper))
                 ),  // End on true
 

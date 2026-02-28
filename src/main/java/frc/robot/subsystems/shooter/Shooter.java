@@ -253,44 +253,45 @@ public class Shooter extends SubsystemBase {
 
                     ShooterConstants.Positions.initMap();
         
-                    return runDynamicSetpoints(() -> {
-                        Distance distanceToHub = Meters.of(pose.get().getTranslation().getDistance(hubTranslation));
-                        var vel = 0.0;
-                        switch(HubDistance.fromDistance(distanceToHub)) {
-                            case LOW:
-                                vel = ShooterConstants.Positions.distMapLow.get(distanceToHub.magnitude());
-                            
-                            case MEDIUM:
-                                vel = ShooterConstants.Positions.distMapMed.get(distanceToHub.magnitude());
+                    return runDynamicSetpoints(
+                        () -> {
+                            Distance distanceToHub = Meters.of(pose.get().getTranslation().getDistance(hubTranslation));
+                            var vel = 0.0;
+                            switch(HubDistance.fromDistance(distanceToHub)) {
+                                case LOW:
+                                    vel = ShooterConstants.Positions.distMapLow.get(distanceToHub.magnitude());
                                 
-                            case HIGH:
-                                vel = ShooterConstants.Positions.distMapHigh.get(distanceToHub.magnitude());
-                            
-                            default: 
-                                vel = ShooterConstants.Positions.distMapHigh.get(distanceToHub.magnitude());
-                        }
-
-                        return RotationsPerSecond.of(vel);
-                    },
-
-                    () -> {
-                        // periodic
-                        Distance distanceToHub = Meters.of(pose.get().getTranslation().getDistance(hubTranslation));
-
-                        switch(HubDistance.fromDistance(distanceToHub)) {
-                            case LOW:
-                                return Degrees.of(ShooterConstants.Positions.hoodLOW);
-                            
-                            case MEDIUM:
-                                return Degrees.of(ShooterConstants.Positions.hoodMEDIUM);
+                                case MEDIUM:
+                                    vel = ShooterConstants.Positions.distMapMed.get(distanceToHub.magnitude());
+                                    
+                                case HIGH:
+                                    vel = ShooterConstants.Positions.distMapHigh.get(distanceToHub.magnitude());
                                 
-                            case HIGH:
-                                return Degrees.of(ShooterConstants.Positions.hoodHIGH);
-                            
-                            default: 
-                                return Degrees.of(ShooterConstants.Positions.hoodMEDIUM);
-                        }   
-                });
+                                default: 
+                                    vel = ShooterConstants.Positions.distMapHigh.get(distanceToHub.magnitude());
+                            }
+
+                            return RotationsPerSecond.of(vel);
+                        },
+                    
+                        () -> {
+                            // periodic
+                            Distance distanceToHub = Meters.of(pose.get().getTranslation().getDistance(hubTranslation));
+
+                            switch(HubDistance.fromDistance(distanceToHub)) {
+                                case LOW:
+                                    return Degrees.of(ShooterConstants.Positions.hoodLOW);
+                                
+                                case MEDIUM:
+                                    return Degrees.of(ShooterConstants.Positions.hoodMEDIUM);
+                                    
+                                case HIGH:
+                                    return Degrees.of(ShooterConstants.Positions.hoodHIGH);
+                                
+                                default: 
+                                    return Degrees.of(ShooterConstants.Positions.hoodMEDIUM);
+                            }   
+                    });
             }),
             hopper.forwardFeed()
         );
