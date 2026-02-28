@@ -133,12 +133,12 @@ public class ClimberIOTalonFX implements ClimberIO {
             twistVelocitySig
         );
 
-        inputs.deployPosition= deployPositionSig.getValue();
+        inputs.deployPostion= deployPositionSig.getValue();
         inputs.deployVolts= deployVoltageSig.getValue();
         inputs.deployCurrent= deployCurrentSig.getValue();
-        inputs.deployVelocity= deployVelocitySig.getValue();
+        inputs.deployvelocity= deployVelocitySig.getValue();
 
-        inputs.twistPosition= twistPositionSig.getValue();
+        inputs.twistPostion= twistPositionSig.getValue();
         inputs.twistVolts= twistVoltageSig.getValue();
         inputs.twistCurrent= twistCurrentSig.getValue();
         inputs.twistVelocity= twistVelocitySig.getValue();
@@ -182,6 +182,6 @@ public class ClimberIOTalonFX implements ClimberIO {
     @Override
     public void stopDeploy() {
         deployMotor.setControl(deployVoltageRequest.withOutput(Volts.of(0)));
-        deployMotor.setControl(deployPositionSig.withOutput(Volts.of(0)));
+        //deployMotor.setControl(deployPositionSig.withOutput(0));
     }
 }

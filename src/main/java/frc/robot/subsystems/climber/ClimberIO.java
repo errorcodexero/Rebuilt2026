@@ -6,41 +6,75 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.DegreesPerSecond;
+// import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import org.littletonrobotics.junction.AutoLog;
 
+//import edu.wpi.first.units.measure.Angle;
+//import edu.wpi.first.units.measure.Current;
+// import edu.wpi.first.units.measure.Voltage;
+
 public interface ClimberIO {
 
     @AutoLog
-    public class ClimberIOInputs {
-      public Voltage deployVolts = Volts.of(0);
-      public Current deployCurrent = Amps.of(0);
-      public Angle deployPosition = Degrees.of(0);
-      public AngularVelocity deployVelocity = DegreesPerSecond.of(0);
+    public static class ClimberIOInputs {
+      // public boolean oneConnected = false;
+      // public Voltage oneVolts = Volts.zero();
+      // public Current oneCurrent = Amps.zero();
+      //  public Angle onePosition = Radians.zero();
 
-      public Voltage twistVolts = Volts.of(0);
-      public Current twistCurrent = Amps.of(0);
-      public Angle twistPosition = Degrees.of(0);
-      public AngularVelocity twistVelocity = DegreesPerSecond.of(0);
-    }
+        public Angle deployPostion = Radians.zero();
+        public Voltage deployVolts = Volts.zero();
+        public Current deployCurrent = Amps.zero(); 
+        public AngularVelocity deployvelocity = RadiansPerSecond.zero(); 
+
+        public Angle twistPostion = Radians.zero();
+        public Voltage twistVolts = Volts.zero();
+        public Current twistCurrent = Amps.zero();
+        public AngularVelocity twistVelocity = RadiansPerSecond.zero();
       
+
+       public  boolean twoConnected = false;
+      public Voltage twoVolts = Volts.zero();
+       public Current twoCurrent = Amps.zero();
+       public Angle twoPosition = Radians.zero();
+    }
+
+    public static class ClimberIOOutputs {
+      public Angle oneSetpoint = Degrees.zero();
+      public Angle twoSetpoint = Degrees.zero(); 
+    }
+     // methods for angles 
+      public Angle  deployPosition = Radians.zero();
+      public Angle  twistpostion = Radians.zero(); 
+
+      // interface for primary methods 
+     public default void setDeployAngle(Angle angle) {}
+     public default void  setTwistAngle (Angle angle) {}
+
+
+    //interface for secondary methods 
     public default void updateInputs(ClimberIOInputs inputs) {}
 
-    public default void setDeployAngle(Angle angle) {}
+    public default void applyOutputs(ClimberIOOutputs outputs) {}
+     
+    public default void setDeployVoltage (Voltage voltage ) {}
 
-    public default void setDeployVelocity(AngularVelocity velocity) {}
+    public default void setTwistVoltage (Voltage voltage)  {}
 
-    public default void setDeployVoltage(Voltage volts) {}
+    public default void setDeployVelocity (AngularVelocity velocity) {}
 
-    public default void setTwistAngle(Angle angle) {}
+    public default void  setTwistVelocity (AngularVelocity velocity) {}
 
-    public default void setTwistVelocity(AngularVelocity velocity) {}
-
-    public default void setTwistVoltage(Voltage volts) {}
-    
-    public default void stopDeploy() {}
+    public default void stopDeploy () {}
 
     public default void stopTwist() {}
+
+    
+    
+
+
 }

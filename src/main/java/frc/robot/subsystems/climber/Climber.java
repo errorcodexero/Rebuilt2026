@@ -1,5 +1,5 @@
 package frc.robot.subsystems.climber;
-import org.ejml.equation.ManagerFunctions.Input1;
+//import org.ejml.equation.ManagerFunctions.Input1;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.units.measure.Angle;
@@ -31,7 +31,7 @@ public class Climber extends SubsystemBase {
     @Override 
     public void periodic() {
         io.updateInputs(inputs);
-        Logger.processInputs("Climber", Input1);
+        Logger.processInputs("Climber", inputs);
 
         Logger.recordOutput("Climber/DeployMotor_DeployedAngleSetpoint", deployDeployedAngle);
         Logger.recordOutput("Climber/DeployMotor_StowedAngleSetpoint", deployStowedAngle);
@@ -77,11 +77,11 @@ public class Climber extends SubsystemBase {
     }
 
     public boolean isDeployAtAngle(Angle angle) {
-        return inputs.deployPosition.isNear(angle, ClimberConstants.Tolerances.deployTolerance);
+        return inputs.deployPostion.isNear(angle, ClimberConstants.Tolerances.deployTolerance);
     }
 
     public boolean isTwistAtAngle(Angle angle) {
-        return inputs.twistPosition.isNear(angle, ClimberConstants.Tolerances.twistTolerance);
+        return inputs.twistPostion.isNear(angle, ClimberConstants.Tolerances.twistTolerance);
     }
 
     public boolean isDeployed() {
