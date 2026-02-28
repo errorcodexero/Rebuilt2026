@@ -14,8 +14,8 @@ import frc.robot.commands.drive.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.hopper.Hopper;
 
-public class ShooterCommands {
-    public static Command Shoot(Supplier<Pose2d> pose, Shooter shooter, Hopper hopper, Drive drive) {
+public class RobotCommands {
+    public static Command shoot(Supplier<Pose2d> pose, Shooter shooter, Hopper hopper, Drive drive) {
         return new ConditionalCommand(Commands.parallel(DriveCommands.joystickDriveAtAngle(drive,
                 () -> 0,
                 () -> 0, 
@@ -30,7 +30,7 @@ public class ShooterCommands {
 
                     return rotation;
                 }).andThen(drive.stopWithXCmd()),
-                Commands.waitSeconds(ShooterConstants.timeBeforeShoot).andThen(shooter.shoot(() -> drive.getPose(), hopper))
+                Commands.waitUntil(() -> Math.abs(drive.getChassisSpeeds().omegaRadiansPerSecond) < .001).andThen(shooter.shoot(() -> drive.getPose(), hopper))
             ),
 
             Commands.parallel(DriveCommands.joystickDriveAtAngle(drive,
@@ -62,7 +62,7 @@ public class ShooterCommands {
 
                     return rotation;
                 }),
-                Commands.waitSeconds(ShooterConstants.timeBeforeShoot).andThen(shooter.shoot(() -> drive.getPose(), hopper))
+                Commands.waitUntil(() -> Math.abs(drive.getChassisSpeeds().omegaRadiansPerSecond) < .001).andThen(shooter.shoot(() -> drive.getPose(), hopper))
             ),
 
             () -> { 

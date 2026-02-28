@@ -7,7 +7,7 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.ShooterCommands;
+import frc.robot.subsystems.shooter.RobotCommands;
 
 public class AutoCommands {
 
@@ -16,11 +16,11 @@ public class AutoCommands {
         return Commands.sequence(
             DriveCommands.initialFollowPathCommand(drive,"TopToBottom Trench").deadlineFor(intake.intakeSequence()),
 
-            ShooterCommands.Shoot(() -> drive.getPose(), shooter, hopper, drive),
+            RobotCommands.shoot(() -> drive.getPose(), shooter, hopper, drive),
         
             DriveCommands.followPathCommand("BottomToTop").deadlineFor(intake.intakeSequence()),
 
-            ShooterCommands.Shoot(() -> drive.getPose(), shooter, hopper, drive)
+            RobotCommands.shoot(() -> drive.getPose(), shooter, hopper, drive)
         );
     }
     

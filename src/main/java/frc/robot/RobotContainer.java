@@ -49,7 +49,7 @@ import frc.robot.subsystems.shooter.HoodIO;
 import frc.robot.subsystems.shooter.HoodIOServo;
 import frc.robot.subsystems.shooter.HoodIOSim;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.ShooterCommands;
+import frc.robot.subsystems.shooter.RobotCommands;
 import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterIOSim;
 import frc.robot.subsystems.shooter.ShooterIOTalonFX;
@@ -322,7 +322,7 @@ public class RobotContainer {
         gamepad_.leftTrigger().whileTrue(intake_.intakeSequence());
 
         // While the right trigger is held, we will shoot into the hub or ferry.
-        gamepad_.rightTrigger().whileTrue(ShooterCommands.Shoot( () -> drivebase_.getPose(), shooter_, hopper_, drivebase_));
+        gamepad_.rightTrigger().whileTrue(RobotCommands.shoot( () -> drivebase_.getPose(), shooter_, hopper_, drivebase_));
             
 
         // When the hopper isnt shooting, set it to run its idle velocity.
