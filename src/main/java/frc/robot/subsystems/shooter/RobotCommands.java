@@ -15,7 +15,7 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.hopper.Hopper;
 
 public class RobotCommands {
-    public static Command shoot(Supplier<Pose2d> pose, Shooter shooter, Hopper hopper, Drive drive) {
+    public static Command shoot(Shooter shooter, Hopper hopper, Drive drive) {
         return new ConditionalCommand(Commands.parallel(DriveCommands.joystickDriveAtAngle(drive,
                 () -> 0,
                 () -> 0, 
@@ -67,7 +67,7 @@ public class RobotCommands {
 
             () -> { 
 
-                Pose2d robotPose = pose.get();
+                Pose2d robotPose = drive.getPose();
 
                 var zone =
                     DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue

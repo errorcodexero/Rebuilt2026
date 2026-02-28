@@ -43,21 +43,19 @@ public final class IntakeConstants {
     public static final Angle deployedAngle= Degrees.of(125); //Temporary angle
     public static final Angle pivotMinAngle= Degrees.of(-15); //Temporary angle
     public static final Angle pivotMaxAngle= Degrees.of(130); //Temporary angle
-    public static final Angle pivotTargetAngle = Degrees.of(-25); //This variable can be changed if we want to run a command to tell intake to go to a specific position
-    public static final Voltage pivotVoltage= Volts.of(2); //Temporary if we want to set the pivot voltage to a specifc value at all 
 
     public static final AngularVelocity pivotCruiseVelocity= DegreesPerSecond.of(90); //Temporary speed
     public static final AngularAcceleration pivotCruiseAcceleration= DegreesPerSecondPerSecond.of(180); //Temporary acceleration
     public static final double pivotMaxJerk= 0; //Temporary jerk
 
     public static final AngularVelocity rollerMaxVelocity= DegreesPerSecond.of(360); //Temporary speed to be changed as needed 
-    public static final Voltage rollerCollectVoltage= Volts.of(6); //Temporary voltage
-    public static final Voltage rollerEjectVoltage= Volts.of(-6); //Temporary voltage
+    public static final Voltage rollerCollectVoltage= Volts.of(6);
+    public static final Voltage rollerEjectVoltage= Volts.of(-6);
 
     public static final Angle pivotTolerance = Degrees.of(5); //Tolerance to compare current angle to target
 
-    public static final double motorToPivotGearRatio = 2.0; //Unsure yet, will need it for the simulator
-    public static final double rollerGearRatio = 1.0; //Unsure yet, will need it for the simulator
+    public static final double motorToPivotGearRatio = 1.0 ;
+    public static final double rollerGearRatio = 1.0 ;
     public static final MomentOfInertia PIVOT_MOMENTOFINERTIA = KilogramSquareMeters.of(0.01);
     public static final MomentOfInertia ROLLER_MOMENTOFINERTIA = KilogramSquareMeters.of(0.001);
 }

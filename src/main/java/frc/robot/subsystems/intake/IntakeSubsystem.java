@@ -23,8 +23,6 @@ import frc.robot.util.Mechanism3d;
 public class IntakeSubsystem extends SubsystemBase {
     private final IntakeIO io; 
     private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
-    private final Angle pivotDeployedAngle = IntakeConstants.deployedAngle;
-    private final Angle pivotStowedAngle = IntakeConstants.stowedAngle;
 
     private final Alert pivotAlert =
         new Alert("The intake pivot is disconnected!", AlertType.kError);
@@ -32,7 +30,7 @@ public class IntakeSubsystem extends SubsystemBase {
     private final Alert rollerAlert =
         new Alert("The intake roller is disconnected!", AlertType.kError);
 
-    private Angle setpointAngle = pivotStowedAngle;
+    private Angle setpointAngle = IntakeConstants.stowedAngle;
 
     public IntakeSubsystem(IntakeIO io) {
         this.io = io;
@@ -108,11 +106,15 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public boolean isIntakeDeployed() {
-        return isPivotAtAngle(pivotDeployedAngle);
+        return isPivotAtAngle(IntakeConstants.deployedAngle);
     }
 
+    public boolean isIntakeWaiting() {
+        return isPivotAtAngle(IntakeConstants.waitingAngle);
+    }    
+
     public boolean isIntakeStowed(){
-        return isPivotAtAngle(pivotStowedAngle);
+        return isPivotAtAngle(IntakeConstants.stowedAngle);
     }
 
     public boolean isPivotAtAngle(Angle angle){
@@ -142,6 +144,12 @@ public class IntakeSubsystem extends SubsystemBase {
             .andThen(Commands.waitUntil(this::isIntakeDeployed)
             .withTimeout(2)).withName("Deploy Intake");
     }
+
+    public Command waitCommand() {
+        return runOnce(this::waiting)
+            .andThen(Commands.waitUntil(this::isIntakeWaiting)
+            .withTimeout(2)).withName("Deploy Intake");
+    }    
 
     /**
      * Command that runs the intake until the command ends.
