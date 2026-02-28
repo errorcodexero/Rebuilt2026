@@ -1,7 +1,5 @@
 package frc.robot.subsystems.shooter;
 
-import java.util.function.Supplier;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -16,54 +14,57 @@ import frc.robot.subsystems.hopper.Hopper;
 
 public class RobotCommands {
     public static Command shoot(Shooter shooter, Hopper hopper, Drive drive) {
-        return new ConditionalCommand(Commands.parallel(DriveCommands.joystickDriveAtAngle(drive,
-                () -> 0,
-                () -> 0, 
-                () -> {
-                    Translation2d hub =
-                            DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                            ? ShooterConstants.Positions.blueHubPose
-                            : ShooterConstants.Positions.redHubPose;
-                    
-                    var hubTranslation = hub.minus(drive.getPose().getTranslation());
-                    var rotation = new Rotation2d(hubTranslation.getX(), hubTranslation.getY());
+        return new ConditionalCommand(
+                // On true
+                Commands.parallel(DriveCommands.joystickDriveAtAngle(drive,
+                    () -> 0,
+                    () -> 0, 
+                    () -> {
+                        Translation2d hub =
+                                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                                ? ShooterConstants.Positions.blueHubPose
+                                : ShooterConstants.Positions.redHubPose;
+                        
+                        var hubTranslation = hub.minus(drive.getPose().getTranslation());
+                        var rotation = new Rotation2d(hubTranslation.getX(), hubTranslation.getY());
 
-                    return rotation;
-                }).andThen(drive.stopWithXCmd()),
-                Commands.waitUntil(() -> Math.abs(drive.getChassisSpeeds().omegaRadiansPerSecond) < .001).andThen(shooter.shoot(() -> drive.getPose(), hopper))
-            ),
+                        return rotation;
+                    }).andThen(drive.stopWithXCmd()),
+                    Commands.waitUntil(() -> Math.abs(drive.getChassisSpeeds().omegaRadiansPerSecond) < .001).andThen(shooter.shoot(() -> drive.getPose(), hopper))
+                ),  // End on true
 
-            Commands.parallel(DriveCommands.joystickDriveAtAngle(drive,
-                () -> drive.getChassisSpeeds().vxMetersPerSecond,
-                () -> drive.getChassisSpeeds().vyMetersPerSecond, 
-                () -> {
+                // On false
+                Commands.parallel(DriveCommands.joystickDriveAtAngle(drive,
+                    () -> drive.getChassisSpeeds().vxMetersPerSecond,
+                    () -> drive.getChassisSpeeds().vyMetersPerSecond, 
+                    () -> {
 
-                    var rotation = new Rotation2d();
+                        var rotation = new Rotation2d();
 
-                    var targetTranslation = new Translation2d();
-                    
-                    Translation2d rightTarget =
-                            DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                            ? ShooterConstants.Positions.blueTargetRight
-                            : ShooterConstants.Positions.redTargetRight;
+                        var targetTranslation = new Translation2d();
+                        
+                        Translation2d rightTarget =
+                                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                                ? ShooterConstants.Positions.blueTargetRight
+                                : ShooterConstants.Positions.redTargetRight;
 
-                    Translation2d leftTarget =
-                            DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                            ? ShooterConstants.Positions.blueTargetLeft
-                            : ShooterConstants.Positions.redTargetLeft;
+                        Translation2d leftTarget =
+                                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                                ? ShooterConstants.Positions.blueTargetLeft
+                                : ShooterConstants.Positions.redTargetLeft;
 
-                    if (drive.getPose().getY() < ShooterConstants.Positions.centerLineY) {
-                        targetTranslation = rightTarget.minus(drive.getPose().getTranslation());
-                    }
-                    else {
-                        targetTranslation = leftTarget.minus(drive.getPose().getTranslation());
-                    }
-                    rotation = new Rotation2d(targetTranslation.getX(), targetTranslation.getY());
+                        if (drive.getPose().getY() < ShooterConstants.Positions.centerLineY) {
+                            targetTranslation = rightTarget.minus(drive.getPose().getTranslation());
+                        }
+                        else {
+                            targetTranslation = leftTarget.minus(drive.getPose().getTranslation());
+                        }
+                        rotation = new Rotation2d(targetTranslation.getX(), targetTranslation.getY());
 
-                    return rotation;
-                }),
-                Commands.waitUntil(() -> Math.abs(drive.getChassisSpeeds().omegaRadiansPerSecond) < .001).andThen(shooter.shoot(() -> drive.getPose(), hopper))
-            ),
+                        return rotation;
+                    }),
+                    Commands.waitUntil(() -> Math.abs(drive.getChassisSpeeds().omegaRadiansPerSecond) < .001).andThen(shooter.shoot(() -> drive.getPose(), hopper))
+                ),  // End on false
 
             () -> { 
 

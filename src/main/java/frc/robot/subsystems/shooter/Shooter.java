@@ -137,27 +137,14 @@ public class Shooter extends SubsystemBase {
     }
 
     /**
-     * Runs specified setpoints until the command ends, then stops.
-     * @param vel
-     * @param pos
-     * @return
-     */
-    // public Command shootCmd(Hopper hopper) {
-    //     return Commands.parallel(
-    //         runDynamicSetpoints(() -> RPM.of(5000), () -> Degrees.of(30)),
-    //         hopper.forwardFeed()
-    //     );
-    // }
-
-    /**
      * The command that the shooter can run whenever its not shooting to manage
      * things like going to different hood angles to get ready to shoot,
      * or lowering the hood under the trench.
      * @return A command that does so.
      */
     public Command awaitShooting(Supplier<Pose2d> robotPose) {
-        return runDynamicSetpoints(() -> {
-
+        return runDynamicSetpoints(
+            () -> {
                 Distance zone =
                     DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
                     ? ShooterConstants.Positions.blueAllianceWall
