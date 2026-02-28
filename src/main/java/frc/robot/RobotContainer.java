@@ -52,7 +52,6 @@ import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterIOSim;
 import frc.robot.subsystems.shooter.ShooterIOTalonFX;
-import frc.robot.subsystems.thriftyclimb.ThriftyClimb;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIO;
 import frc.robot.subsystems.vision.CameraIOLimelight4;
@@ -69,7 +68,6 @@ public class RobotContainer {
     private IntakeSubsystem intake_;
     private Shooter shooter_;
     private Hopper hopper_;
-    private ThriftyClimb climb_;
 
     private CANBus roborioCANBus = new CANBus();
 
@@ -275,7 +273,6 @@ public class RobotContainer {
         //While the A button is held, the intake will run the eject sequence. If it the intake is stowed, it will also deploy it.
         gamepad_.a().whileTrue(intake_.ejectSequence());
 
-        gamepad_.leftTrigger().and(gamepad_.rightTrigger()).whileTrue(shooter_.ferryToOutpost(drivebase_, hopper_, intake_, null, null));
     }
 
     private void configureDriveBindings() {
