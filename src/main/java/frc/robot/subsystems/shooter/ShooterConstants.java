@@ -130,25 +130,23 @@ public class ShooterConstants {
             public static final double high2 = 80;
             public static final double high3 = 90;
 
-            public static final InterpolatingDoubleTreeMap distMapLow = new InterpolatingDoubleTreeMap();
-            public static final InterpolatingDoubleTreeMap distMapMed = new InterpolatingDoubleTreeMap();
-            public static final InterpolatingDoubleTreeMap distMapHigh = new InterpolatingDoubleTreeMap();
+            public static final InterpolatingDoubleTreeMap distMap = new InterpolatingDoubleTreeMap();
 
             public static void initMap() {
                 // Hood Low
-                distMapLow.put(dist1, low1);
-                distMapLow.put(dist2, low2);
-                distMapLow.put(dist3, low3);
+                distMap.put(dist1, low1);
+                distMap.put(dist2, low2);
+                distMap.put(dist3, low3);
 
                 // Hood Med
-                distMapMed.put(dist4, med1);
-                distMapMed.put(dist5, med2);
-                distMapMed.put(dist6, med3);
+                distMap.put(dist4, med1);
+                distMap.put(dist5, med2);
+                distMap.put(dist6, med3);
 
                 // Hood High
-                distMapHigh.put(dist7, high1);
-                distMapHigh.put(dist8, high2);
-                distMapHigh.put(dist9, high3);
+                distMap.put(dist7, high1);
+                distMap.put(dist8, high2);
+                distMap.put(dist9, high3);
             }
         
             public enum HubDistance {

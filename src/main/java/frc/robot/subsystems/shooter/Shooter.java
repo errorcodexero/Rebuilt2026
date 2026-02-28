@@ -16,7 +16,6 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -30,7 +29,6 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -43,10 +41,6 @@ import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.subsystems.shooter.ShooterConstants.Positions.HubDistance;
 import frc.robot.util.MapleSimUtil;
 import frc.robot.util.Mechanism3d;
-import frc.robot.subsystems.drive.Drive;
-import frc.robot.commands.drive.DriveCommands;
-import frc.robot.subsystems.intake.IntakeSubsystem;
-import java.util.function.DoubleSupplier;
 
 
 public class Shooter extends SubsystemBase {
@@ -185,6 +179,8 @@ public class Shooter extends SubsystemBase {
                     return Degrees.of(ShooterConstants.Positions.hoodLOW);  
                     
             }
+        });
+    }
     public Command awaitShooting(Supplier<Pose2d> robotPose) {
         return runDynamicSetpoints(() -> {
 
@@ -204,19 +200,7 @@ public class Shooter extends SubsystemBase {
                 var vel = 0.0;
 
                 if ((Math.abs(pose.getX() - zone.magnitude()) < ShooterConstants.Positions.spinUpZone.magnitude())) {
-                    switch(HubDistance.fromDistance(distanceToHub)) {
-                        case LOW:
-                            vel = ShooterConstants.Positions.distMapLow.get(distanceToHub.magnitude());
-                        
-                        case MEDIUM:
-                            vel = ShooterConstants.Positions.distMapMed.get(distanceToHub.magnitude());
-                            
-                        case HIGH:
-                            vel = ShooterConstants.Positions.distMapHigh.get(distanceToHub.magnitude());
-                        
-                        default: 
-                            vel = ShooterConstants.Positions.distMapHigh.get(distanceToHub.magnitude());
-                    }
+                    vel = ShooterConstants.Positions.distMap.get(distanceToHub.magnitude());
                 }
                 return RotationsPerSecond.of(vel);
             },
@@ -275,7 +259,7 @@ public class Shooter extends SubsystemBase {
     }
     public Command runSetpoints(AngularVelocity vel, Angle pos) {
         return startEnd(() -> setSetpoints(vel, pos), this::stopShooter);
-
+    }
     /**
      * Calculates Velocity and Hood Angle based on distance and Shoots
      * 
@@ -297,20 +281,7 @@ public class Shooter extends SubsystemBase {
                     return runDynamicSetpoints(() -> {
                         Distance distanceToHub = Meters.of(pose.get().getTranslation().getDistance(hubTranslation));
                         var vel = 0.0;
-                        switch(HubDistance.fromDistance(distanceToHub)) {
-                            case LOW:
-                                vel = ShooterConstants.Positions.distMapLow.get(distanceToHub.magnitude());
-                            
-                            case MEDIUM:
-                                vel = ShooterConstants.Positions.distMapMed.get(distanceToHub.magnitude());
-                                
-                            case HIGH:
-                                vel = ShooterConstants.Positions.distMapHigh.get(distanceToHub.magnitude());
-                            
-                            default: 
-                                vel = ShooterConstants.Positions.distMapHigh.get(distanceToHub.magnitude());
-                        }
-
+                        vel = ShooterConstants.Positions.distMap.get(distanceToHub.magnitude());
                         return RotationsPerSecond.of(vel);
                     },
 
@@ -481,46 +452,4 @@ public class Shooter extends SubsystemBase {
     //         return Degrees.of(45); // TODO: replace this with whatever determines shooter angle
     //     });
     // }
-
-    public Command ferryToOutpost(Drive drive, Hopper hopper, IntakeSubsystem intake, DoubleSupplier xSupplier, DoubleSupplier ySupplier){
-        return new ConditionalCommand(
-            Commands.parallel(
-                DriveCommands.joystickDriveAtAngle(
-                    drive,
-                    ()-> 0,
-                    () -> 0,
-                    () -> {
-                        Translation2d ferryTarget = ShooterConstants.FerryPositions.blueOutpostTarget;
-
-                        var targetTranslation= ferryTarget.minus(drive.getPose().getTranslation());
-                        var targetRotation= new Rotation2d(targetTranslation.getX(), targetTranslation.getY());
-                        return targetRotation;
-                    }
-                ),
-                shootCmd(hopper)
-            ),
-            Commands.parallel(
-                DriveCommands.joystickDriveAtAngle(
-                    drive,
-                    ()-> 0,
-                    () -> 0,
-                    () -> {
-                        Translation2d ferryTarget= ShooterConstants.FerryPositions.redOutpostTarget;
-
-                        var targetTranslation= ferryTarget.minus(drive.getPose().getTranslation());
-                        var targetRotation= new Rotation2d(targetTranslation.getX(), targetTranslation.getY());
-                        return targetRotation;
-                    }
-                ),
-                shootCmd(hopper)
-            ),
-
-            () -> {
-                if(DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue){
-                    return true;
-                }
-                return false;
-            }
-        );
-    }
 }
