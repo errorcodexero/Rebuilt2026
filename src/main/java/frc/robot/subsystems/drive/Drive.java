@@ -62,12 +62,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
-import frc.robot.generated.BetaTunerConstants;
+import frc.robot.generated.CompTunerConstants;
 import frc.robot.util.LocalADStarAK;
 
 public class Drive extends SubsystemBase {
     // These Constants should be the same for every drivebase, so just use the comp bot constants.
-    static final double ODOMETRY_FREQUENCY = BetaTunerConstants.kCANBus.isNetworkFD() ? 250.0 : 100.0;
+    static final double ODOMETRY_FREQUENCY = CompTunerConstants.kCANBus.isNetworkFD() ? 250.0 : 100.0;
     public final double DRIVE_BASE_RADIUS;
 
     // Gyro degrees-per-rotation correction/trim
@@ -361,20 +361,14 @@ public class Drive extends SubsystemBase {
         return runOnce(() -> stopWithX());
     }
     
-    public Command stopCmd() {
-        return runOnce(() -> stop());
-    }
-    
     public Command runVelocityCmd(ChassisSpeeds speeds) {
-        return run(() -> {
+        return startEnd(() -> {
             runVelocity(speeds);
-        });
+        }, this::stop);
     }
     
     public Command runVelocityCmd(LinearVelocity x, LinearVelocity y, AngularVelocity omega) {
-        return run(() -> {
-            runVelocity(x, y, omega);
-        });
+        return runVelocityCmd(new ChassisSpeeds(x, y, omega));
     }
     
     /** Returns the module states (turn angles and drive velocities) for all of the modules. */

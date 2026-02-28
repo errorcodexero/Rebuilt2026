@@ -137,6 +137,10 @@ public class MapleSimUtil {
         return drivebaseSimulation.getSimulatedDriveTrainPose();
     }
 
+    public static void placeRobotOnField(Pose2d pose) {
+        drivebaseSimulation.setSimulationWorldPose(pose);
+    }
+
     public static ChassisSpeeds getFieldChassisSpeeds() {
         return drivebaseSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative();
     }

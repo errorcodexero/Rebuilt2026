@@ -3,32 +3,37 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.3016555555555556,
-        "y": 0.9713555555555557
+        "x": 4.259044444444445,
+        "y": 7.441288888888889
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.728165500014941,
-        "y": 1.7093464300164145
+        "x": 7.2723,
+        "y": 7.602533333333334
       },
       "isLocked": false,
-      "linkedName": "Shoot2"
+      "linkedName": "ShootLoc1"
     },
     {
       "anchor": {
-        "x": 0.7419,
-        "y": 2.664422222222222
+        "x": 5.8311777777777785,
+        "y": 4.0652333333333335
       },
       "prevControl": {
-        "x": 1.2085026323659471,
-        "y": 1.7916777703204518
+        "x": 6.143588888888888,
+        "y": 4.649744444444446
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Hub"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1,
+      "rotationDegrees": 0.0
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -42,13 +47,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": -90.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "NoClimbAutos",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 59.058463533677475
+    "rotation": -85.68397248013444
   },
   "useDefaultConstraints": true
 }

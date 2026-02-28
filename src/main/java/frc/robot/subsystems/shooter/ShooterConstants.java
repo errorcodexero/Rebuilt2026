@@ -9,8 +9,11 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.math.geometry.Translation2d;
+
 
 public class ShooterConstants {
 
@@ -18,10 +21,10 @@ public class ShooterConstants {
     public static final int shooter2CANID = 1;
     public static final int shooter3CANID = 2;
 
-    public static final int currentLimit = 40;
+    public static final Current currentLimit = Amps.of(180);
     public static final Time currentLimitTime = Seconds.of(1);
 
-    public static final double gearRatio = 1.04 ;
+    public static final double gearRatio = 1.04;
 
     public static final AngularVelocity shooterTolerance = RotationsPerSecond.of(1.0);
 
@@ -35,10 +38,10 @@ public class ShooterConstants {
 
     public class PID {
             // shooter
-            public static final double shooterkP = 0.0; 
+            public static final double shooterkP = 0.45; 
             public static final double shooterkI = 0.0;
             public static final double shooterkD = 0.0;
-            public static final double shooterkV = 0.117;
+            public static final double shooterkV = 0.132;
             public static final double shooterkA = 0.0;
             public static final double shooterkG = 0.0;
             public static final double shooterkS = 0.0;

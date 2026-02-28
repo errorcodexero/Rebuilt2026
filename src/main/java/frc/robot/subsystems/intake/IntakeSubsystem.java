@@ -9,6 +9,8 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -24,6 +26,12 @@ public class IntakeSubsystem extends SubsystemBase {
     private final Angle pivotDeployedAngle = IntakeConstants.deployedAngle;
     private final Angle pivotStowedAngle = IntakeConstants.stowedAngle;
 
+    private final Alert pivotAlert =
+        new Alert("The intake pivot is disconnected!", AlertType.kError);
+
+    private final Alert rollerAlert =
+        new Alert("The intake roller is disconnected!", AlertType.kError);
+
     private Angle setpointAngle = pivotStowedAngle;
 
     public IntakeSubsystem(IntakeIO io) {
@@ -34,6 +42,9 @@ public class IntakeSubsystem extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Intake", inputs);
+
+        pivotAlert.set(!inputs.pivotConnected);
+        rollerAlert.set(!inputs.rollerConnected);
 
         Logger.recordOutput("Intake/PivotSetpoint", setpointAngle);
 
@@ -67,6 +78,10 @@ public class IntakeSubsystem extends SubsystemBase {
      */
     private void stopIntaking() {
         io.stopRoller();
+    }
+
+    private void eject(){
+        io.setRollerVoltage(IntakeConstants.rollerEjectVoltage);
     }
 
     /**
@@ -123,17 +138,9 @@ public class IntakeSubsystem extends SubsystemBase {
      * @return
      */
     public Command deployCmd() {
-        return startDeployCmd()
+        return runOnce(this::deploy)
             .andThen(Commands.waitUntil(this::isIntakeDeployed)
             .withTimeout(2)).withName("Deploy Intake");
-    }
-
-    /**
-     * Command that starts the deployment of the intake, but doesnt wait until its done. 
-     * @return
-     */
-    public Command startDeployCmd() {
-        return runOnce(this::deploy);
     }
 
     /**
@@ -146,6 +153,16 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public Command intakeSequence() {
         return runIntakeCmd().beforeStarting(
+            deployCmd().unless(this::isIntakeDeployed)
+        ).finallyDo(interrupted -> waiting());
+    }
+
+    public Command runEjectCmd() {
+        return startEnd(this::eject, this::stopIntaking);
+    }
+
+    public Command ejectSequence() {
+        return runEjectCmd().beforeStarting(
             deployCmd().unless(this::isIntakeDeployed)
         ).finallyDo(interrupted -> waiting());
     }
