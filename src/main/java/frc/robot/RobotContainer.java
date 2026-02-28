@@ -23,6 +23,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.DriveConstants;
@@ -260,7 +261,12 @@ public class RobotContainer {
         
 
         // While the left trigger is held, we will run the intake. If the intake is stowed, it will also deploy it.
-        gamepad_.leftTrigger().whileTrue(intake_.intakeSequence());
+        gamepad_.leftTrigger().whileTrue(
+            new ParallelCommandGroup(
+                intake_.intakeSequence(),
+                hopper_.collectScrambler()
+            )
+        );
 
         // When the hopper isnt shooting, set it to run its idle velocity.
         // hopper_.setDefaultCommand(hopper_.idleScrambler());

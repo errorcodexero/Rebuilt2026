@@ -8,8 +8,9 @@ public class HopperConstants {
 
     // Command Constants
     public static final AngularVelocity feedingVelocity = RotationsPerSecond.of(20);
-    public static final AngularVelocity scramblerActiveVelocity = RotationsPerSecond.of(10);
+    public static final AngularVelocity scramblerShootingVelocity = RotationsPerSecond.of(10);
     public static final AngularVelocity scramblerIdleVelocity = RotationsPerSecond.of(2);
+    public static final AngularVelocity scramblerCollectVelocity = RotationsPerSecond.of(6);
     
     //Feeder Constants
 

@@ -245,6 +245,10 @@ public class Shooter extends SubsystemBase {
             .andThen(Commands.waitUntil(this::isShooterReady)).withName("Set Shooter Velocity");
     }
 
+    public Command requestToVelocityCmd(AngularVelocity vel) {
+        return runOnce(() -> setShooterVelocity(vel)) ;
+    }    
+
     public Command stopCmd() {
         return runOnce(() -> stopShooter())
             .andThen(Commands.waitUntil(this::isShooterReady)).withName("Stop Shooter");

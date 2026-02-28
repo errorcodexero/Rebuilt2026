@@ -106,16 +106,23 @@ public class Hopper extends SubsystemBase {
         );
     }
 
+    public Command collectScrambler() {
+        return startEnd(
+            () -> setScramblerVelocity(HopperConstants.scramblerCollectVelocity),
+            this::stopScrambler
+        );
+    }    
+
     /**
      * Runs the scrambler at backwards to move balls out of the shooter/feeder
      * @return
      */
     public Command reverseScrambler() {
         return startEnd(
-            () -> setScramblerVelocity(HopperConstants.scramblerActiveVelocity.times(-1)),
+            () -> setScramblerVelocity(HopperConstants.scramblerShootingVelocity.times(-1)),
             this::stopScrambler
         );
-    }    
+    }
 
     /**
      * Runs the feeder and scrambler at specified speeds.
@@ -138,7 +145,7 @@ public class Hopper extends SubsystemBase {
     // idk how to do this but like we should run the feeder motor backwards for about 0.5 secs to get arid of the balls stuck in there after we stop shooting
     // theoretically this would improve consistency
     public Command forwardFeed() {
-        return feed(HopperConstants.scramblerActiveVelocity, HopperConstants.feedingVelocity);
+        return feed(HopperConstants.scramblerShootingVelocity, HopperConstants.feedingVelocity);
     }
     
     /**
@@ -146,7 +153,7 @@ public class Hopper extends SubsystemBase {
      * @return
      */
     public Command reverseFeed() {
-        return feed(HopperConstants.scramblerActiveVelocity.times(-1), HopperConstants.feedingVelocity.times(-1));
+        return feed(HopperConstants.scramblerShootingVelocity.times(-1), HopperConstants.feedingVelocity.times(-1));
     }
     
     // Readbacks + state checks
