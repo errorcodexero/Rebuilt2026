@@ -25,6 +25,8 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -36,14 +38,13 @@ import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.subsystems.hopper.Hopper;
+import frc.robot.subsystems.shooter.ShooterConstants.Positions.HubDistance;
 import frc.robot.util.MapleSimUtil;
 import frc.robot.util.Mechanism3d;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import java.util.function.DoubleSupplier;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 
 public class Shooter extends SubsystemBase {
@@ -120,8 +121,7 @@ public class Shooter extends SubsystemBase {
     public Current getShooterCurrent() {
         return (shooterInputs.shooter1Current)
             .plus(shooterInputs.shooter2Current)
-            .plus(shooterInputs.shooter3Current)
-            .plus(shooterInputs.shooter4Current);
+            .plus(shooterInputs.shooter3Current);
     }
 
     private void setHoodAngle(Angle pos) {
@@ -142,8 +142,167 @@ public class Shooter extends SubsystemBase {
      * @param pos
      * @return
      */
-    public Command runSetpoints(AngularVelocity vel, Angle pos) {
-        return startEnd(() -> setSetpoints(vel, pos), this::stopShooter);
+    // public Command shootCmd(Hopper hopper) {
+    //     return Commands.parallel(
+    //         runDynamicSetpoints(() -> RPM.of(5000), () -> Degrees.of(30)),
+    //         hopper.forwardFeed()
+    //     );
+    // }
+
+    /**
+     * The command that the shooter can run whenever its not shooting to manage
+     * things like going to different hood angles to get ready to shoot,
+     * or lowering the hood under the trench.
+     * @return A command that does so.
+     */
+    public Command awaitShooting(Supplier<Pose2d> robotPose) {
+        return runDynamicSetpoints(() -> {
+
+                Distance zone =
+                    DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                    ? ShooterConstants.Positions.blueAllianceWall
+                    : ShooterConstants.Positions.redAllianceWall;
+
+                Pose2d pose = robotPose.get();
+
+                Translation2d hubTranslation =
+                    DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                    ? ShooterConstants.Positions.blueHubPose
+                    : ShooterConstants.Positions.redHubPose;
+            
+                Distance distanceToHub = Meters.of(pose.getTranslation().getDistance(hubTranslation));
+                var vel = 0.0;
+
+                if ((Math.abs(pose.getX() - zone.magnitude()) < ShooterConstants.Positions.spinUpZone.magnitude())) {
+                    switch(HubDistance.fromDistance(distanceToHub)) {
+                        case LOW:
+                            vel = ShooterConstants.Positions.distMapLow.get(distanceToHub.magnitude());
+                        
+                        case MEDIUM:
+                            vel = ShooterConstants.Positions.distMapMed.get(distanceToHub.magnitude());
+                            
+                        case HIGH:
+                            vel = ShooterConstants.Positions.distMapHigh.get(distanceToHub.magnitude());
+                        
+                        default: 
+                            vel = ShooterConstants.Positions.distMapHigh.get(distanceToHub.magnitude());
+                    }
+                }
+                return RotationsPerSecond.of(vel);
+            },
+                                
+            () -> {
+                Pose2d pose = robotPose.get();
+                Pose2d nearestTrench = pose.nearest(FieldConstants.trenches);
+                Distance nearestDistance = Meters.of(pose.getTranslation().getDistance(nearestTrench.getTranslation()));
+
+                if (nearestDistance.lte(ShooterConstants.allowedTrenchDistance)) {
+                    return Degrees.zero();
+                }
+
+                Translation2d hubTranslation =
+                    DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                    ? ShooterConstants.Positions.blueHubPose
+                    : ShooterConstants.Positions.redHubPose;
+
+                Distance distanceToHub = Meters.of(pose.getTranslation().getDistance(hubTranslation));
+
+                switch(HubDistance.fromDistance(distanceToHub)) {
+                    case LOW:
+                        return Degrees.of(ShooterConstants.Positions.hoodLOW);
+                    case MEDIUM:
+                        return Degrees.of(ShooterConstants.Positions.hoodMEDIUM);
+                    case HIGH:
+                        return Degrees.of(ShooterConstants.Positions.hoodHIGH);
+                    default:  
+                        return Degrees.of(ShooterConstants.Positions.hoodLOW);  
+                        
+                }
+            
+        });
+    }
+
+    public Command runToSetpointsCmd(AngularVelocity vel, Angle pos) {
+        return runOnce(() -> setSetpoints(vel, pos)).andThen(Commands.waitUntil(this::isShooterReady));
+    }
+
+    public Command runToVelocityCmd(AngularVelocity vel) {
+        return runOnce(() -> setShooterVelocity(vel))
+            .andThen(Commands.waitUntil(this::isShooterReady)).withName("Set Shooter Velocity");
+    }
+
+    public Command stopCmd() {
+        return runOnce(() -> stopShooter())
+            .andThen(Commands.waitUntil(this::isShooterReady)).withName("Stop Shooter");
+    }
+
+    public Command runVoltageCmd(Voltage vol) {
+        return runOnce(() -> setShooterVoltage(vol)).withName("Set Shooter Voltage");
+    }
+
+    public Command hoodToPosCmd(Angle pos) {
+        return runOnce(() -> setHoodAngle(pos)).withName("Set Hood Position");
+    }
+
+    /**
+     * Calculates Velocity and Hood Angle based on distance and Shoots
+     * 
+     * 
+     */
+    public Command shoot(Supplier<Pose2d> pose, Hopper hopper) {
+        
+        return Commands.parallel(
+                defer(() -> {
+
+                    // constructing
+                    Translation2d hubTranslation =
+                        DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                        ? ShooterConstants.Positions.blueHubPose
+                        : ShooterConstants.Positions.redHubPose;
+
+                    ShooterConstants.Positions.initMap();
+        
+                    return runDynamicSetpoints(() -> {
+                        Distance distanceToHub = Meters.of(pose.get().getTranslation().getDistance(hubTranslation));
+                        var vel = 0.0;
+                        switch(HubDistance.fromDistance(distanceToHub)) {
+                            case LOW:
+                                vel = ShooterConstants.Positions.distMapLow.get(distanceToHub.magnitude());
+                            
+                            case MEDIUM:
+                                vel = ShooterConstants.Positions.distMapMed.get(distanceToHub.magnitude());
+                                
+                            case HIGH:
+                                vel = ShooterConstants.Positions.distMapHigh.get(distanceToHub.magnitude());
+                            
+                            default: 
+                                vel = ShooterConstants.Positions.distMapHigh.get(distanceToHub.magnitude());
+                        }
+
+                        return RotationsPerSecond.of(vel);
+                    },
+
+                    () -> {
+                        // periodic
+                        Distance distanceToHub = Meters.of(pose.get().getTranslation().getDistance(hubTranslation));
+
+                        switch(HubDistance.fromDistance(distanceToHub)) {
+                            case LOW:
+                                return Degrees.of(ShooterConstants.Positions.hoodLOW);
+                            
+                            case MEDIUM:
+                                return Degrees.of(ShooterConstants.Positions.hoodMEDIUM);
+                                
+                            case HIGH:
+                                return Degrees.of(ShooterConstants.Positions.hoodHIGH);
+                            
+                            default: 
+                                return Degrees.of(ShooterConstants.Positions.hoodMEDIUM);
+                        }   
+                });
+            }),
+            hopper.forwardFeed()
+        );
     }
 
     /**
@@ -189,7 +348,7 @@ public class Shooter extends SubsystemBase {
 
     public Command testCommand(Hopper hopper) {
         LoggedNetworkNumber shooterVelocity = new LoggedNetworkNumber("Tuning/Shooter/TargetShooterRPS", 0);
-        LoggedNetworkNumber hoodAngle = new LoggedNetworkNumber("Tuning/Shooter/TargetHoodAngle", ShooterConstants.SoftwareLimits.hoodMinAngle);
+        LoggedNetworkNumber hoodAngle = new LoggedNetworkNumber("Tuning/Shooter/TargetHoodAngle", ShooterConstants.hoodMinAngle.in(Degrees));
         LoggedNetworkNumber feederVoltage = new LoggedNetworkNumber("Tuning/Shooter/Feeder", 0.0) ;
         
         return Commands.parallel(
@@ -233,19 +392,19 @@ public class Shooter extends SubsystemBase {
      * or lowering the hood under the trench.
      * @return A command that does so.
      */
-    public Command awaitShooting(Supplier<Pose2d> robotPose) {
-        return runDynamicSetpoints(() -> RadiansPerSecond.zero(), () -> {
-            Pose2d pose = robotPose.get();
-            Pose2d nearestTrench = pose.nearest(FieldConstants.trenches);
-            Distance nearestDistance = Meters.of(pose.getTranslation().getDistance(nearestTrench.getTranslation()));
+    // public Command awaitShooting(Supplier<Pose2d> robotPose) {
+    //     return runDynamicSetpoints(() -> RadiansPerSecond.zero(), () -> {
+    //         Pose2d pose = robotPose.get();
+    //         Pose2d nearestTrench = pose.nearest(FieldConstants.trenches);
+    //         Distance nearestDistance = Meters.of(pose.getTranslation().getDistance(nearestTrench.getTranslation()));
 
-            if (nearestDistance.lte(ShooterConstants.allowedTrenchDistance)) {
-                return Degrees.zero();
-            }
+    //         if (nearestDistance.lte(ShooterConstants.allowedTrenchDistance)) {
+    //             return Degrees.zero();
+    //         }
 
-            return Degrees.of(45); // TODO: replace this with whatever determines shooter angle
-        });
-    }
+    //         return Degrees.of(45); // TODO: replace this with whatever determines shooter angle
+    //     });
+    // }
 
     public Command ferryToOutpost(Drive drive, Hopper hopper, IntakeSubsystem intake, DoubleSupplier xSupplier, DoubleSupplier ySupplier){
         return new ConditionalCommand(
@@ -255,7 +414,7 @@ public class Shooter extends SubsystemBase {
                     ()-> 0,
                     () -> 0,
                     () -> {
-                        Translation2d ferryTarget= ShooterConstants.ferryPositions.blueOutpostTarget;
+                        Translation2d ferryTarget = ShooterConstants.FerryPositions.blueOutpostTarget;
 
                         var targetTranslation= ferryTarget.minus(drive.getPose().getTranslation());
                         var targetRotation= new Rotation2d(targetTranslation.getX(), targetTranslation.getY());
@@ -270,7 +429,7 @@ public class Shooter extends SubsystemBase {
                     ()-> 0,
                     () -> 0,
                     () -> {
-                        Translation2d ferryTarget= ShooterConstants.ferryPositions.redOutpostTarget;
+                        Translation2d ferryTarget= ShooterConstants.FerryPositions.redOutpostTarget;
 
                         var targetTranslation= ferryTarget.minus(drive.getPose().getTranslation());
                         var targetRotation= new Rotation2d(targetTranslation.getX(), targetTranslation.getY());

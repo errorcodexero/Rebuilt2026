@@ -1,5 +1,6 @@
 package frc.robot.subsystems.shooter;
 
+import static edu.wpi.first.units.Units.Amps;
 import static frc.robot.util.PhoenixUtil.tryUntilOk;
 
 import com.ctre.phoenix6.CANBus;
@@ -61,7 +62,7 @@ public class ShooterIOTalonFX implements ShooterIO {
         shooterConfigs.MotionMagic.MotionMagicJerk = ShooterConstants.MotionMagic.shooterkJerk;
 
         // Current Limits
-        shooterConfigs.CurrentLimits.StatorCurrentLimit = ShooterConstants.currentLimit;
+        shooterConfigs.CurrentLimits.StatorCurrentLimit = ShooterConstants.currentLimit.in(Amps);
         shooterConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
 
         shooterConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive ;
