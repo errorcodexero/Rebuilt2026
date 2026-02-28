@@ -274,6 +274,8 @@ public class RobotContainer {
 
         //While the A button is held, the intake will run the eject sequence. If it the intake is stowed, it will also deploy it.
         gamepad_.a().whileTrue(intake_.ejectSequence());
+
+        gamepad_.leftTrigger().and(gamepad_.rightTrigger()).whileTrue(shooter_.ferryToOutpost(drivebase_, hopper_, intake_, null, null));
     }
 
     private void configureDriveBindings() {
