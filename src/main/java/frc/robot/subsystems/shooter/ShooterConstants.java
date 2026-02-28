@@ -1,5 +1,6 @@
 package frc.robot.subsystems.shooter;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
@@ -12,7 +13,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.math.geometry.Translation2d;
+
 
 
 public class ShooterConstants {
@@ -35,6 +36,13 @@ public class ShooterConstants {
     public static final Angle hoodParkedAngle = Degrees.of(5.0) ;
     public static final Angle hoodMaxAngle = Degrees.of(75.0) ;
     public static final Angle hoodMinAngle = Degrees.of(0.0) ;
+
+    public class FerryPositions{
+        
+        public static final Translation2d blueOutpostTarget= new Translation2d(2.135, 1.639);
+        public static final Translation2d redOutpostTarget= new Translation2d(14.0,6.0);
+
+    }
 
     public class PID {
             // shooter

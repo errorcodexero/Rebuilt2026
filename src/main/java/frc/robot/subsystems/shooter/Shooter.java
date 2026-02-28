@@ -45,8 +45,6 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import java.util.function.DoubleSupplier;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 
 public class Shooter extends SubsystemBase {
@@ -144,12 +142,12 @@ public class Shooter extends SubsystemBase {
      * @param pos
      * @return
      */
-    public Command shootCmd(Hopper hopper) {
-        return Commands.parallel(
-            runDynamicSetpoints(() -> RPM.of(5000), () -> Degrees.of(30)),
-            hopper.forwardFeed()
-        );
-    }
+    // public Command shootCmd(Hopper hopper) {
+    //     return Commands.parallel(
+    //         runDynamicSetpoints(() -> RPM.of(5000), () -> Degrees.of(30)),
+    //         hopper.forwardFeed()
+    //     );
+    // }
 
     /**
      * The command that the shooter can run whenever its not shooting to manage
@@ -394,19 +392,19 @@ public class Shooter extends SubsystemBase {
      * or lowering the hood under the trench.
      * @return A command that does so.
      */
-    public Command awaitShooting(Supplier<Pose2d> robotPose) {
-        return runDynamicSetpoints(() -> RadiansPerSecond.zero(), () -> {
-            Pose2d pose = robotPose.get();
-            Pose2d nearestTrench = pose.nearest(FieldConstants.trenches);
-            Distance nearestDistance = Meters.of(pose.getTranslation().getDistance(nearestTrench.getTranslation()));
+    // public Command awaitShooting(Supplier<Pose2d> robotPose) {
+    //     return runDynamicSetpoints(() -> RadiansPerSecond.zero(), () -> {
+    //         Pose2d pose = robotPose.get();
+    //         Pose2d nearestTrench = pose.nearest(FieldConstants.trenches);
+    //         Distance nearestDistance = Meters.of(pose.getTranslation().getDistance(nearestTrench.getTranslation()));
 
-            if (nearestDistance.lte(ShooterConstants.allowedTrenchDistance)) {
-                return Degrees.zero();
-            }
+    //         if (nearestDistance.lte(ShooterConstants.allowedTrenchDistance)) {
+    //             return Degrees.zero();
+    //         }
 
-            return Degrees.of(45); // TODO: replace this with whatever determines shooter angle
-        });
-    }
+    //         return Degrees.of(45); // TODO: replace this with whatever determines shooter angle
+    //     });
+    // }
 
     public Command ferryToOutpost(Drive drive, Hopper hopper, IntakeSubsystem intake, DoubleSupplier xSupplier, DoubleSupplier ySupplier){
         return new ConditionalCommand(
@@ -416,7 +414,7 @@ public class Shooter extends SubsystemBase {
                     ()-> 0,
                     () -> 0,
                     () -> {
-                        Translation2d ferryTarget= ShooterConstants.ferryPositions.blueOutpostTarget;
+                        Translation2d ferryTarget = ShooterConstants.FerryPositions.blueOutpostTarget;
 
                         var targetTranslation= ferryTarget.minus(drive.getPose().getTranslation());
                         var targetRotation= new Rotation2d(targetTranslation.getX(), targetTranslation.getY());
@@ -431,7 +429,7 @@ public class Shooter extends SubsystemBase {
                     ()-> 0,
                     () -> 0,
                     () -> {
-                        Translation2d ferryTarget= ShooterConstants.ferryPositions.redOutpostTarget;
+                        Translation2d ferryTarget= ShooterConstants.FerryPositions.redOutpostTarget;
 
                         var targetTranslation= ferryTarget.minus(drive.getPose().getTranslation());
                         var targetRotation= new Rotation2d(targetTranslation.getX(), targetTranslation.getY());
