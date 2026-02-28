@@ -7,21 +7,20 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.RobotCommands;
 
 public class AutoCommands {
 
 
     public static Command NeutralZoneTrenchToTrench(Drive drive, IntakeSubsystem intake, Hopper hopper, Shooter shooter){
         return Commands.sequence(
-            Commands.runOnce(() -> drive.resetGyroCmd()),
-
             DriveCommands.initialFollowPathCommand(drive,"TopToBottom Trench").deadlineFor(intake.intakeSequence()),
 
-            shooter.shootCmd(drive, hopper, null, false).withTimeout(3.8),
+            RobotCommands.shoot(() -> drive.getPose(), shooter, hopper, drive),
         
             DriveCommands.followPathCommand("BottomToTop").deadlineFor(intake.intakeSequence()),
 
-            shooter.shootCmd(drive, hopper, null, false).withTimeout(2.5)
+            RobotCommands.shoot(() -> drive.getPose(), shooter, hopper, drive)
         );
     }
     

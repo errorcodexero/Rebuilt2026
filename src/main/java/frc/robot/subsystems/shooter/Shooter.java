@@ -16,6 +16,7 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -23,10 +24,13 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -39,6 +43,11 @@ import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.subsystems.shooter.ShooterConstants.Positions.HubDistance;
 import frc.robot.util.MapleSimUtil;
 import frc.robot.util.Mechanism3d;
+import frc.robot.subsystems.drive.Drive;
+import frc.robot.commands.drive.DriveCommands;
+import frc.robot.subsystems.intake.IntakeSubsystem;
+import java.util.function.DoubleSupplier;
+
 
 public class Shooter extends SubsystemBase {
     
@@ -176,6 +185,69 @@ public class Shooter extends SubsystemBase {
                     return Degrees.of(ShooterConstants.Positions.hoodLOW);  
                     
             }
+    public Command awaitShooting(Supplier<Pose2d> robotPose) {
+        return runDynamicSetpoints(() -> {
+
+                Distance zone =
+                    DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                    ? ShooterConstants.Positions.blueAllianceWall
+                    : ShooterConstants.Positions.redAllianceWall;
+
+                Pose2d pose = robotPose.get();
+
+                Translation2d hubTranslation =
+                    DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                    ? ShooterConstants.Positions.blueHubPose
+                    : ShooterConstants.Positions.redHubPose;
+            
+                Distance distanceToHub = Meters.of(pose.getTranslation().getDistance(hubTranslation));
+                var vel = 0.0;
+
+                if ((Math.abs(pose.getX() - zone.magnitude()) < ShooterConstants.Positions.spinUpZone.magnitude())) {
+                    switch(HubDistance.fromDistance(distanceToHub)) {
+                        case LOW:
+                            vel = ShooterConstants.Positions.distMapLow.get(distanceToHub.magnitude());
+                        
+                        case MEDIUM:
+                            vel = ShooterConstants.Positions.distMapMed.get(distanceToHub.magnitude());
+                            
+                        case HIGH:
+                            vel = ShooterConstants.Positions.distMapHigh.get(distanceToHub.magnitude());
+                        
+                        default: 
+                            vel = ShooterConstants.Positions.distMapHigh.get(distanceToHub.magnitude());
+                    }
+                }
+                return RotationsPerSecond.of(vel);
+            },
+                                
+            () -> {
+                Pose2d pose = robotPose.get();
+                Pose2d nearestTrench = pose.nearest(FieldConstants.trenches);
+                Distance nearestDistance = Meters.of(pose.getTranslation().getDistance(nearestTrench.getTranslation()));
+
+                if (nearestDistance.lte(ShooterConstants.allowedTrenchDistance)) {
+                    return Degrees.zero();
+                }
+
+                Translation2d hubTranslation =
+                    DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                    ? ShooterConstants.Positions.blueHubPose
+                    : ShooterConstants.Positions.redHubPose;
+
+                Distance distanceToHub = Meters.of(pose.getTranslation().getDistance(hubTranslation));
+
+                switch(HubDistance.fromDistance(distanceToHub)) {
+                    case LOW:
+                        return Degrees.of(ShooterConstants.Positions.hoodLOW);
+                    case MEDIUM:
+                        return Degrees.of(ShooterConstants.Positions.hoodMEDIUM);
+                    case HIGH:
+                        return Degrees.of(ShooterConstants.Positions.hoodHIGH);
+                    default:  
+                        return Degrees.of(ShooterConstants.Positions.hoodLOW);  
+                        
+                }
             
         });
     }
@@ -203,6 +275,66 @@ public class Shooter extends SubsystemBase {
     }
     public Command runSetpoints(AngularVelocity vel, Angle pos) {
         return startEnd(() -> setSetpoints(vel, pos), this::stopShooter);
+
+    /**
+     * Calculates Velocity and Hood Angle based on distance and Shoots
+     * 
+     * 
+     */
+    public Command shoot(Supplier<Pose2d> pose, Hopper hopper) {
+        
+        return Commands.parallel(
+                defer(() -> {
+
+                    // constructing
+                    Translation2d hubTranslation =
+                        DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                        ? ShooterConstants.Positions.blueHubPose
+                        : ShooterConstants.Positions.redHubPose;
+
+                    ShooterConstants.Positions.initMap();
+        
+                    return runDynamicSetpoints(() -> {
+                        Distance distanceToHub = Meters.of(pose.get().getTranslation().getDistance(hubTranslation));
+                        var vel = 0.0;
+                        switch(HubDistance.fromDistance(distanceToHub)) {
+                            case LOW:
+                                vel = ShooterConstants.Positions.distMapLow.get(distanceToHub.magnitude());
+                            
+                            case MEDIUM:
+                                vel = ShooterConstants.Positions.distMapMed.get(distanceToHub.magnitude());
+                                
+                            case HIGH:
+                                vel = ShooterConstants.Positions.distMapHigh.get(distanceToHub.magnitude());
+                            
+                            default: 
+                                vel = ShooterConstants.Positions.distMapHigh.get(distanceToHub.magnitude());
+                        }
+
+                        return RotationsPerSecond.of(vel);
+                    },
+
+                    () -> {
+                        // periodic
+                        Distance distanceToHub = Meters.of(pose.get().getTranslation().getDistance(hubTranslation));
+
+                        switch(HubDistance.fromDistance(distanceToHub)) {
+                            case LOW:
+                                return Degrees.of(ShooterConstants.Positions.hoodLOW);
+                            
+                            case MEDIUM:
+                                return Degrees.of(ShooterConstants.Positions.hoodMEDIUM);
+                                
+                            case HIGH:
+                                return Degrees.of(ShooterConstants.Positions.hoodHIGH);
+                            
+                            default: 
+                                return Degrees.of(ShooterConstants.Positions.hoodMEDIUM);
+                        }   
+                });
+            }),
+            hopper.forwardFeed()
+        );
     }
 
     /**
@@ -292,7 +424,7 @@ public class Shooter extends SubsystemBase {
 
     public Command testCommand(Hopper hopper) {
         LoggedNetworkNumber shooterVelocity = new LoggedNetworkNumber("Tuning/Shooter/TargetShooterRPS", 0);
-        LoggedNetworkNumber hoodAngle = new LoggedNetworkNumber("Tuning/Shooter/TargetHoodAngle", ShooterConstants.SoftwareLimits.hoodMinAngle);
+        LoggedNetworkNumber hoodAngle = new LoggedNetworkNumber("Tuning/Shooter/TargetHoodAngle", ShooterConstants.hoodMinAngle.in(Degrees));
         LoggedNetworkNumber feederVoltage = new LoggedNetworkNumber("Tuning/Shooter/Feeder", 0.0) ;
         
         return Commands.parallel(
@@ -336,17 +468,59 @@ public class Shooter extends SubsystemBase {
      * or lowering the hood under the trench.
      * @return A command that does so.
      */
-    public Command awaitShooting(Supplier<Pose2d> robotPose) {
-        return runDynamicSetpoints(() -> RadiansPerSecond.zero(), () -> {
-            Pose2d pose = robotPose.get();
-            Pose2d nearestTrench = pose.nearest(FieldConstants.trenches);
-            Distance nearestDistance = Meters.of(pose.getTranslation().getDistance(nearestTrench.getTranslation()));
+    // public Command awaitShooting(Supplier<Pose2d> robotPose) {
+    //     return runDynamicSetpoints(() -> RadiansPerSecond.zero(), () -> {
+    //         Pose2d pose = robotPose.get();
+    //         Pose2d nearestTrench = pose.nearest(FieldConstants.trenches);
+    //         Distance nearestDistance = Meters.of(pose.getTranslation().getDistance(nearestTrench.getTranslation()));
 
-            if (nearestDistance.lte(ShooterConstants.allowedTrenchDistance)) {
-                return Degrees.zero();
+    //         if (nearestDistance.lte(ShooterConstants.allowedTrenchDistance)) {
+    //             return Degrees.zero();
+    //         }
+
+    //         return Degrees.of(45); // TODO: replace this with whatever determines shooter angle
+    //     });
+    // }
+
+    public Command ferryToOutpost(Drive drive, Hopper hopper, IntakeSubsystem intake, DoubleSupplier xSupplier, DoubleSupplier ySupplier){
+        return new ConditionalCommand(
+            Commands.parallel(
+                DriveCommands.joystickDriveAtAngle(
+                    drive,
+                    ()-> 0,
+                    () -> 0,
+                    () -> {
+                        Translation2d ferryTarget = ShooterConstants.FerryPositions.blueOutpostTarget;
+
+                        var targetTranslation= ferryTarget.minus(drive.getPose().getTranslation());
+                        var targetRotation= new Rotation2d(targetTranslation.getX(), targetTranslation.getY());
+                        return targetRotation;
+                    }
+                ),
+                shootCmd(hopper)
+            ),
+            Commands.parallel(
+                DriveCommands.joystickDriveAtAngle(
+                    drive,
+                    ()-> 0,
+                    () -> 0,
+                    () -> {
+                        Translation2d ferryTarget= ShooterConstants.FerryPositions.redOutpostTarget;
+
+                        var targetTranslation= ferryTarget.minus(drive.getPose().getTranslation());
+                        var targetRotation= new Rotation2d(targetTranslation.getX(), targetTranslation.getY());
+                        return targetRotation;
+                    }
+                ),
+                shootCmd(hopper)
+            ),
+
+            () -> {
+                if(DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue){
+                    return true;
+                }
+                return false;
             }
-
-            return Degrees.of(45); // TODO: replace this with whatever determines shooter angle
-        });
+        );
     }
 }
