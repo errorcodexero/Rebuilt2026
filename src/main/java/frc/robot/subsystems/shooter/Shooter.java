@@ -17,6 +17,7 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -27,6 +28,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
@@ -35,6 +37,14 @@ import frc.robot.Constants.Mode;
 import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.util.MapleSimUtil;
 import frc.robot.util.Mechanism3d;
+import frc.robot.subsystems.drive.Drive;
+import frc.robot.commands.drive.DriveCommands;
+import java.util.function.DoubleSupplier;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.math.geometry.Rotation2d;
+import frc.robot.subsystems.intake.IntakeSubsystem;
+
 
 public class Shooter extends SubsystemBase {
     
@@ -235,5 +245,59 @@ public class Shooter extends SubsystemBase {
 
             return Degrees.of(45); // TODO: replace this with whatever determines shooter angle
         });
+    }
+
+    public Command ferryOnMove(Drive drive, Hopper hopper, DoubleSupplier xSupplier, DoubleSupplier ySupplier, IntakeSubsystem intake){
+        return new ConditionalCommand(
+
+            Commands.parallel(
+                DriveCommands.joystickDriveAtAngle(
+                    drive,
+                    xSupplier,
+                    ySupplier,
+                    () -> {
+                        Translation2d ferryTarget= 
+                        DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                        ? ShooterConstants.ferryPositions.blueOutpostFerryTarget
+                        : ShooterConstants.ferryPositions.redDepotFerryTarget;
+
+                        var targetTranslation= ferryTarget.minus(drive.getPose().getTranslation());
+                        var targetRotation= new Rotation2d(targetTranslation.getX(), targetTranslation.getY());
+                        return targetRotation;
+                }),
+                intake.intakeSequence(),
+                shootCmd(hopper)
+            ),
+            
+            Commands.parallel(
+                DriveCommands.joystickDriveAtAngle(
+                    drive,
+                    xSupplier,
+                    ySupplier,
+                    () -> {
+                        Translation2d ferryTarget= 
+                        DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                        ? ShooterConstants.ferryPositions.blueDepotFerryTarget
+                        : ShooterConstants.ferryPositions.redOutpostFerryTarget;
+
+                        var targetTranslation= ferryTarget.minus(drive.getPose().getTranslation());
+                        var targetRotation= new Rotation2d(targetTranslation.getX(), targetTranslation.getY());
+                        return targetRotation;
+                }),
+                intake.intakeSequence(),
+                shootCmd(hopper)
+            ),
+
+            () -> {
+                var robotPose= drive.getPose().getTranslation();
+
+                if(robotPose.getY()<3){
+                    return true;
+                } else if (robotPose.getY()>5){
+                    return false;
+                } 
+                return false;
+            }
+        );
     }
 }
