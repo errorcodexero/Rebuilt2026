@@ -9,6 +9,8 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.math.geometry.Translation2d;
+
 
 public class ShooterConstants {
 
@@ -56,5 +58,11 @@ public class ShooterConstants {
     public class HoodPWMs {
         public static final int hoodLeftPWMPort = 2;
         public static final int hoodRightPWMPort = 0;
+    }
+
+    public class ferryPositions{
+        public static final Translation2d blueOutpostTarget= new Translation2d(2.135, 1.639);
+        public static final Translation2d redOutpostTarget= new Translation2d(14.0,6.0);
+
     }
 }
