@@ -49,6 +49,7 @@ import frc.robot.subsystems.shooter.HoodIO;
 import frc.robot.subsystems.shooter.HoodIOServo;
 import frc.robot.subsystems.shooter.HoodIOSim;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.RobotCommands;
 import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterIOSim;
 import frc.robot.subsystems.shooter.ShooterIOTalonFX;
@@ -77,7 +78,7 @@ public class RobotContainer {
 
     // Trigger Devices
     private final CommandXboxController gamepad_ = new CommandXboxController(0);
-
+    
     public RobotContainer() {
         /**
          * Subsystem setup
@@ -248,7 +249,7 @@ public class RobotContainer {
         configureBindings();
         configureDriveBindings();
     }
-
+    
     // Bind robot actions to commands here.
     private void configureBindings() {
         // Manually deploying and undeploying the intake.
@@ -258,11 +259,14 @@ public class RobotContainer {
             intake_::isIntakeStowed
         ));
 
+        
+
         // While the left trigger is held, we will run the intake. If the intake is stowed, it will also deploy it.
         gamepad_.leftTrigger().whileTrue(intake_.intakeSequence());
 
-        // While the right trigger is held, we will shoot into the hub.
-        gamepad_.rightTrigger().whileTrue(shooter_.shootCmd(hopper_));
+        // While the right trigger is held, we will shoot into the hub or ferry.
+        gamepad_.rightTrigger().whileTrue(RobotCommands.shoot( () -> drivebase_.getPose(), shooter_, hopper_, drivebase_));
+            
 
         // When the hopper isnt shooting, set it to run its idle velocity.
         hopper_.setDefaultCommand(hopper_.idleScrambler());
