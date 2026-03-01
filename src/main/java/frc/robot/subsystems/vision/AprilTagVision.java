@@ -84,7 +84,6 @@ public class AprilTagVision extends SubsystemBase {
 
     @Override
     public void periodic() {
-            
         // Update inputs for each camera
         for (int index = 0; index < io_.length; index++) {
             io_[index].updateInputs(inputs_[index]);
