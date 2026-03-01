@@ -20,6 +20,7 @@ import frc.robot.Constants.FieldConstants;
 import frc.robot.subsystems.vision.CameraIO.Fiducial;
 import frc.robot.subsystems.vision.CameraIO.PoseEstimation;
 import frc.robot.subsystems.vision.CameraIO.PoseEstimationType;
+import frc.robot.util.LoggedTracer;
 
 public class AprilTagVision extends SubsystemBase {
 
@@ -84,12 +85,16 @@ public class AprilTagVision extends SubsystemBase {
 
     @Override
     public void periodic() {
+
+        LoggedTracer.reset();
             
         // Update inputs for each camera
         for (int index = 0; index < io_.length; index++) {
             io_[index].updateInputs(inputs_[index]);
             Logger.processInputs("Vision/Camera" + index, inputs_[index]);
         }
+
+        LoggedTracer.record("Vision/UpdateInputs");
 
         ArrayList<Pose3d> summaryTagPoses = new ArrayList<>();
         ArrayList<PoseEstimation> poseEstimates = new ArrayList<>();
@@ -124,6 +129,8 @@ public class AprilTagVision extends SubsystemBase {
             Logger.recordOutput(getCameraKey(cam, "BotPose"), est.pose());
         }
 
+        LoggedTracer.record("Vision/GatherPoses");
+
         // Integrate pose estimates
 
         ArrayList<PoseEstimation> acceptedEstimates = new ArrayList<>();
@@ -136,6 +143,8 @@ public class AprilTagVision extends SubsystemBase {
                 declinedEstimates.add(est);
             }
         }
+
+        LoggedTracer.record("Vision/FilterPoses");
 
         switch (VisionConstants.integrationBehavior) {
             case ONLY_NEAREST -> {
@@ -157,13 +166,14 @@ public class AprilTagVision extends SubsystemBase {
             }
         }
 
+        LoggedTracer.record("Vision/IntegratePoses");
+
         Logger.recordOutput("Vision/Summary/TagPoses", summaryTagPoses.toArray(new Pose3d[0]));
         Logger.recordOutput("Vision/Summary/BotPoses/All", estimateListToPoseArray(poseEstimates));
         Logger.recordOutput("Vision/Summary/BotPoses/Accepted", estimateListToPoseArray(acceptedEstimates));
         Logger.recordOutput("Vision/Summary/BotPoses/Declined", estimateListToPoseArray(declinedEstimates));
 
         Logger.recordOutput("Vision/PoseEstimatesEnabled", enabled_);
-
     }
 
 
