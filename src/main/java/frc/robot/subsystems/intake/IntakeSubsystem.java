@@ -130,9 +130,7 @@ public class IntakeSubsystem extends SubsystemBase {
      * @return
      */
     public Command stowCmd() {
-        return runOnce(() -> stow())
-            .andThen(Commands.waitUntil(() -> isIntakeStowed())
-            .withTimeout(2)).withName("Stow Intake");
+        return runOnce(this::stow);
     }
 
     /**
@@ -140,15 +138,11 @@ public class IntakeSubsystem extends SubsystemBase {
      * @return
      */
     public Command deployCmd() {
-        return runOnce(this::deploy)
-            .andThen(Commands.waitUntil(this::isIntakeDeployed)
-            .withTimeout(2)).withName("Deploy Intake");
+        return runOnce(this::deploy);
     }
 
     public Command waitCommand() {
-        return runOnce(this::waiting)
-            .andThen(Commands.waitUntil(this::isIntakeWaiting)
-            .withTimeout(2)).withName("Deploy Intake");
+        return runOnce(this::waiting);
     }    
 
     /**
