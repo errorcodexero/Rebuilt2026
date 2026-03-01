@@ -68,7 +68,7 @@ public class IntakeSubsystem extends SubsystemBase {
      * Runs the roller.
      */
     private void startIntaking() {
-        io.setRollerVoltage(IntakeConstants.rollerCollectVoltage);
+        io.setRollerVelocity(IntakeConstants.rollerCollectVelocity);
     }
 
     /**

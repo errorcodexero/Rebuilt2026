@@ -153,8 +153,8 @@ public class RobotContainer {
                     vision_ = new AprilTagVision(
                         drivebase_::addVisionMeasurement,
                         new CameraIOLimelight4("limelight-front", drivebase_::getRotation),
-                        new CameraIOLimelight4("limelight-backleft", drivebase_::getRotation),
-                        new CameraIOLimelight4("limelight-backright", drivebase_::getRotation)
+                        new CameraIOLimelight4("limelight-bl", drivebase_::getRotation),
+                        new CameraIOLimelight4("limelight-br", drivebase_::getRotation)
                     );
 
                     shooter_ = new Shooter(new ShooterIOTalonFX(roborioCANBus), new HoodIOServo());

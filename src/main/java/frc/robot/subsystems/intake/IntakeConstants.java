@@ -25,24 +25,24 @@ public final class IntakeConstants {
     public static final Current pivotCurrentLimit = Amps.of(40) ;
     public static final Time currentLimitTime= Seconds.of(1); //Temporary
 
-    public static final double pivotKP= 4.0; //later for turning
-    public static final double pivotKD= 0; //later for turning
-    public static final double pivotKV= 0.222; //later for turning
-    public static final double pivotKI= 0; //later for turning
-    public static final double pivotKA= 0; //later for turning
-    public static final double pivotKS= 0; //later for turning
-    public static final double pivotKG= 0; //later for tuning
+    public static final double pivotKP= 4.0;
+    public static final double pivotKD= 0;
+    public static final double pivotKV= 0.222;
+    public static final double pivotKI= 0;
+    public static final double pivotKA= 0;
+    public static final double pivotKS= 0;
+    public static final double pivotKG= 0;
     
-    public static final double rollerKP= 0; //later for roller speed
-    public static final double rollerKD= 0; //change later
-    public static final double rollerKV= 0; //change later
-    public static final double rollerKI= 0; //change later
-    public static final double rollerKA = 0; //change later
-    public static final double rollerKS= 0; //change later
-    public static final double rollerKG= 0; //change later
+    public static final double rollerKP= 1.2;
+    public static final double rollerKD= 0;
+    public static final double rollerKV= 0.132;
+    public static final double rollerKI= 0;
+    public static final double rollerKA = 0;
+    public static final double rollerKS= 0;
+    public static final double rollerKG= 0;
 
     public static final Angle stowedAngle= Rotations.of(0);
-    public static final Angle waitingAngle= Rotations.of(11.5);
+    public static final Angle waitingAngle= Rotations.of(11.0);
     public static final Angle deployedAngle= Rotations.of(18.5);
 
     public static final Angle pivotMinAngle= Rotations.of(0) ;
@@ -52,7 +52,8 @@ public final class IntakeConstants {
     public static final AngularVelocity pivotCruiseAcceleration= RotationsPerSecond.of(100);
     public static final double pivotMaxJerk= 0;
 
-    public static final Voltage rollerCollectVoltage= Volts.of(6);
+    public static final Voltage rollerCollectVoltage= Volts.of(5);
+    public static final AngularVelocity rollerCollectVelocity= RotationsPerSecond.of(38);
     public static final Voltage rollerEjectVoltage= Volts.of(-6);
 
     public static final Angle pivotTolerance = Rotations.of(1); //Tolerance to compare current angle to target
