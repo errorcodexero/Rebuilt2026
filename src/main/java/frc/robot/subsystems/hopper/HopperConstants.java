@@ -26,7 +26,7 @@ public class HopperConstants {
 
     public static final AngularVelocity feederMaxVelocity = RotationsPerSecond.of(0.0); //To be updated
 
-    public static final Current feederCurrentLimit = Amps.of(0.0); //To be updated
+    public static final Current feederCurrentLimit = Amps.of(40.0) ;
 
     //Scrambler Constants
     public static final int scramblerMotorCANID = 6; //To be updated
@@ -41,5 +41,5 @@ public class HopperConstants {
 
     public static final AngularVelocity scramblerMaxVelocity = RotationsPerSecond.of(0.0); //To be updated
 
-    public static final Current scramblerCurrentLimit = Amps.of(0.0); //To be updated
+    public static final Current scramblerCurrentLimit = Amps.of(40.0) ;
 }

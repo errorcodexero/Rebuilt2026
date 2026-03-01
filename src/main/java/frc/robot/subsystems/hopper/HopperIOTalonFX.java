@@ -61,16 +61,15 @@ public class HopperIOTalonFX implements HopperIO {
         feederConfig.Slot0.kA = HopperConstants.feederKA;
 
         feederConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive ;
-        feederConfig.CurrentLimits.StatorCurrentLimit = HopperConstants.feederCurrentLimit.in(Amps);
+        feederConfig.CurrentLimits.SupplyCurrentLimit = HopperConstants.feederCurrentLimit ;
+        feederConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
         tryUntilOk(5, () -> feederMotor.getConfigurator().apply(feederConfig, 0.25));
-
-
 
         //Status Signals Initialization
         feederAngularVelocitySignal = feederMotor.getVelocity();
         feederVoltageSignal = feederMotor.getMotorVoltage();
-        feederCurrentSignal = feederMotor.getStatorCurrent();        
+        feederCurrentSignal = feederMotor.getSupplyCurrent();        
 
         // Scrambler Motor Configuration
         scramblerMotor = new TalonFX(HopperConstants.scramblerMotorCANID);
@@ -83,14 +82,15 @@ public class HopperIOTalonFX implements HopperIO {
         scramblerConfig.Slot0.kS = HopperConstants.scramblerKS;
         scramblerConfig.Slot0.kV = HopperConstants.scramblerKV;
         scramblerConfig.Slot0.kA = HopperConstants.scramblerKA;
-        scramblerConfig.CurrentLimits.StatorCurrentLimit = HopperConstants.scramblerCurrentLimit.in(Amps);
+        scramblerConfig.CurrentLimits.SupplyCurrentLimit = HopperConstants.scramblerCurrentLimit.in(Amps);
+        scramblerConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
         tryUntilOk(5, () -> scramblerMotor.getConfigurator().apply(scramblerConfig, 0.25));
 
 
 
         scramblerAngularVelocitySignal = scramblerMotor.getVelocity();
         scramblerVoltageSignal = scramblerMotor.getMotorVoltage();
-        scramblerCurrentSignal = scramblerMotor.getStatorCurrent();
+        scramblerCurrentSignal = scramblerMotor.getSupplyCurrent();
 
         BaseStatusSignal.setUpdateFrequencyForAll(50.0, 
             feederAngularVelocitySignal, feederVoltageSignal, feederCurrentSignal);

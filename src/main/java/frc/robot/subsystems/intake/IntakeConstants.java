@@ -1,5 +1,6 @@
 package frc.robot.subsystems.intake;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
@@ -10,6 +11,7 @@ import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.AngularAcceleration;
@@ -19,7 +21,8 @@ public final class IntakeConstants {
     public static final int rollerMotorCANID= 8;//Temporary
     public static final int pivotMotorCANID= 9; //Temporary
 
-    public static final int currentLimit= 40; 
+    public static final Current rollerCurrentLimit = Amps.of(40) ;
+    public static final Current pivotCurrentLimit = Amps.of(40) ;
     public static final Time currentLimitTime= Seconds.of(1); //Temporary
 
     public static final double pivotKP= 0.62; //later for turning

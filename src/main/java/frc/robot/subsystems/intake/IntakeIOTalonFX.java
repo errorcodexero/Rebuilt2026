@@ -1,5 +1,6 @@
 package frc.robot.subsystems.intake;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
@@ -68,8 +69,8 @@ public class IntakeIOTalonFX implements IntakeIO {
         pivotConfigs.MotorOutput.NeutralMode= NeutralModeValue.Brake;
 
         //Current Limit Configurations
-        pivotConfigs.CurrentLimits.StatorCurrentLimit = IntakeConstants.currentLimit;
-        pivotConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
+        pivotConfigs.CurrentLimits.SupplyCurrentLimit = IntakeConstants.pivotCurrentLimit.in(Amps);
+        pivotConfigs.CurrentLimits.SupplyCurrentLimitEnable = true;
 
         //PID Configurations
         pivotConfigs.Slot0.kP= IntakeConstants.pivotKP;
@@ -103,8 +104,8 @@ public class IntakeIOTalonFX implements IntakeIO {
         rollerConfigs.MotorOutput.NeutralMode= NeutralModeValue.Coast;
 
         //Current Limit Configurations
-        rollerConfigs.CurrentLimits.StatorCurrentLimit= IntakeConstants.currentLimit;
-        rollerConfigs.CurrentLimits.StatorCurrentLimitEnable= true;
+        rollerConfigs.CurrentLimits.SupplyCurrentLimit = IntakeConstants.rollerCurrentLimit.in(Amps);
+        rollerConfigs.CurrentLimits.SupplyCurrentLimitEnable= true;
 
         //PID Configurations
         rollerConfigs.Slot0.kP= IntakeConstants.rollerKP;
@@ -125,8 +126,8 @@ public class IntakeIOTalonFX implements IntakeIO {
         rollerAngularVelocitySignal = rollerMotor.getVelocity();
         rollerAppliedVoltsSignal = rollerMotor.getMotorVoltage();
         pivotAppliedVoltsSignal = pivotMotor.getMotorVoltage();
-        rollerCurrentAmpsSignal = rollerMotor.getStatorCurrent();
-        pivotCurrentAmpsSignal = pivotMotor.getStatorCurrent();
+        rollerCurrentAmpsSignal = rollerMotor.getSupplyCurrent();
+        pivotCurrentAmpsSignal = pivotMotor.getSupplyCurrent();
 
         BaseStatusSignal.setUpdateFrequencyForAll(20, rollerAppliedVoltsSignal, rollerCurrentAmpsSignal,pivotAppliedVoltsSignal, pivotCurrentAmpsSignal);
         BaseStatusSignal.setUpdateFrequencyForAll(50, pivotAngleSignal,pivotAngularVelocitySignal,rollerAngularVelocitySignal);
