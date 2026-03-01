@@ -3,7 +3,8 @@ package frc.robot.subsystems.intake;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.util.PhoenixUtil.tryUntilOk;
 
@@ -83,18 +84,20 @@ public class IntakeIOTalonFX implements IntakeIO {
 
         //Soft Limit Configurations
         pivotConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable= true;
-        pivotConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold= IntakeConstants.pivotMaxAngle.in(Degrees);
+        pivotConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold= IntakeConstants.pivotMaxAngle.in(Rotations);
         pivotConfigs.SoftwareLimitSwitch.ReverseSoftLimitEnable= true;
-        pivotConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold= IntakeConstants.pivotMinAngle.in(Degrees);
+        pivotConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold= IntakeConstants.pivotMinAngle.in(Rotations);
 
         //Motion Magic Configurations
-        pivotConfigs.MotionMagic.MotionMagicCruiseVelocity= IntakeConstants.pivotCruiseVelocity.in(DegreesPerSecond); 
-        pivotConfigs.MotionMagic.MotionMagicAcceleration= IntakeConstants.pivotCruiseAcceleration.in(DegreesPerSecondPerSecond); 
+        pivotConfigs.MotionMagic.MotionMagicCruiseVelocity= IntakeConstants.pivotCruiseVelocity.in(RotationsPerSecond); 
+        pivotConfigs.MotionMagic.MotionMagicAcceleration= IntakeConstants.pivotCruiseAcceleration.in(RotationsPerSecond); 
         pivotConfigs.MotionMagic.MotionMagicJerk= IntakeConstants.pivotMaxJerk; 
 
         //Used to apply configs once instead of having multiple iterations to do this
         //Also trys the configuartion 5 times until it receives an OK status signal 
         tryUntilOk(5, () -> pivotMotor.getConfigurator().apply(pivotConfigs, 0.25));
+
+        pivotMotor.setPosition(Rotations.of(0)) ;
 
 
         // Configuration for the roller motor
@@ -120,6 +123,8 @@ public class IntakeIOTalonFX implements IntakeIO {
         //Also trys the configuartion 5 times until it receives an OK status signal 
         tryUntilOk(5, () -> rollerMotor.getConfigurator().apply(rollerConfigs, 0.25));
 
+        rollerMotor.setPosition(Rotations.of(0)) ;
+
         // Initialize all status signals
         pivotAngleSignal = pivotMotor.getPosition();
         pivotAngularVelocitySignal = pivotMotor.getVelocity();
@@ -129,8 +134,8 @@ public class IntakeIOTalonFX implements IntakeIO {
         rollerCurrentAmpsSignal = rollerMotor.getSupplyCurrent();
         pivotCurrentAmpsSignal = pivotMotor.getSupplyCurrent();
 
-        BaseStatusSignal.setUpdateFrequencyForAll(20, rollerAppliedVoltsSignal, rollerCurrentAmpsSignal,pivotAppliedVoltsSignal, pivotCurrentAmpsSignal);
-        BaseStatusSignal.setUpdateFrequencyForAll(50, pivotAngleSignal,pivotAngularVelocitySignal,rollerAngularVelocitySignal);
+        BaseStatusSignal.setUpdateFrequencyForAll(1, rollerAppliedVoltsSignal, rollerCurrentAmpsSignal,pivotAppliedVoltsSignal, pivotCurrentAmpsSignal, rollerAngularVelocitySignal);
+        BaseStatusSignal.setUpdateFrequencyForAll(50, pivotAngleSignal,pivotAngularVelocitySignal);
 
         // Optimize CAN bus for these parent devices-motors
         ParentDevice.optimizeBusUtilizationForAll(rollerMotor, pivotMotor);
@@ -152,7 +157,7 @@ public class IntakeIOTalonFX implements IntakeIO {
         );
 
         inputs.pivotConnected = pivotConnectedDebounce.calculate(pivotStatus.isOK());
-        inputs.PivotAngle = pivotAngleSignal.getValue();
+        inputs.PivotAngle = pivotAngleSignal.getValue() ;
         inputs.PivotAngularVelocity = pivotAngularVelocitySignal.getValue();
         inputs.PivotAppliedVolts = pivotAppliedVoltsSignal.getValue();
         inputs.PivotCurrentAmps = pivotCurrentAmpsSignal.getValue();

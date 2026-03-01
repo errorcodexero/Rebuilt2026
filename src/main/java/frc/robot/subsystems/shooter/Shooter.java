@@ -19,6 +19,7 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -63,9 +64,34 @@ public class Shooter extends SubsystemBase {
     private AngularVelocity shooterTarget = RadiansPerSecond.zero();
     private Angle hoodTarget = Radians.zero();
 
+
+    public final InterpolatingDoubleTreeMap distMapLow = new InterpolatingDoubleTreeMap();
+    public final InterpolatingDoubleTreeMap distMapMed = new InterpolatingDoubleTreeMap();
+    public final InterpolatingDoubleTreeMap distMapHigh = new InterpolatingDoubleTreeMap();
+
+    private void initMap() {
+        if (ShooterConstants.Positions.lowDist.length != ShooterConstants.Positions.lowVelocities.length || ShooterConstants.Positions.medDist.length != ShooterConstants.Positions.medVelocities.length || ShooterConstants.Positions.highDist.length != ShooterConstants.Positions.highVelocities.length) {
+            throw new IllegalArgumentException("Distance and velocity arrays must be of the same length");
+        }
+
+        for(int i = 0 ; i < ShooterConstants.Positions.lowDist.length; i++) {
+            distMapLow.put(ShooterConstants.Positions.lowDist[i], ShooterConstants.Positions.lowVelocities[i]);
+        }
+
+        for(int i = 0 ; i < ShooterConstants.Positions.medDist.length; i++) {
+            distMapMed.put(ShooterConstants.Positions.medDist[i], ShooterConstants.Positions.medVelocities[i]);
+        }
+
+        for(int i = 0 ; i < ShooterConstants.Positions.highDist.length; i++) {
+            distMapHigh.put(ShooterConstants.Positions.highDist[i], ShooterConstants.Positions.highVelocities[i]);
+        }
+    }    
+
     public Shooter(ShooterIO ioShooter, HoodIO ioHood) {
         this.shooterIO = ioShooter;
         this.hoodIO = ioHood;
+
+        initMap() ;
     }
 
     @Override
@@ -163,16 +189,16 @@ public class Shooter extends SubsystemBase {
                 if ((Math.abs(pose.getX() - zone.magnitude()) < ShooterConstants.Positions.spinUpZone.magnitude())) {
                     switch(HubDistance.fromDistance(distanceToHub)) {
                         case LOW:
-                            vel = ShooterConstants.Positions.distMapLow.get(distanceToHub.magnitude());
+                            vel = distMapLow.get(distanceToHub.magnitude());
                         
                         case MEDIUM:
-                            vel = ShooterConstants.Positions.distMapMed.get(distanceToHub.magnitude());
+                            vel = distMapMed.get(distanceToHub.magnitude());
                             
                         case HIGH:
-                            vel = ShooterConstants.Positions.distMapHigh.get(distanceToHub.magnitude());
+                            vel = distMapHigh.get(distanceToHub.magnitude());
                         
                         default: 
-                            vel = ShooterConstants.Positions.distMapHigh.get(distanceToHub.magnitude());
+                            vel = distMapHigh.get(distanceToHub.magnitude());
                     }
                 }
                 return RotationsPerSecond.of(vel);
@@ -251,24 +277,22 @@ public class Shooter extends SubsystemBase {
                         ? ShooterConstants.Positions.blueHubPose
                         : ShooterConstants.Positions.redHubPose;
 
-                    ShooterConstants.Positions.initMap();
-        
                     return runDynamicSetpoints(
                         () -> {
                             Distance distanceToHub = Meters.of(pose.get().getTranslation().getDistance(hubTranslation));
                             var vel = 0.0;
                             switch(HubDistance.fromDistance(distanceToHub)) {
                                 case LOW:
-                                    vel = ShooterConstants.Positions.distMapLow.get(distanceToHub.magnitude());
+                                    vel = distMapLow.get(distanceToHub.magnitude());
                                 
                                 case MEDIUM:
-                                    vel = ShooterConstants.Positions.distMapMed.get(distanceToHub.magnitude());
+                                    vel = distMapMed.get(distanceToHub.magnitude());
                                     
                                 case HIGH:
-                                    vel = ShooterConstants.Positions.distMapHigh.get(distanceToHub.magnitude());
+                                    vel = distMapHigh.get(distanceToHub.magnitude());
                                 
                                 default: 
-                                    vel = ShooterConstants.Positions.distMapHigh.get(distanceToHub.magnitude());
+                                    vel = distMapHigh.get(distanceToHub.magnitude());
                             }
 
                             return RotationsPerSecond.of(vel);
