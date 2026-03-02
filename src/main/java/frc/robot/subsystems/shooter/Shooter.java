@@ -40,12 +40,9 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.util.MapleSimUtil;
 import frc.robot.util.Mechanism3d;
-import frc.robot.subsystems.drive.Drive;
-import frc.robot.commands.drive.DriveCommands;
-import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.shooter.ShooterConstants.Positions.HubDistance;
 
 import java.util.Set;
-import java.util.function.DoubleSupplier;
 
 
 public class Shooter extends SubsystemBase {
@@ -150,7 +147,7 @@ public class Shooter extends SubsystemBase {
                 DriveCommands.pointAtShootingTarget(drive, gamepad, shootOnMove),
                 Commands.sequence(
                     Commands.waitTime(ShooterConstants.dbRotationDelay), 
-                    shooterSetpointSupplier(() -> drive.getVirtualTarget().minus(drive.getPose().getTranslation()), hopper)
+                    shoot(drive::getVirtualTarget, hopper)
                 )
             );
     }
@@ -266,20 +263,17 @@ public class Shooter extends SubsystemBase {
      * 
      * 
      */
-    public Command shoot(Supplier<Pose2d> pose, Hopper hopper) {
+    public Command shoot(Supplier<Translation2d> dist, Hopper hopper) {
         
         return Commands.parallel(
                 defer(() -> {
 
                     // constructing
-                    Translation2d hubTranslation =
-                        DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                        ? ShooterConstants.Positions.blueHubPose
-                        : ShooterConstants.Positions.redHubPose;
+                    
 
                     return runDynamicSetpoints(
                         () -> {
-                            Distance distanceToHub = Meters.of(pose.get().getTranslation().getDistance(hubTranslation));
+                            Distance distanceToHub = Meters.of(dist.get().getNorm());
                             var params = tuning_.getShooterParams(distanceToHub.in(Meters));
                             var vel = params.velocity;
                             return RotationsPerSecond.of(vel);
@@ -287,7 +281,7 @@ public class Shooter extends SubsystemBase {
                     
                         () -> {
                             // periodic
-                            Distance distanceToHub = Meters.of(pose.get().getTranslation().getDistance(hubTranslation));
+                            Distance distanceToHub = Meters.of(dist.get().getNorm());
                             var params = tuning_.getShooterParams(distanceToHub.in(Meters));
                             return Degrees.of(params.hood) ;
                     });

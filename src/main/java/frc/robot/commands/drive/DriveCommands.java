@@ -257,7 +257,7 @@ public class DriveCommands {
                 });
   }
 
-  private static Translation2d getTarget(Drive drive) {
+  public static Translation2d getTarget(Drive drive) {
     Translation2d target;
 
     boolean blueDS = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue;
