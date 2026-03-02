@@ -411,8 +411,8 @@ public class Shooter extends SubsystemBase {
                     () -> {
                         Translation2d ferryTarget= 
                         DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                        ? ShooterConstants.ferryPositions.blueOutpostFerryTarget
-                        : ShooterConstants.ferryPositions.redDepotFerryTarget;
+                        ? ShooterConstants.FerryPositions.blueOutpostTarget
+                        : ShooterConstants.FerryPositions.redOutpostTarget;
 
                         var targetTranslation= ferryTarget.minus(drive.getPose().getTranslation());
                         var targetRotation= new Rotation2d(targetTranslation.getX(), targetTranslation.getY());
@@ -430,8 +430,8 @@ public class Shooter extends SubsystemBase {
                     () -> {
                         Translation2d ferryTarget= 
                         DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                        ? ShooterConstants.ferryPositions.blueDepotFerryTarget
-                        : ShooterConstants.ferryPositions.redOutpostFerryTarget;
+                        ? ShooterConstants.FerryPositions.blueOutpostTarget
+                        : ShooterConstants.FerryPositions.redOutpostTarget;
 
                         var targetTranslation= ferryTarget.minus(drive.getPose().getTranslation());
                         var targetRotation= new Rotation2d(targetTranslation.getX(), targetTranslation.getY());

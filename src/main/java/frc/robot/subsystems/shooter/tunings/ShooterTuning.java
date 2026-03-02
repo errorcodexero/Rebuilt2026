@@ -39,7 +39,7 @@ public abstract class ShooterTuning {
     }
 
 
-    private final double HYSTERESIS_DIST = 0.3 ; // in meters, about a foot of hysteresis when switching hood settings
+    private final double HYSTERESIS_DIST = 0.2 ; // in meters, about a foot of hysteresis when
     private List<OneSettings> settings_ = new ArrayList<OneSettings>() ;
     private int lastHoodIndex_ ;
     private String name_ ;
@@ -71,7 +71,7 @@ public abstract class ShooterTuning {
             }
         }
 
-        return -1 ;
+        return settings_.size() - 1 ;
     }
 
     private int processHysteresis(double dist, int newIndex) {

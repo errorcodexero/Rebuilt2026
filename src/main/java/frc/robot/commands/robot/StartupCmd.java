@@ -27,7 +27,7 @@ public class StartupCmd extends SequentialCommandGroup {
 
         addCommands(
             intake_.deployCmd(),             // Deploy the intake to expand the hopper and drop the first four balls into the hopper
-            moveShooterBalls(),            // Run the startup sequence to deploy the intake and move balls from shooter to hopper
+            moveShooterBalls(),              // Run the startup sequence to deploy the intake and move balls from shooter to hopper
             intake_.waitCommand()            // Move the intake to the waiting position to avoid collisions with the ground and the robot during auto
         );
     }
