@@ -1,9 +1,13 @@
 package frc.robot.commands.robot;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -37,7 +41,7 @@ public class RobotCommands {
             ).finallyDo(drive::stopWithX),
             Commands.repeatingSequence(
                 Commands.waitUntil(aimedAtHub),
-                shooter.shoot(() -> drive.getPose(), hopper)
+                shooter.shootAtDistance(RobotState::hubDistance, hopper)
                     .until(() -> !aimedAtHub.getAsBoolean())
             )
         );
@@ -51,40 +55,32 @@ public class RobotCommands {
      * @return
      */
     private static Command ferry(Shooter shooter, Hopper hopper, Drive drive) {
-        return Commands.parallel(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> drive.getChassisSpeeds().vxMetersPerSecond,
-                () -> drive.getChassisSpeeds().vyMetersPerSecond, 
-                () -> {
+        Translation2d rightTarget =
+            DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                ? ShooterConstants.Positions.blueTargetRight
+                : ShooterConstants.Positions.redTargetRight;
 
-                    var rotation = new Rotation2d();
+        Translation2d leftTarget =
+            DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                ? ShooterConstants.Positions.blueTargetLeft
+                : ShooterConstants.Positions.redTargetLeft;
 
-                    var targetTranslation = new Translation2d();
-                    
-                    Translation2d rightTarget =
-                            DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                            ? ShooterConstants.Positions.blueTargetRight
-                            : ShooterConstants.Positions.redTargetRight;
+        Supplier<Translation2d> target =
+            () -> drive.getPose().getY() < ShooterConstants.Positions.centerLineY
+                ? rightTarget
+                : leftTarget;
 
-                    Translation2d leftTarget =
-                            DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                            ? ShooterConstants.Positions.blueTargetLeft
-                            : ShooterConstants.Positions.redTargetLeft;
+        Supplier<Distance> targetDistance =
+            () -> Meters.of(target.get().getDistance(drive.getPose().getTranslation()));
 
-                    if (drive.getPose().getY() < ShooterConstants.Positions.centerLineY) {
-                        targetTranslation = rightTarget.minus(drive.getPose().getTranslation());
-                    }
-                    else {
-                        targetTranslation = leftTarget.minus(drive.getPose().getTranslation());
-                    }
-                    rotation = new Rotation2d(targetTranslation.getX(), targetTranslation.getY());
+        Supplier<Rotation2d> targetingAngle = 
+            () -> {
+                var botToHub = target.get().minus(drive.getPose().getTranslation());
+                return new Rotation2d(botToHub.getX(), botToHub.getY());
+            };
 
-                    return rotation;
-                }   
-            ),
-            Commands.waitUntil(() -> Math.abs(drive.getChassisSpeeds().omegaRadiansPerSecond) < .001).andThen(shooter.shoot(() -> drive.getPose(), hopper))
-        );
+        return DriveCommands.joystickDriveAtAngle(targetingAngle)
+            .alongWith(shooter.shootAtDistance(targetDistance, hopper));
     }
 
     public static Command shoot(Shooter shooter, Hopper hopper, Drive drive) {

@@ -44,6 +44,7 @@ import frc.robot.util.Mechanism3d;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.shooter.ShooterTuning.ShooterParams;
 
 import java.util.Set;
 import java.util.function.DoubleSupplier;
@@ -199,20 +200,14 @@ public class Shooter extends SubsystemBase {
      * 
      * 
      */
-    public Command shoot(Supplier<Pose2d> pose, Hopper hopper) {
-        return Commands.parallel(
-            runDynamicSetpoints(
-                () -> {
-                    var params = tuning_.getShooterParams(RobotState.hubDistance().in(Meters));
-                    return RotationsPerSecond.of(params.velocity);
-                },
-                () -> {
-                    var params = tuning_.getShooterParams(RobotState.hubDistance().in(Meters));
-                    return Degrees.of(params.hood);
-                }
-            ),
-            hopper.forwardFeed()
-        );
+    public Command shootAtDistance(Supplier<Distance> distance, Hopper hopper) {
+        Supplier<ShooterParams> shooterParams =
+            () -> tuning_.getShooterParams(distance.get().in(Meters));
+
+        return runDynamicSetpoints(
+            () -> RotationsPerSecond.of(shooterParams.get().velocity),
+            () -> Degrees.of(shooterParams.get().hood)
+        ).alongWith(hopper.forwardFeed());
     }
 
     /**
