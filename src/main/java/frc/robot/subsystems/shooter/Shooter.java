@@ -43,7 +43,12 @@ import frc.robot.util.Mechanism3d;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.shooter.tunings.ArcShooterTuning;
+import frc.robot.subsystems.shooter.tunings.FlatShooterTuning;
+import frc.robot.subsystems.shooter.tunings.ShooterTuning;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.function.DoubleSupplier;
 
@@ -64,11 +69,16 @@ public class Shooter extends SubsystemBase {
     private AngularVelocity shooterTarget = RadiansPerSecond.zero();
     private Angle hoodTarget = Radians.zero();
 
-    private ShooterTuning tuning_ = new ShooterTuning();
+    private int tuningIndex_ = 0 ;
+    private List<ShooterTuning> tunings_ = new ArrayList<ShooterTuning>() ;
 
     public Shooter(ShooterIO ioShooter, HoodIO ioHood) {
         this.shooterIO = ioShooter;
         this.hoodIO = ioHood;
+
+        tunings_.add(new ArcShooterTuning()) ;
+        tunings_.add(new FlatShooterTuning()) ;
+        tuningIndex_ = 0 ;
     }
 
     @Override
@@ -139,6 +149,17 @@ public class Shooter extends SubsystemBase {
         setHoodAngle(hoodTarget);
     }
 
+    private ShooterTuning getTuning() {
+        return tunings_.get(tuningIndex_);
+    }
+
+    // Commands
+    public Command cycleTuning() {
+        return runOnce(() -> {
+            tuningIndex_ = (tuningIndex_ + 1) % tunings_.size();
+        });
+    }
+
     /**
      * The command that the shooter can run whenever its not shooting to manage
      * things like going to different hood angles to get ready to shoot,
@@ -164,7 +185,7 @@ public class Shooter extends SubsystemBase {
                 var vel = 0.0;
 
                 if ((Math.abs(pose.getX() - zone.magnitude()) < ShooterConstants.Positions.spinUpZone.magnitude())) {
-                    var params = tuning_.getShooterParams(distanceToHub.in(Meters));
+                    var params = getTuning().getShooterParams(distanceToHub.in(Meters));
                     vel = params.velocity ;
                 }
                 return RotationsPerSecond.of(vel);
@@ -185,7 +206,7 @@ public class Shooter extends SubsystemBase {
                     : ShooterConstants.Positions.redHubPose;
 
                 Distance distanceToHub = Meters.of(pose.getTranslation().getDistance(hubTranslation));
-                var params = tuning_.getShooterParams(distanceToHub.in(Meters));
+                var params = getTuning().getShooterParams(distanceToHub.in(Meters));
                 return Degrees.of(params.hood) ;
         });
     }
@@ -221,7 +242,7 @@ public class Shooter extends SubsystemBase {
      * 
      * 
      */
-    public Command shoot(Supplier<Pose2d> pose, Hopper hopper) {
+    public Command shoot(Supplier<Pose2d> pose, Hopper hopper, IntakeSubsystem intake) {
         
         return Commands.parallel(
                 defer(() -> {
@@ -235,7 +256,7 @@ public class Shooter extends SubsystemBase {
                     return runDynamicSetpoints(
                         () -> {
                             Distance distanceToHub = Meters.of(pose.get().getTranslation().getDistance(hubTranslation));
-                            var params = tuning_.getShooterParams(distanceToHub.in(Meters));
+                            var params = getTuning().getShooterParams(distanceToHub.in(Meters));
                             var vel = params.velocity;
                             return RotationsPerSecond.of(vel);
                         },
@@ -243,11 +264,12 @@ public class Shooter extends SubsystemBase {
                         () -> {
                             // periodic
                             Distance distanceToHub = Meters.of(pose.get().getTranslation().getDistance(hubTranslation));
-                            var params = tuning_.getShooterParams(distanceToHub.in(Meters));
+                            var params = getTuning().getShooterParams(distanceToHub.in(Meters));
                             return Degrees.of(params.hood) ;
                     });
             }),
-            hopper.forwardFeed()
+            hopper.forwardFeed(),
+            intake.enableShootMode()
         );
     }
 

@@ -283,8 +283,7 @@ public class RobotContainer {
             intake_.stowCmd(),
             intake_::isIntakeStowed
         ));
-
-        
+       
 
         // While the left trigger is held, we will run the intake. If the intake is stowed, it will also deploy it.
         gamepad_.leftTrigger().whileTrue(
@@ -295,7 +294,7 @@ public class RobotContainer {
         );
 
         // While the right trigger is held, we will shoot into the hub or ferry.
-        gamepad_.rightTrigger().whileTrue(RobotCommands.shoot(shooter_, hopper_, drivebase_));
+        gamepad_.rightTrigger().whileTrue(RobotCommands.shoot(shooter_, hopper_, intake_, drivebase_));
             
 
         // When the hopper isnt shooting, set it to run its idle velocity.
@@ -306,6 +305,9 @@ public class RobotContainer {
 
         //While the A button is held, the intake will run the eject sequence. If it the intake is stowed, it will also deploy it.
         gamepad_.a().whileTrue(intake_.ejectSequence());
+
+        // Cycle through shooter tunings when the X button is pressed.
+        gamepad_.x().onTrue(shooter_.cycleTuning()) ;
 
     }
 

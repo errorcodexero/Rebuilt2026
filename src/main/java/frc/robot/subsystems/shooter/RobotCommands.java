@@ -11,9 +11,10 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.hopper.Hopper;
+import frc.robot.subsystems.intake.IntakeSubsystem;
 
 public class RobotCommands {
-    public static Command shoot(Shooter shooter, Hopper hopper, Drive drive) {
+    public static Command shoot(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive) {
         return new ConditionalCommand(
                 // On true
                 Commands.parallel(
@@ -33,7 +34,7 @@ public class RobotCommands {
                                 return rotation;
                             }).andThen(drive.stopWithXCmd()),
                     // Parallel two
-                    Commands.waitUntil(() -> Math.abs(drive.getChassisSpeeds().omegaRadiansPerSecond) < .001).andThen(shooter.shoot(() -> drive.getPose(), hopper))
+                    Commands.waitUntil(() -> Math.abs(drive.getChassisSpeeds().omegaRadiansPerSecond) < .001).andThen(shooter.shoot(() -> drive.getPose(), hopper, intake))
                 ),  // End on true
 
                 // On false
@@ -66,7 +67,7 @@ public class RobotCommands {
 
                         return rotation;
                     }),
-                    Commands.waitUntil(() -> Math.abs(drive.getChassisSpeeds().omegaRadiansPerSecond) < .001).andThen(shooter.shoot(() -> drive.getPose(), hopper))
+                    Commands.waitUntil(() -> Math.abs(drive.getChassisSpeeds().omegaRadiansPerSecond) < .001).andThen(shooter.shoot(() -> drive.getPose(), hopper, intake))
                 ),  // End on false
 
             () -> { 

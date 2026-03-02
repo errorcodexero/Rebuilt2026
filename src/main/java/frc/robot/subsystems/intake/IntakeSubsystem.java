@@ -12,6 +12,7 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
@@ -58,7 +59,7 @@ public class IntakeSubsystem extends SubsystemBase {
         io.setRollerVoltage(volts);
     }
 
-    private void setPivotAngle(Angle angle) {
+    public void setPivotAngle(Angle angle) {
         setpointAngle = angle;
         io.setPivotAngle(angle);
     }
@@ -68,6 +69,10 @@ public class IntakeSubsystem extends SubsystemBase {
      */
     private void startIntaking() {
         io.setRollerVelocity(IntakeConstants.rollerCollectVelocity);
+    }
+
+    private void startShootIntake() {
+        io.setRollerVelocity(IntakeConstants.rollerShootVelocity) ;
     }
 
     /**
@@ -99,7 +104,6 @@ public class IntakeSubsystem extends SubsystemBase {
         setPivotAngle(IntakeConstants.waitingAngle);
     }
     
-
     public Angle getPivotAngle(){
         return inputs.PivotAngle;
     }
@@ -119,6 +123,10 @@ public class IntakeSubsystem extends SubsystemBase {
     public boolean isPivotAtAngle(Angle angle){
         return inputs.PivotAngle.isNear(angle, IntakeConstants.pivotTolerance);
     }
+
+    public boolean isPivotAtSetpoint() {
+        return isPivotAtAngle(setpointAngle);
+    }   
 
     /////////////
     ///Commands//
@@ -152,6 +160,10 @@ public class IntakeSubsystem extends SubsystemBase {
         return startEnd(this::startIntaking, this::stopIntaking);
     }
 
+    public Command runShootIntakeCmd() {
+        return startEnd(this::startShootIntake, this::stopIntaking);
+    }
+
     public Command intakeSequence() {
         return runIntakeCmd().beforeStarting(
             deployCmd().unless(this::isIntakeDeployed)
@@ -166,6 +178,17 @@ public class IntakeSubsystem extends SubsystemBase {
         return runEjectCmd().beforeStarting(
             deployCmd().unless(this::isIntakeDeployed)
         ).finallyDo(interrupted -> waiting());
+    }
+
+    public Command moveIntakeWhileShooting() {
+        return new MoveIntakeCmd(this, IntakeConstants.shootAngles, IntakeConstants.angleChangeDelay);
+    }
+
+    public Command enableShootMode() {
+        return new ParallelCommandGroup(
+            runShootIntakeCmd(),
+            moveIntakeWhileShooting()
+        ) ;
     }
 
     ////////////////////////////
