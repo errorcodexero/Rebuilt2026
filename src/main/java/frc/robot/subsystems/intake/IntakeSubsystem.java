@@ -30,7 +30,7 @@ public class IntakeSubsystem extends SubsystemBase {
     private final Alert rollerAlert =
         new Alert("The intake roller is disconnected!", AlertType.kError);
 
-    private Angle setpointAngle = IntakeConstants.stowedAngle;
+    private Angle setpointAngle = IntakeConstants.Positions.stowedAngle;
 
     public IntakeSubsystem(IntakeIO io) {
         this.io = io;
@@ -81,23 +81,26 @@ public class IntakeSubsystem extends SubsystemBase {
     private void eject(){
         io.setRollerVoltage(IntakeConstants.rollerEjectVoltage);
     }
-
+ 
     /**
      * Stows the intake and hopper.
      */
     private void stow() {
-        setPivotAngle(IntakeConstants.stowedAngle);
+        io.pivotSlow();
+        setPivotAngle(IntakeConstants.Positions.stowedAngle);
     }
 
     /**
      * Deploys the intake and hopper.
      */
     private void deploy() {
-        setPivotAngle(IntakeConstants.deployedAngle);
+        io.pivotFast();
+        setPivotAngle(IntakeConstants.Positions.deployedAngle);
     }
 
     private void waiting(){
-        setPivotAngle(IntakeConstants.waitingAngle);
+        io.pivotFast();
+        setPivotAngle(IntakeConstants.Positions.waitingAngle);
     }
     
 
@@ -106,15 +109,15 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public boolean isIntakeDeployed() {
-        return isPivotAtAngle(IntakeConstants.deployedAngle);
+        return isPivotAtAngle(IntakeConstants.Positions.deployedAngle);
     }
 
     public boolean isIntakeWaiting() {
-        return isPivotAtAngle(IntakeConstants.waitingAngle);
+        return isPivotAtAngle(IntakeConstants.Positions.waitingAngle);
     }    
 
     public boolean isIntakeStowed(){
-        return isPivotAtAngle(IntakeConstants.stowedAngle);
+        return isPivotAtAngle(IntakeConstants.Positions.stowedAngle);
     }
 
     public boolean isPivotAtAngle(Angle angle){

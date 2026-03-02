@@ -3,12 +3,15 @@ package frc.robot.subsystems.intake;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.util.PhoenixUtil.tryUntilOk;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -56,10 +59,13 @@ public class IntakeIOTalonFX implements IntakeIO {
     private StatusSignal<Voltage> rollerAppliedVoltsSignal;
     private StatusSignal<Current> rollerCurrentAmpsSignal; 
 
+    private MotionMagicConfigs slowPivotConfigs;
+    private MotionMagicConfigs fastPivotConfigs;
+
     public IntakeIOTalonFX(CANBus canbus) {
         // Initialize motor objects
-        rollerMotor = new TalonFX(IntakeConstants.rollerMotorCANID, canbus);
-        pivotMotor = new TalonFX(IntakeConstants.pivotMotorCANID, canbus);
+        rollerMotor = new TalonFX(IntakeConstants.CANID.rollerMotorCANID, canbus);
+        pivotMotor = new TalonFX(IntakeConstants.CANID.pivotMotorCANID, canbus);
 
         // Configuration for the pivot motor
         final TalonFXConfiguration pivotConfigs= new TalonFXConfiguration();
@@ -68,34 +74,45 @@ public class IntakeIOTalonFX implements IntakeIO {
         pivotConfigs.MotorOutput.NeutralMode= NeutralModeValue.Brake;
 
         //Current Limit Configurations
-        pivotConfigs.CurrentLimits.StatorCurrentLimit = IntakeConstants.currentLimit;
+        pivotConfigs.CurrentLimits.StatorCurrentLimit = IntakeConstants.CurrentLimits.currentLimit;
         pivotConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
 
         //PID Configurations
-        pivotConfigs.Slot0.kP= IntakeConstants.pivotKP;
-        pivotConfigs.Slot0.kD= IntakeConstants.pivotKD;
-        pivotConfigs.Slot0.kV= IntakeConstants.pivotKV;
-        pivotConfigs.Slot0.kI= IntakeConstants.pivotKI;
-        pivotConfigs.Slot0.kA= IntakeConstants.pivotKA;
-        pivotConfigs.Slot0.kG= IntakeConstants.pivotKG;
-        pivotConfigs.Slot0.kS= IntakeConstants.pivotKS;
+        pivotConfigs.Slot0.kP= IntakeConstants.PID.pivotKP;
+        pivotConfigs.Slot0.kD= IntakeConstants.PID.pivotKD;
+        pivotConfigs.Slot0.kV= IntakeConstants.PID.pivotKV;
+        pivotConfigs.Slot0.kI= IntakeConstants.PID.pivotKI;
+        pivotConfigs.Slot0.kA= IntakeConstants.PID.pivotKA;
+        pivotConfigs.Slot0.kG= IntakeConstants.PID.pivotKG;
+        pivotConfigs.Slot0.kS= IntakeConstants.PID.pivotKS;
 
         //Soft Limit Configurations
         pivotConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable= true;
-        pivotConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold= IntakeConstants.pivotMaxAngle.in(Degrees);
+        pivotConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold= IntakeConstants.Positions.pivotMaxAngle.in(Degrees);
         pivotConfigs.SoftwareLimitSwitch.ReverseSoftLimitEnable= true;
-        pivotConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold= IntakeConstants.pivotMinAngle.in(Degrees);
+        pivotConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold= IntakeConstants.Positions.pivotMinAngle.in(Degrees);
 
-        //Motion Magic Configurations
-        pivotConfigs.MotionMagic.MotionMagicCruiseVelocity= IntakeConstants.pivotCruiseVelocity.in(DegreesPerSecond); 
-        pivotConfigs.MotionMagic.MotionMagicAcceleration= IntakeConstants.pivotCruiseAcceleration.in(DegreesPerSecondPerSecond); 
-        pivotConfigs.MotionMagic.MotionMagicJerk= IntakeConstants.pivotMaxJerk; 
+        //Motion Magic Configurations for slow pivot
+        final MotionMagicConfigs slowConfigs= new MotionMagicConfigs();
 
-        //Used to apply configs once instead of having multiple iterations to do this
-        //Also trys the configuartion 5 times until it receives an OK status signal 
+        slowConfigs.MotionMagicCruiseVelocity= IntakeConstants.MotionMagic.lowPivotVelocity.in(RotationsPerSecond); 
+        slowConfigs.MotionMagicAcceleration= IntakeConstants.MotionMagic.lowPivotAcceleration.in(RotationsPerSecondPerSecond); 
+        slowConfigs.MotionMagicJerk= IntakeConstants.MotionMagic.lowPivotJerk; 
+
+        this.slowPivotConfigs= slowConfigs;
+
+
+        //Motion Magic Configuration for fast pivot
+        final MotionMagicConfigs fastConfigs= new MotionMagicConfigs();
+
+        fastConfigs.MotionMagicCruiseVelocity= IntakeConstants.MotionMagic.highPivotVelocity.in(RotationsPerSecond);
+        fastConfigs.MotionMagicAcceleration= IntakeConstants.MotionMagic.highPivotAcceleration.in(RotationsPerSecondPerSecond);
+        fastConfigs.MotionMagicJerk= IntakeConstants.MotionMagic.highPivotJerk;
+
+        this.fastPivotConfigs= fastConfigs;
+
+
         tryUntilOk(5, () -> pivotMotor.getConfigurator().apply(pivotConfigs, 0.25));
-
-
         // Configuration for the roller motor
         final TalonFXConfiguration rollerConfigs= new TalonFXConfiguration();
         
@@ -103,17 +120,17 @@ public class IntakeIOTalonFX implements IntakeIO {
         rollerConfigs.MotorOutput.NeutralMode= NeutralModeValue.Coast;
 
         //Current Limit Configurations
-        rollerConfigs.CurrentLimits.StatorCurrentLimit= IntakeConstants.currentLimit;
+        rollerConfigs.CurrentLimits.StatorCurrentLimit= IntakeConstants.CurrentLimits.currentLimit;
         rollerConfigs.CurrentLimits.StatorCurrentLimitEnable= true;
 
         //PID Configurations
-        rollerConfigs.Slot0.kP= IntakeConstants.rollerKP;
-        rollerConfigs.Slot0.kD= IntakeConstants.rollerKD;
-        rollerConfigs.Slot0.kV= IntakeConstants.rollerKV;
-        rollerConfigs.Slot0.kI= IntakeConstants.rollerKI;
-        rollerConfigs.Slot0.kA= IntakeConstants.rollerKA;
-        rollerConfigs.Slot0.kS= IntakeConstants.rollerKS;
-        rollerConfigs.Slot0.kG= IntakeConstants.rollerKG;
+        rollerConfigs.Slot0.kP= IntakeConstants.PID.rollerKP;
+        rollerConfigs.Slot0.kD= IntakeConstants.PID.rollerKD;
+        rollerConfigs.Slot0.kV= IntakeConstants.PID.rollerKV;
+        rollerConfigs.Slot0.kI= IntakeConstants.PID.rollerKI;
+        rollerConfigs.Slot0.kA= IntakeConstants.PID.rollerKA;
+        rollerConfigs.Slot0.kS= IntakeConstants.PID.rollerKS;
+        rollerConfigs.Slot0.kG= IntakeConstants.PID.rollerKG;
 
         //Used to apply configs once instead of having multiple iterations to do this
         //Also trys the configuartion 5 times until it receives an OK status signal 
@@ -189,5 +206,15 @@ public class IntakeIOTalonFX implements IntakeIO {
     @Override
     public void stopRoller() {
         rollerMotor.setControl(rollerVoltageRequest.withOutput(0));
-    }  
+    }
+
+    @Override
+    public void pivotSlow(){
+        tryUntilOk(5, () -> pivotMotor.getConfigurator().apply(slowPivotConfigs, 0.25));
+    }
+
+    @Override
+    public void pivotFast(){
+        tryUntilOk(5, () -> pivotMotor.getConfigurator().apply(fastPivotConfigs, 0.25));
+    }
 }
