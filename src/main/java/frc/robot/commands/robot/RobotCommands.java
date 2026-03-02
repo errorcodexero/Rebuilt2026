@@ -94,7 +94,7 @@ public class RobotCommands {
         return Commands.parallel(
                 DriveCommands.pointAtShootingTarget(drive, gamepad, shootOnMove),
                 Commands.sequence(
-                    Commands.waitTime(ShooterConstants.dbRotationDelay), 
+                    Commands.waitUntil(() -> drive.rotationIsNear(drive.getVirtualTarget().minus(drive.getPose().getTranslation()).getAngle(), ShooterConstants.aimingTolerance)),
                     shooter.shoot(drive, hopper, gamepad, shootOnMove)
                 )
             );

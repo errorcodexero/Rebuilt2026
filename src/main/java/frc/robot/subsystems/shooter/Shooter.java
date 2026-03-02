@@ -34,7 +34,6 @@ import frc.robot.Constants;
 import frc.robot.RobotState;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Mode;
-import frc.robot.commands.drive.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.util.MapleSimUtil;
@@ -143,13 +142,7 @@ public class Shooter extends SubsystemBase {
      * @return
      */
     public Command shoot(Drive drive, Hopper hopper, CommandXboxController gamepad, boolean shootOnMove) {
-        return Commands.parallel(
-                DriveCommands.pointAtShootingTarget(drive, gamepad, shootOnMove),
-                Commands.sequence(
-                    Commands.waitUntil(() -> drive.rotationIsNear(drive.getVirtualTarget().minus(drive.getPose().getTranslation()).getAngle(), ShooterConstants.aimingTolerance)),
-                    shootAtDistance(() -> Meters.of(drive.getVirtualTarget().getDistance(drive.getPose().getTranslation())), hopper)
-                )
-            );
+        return shootAtDistance(() -> Meters.of(drive.getVirtualTarget().getDistance(drive.getPose().getTranslation())), hopper);
     }
 
     /**
