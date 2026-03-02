@@ -34,10 +34,8 @@ public class ShooterConstants {
     public static final Angle hoodMinAngle = Degrees.of(0.0) ;
 
     public class FerryPositions{
-        
         public static final Translation2d blueOutpostTarget= new Translation2d(2.135, 1.639);
         public static final Translation2d redOutpostTarget= new Translation2d(14.0,6.0);
-
     }
 
     public class PID {
@@ -87,16 +85,6 @@ public class ShooterConstants {
             public static final double hoodLOW = 0;
             public static final double hoodMEDIUM = 1;
             public static final double hoodHIGH = 2;
-
-            // Tested Distances 
-            public static final double lowDist[] = {1, 2, 3};
-            public static final double lowVelocities[] = {10, 20, 30};
-
-            public static final double medDist[] = {4, 5, 6};
-            public static final double medVelocities[] = {40, 50, 60};
-
-            public static final double highDist[] = {7, 8, 9};
-            public static final double highVelocities[] = {70, 80, 90};
         
             public enum HubDistance {
                 LOW(Meters.of(2)), // 0-2 m

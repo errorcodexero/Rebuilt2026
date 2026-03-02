@@ -50,7 +50,6 @@ public final class IntakeConstants {
     public static final AngularVelocity pivotCruiseAcceleration= RotationsPerSecond.of(100);
     public static final double pivotMaxJerk= 0;
 
-    public static final Voltage rollerCollectVoltage= Volts.of(5);
     public static final AngularVelocity rollerCollectVelocity= RotationsPerSecond.of(38);
     public static final Voltage rollerEjectVoltage= Volts.of(-6);
 

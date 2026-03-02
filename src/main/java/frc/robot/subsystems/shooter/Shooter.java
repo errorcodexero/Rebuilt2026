@@ -19,7 +19,6 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -39,7 +38,6 @@ import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.subsystems.hopper.Hopper;
-import frc.robot.subsystems.shooter.ShooterConstants.Positions.HubDistance;
 import frc.robot.util.MapleSimUtil;
 import frc.robot.util.Mechanism3d;
 import frc.robot.subsystems.drive.Drive;
@@ -66,34 +64,11 @@ public class Shooter extends SubsystemBase {
     private AngularVelocity shooterTarget = RadiansPerSecond.zero();
     private Angle hoodTarget = Radians.zero();
 
-
-    public final InterpolatingDoubleTreeMap distMapLow = new InterpolatingDoubleTreeMap();
-    public final InterpolatingDoubleTreeMap distMapMed = new InterpolatingDoubleTreeMap();
-    public final InterpolatingDoubleTreeMap distMapHigh = new InterpolatingDoubleTreeMap();
-
-    private void initMap() {
-        if (ShooterConstants.Positions.lowDist.length != ShooterConstants.Positions.lowVelocities.length || ShooterConstants.Positions.medDist.length != ShooterConstants.Positions.medVelocities.length || ShooterConstants.Positions.highDist.length != ShooterConstants.Positions.highVelocities.length) {
-            throw new IllegalArgumentException("Distance and velocity arrays must be of the same length");
-        }
-
-        for(int i = 0 ; i < ShooterConstants.Positions.lowDist.length; i++) {
-            distMapLow.put(ShooterConstants.Positions.lowDist[i], ShooterConstants.Positions.lowVelocities[i]);
-        }
-
-        for(int i = 0 ; i < ShooterConstants.Positions.medDist.length; i++) {
-            distMapMed.put(ShooterConstants.Positions.medDist[i], ShooterConstants.Positions.medVelocities[i]);
-        }
-
-        for(int i = 0 ; i < ShooterConstants.Positions.highDist.length; i++) {
-            distMapHigh.put(ShooterConstants.Positions.highDist[i], ShooterConstants.Positions.highVelocities[i]);
-        }
-    }    
+    private ShooterTuning tuning_ = new ShooterTuning();
 
     public Shooter(ShooterIO ioShooter, HoodIO ioHood) {
         this.shooterIO = ioShooter;
         this.hoodIO = ioHood;
-
-        initMap() ;
     }
 
     @Override
@@ -189,19 +164,8 @@ public class Shooter extends SubsystemBase {
                 var vel = 0.0;
 
                 if ((Math.abs(pose.getX() - zone.magnitude()) < ShooterConstants.Positions.spinUpZone.magnitude())) {
-                    switch(HubDistance.fromDistance(distanceToHub)) {
-                        case LOW:
-                            vel = distMapLow.get(distanceToHub.magnitude());
-                        
-                        case MEDIUM:
-                            vel = distMapMed.get(distanceToHub.magnitude());
-                            
-                        case HIGH:
-                            vel = distMapHigh.get(distanceToHub.magnitude());
-                        
-                        default: 
-                            vel = distMapHigh.get(distanceToHub.magnitude());
-                    }
+                    var params = tuning_.getShooterParams(distanceToHub.in(Meters));
+                    vel = params.velocity ;
                 }
                 return RotationsPerSecond.of(vel);
             },
@@ -221,19 +185,8 @@ public class Shooter extends SubsystemBase {
                     : ShooterConstants.Positions.redHubPose;
 
                 Distance distanceToHub = Meters.of(pose.getTranslation().getDistance(hubTranslation));
-
-                switch(HubDistance.fromDistance(distanceToHub)) {
-                    case LOW:
-                        return Degrees.of(ShooterConstants.Positions.hoodLOW);
-                    case MEDIUM:
-                        return Degrees.of(ShooterConstants.Positions.hoodMEDIUM);
-                    case HIGH:
-                        return Degrees.of(ShooterConstants.Positions.hoodHIGH);
-                    default:  
-                        return Degrees.of(ShooterConstants.Positions.hoodLOW);  
-                        
-                }
-            
+                var params = tuning_.getShooterParams(distanceToHub.in(Meters));
+                return Degrees.of(params.hood) ;
         });
     }
 
@@ -282,41 +235,16 @@ public class Shooter extends SubsystemBase {
                     return runDynamicSetpoints(
                         () -> {
                             Distance distanceToHub = Meters.of(pose.get().getTranslation().getDistance(hubTranslation));
-                            var vel = 0.0;
-                            switch(HubDistance.fromDistance(distanceToHub)) {
-                                case LOW:
-                                    vel = distMapLow.get(distanceToHub.magnitude());
-                                
-                                case MEDIUM:
-                                    vel = distMapMed.get(distanceToHub.magnitude());
-                                    
-                                case HIGH:
-                                    vel = distMapHigh.get(distanceToHub.magnitude());
-                                
-                                default: 
-                                    vel = distMapHigh.get(distanceToHub.magnitude());
-                            }
-
+                            var params = tuning_.getShooterParams(distanceToHub.in(Meters));
+                            var vel = params.velocity;
                             return RotationsPerSecond.of(vel);
                         },
                     
                         () -> {
                             // periodic
                             Distance distanceToHub = Meters.of(pose.get().getTranslation().getDistance(hubTranslation));
-
-                            switch(HubDistance.fromDistance(distanceToHub)) {
-                                case LOW:
-                                    return Degrees.of(ShooterConstants.Positions.hoodLOW);
-                                
-                                case MEDIUM:
-                                    return Degrees.of(ShooterConstants.Positions.hoodMEDIUM);
-                                    
-                                case HIGH:
-                                    return Degrees.of(ShooterConstants.Positions.hoodHIGH);
-                                
-                                default: 
-                                    return Degrees.of(ShooterConstants.Positions.hoodMEDIUM);
-                            }   
+                            var params = tuning_.getShooterParams(distanceToHub.in(Meters));
+                            return Degrees.of(params.hood) ;
                     });
             }),
             hopper.forwardFeed()
