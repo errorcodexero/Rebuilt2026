@@ -101,7 +101,25 @@ public class Hopper extends SubsystemBase {
      */
     public Command idleScrambler() {
         return startEnd(
-            () -> setScramblerVelocity(HopperConstants.scramblerActiveVelocity.times(0.15)),
+            () -> setScramblerVelocity(HopperConstants.scramblerIdleVelocity),
+            this::stopScrambler
+        );
+    }
+
+    public Command collectScrambler() {
+        return startEnd(
+            () -> setScramblerVelocity(HopperConstants.scramblerCollectVelocity),
+            this::stopScrambler
+        );
+    }    
+
+    /**
+     * Runs the scrambler at backwards to move balls out of the shooter/feeder
+     * @return
+     */
+    public Command reverseScrambler() {
+        return startEnd(
+            () -> setScramblerVelocity(HopperConstants.scramblerShootingVelocity.times(-1)),
             this::stopScrambler
         );
     }
@@ -124,7 +142,7 @@ public class Hopper extends SubsystemBase {
      * @return
      */
     public Command forwardFeed() {
-        return feed(HopperConstants.scramblerActiveVelocity, HopperConstants.feedingVelocity);
+        return feed(HopperConstants.scramblerShootingVelocity, HopperConstants.feedingVelocity);
     }
     
     /**
@@ -132,7 +150,7 @@ public class Hopper extends SubsystemBase {
      * @return
      */
     public Command reverseFeed() {
-        return feed(HopperConstants.scramblerActiveVelocity.times(-1), HopperConstants.feedingVelocity.times(-1));
+        return feed(HopperConstants.scramblerShootingVelocity.times(-1), HopperConstants.feedingVelocity.times(-1));
     }
     
     // Readbacks + state checks
@@ -161,31 +179,7 @@ public class Hopper extends SubsystemBase {
     }
 
     public Command dynamicFeederVoltageCommand(Supplier<Voltage> v) {
-        return runEnd(() -> setFeederVoltage(v.get()), this::stopFeederCommand);
+        return runEnd(() -> setFeederVoltage(v.get()), this::stopFeeder);
     }
     
-    public Command setFeederVoltageCommand(Voltage voltage) {
-        return runOnce(() -> setFeederVoltage(voltage))
-            .withName("Hopper.SetFeederVoltage");
-    }
-    
-    public Command setScramblerVoltageCommand(Voltage voltage) {
-        return runOnce(() -> setScramblerVoltage(voltage))
-            .withName("Hopper.SetScramblerVoltage");
-    }
-    
-    public Command stopFeederCommand() {
-        return runOnce(this::stopFeeder)
-            .withName("Hopper.StopFeeder");
-    }
-    
-    public Command stopScramblerCommand() {
-        return runOnce(this::stopScrambler)
-            .withName("Hopper.StopScrambler");
-    }
-    
-    public Command stopAllCommand() {
-        return runOnce(this::stopAll)
-            .withName("Hopper.StopAll");
-    }
 }
