@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
+import frc.robot.RobotState;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.drive.DriveCommands;
@@ -41,6 +42,10 @@ import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.util.MapleSimUtil;
 import frc.robot.util.Mechanism3d;
 import frc.robot.subsystems.shooter.ShooterConstants.Positions.HubDistance;
+import frc.robot.subsystems.drive.Drive;
+import frc.robot.commands.drive.DriveCommands;
+import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.shooter.ShooterTuning.ShooterParams;
 
 import java.util.Set;
 
@@ -187,29 +192,11 @@ public class Shooter extends SubsystemBase {
     }
     public Command awaitShooting(Supplier<Pose2d> robotPose) {
         return runDynamicSetpoints(
-            () -> {
-                Distance zone =
-                    DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                    ? ShooterConstants.Positions.blueAllianceWall
-                    : ShooterConstants.Positions.redAllianceWall;
-
-                Pose2d pose = robotPose.get();
-
-                Translation2d hubTranslation =
-                    DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                    ? ShooterConstants.Positions.blueHubPose
-                    : ShooterConstants.Positions.redHubPose;
-            
-                Distance distanceToHub = Meters.of(pose.getTranslation().getDistance(hubTranslation));
-                var vel = 0.0;
-
-                if ((Math.abs(pose.getX() - zone.magnitude()) < ShooterConstants.Positions.spinUpZone.magnitude())) {
-                    var params = tuning_.getShooterParams(distanceToHub.in(Meters));
-                    vel = params.velocity ;
-                }
-                return RotationsPerSecond.of(vel);
-            },
-                                
+            () -> RotationsPerSecond.of(
+                RobotState.inAllianceZone()
+                    ? tuning_.getShooterParams(RobotState.hubDistance().in(Meters)).velocity
+                    : 0.0
+            ),             
             () -> {
                 Pose2d pose = robotPose.get();
                 Pose2d nearestTrench = pose.nearest(FieldConstants.trenches);
@@ -219,15 +206,10 @@ public class Shooter extends SubsystemBase {
                     return Degrees.zero();
                 }
 
-                Translation2d hubTranslation =
-                    DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                    ? ShooterConstants.Positions.blueHubPose
-                    : ShooterConstants.Positions.redHubPose;
-
-                Distance distanceToHub = Meters.of(pose.getTranslation().getDistance(hubTranslation));
-                var params = tuning_.getShooterParams(distanceToHub.in(Meters));
-                return Degrees.of(params.hood) ;
-        });
+                var params = tuning_.getShooterParams(RobotState.hubDistance().in(Meters));
+                return Degrees.of(params.hood);
+            }
+        );
     }
 
     public Command runToSetpointsCmd(AngularVelocity vel, Angle pos) {
@@ -263,31 +245,14 @@ public class Shooter extends SubsystemBase {
      * 
      * 
      */
-    public Command shoot(Supplier<Translation2d> dist, Hopper hopper) {
-        
-        return Commands.parallel(
-                defer(() -> {
+    public Command shootAtDistance(Supplier<Distance> distance, Hopper hopper) {
+        Supplier<ShooterParams> shooterParams =
+            () -> tuning_.getShooterParams(distance.get().in(Meters));
 
-                    // constructing
-                    
-
-                    return runDynamicSetpoints(
-                        () -> {
-                            Distance distanceToHub = Meters.of(dist.get().getNorm());
-                            var params = tuning_.getShooterParams(distanceToHub.in(Meters));
-                            var vel = params.velocity;
-                            return RotationsPerSecond.of(vel);
-                        },
-                    
-                        () -> {
-                            // periodic
-                            Distance distanceToHub = Meters.of(dist.get().getNorm());
-                            var params = tuning_.getShooterParams(distanceToHub.in(Meters));
-                            return Degrees.of(params.hood) ;
-                    });
-            }),
-            hopper.forwardFeed()
-        );
+        return runDynamicSetpoints(
+            () -> RotationsPerSecond.of(shooterParams.get().velocity),
+            () -> Degrees.of(shooterParams.get().hood)
+        ).alongWith(hopper.forwardFeed());
     }
 
     /**
