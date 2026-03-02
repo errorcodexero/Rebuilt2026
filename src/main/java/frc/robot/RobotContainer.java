@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.Constants.RobotType;
 import frc.robot.commands.drive.DriveCommands;
@@ -216,6 +217,11 @@ public class RobotContainer {
 
         if (hopper_ == null) {
             hopper_ = new Hopper(new HopperIO() {});
+        }
+
+        // Force Load Apriltag Layout
+        for (var tag : FieldConstants.layout.getTags()) {
+            System.out.println("Tag Loaded: " + tag.ID);
         }
 
         DriveCommands.configure(
