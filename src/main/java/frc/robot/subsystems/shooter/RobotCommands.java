@@ -12,7 +12,7 @@ public class RobotCommands {
                 DriveCommands.pointAtShootingTarget(drive, gamepad, shootOnMove),
                 Commands.sequence(
                     Commands.waitTime(ShooterConstants.dbRotationDelay), 
-                    shooter.shoot(drive::getVirtualTarget, hopper)
+                    shooter.shoot(() -> drive.getVirtualTarget().minus(drive.getPose().getTranslation()), hopper)
                 )
             );
     }

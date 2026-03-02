@@ -307,7 +307,7 @@ public class RobotContainer {
         //CHANGE BACK TO RIGHT TRIGGER!
         // we might want to limit the acceleration on this while shooting, but idk how to do that and hopefully it wont matter too much. 
         // just realized we could interrupt this with POV driving, but we would still be shooting, so we might want to create a block for that, but this too probably wont come up that much and i think i am not that numb-skulled to actually do this so idk
-        gamepad_.rightTrigger().whileTrue(
+        gamepad_.a().whileTrue(
             RobotCommands.shoot(shooter_, hopper_, drivebase_, gamepad_, Constants.shootOnMove)
         );
         // shooter_.setDefaultCommand(shooter_.awaitShooting(drivebase_::getPose));
