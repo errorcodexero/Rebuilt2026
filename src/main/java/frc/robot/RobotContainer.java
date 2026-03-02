@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.FeetPerSecond;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
@@ -37,9 +36,6 @@ import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.Constants.RobotType;
 import frc.robot.commands.drive.DriveCommands;
-import frc.robot.commands.drive.autos.AutoCommands;
-import frc.robot.generated.AlphaTunerConstants;
-import frc.robot.generated.BetaTunerConstants;
 import frc.robot.generated.CompTunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -122,7 +118,7 @@ public class RobotContainer {
 
                     // Add sim drivebase to simulation and where modules can get it.
                     // CALL THIS BEFORE CREATING THE DRIVEBASE!
-                    MapleSimUtil.createSwerve(config, new Pose2d(2.0, 2.0, Rotation2d.kZero)); 
+                    MapleSimUtil.createSwerve(config, new Pose2d(2.0, 2.0, Rotation2d.kZero));
                     MapleSimUtil.createIntake();
 
                     drivebase_ = new Drive(
@@ -247,8 +243,6 @@ public class RobotContainer {
         // AutoModes
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
 
-        autoChooser_.addOption("Neutral Zone Collect and Shoot", AutoCommands.NZCollectAuto(drivebase_, shooter_, intake_, hopper_));
-
         autoChooser_.onChange(auto -> {
             System.out.println("Auto \"" + auto.getName() + "\" selected!");
             // Anything you may want to do when the auto is selected.
@@ -361,7 +355,7 @@ public class RobotContainer {
         // Reset gyro to 0° when Y & B button is pressed
         gamepad_.y().and(gamepad_.b()).onTrue(drivebase_.resetGyroCmd());
     }
-
+    
     public Command getAutonomousCommand() {
         return autoChooser_.get();
     }
