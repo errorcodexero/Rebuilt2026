@@ -23,8 +23,6 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -42,9 +40,6 @@ import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.util.MapleSimUtil;
 import frc.robot.util.Mechanism3d;
 import frc.robot.subsystems.shooter.ShooterConstants.Positions.HubDistance;
-import frc.robot.subsystems.drive.Drive;
-import frc.robot.commands.drive.DriveCommands;
-import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.shooter.ShooterTuning.ShooterParams;
 
 import java.util.Set;
@@ -147,12 +142,12 @@ public class Shooter extends SubsystemBase {
      * @param pos
      * @return
      */
-    public Command shootCmd(Drive drive, Hopper hopper, CommandXboxController gamepad, boolean shootOnMove) {
+    public Command shoot(Drive drive, Hopper hopper, CommandXboxController gamepad, boolean shootOnMove) {
         return Commands.parallel(
                 DriveCommands.pointAtShootingTarget(drive, gamepad, shootOnMove),
                 Commands.sequence(
-                    Commands.waitTime(ShooterConstants.dbRotationDelay), 
-                    shoot(drive::getVirtualTarget, hopper)
+                    Commands.waitUntil(() -> drive.rotationIsNear(drive.getVirtualTarget().minus(drive.getPose().getTranslation()).getAngle(), ShooterConstants.aimingTolerance)),
+                    shootAtDistance(() -> Meters.of(drive.getVirtualTarget().getDistance(drive.getPose().getTranslation())), hopper)
                 )
             );
     }
