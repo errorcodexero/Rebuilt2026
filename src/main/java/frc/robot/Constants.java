@@ -43,7 +43,7 @@ public final class Constants {
     // desktop physics simulation so AdvantageKit runs in SIM mode instead of
     // falling back to REPLAY.
     //REMEMBER TO CHANGE BACK TO COMPETITION!
-    private static final RobotType robotType = RobotType.SIMBOT;
+    private static final RobotType robotType = RobotType.COMPETITION;
 
     public static final boolean spawnLessFuelInSim = true;
     public static final boolean shootOnMove = true; // if true, we will allow the driver to shoot while moving, but with reduced max speed. if false, we will not allow the driver to shoot while moving.
