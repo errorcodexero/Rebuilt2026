@@ -86,6 +86,7 @@ public class RobotContainer {
 
     // Trigger Devices
     private final CommandXboxController gamepad_ = new CommandXboxController(0);
+    private final CommandXboxController operatorGamepad_ = new CommandXboxController(2);
     
     public RobotContainer() {
         /**
@@ -278,7 +279,7 @@ public class RobotContainer {
     // Bind robot actions to commands here.
     private void configureBindings() {
         // Manually deploying and undeploying the intake.
-        gamepad_.start().onTrue(Commands.either(
+        gamepad_.start().or(operatorGamepad_.start()).onTrue(Commands.either(
             intake_.deployCmd(),
             intake_.stowCmd(),
             intake_::isIntakeStowed
@@ -286,7 +287,7 @@ public class RobotContainer {
        
 
         // While the left trigger is held, we will run the intake. If the intake is stowed, it will also deploy it.
-        gamepad_.leftTrigger().whileTrue(
+        gamepad_.leftTrigger().or(operatorGamepad_.leftTrigger()).whileTrue(
             new ParallelCommandGroup(
                 intake_.intakeSequence(),
                 hopper_.collectScrambler()
@@ -294,7 +295,7 @@ public class RobotContainer {
         );
 
         // While the right trigger is held, we will shoot into the hub or ferry.
-        gamepad_.rightTrigger().whileTrue(RobotCommands.shoot(shooter_, hopper_, intake_, drivebase_));
+        gamepad_.rightTrigger().or(operatorGamepad_.rightTrigger()).whileTrue(RobotCommands.shoot(shooter_, hopper_, intake_, drivebase_));
             
 
         // When the hopper isnt shooting, set it to run its idle velocity.
@@ -304,11 +305,10 @@ public class RobotContainer {
         // shooter_.setDefaultCommand(shooter_.awaitShooting(drivebase_::getPose));
 
         //While the A button is held, the intake will run the eject sequence. If it the intake is stowed, it will also deploy it.
-        gamepad_.a().whileTrue(intake_.ejectSequence());
+        gamepad_.a().or(operatorGamepad_.a()).whileTrue(intake_.ejectSequence());
 
         // Cycle through shooter tunings when the X button is pressed.
-        gamepad_.x().onTrue(shooter_.cycleTuning()) ;
-
+        gamepad_.x().or(operatorGamepad_.x()).onTrue(shooter_.cycleTuning()) ;
     }
 
     private void configureDriveBindings() {
