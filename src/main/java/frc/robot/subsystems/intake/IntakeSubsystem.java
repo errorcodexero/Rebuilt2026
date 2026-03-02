@@ -1,6 +1,7 @@
 package frc.robot.subsystems.intake; 
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -50,7 +51,7 @@ public class IntakeSubsystem extends SubsystemBase {
         Mechanism3d.setpoints.setIntake(setpointAngle);
 
         if (Constants.getMode() == Mode.SIM) {
-            MapleSimUtil.setIntakeRunning(isIntakeDeployed() && inputs.RollerAngularVelocity.gt(RadiansPerSecond.zero()));
+            // MapleSimUtil.setIntakeRunning(isIntakeDeployed() && inputs.RollerAngularVelocity.gt(RadiansPerSecond.zero()));
         }
     }
 
@@ -121,7 +122,9 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public boolean isPivotAtAngle(Angle angle){
-        return inputs.PivotAngle.isNear(angle, IntakeConstants.pivotTolerance);
+        var ret = inputs.PivotAngle.isNear(angle, IntakeConstants.pivotTolerance);
+        System.out.println("Pivot angle: " + inputs.PivotAngle.in(Rotations) + ", Target angle: " + angle.in(Rotations) + ", At setpoint: " + ret); 
+        return ret;
     }
 
     public boolean isPivotAtSetpoint() {
@@ -150,7 +153,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public Command waitCommand() {
         return runOnce(this::waiting);
-    }    
+    }
 
     /**
      * Command that runs the intake until the command ends.
