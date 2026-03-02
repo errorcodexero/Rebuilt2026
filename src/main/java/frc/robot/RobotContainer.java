@@ -295,8 +295,7 @@ public class RobotContainer {
         );
 
         // While the right trigger is held, we will shoot into the hub or ferry.
-        gamepad_.rightTrigger().or(operatorGamepad_.rightTrigger()).whileTrue(RobotCommands.shoot(shooter_, hopper_, intake_, drivebase_));
-            
+        gamepad_.rightTrigger().or(operatorGamepad_.rightTrigger()).whileTrue(RobotCommands.shoot(shooter_, hopper_, intake_, drivebase_));           
 
         // When the hopper isnt shooting, set it to run its idle velocity.
         // hopper_.setDefaultCommand(hopper_.idleScrambler());
@@ -309,6 +308,7 @@ public class RobotContainer {
 
         // Cycle through shooter tunings when the X button is pressed.
         gamepad_.x().or(operatorGamepad_.x()).onTrue(shooter_.cycleTuning()) ;
+        gamepad_.a().whileTrue(intake_.ejectSequence());
     }
 
     private void configureDriveBindings() {
@@ -324,7 +324,7 @@ public class RobotContainer {
                 () -> -gamepad_.getRightX() * DriveConstants.slowModeJoystickMultiplier));
 
         // Switch to X pattern / brake while X button is pressed
-        gamepad_.x().whileTrue(drivebase_.stopWithXCmd());
+        gamepad_.x().whileTrue(drivebase_.stopWithXCmd()); 
 
         // Robot Relative
         gamepad_.povUp().whileTrue(

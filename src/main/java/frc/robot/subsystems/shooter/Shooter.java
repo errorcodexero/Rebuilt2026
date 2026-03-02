@@ -399,4 +399,58 @@ public class Shooter extends SubsystemBase {
             }
         );
     }
+
+    public Command ferryOnMove(Drive drive, Hopper hopper, DoubleSupplier xSupplier, DoubleSupplier ySupplier, IntakeSubsystem intake){
+        return new ConditionalCommand(
+
+            Commands.parallel(
+                DriveCommands.joystickDriveAtAngle(
+                    drive,
+                    xSupplier,
+                    ySupplier,
+                    () -> {
+                        Translation2d ferryTarget= 
+                        DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                        ? ShooterConstants.ferryPositions.blueOutpostFerryTarget
+                        : ShooterConstants.ferryPositions.redDepotFerryTarget;
+
+                        var targetTranslation= ferryTarget.minus(drive.getPose().getTranslation());
+                        var targetRotation= new Rotation2d(targetTranslation.getX(), targetTranslation.getY());
+                        return targetRotation;
+                }),
+                intake.intakeSequence(),
+                shootCmd(hopper)
+            ),
+            
+            Commands.parallel(
+                DriveCommands.joystickDriveAtAngle(
+                    drive,
+                    xSupplier,
+                    ySupplier,
+                    () -> {
+                        Translation2d ferryTarget= 
+                        DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                        ? ShooterConstants.ferryPositions.blueDepotFerryTarget
+                        : ShooterConstants.ferryPositions.redOutpostFerryTarget;
+
+                        var targetTranslation= ferryTarget.minus(drive.getPose().getTranslation());
+                        var targetRotation= new Rotation2d(targetTranslation.getX(), targetTranslation.getY());
+                        return targetRotation;
+                }),
+                intake.intakeSequence(),
+                shootCmd(hopper)
+            ),
+
+            () -> {
+                var robotPose= drive.getPose().getTranslation();
+
+                if(robotPose.getY()<3){
+                    return true;
+                } else if (robotPose.getY()>5){
+                    return false;
+                } 
+                return false;
+            }
+        );
+    }
 }
