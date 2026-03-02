@@ -82,6 +82,13 @@ public class RobotCommands {
             .alongWith(shooter.shootAtDistance(targetDistance, hopper));
     }
 
+    /**
+     * Shoots at either the hub, or ferrying targets based on the current robot position.
+     * @param shooter
+     * @param hopper
+     * @param drive
+     * @return
+     */
     public static Command shoot(Shooter shooter, Hopper hopper, Drive drive) {
         return Commands.either(
             shootHub(shooter, hopper, drive),
