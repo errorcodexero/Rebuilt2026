@@ -51,6 +51,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.Alert;
@@ -437,6 +438,11 @@ public class Drive extends SubsystemBase {
     /** Returns the current odometry rotation. */
     public Rotation2d getRotation() {
         return getPose().getRotation();
+    }
+
+    /** Whether the rotation of the robot is near to a target. */
+    public boolean rotationIsNear(Rotation2d target, Angle tolerance) {
+        return target.getMeasure().isNear(getRotation().getMeasure(), tolerance);
     }
     
     /** Resets the current odometry pose. */
