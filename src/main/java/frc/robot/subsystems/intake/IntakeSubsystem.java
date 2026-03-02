@@ -12,7 +12,6 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
@@ -68,7 +67,7 @@ public class IntakeSubsystem extends SubsystemBase {
      * Runs the roller.
      */
     private void startIntaking() {
-        io.setRollerVoltage(IntakeConstants.rollerCollectVoltage);
+        io.setRollerVelocity(IntakeConstants.rollerCollectVelocity);
     }
 
     /**
@@ -130,9 +129,7 @@ public class IntakeSubsystem extends SubsystemBase {
      * @return
      */
     public Command stowCmd() {
-        return runOnce(() -> stow())
-            .andThen(Commands.waitUntil(() -> isIntakeStowed())
-            .withTimeout(2)).withName("Stow Intake");
+        return runOnce(this::stow);
     }
 
     /**
@@ -140,15 +137,11 @@ public class IntakeSubsystem extends SubsystemBase {
      * @return
      */
     public Command deployCmd() {
-        return runOnce(this::deploy)
-            .andThen(Commands.waitUntil(this::isIntakeDeployed)
-            .withTimeout(2)).withName("Deploy Intake");
+        return runOnce(this::deploy);
     }
 
     public Command waitCommand() {
-        return runOnce(this::waiting)
-            .andThen(Commands.waitUntil(this::isIntakeWaiting)
-            .withTimeout(2)).withName("Deploy Intake");
+        return runOnce(this::waiting);
     }    
 
     /**

@@ -62,8 +62,8 @@ public class ShooterIOTalonFX implements ShooterIO {
         shooterConfigs.MotionMagic.MotionMagicJerk = ShooterConstants.MotionMagic.shooterkJerk;
 
         // Current Limits
-        shooterConfigs.CurrentLimits.StatorCurrentLimit = ShooterConstants.currentLimit.in(Amps);
-        shooterConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
+        shooterConfigs.CurrentLimits.SupplyCurrentLimit = ShooterConstants.currentLimit.in(Amps);
+        shooterConfigs.CurrentLimits.SupplyCurrentLimitEnable = true;
 
         shooterConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive ;
 
@@ -78,13 +78,13 @@ public class ShooterIOTalonFX implements ShooterIO {
 
         shooter1AngularVelocity = shooter1Motor.getVelocity();
         shooter1AppliedVolts = shooter1Motor.getMotorVoltage();
-        shooter1CurrentAmps = shooter1Motor.getStatorCurrent();
+        shooter1CurrentAmps = shooter1Motor.getSupplyCurrent();
         shooter2AngularVelocity = shooter2Motor.getVelocity();
         shooter2AppliedVolts = shooter2Motor.getMotorVoltage();
-        shooter2CurrentAmps = shooter2Motor.getStatorCurrent();
+        shooter2CurrentAmps = shooter2Motor.getSupplyCurrent();
         shooter3AngularVelocity = shooter3Motor.getVelocity();
         shooter3AppliedVolts = shooter3Motor.getMotorVoltage();
-        shooter3CurrentAmps = shooter3Motor.getStatorCurrent();
+        shooter3CurrentAmps = shooter3Motor.getSupplyCurrent();
         
         // Status Signal Collection, less repetitive code
         signals = new StatusSignalCollection(

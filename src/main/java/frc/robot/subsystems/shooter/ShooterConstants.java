@@ -7,22 +7,18 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
 
-
-
 public class ShooterConstants {
-
-   public static final int shooter1CANID = 0;
+    public static final int shooter1CANID = 0;
     public static final int shooter2CANID = 1;
     public static final int shooter3CANID = 2;
 
-    public static final Current currentLimit = Amps.of(180);
+    public static final Current currentLimit = Amps.of(80);
     public static final Time currentLimitTime = Seconds.of(1);
 
     public static final double gearRatio = 1.04;
@@ -40,10 +36,8 @@ public class ShooterConstants {
     public static final Angle hoodMinAngle = Degrees.of(0.0) ;
 
     public class FerryPositions{
-        
         public static final Translation2d blueOutpostTarget= new Translation2d(2.135, 1.639);
         public static final Translation2d redOutpostTarget= new Translation2d(14.0,6.0);
-
     }
 
     public class PID {
@@ -98,56 +92,6 @@ public class ShooterConstants {
             public static final double hoodLOW = 0;
             public static final double hoodMEDIUM = 1;
             public static final double hoodHIGH = 2;
-          
-            //why are these not all Distances/Angles?
-
-            // Tested Distances 
-            public static final double dist1 = 1;
-            public static final double dist2 = 2;
-            public static final double dist3 = 3;
-
-            public static final double dist4 = 4;
-            public static final double dist5 = 5;
-            public static final double dist6 = 6;
-
-            public static final double dist7 = 7;
-            public static final double dist8 = 8;
-            public static final double dist9 = 9;
-
-            public static final double distLowMid = 3.5;
-            public static final double distMidHigh = 6.5;
-
-            // Tested Velocities
-            public static final double low1 = 10;
-            public static final double low2 = 20;
-            public static final double low3 = 30;
-
-            public static final double med1 = 40;
-            public static final double med2 = 50;
-            public static final double med3 = 60;
-
-            public static final double high1 = 70;
-            public static final double high2 = 80;
-            public static final double high3 = 90;
-
-            public static final InterpolatingDoubleTreeMap distMap = new InterpolatingDoubleTreeMap();
-
-            public static void initMap() {
-                // Hood Low
-                distMap.put(dist1, low1);
-                distMap.put(dist2, low2);
-                distMap.put(dist3, low3);
-
-                // Hood Med
-                distMap.put(dist4, med1);
-                distMap.put(dist5, med2);
-                distMap.put(dist6, med3);
-
-                // Hood High
-                distMap.put(dist7, high1);
-                distMap.put(dist8, high2);
-                distMap.put(dist9, high3);
-            }
         
             public enum HubDistance {
                 LOW(Meters.of(2)), // 0-2 m

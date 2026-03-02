@@ -38,9 +38,14 @@ import frc.robot.Constants.Mode;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.hopper.Hopper;
-import frc.robot.subsystems.shooter.ShooterConstants.Positions.HubDistance;
 import frc.robot.util.MapleSimUtil;
 import frc.robot.util.Mechanism3d;
+import frc.robot.subsystems.drive.Drive;
+import frc.robot.commands.drive.DriveCommands;
+import frc.robot.subsystems.intake.IntakeSubsystem;
+
+import java.util.Set;
+import java.util.function.DoubleSupplier;
 
 
 public class Shooter extends SubsystemBase {
@@ -58,6 +63,8 @@ public class Shooter extends SubsystemBase {
 
     private AngularVelocity shooterTarget = RadiansPerSecond.zero();
     private Angle hoodTarget = Radians.zero();
+
+    private ShooterTuning tuning_ = new ShooterTuning();
 
     public Shooter(ShooterIO ioShooter, HoodIO ioHood) {
         this.shooterIO = ioShooter;
@@ -182,8 +189,8 @@ public class Shooter extends SubsystemBase {
         });
     }
     public Command awaitShooting(Supplier<Pose2d> robotPose) {
-        return runDynamicSetpoints(() -> {
-
+        return runDynamicSetpoints(
+            () -> {
                 Distance zone =
                     DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
                     ? ShooterConstants.Positions.blueAllianceWall
@@ -200,7 +207,8 @@ public class Shooter extends SubsystemBase {
                 var vel = 0.0;
 
                 if ((Math.abs(pose.getX() - zone.magnitude()) < ShooterConstants.Positions.spinUpZone.magnitude())) {
-                    vel = ShooterConstants.Positions.distMap.get(distanceToHub.magnitude());
+                    var params = tuning_.getShooterParams(distanceToHub.in(Meters));
+                    vel = params.velocity ;
                 }
                 return RotationsPerSecond.of(vel);
             },
@@ -220,19 +228,8 @@ public class Shooter extends SubsystemBase {
                     : ShooterConstants.Positions.redHubPose;
 
                 Distance distanceToHub = Meters.of(pose.getTranslation().getDistance(hubTranslation));
-
-                switch(HubDistance.fromDistance(distanceToHub)) {
-                    case LOW:
-                        return Degrees.of(ShooterConstants.Positions.hoodLOW);
-                    case MEDIUM:
-                        return Degrees.of(ShooterConstants.Positions.hoodMEDIUM);
-                    case HIGH:
-                        return Degrees.of(ShooterConstants.Positions.hoodHIGH);
-                    default:  
-                        return Degrees.of(ShooterConstants.Positions.hoodLOW);  
-                        
-                }
-            
+                var params = tuning_.getShooterParams(distanceToHub.in(Meters));
+                return Degrees.of(params.hood) ;
         });
     }
 
@@ -280,77 +277,20 @@ public class Shooter extends SubsystemBase {
                         ? ShooterConstants.Positions.blueHubPose
                         : ShooterConstants.Positions.redHubPose;
 
-                    ShooterConstants.Positions.initMap();
-        
-                    return runDynamicSetpoints(() -> {
-                        Distance distanceToHub = Meters.of(pose.get().getTranslation().getDistance(hubTranslation));
-                        var vel = 0.0;
-                        vel = ShooterConstants.Positions.distMap.get(distanceToHub.magnitude());
-                        return RotationsPerSecond.of(vel);
-                    },
-
-                    () -> {
-                        // periodic
-                        Distance distanceToHub = Meters.of(pose.get().getTranslation().getDistance(hubTranslation));
-
-                        switch(HubDistance.fromDistance(distanceToHub)) {
-                            case LOW:
-                                return Degrees.of(ShooterConstants.Positions.hoodLOW);
-                            
-                            case MEDIUM:
-                                return Degrees.of(ShooterConstants.Positions.hoodMEDIUM);
-                                
-                            case HIGH:
-                                return Degrees.of(ShooterConstants.Positions.hoodHIGH);
-                            
-                            default: 
-                                return Degrees.of(ShooterConstants.Positions.hoodMEDIUM);
-                        }   
-                });
-            }),
-            hopper.forwardFeed()
-        );
-    }
-
-    /**
-     * Calculates Velocity and Hood Angle based on distance and Shoots
-     * 
-     * 
-     */
-    public Command shooterSetpointSupplier(Supplier<Translation2d> dist, Hopper hopper) {
-        
-        return Commands.parallel(
-                defer(() -> {
-
-                    // constructing
-
-                    ShooterConstants.Positions.initMap();
-        
-                    return runDynamicSetpoints(() -> {
-                        Distance distanceToHub = Meters.of(Math.sqrt(dist.get().getX() * dist.get().getX() + dist.get().getY() * dist.get().getY()));
-                        var vel = ShooterConstants.Positions.distMap.get(distanceToHub.baseUnitMagnitude());
-
-                        return RotationsPerSecond.of(vel);
-                    },
-
-                    () -> {
-                        // periodic
-                        Distance distanceToHub = Meters.of(Math.sqrt(dist.get().getX() * dist.get().getX() + dist.get().getY() * dist.get().getY()));
-
-                        switch(HubDistance.fromDistance(distanceToHub)) {
-                            case LOW:
-                                return Degrees.of(ShooterConstants.Positions.hoodLOW);
-                            
-                            case MEDIUM:
-                                return Degrees.of(ShooterConstants.Positions.hoodMEDIUM);
-                                
-                            case HIGH:
-                                return Degrees.of(ShooterConstants.Positions.hoodHIGH);
-                            
-                            default: 
-                                return Degrees.of(ShooterConstants.Positions.hoodMEDIUM);
-                        }   
-                });
+                    return runDynamicSetpoints(
+                        () -> {
+                            Distance distanceToHub = Meters.of(pose.get().getTranslation().getDistance(hubTranslation));
+                            var params = tuning_.getShooterParams(distanceToHub.in(Meters));
+                            var vel = params.velocity;
+                            return RotationsPerSecond.of(vel);
+                        },
+                    
+                        () -> {
+                            // periodic
+                            Distance distanceToHub = Meters.of(pose.get().getTranslation().getDistance(hubTranslation));
+                            var params = tuning_.getShooterParams(distanceToHub.in(Meters));
+                            return Degrees.of(params.hood) ;
+                    });
             }),
             hopper.forwardFeed()
         );
@@ -398,14 +338,18 @@ public class Shooter extends SubsystemBase {
     }
 
     public Command testCommand(Hopper hopper) {
-        LoggedNetworkNumber shooterVelocity = new LoggedNetworkNumber("Tuning/Shooter/TargetShooterRPS", 0);
-        LoggedNetworkNumber hoodAngle = new LoggedNetworkNumber("Tuning/Shooter/TargetHoodAngle", ShooterConstants.hoodMinAngle.in(Degrees));
-        LoggedNetworkNumber feederVoltage = new LoggedNetworkNumber("Tuning/Shooter/Feeder", 0.0) ;
+        LoggedNetworkNumber shooterVelocity = new LoggedNetworkNumber("/Tuning/Shooter/TargetShooterRPS", 0);
+        LoggedNetworkNumber hoodAngle = new LoggedNetworkNumber("/Tuning/Shooter/TargetHoodAngle", ShooterConstants.hoodMinAngle.in(Degrees));
+        LoggedNetworkNumber feederVelocity = new LoggedNetworkNumber("/Tuning/Shooter/FeederRPS", 40.0);
+        LoggedNetworkNumber scramblerVelocity = new LoggedNetworkNumber("/Tuning/Shooter/ScramblerRPS", 10.0);
         
-        return Commands.parallel(
+        return Commands.defer(() -> Commands.parallel(
             runDynamicSetpoints(() -> RotationsPerSecond.of(shooterVelocity.get()), () -> Degrees.of(hoodAngle.get())),
-            hopper.dynamicFeederVoltageCommand(() -> Volts.of(feederVoltage.get()))
-        );
+            hopper.feed(
+                RotationsPerSecond.of(feederVelocity.get()),
+                RotationsPerSecond.of(scramblerVelocity.get())
+            )
+        ), Set.of(this, hopper));
     }
 
     /**
