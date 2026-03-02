@@ -14,18 +14,13 @@ import java.util.Arrays;
 
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
-import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.ctre.phoenix6.CANBus;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -36,6 +31,7 @@ import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.Constants.RobotType;
 import frc.robot.commands.drive.DriveCommands;
+import frc.robot.commands.robot.RobotCommands;
 import frc.robot.generated.CompTunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -56,8 +52,6 @@ import frc.robot.subsystems.shooter.HoodIO;
 import frc.robot.subsystems.shooter.HoodIOServo;
 import frc.robot.subsystems.shooter.HoodIOSim;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.ShooterConstants;
-import frc.robot.subsystems.shooter.RobotCommands;
 import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterIOSim;
 import frc.robot.subsystems.shooter.ShooterIOTalonFX;
@@ -231,6 +225,8 @@ public class RobotContainer {
             () -> -gamepad_.getRightX()
         );
 
+        RobotState.initialize(drivebase_::getPose);
+
         // Initialize the visualizers.
         Mechanism3d.measured.zero();
         Mechanism3d.setpoints.zero();
@@ -262,18 +258,6 @@ public class RobotContainer {
         configureBindings();
         configureDriveBindings();
     }
-
-    public void publishDistance() {
-        if (this.drivebase_ != null) {
-            Translation2d hubTranslation =
-                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                ? ShooterConstants.Positions.blueHubPose
-                : ShooterConstants.Positions.redHubPose;        
-            var pose = drivebase_.getPose() ;
-            Distance distanceToHub = Meters.of(pose.getTranslation().getDistance(hubTranslation));   
-            Logger.recordOutput("Tuning/Shooter/Distance", distanceToHub);
-        }
-    }
     
     // Bind robot actions to commands here.
     private void configureBindings() {
@@ -283,8 +267,6 @@ public class RobotContainer {
             intake_.stowCmd(),
             intake_::isIntakeStowed
         ));
-
-        
 
         // While the left trigger is held, we will run the intake. If the intake is stowed, it will also deploy it.
         gamepad_.leftTrigger().whileTrue(
