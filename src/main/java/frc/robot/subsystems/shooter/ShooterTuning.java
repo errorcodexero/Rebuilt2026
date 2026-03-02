@@ -55,9 +55,9 @@ public class ShooterTuning {
     private static final double highPlusDist[] = { 4.47, 5.2 } ;
     private static final double highPlusVelocity[] = { 68, 62} ;
 
-    private static final double maxHood = 50;
-    private static final double maxDist[] = { 5.2, 50.0 };
-    private static final double maxVelocities[] = {62, 62};
+    private static final double maxHood = highPlusHood;
+    private static final double maxDist[] = { highPlusDist[0], 50.0 };
+    private static final double maxVelocities[] = {highPlusVelocity[1], highPlusVelocity[1]};
 
     private List<OneSettings> settings_ = new ArrayList<OneSettings>() ;
     private int lastHoodIndex_ ;
