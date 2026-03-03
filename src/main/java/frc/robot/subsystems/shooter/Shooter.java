@@ -231,7 +231,7 @@ public class Shooter extends SubsystemBase {
                 () -> Degrees.of(shooterParams.get().hood)
             ),
             Commands.waitUntil(this::isShooterReady).andThen(hopper.forwardFeed()),
-            intake.runShootIntakeCmd()
+            intake.enableShootMode()
         );
     }
 

@@ -163,7 +163,7 @@ public class IntakeSubsystem extends SubsystemBase {
         return startEnd(this::startIntaking, this::stopIntaking);
     }
 
-    public Command runShootIntakeCmd() {
+    private Command runShootIntakeCmd() {
         return startEnd(this::startShootIntake, this::stopIntaking);
     }
 
@@ -183,7 +183,7 @@ public class IntakeSubsystem extends SubsystemBase {
         ).finallyDo(interrupted -> waiting());
     }
 
-    public Command moveIntakeWhileShooting() {
+    private Command moveIntakeWhileShooting() {
         return new MoveIntakeCmd(this, IntakeConstants.shootAngles, IntakeConstants.angleChangeDelay);
     }
 
