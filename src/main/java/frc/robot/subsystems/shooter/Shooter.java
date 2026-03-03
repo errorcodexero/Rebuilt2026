@@ -172,7 +172,7 @@ public class Shooter extends SubsystemBase {
         return runDynamicSetpoints(
             () -> RotationsPerSecond.of(
                 RobotState.inAllianceZone()
-                    ? tuning_.getShooterParams(RobotState.hubDistance().in(Meters)).velocity
+                    ? getTuning().getShooterParams(RobotState.hubDistance().in(Meters)).velocity
                     : 0.0
             ),             
             () -> {
@@ -228,7 +228,7 @@ public class Shooter extends SubsystemBase {
         return runDynamicSetpoints(
             () -> RotationsPerSecond.of(shooterParams.get().velocity),
             () -> Degrees.of(shooterParams.get().hood)
-        ).alongWith(hopper.forwardFeed());
+        ).alongWith(hopper.forwardFeed(), intake.runShootIntakeCmd());
     }
 
     /**

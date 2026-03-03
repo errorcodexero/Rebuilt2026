@@ -31,12 +31,9 @@ import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.Constants.RobotType;
 import frc.robot.commands.drive.DriveCommands;
-<<<<<<< HEAD
 import frc.robot.commands.robot.StartupCmd;
 import frc.robot.commands.robot.TestTuningCmd;
-=======
 import frc.robot.commands.robot.RobotCommands;
->>>>>>> main
 import frc.robot.generated.CompTunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -275,10 +272,7 @@ public class RobotContainer {
             intake_.stowCmd(),
             intake_::isIntakeStowed
         ));
-<<<<<<< HEAD
        
-=======
->>>>>>> main
 
         // While the left trigger is held, we will run the intake. If the intake is stowed, it will also deploy it.
         gamepad_.leftTrigger().or(operatorGamepad_.leftTrigger()).whileTrue(
@@ -289,7 +283,7 @@ public class RobotContainer {
         );
 
         // While the right trigger is held, we will shoot into the hub or ferry.
-        gamepad_.rightTrigger().or(operatorGamepad_.rightTrigger()).whileTrue(RobotCommands.shoot(shooter_, hopper_, intake_, drivebase_));           
+        gamepad_.rightTrigger().or(operatorGamepad_.rightTrigger()).whileTrue(RobotCommands.shoot(shooter_, hopper_, intake_, drivebase_));
 
         // When the hopper isnt shooting, set it to run its idle velocity.
         // hopper_.setDefaultCommand(hopper_.idleScrambler());
