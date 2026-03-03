@@ -253,14 +253,27 @@ public class Shooter extends SubsystemBase {
         Supplier<ShooterParams> shooterParams =
             () -> getTuning().getShooterParams(distance.get().in(Meters));
 
-        return Commands.parallel(
-            runDynamicSetpoints(
-                () -> RotationsPerSecond.of(shooterParams.get().velocity),
-                () -> Degrees.of(shooterParams.get().hood)
-            ),
-            Commands.waitUntil(this::isShooterReady).andThen(hopper.forwardFeed()),
-            intake.enableShootMode()
-        );
+        return Commands.defer(() -> {
+            var startVelocity = RotationsPerSecond.of(shooterParams.get().velocity);
+
+            return Commands.parallel(
+                runDynamicSetpoints(
+                    () -> startVelocity,
+                    () -> Degrees.of(shooterParams.get().hood)
+                ),
+                Commands.waitUntil(this::isShooterReady).andThen(hopper.forwardFeed()),
+                intake.enableShootMode()
+            );
+        }, Set.of(this, hopper, intake));
+
+        // return Commands.parallel(
+        //     runDynamicSetpoints(
+        //         () -> RotationsPerSecond.of(shooterParams.get().velocity),
+        //         () -> Degrees.of(shooterParams.get().hood)
+        //     ),
+        //     Commands.waitUntil(this::isShooterReady).andThen(hopper.forwardFeed()),
+        //     intake.enableShootMode()
+        // );
     }
 
     /**

@@ -9,11 +9,11 @@ public class ArcShooterTuning extends ShooterTuning {
 
     private static final double lowHood = 15 ;
     private static final double lowDist[] =  { 2.47, 2.77, 3.06, 3.35} ;
-    private static final double lowVelocities[] = { 60, 63, 67, 72 } ;
+    private static final double lowVelocities[] = { 62, 64, 68, 73 } ;
 
     private static final double medHood = 25 ;
     private static final double medDist[] = { 3.69, 4.02, 4.30  } ;
-    private static final double medVelocities[] = { 66, 69, 72 };
+    private static final double medVelocities[] = { 70, 72, 75 };
 
     private static final double highPlusHood = 35 ;
     private static final double highPlusDist[] = { 4.60, 4.92, 5.24 } ;
