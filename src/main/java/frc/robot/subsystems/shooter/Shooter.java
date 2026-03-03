@@ -225,10 +225,14 @@ public class Shooter extends SubsystemBase {
         Supplier<ShooterParams> shooterParams =
             () -> getTuning().getShooterParams(distance.get().in(Meters));
 
-        return runDynamicSetpoints(
-            () -> RotationsPerSecond.of(shooterParams.get().velocity),
-            () -> Degrees.of(shooterParams.get().hood)
-        ).alongWith(hopper.forwardFeed(), intake.runShootIntakeCmd());
+        return Commands.parallel(
+            runDynamicSetpoints(
+                () -> RotationsPerSecond.of(shooterParams.get().velocity),
+                () -> Degrees.of(shooterParams.get().hood)
+            ),
+            Commands.waitUntil(this::isShooterReady).andThen(hopper.forwardFeed()),
+            intake.runShootIntakeCmd()
+        );
     }
 
     /**
