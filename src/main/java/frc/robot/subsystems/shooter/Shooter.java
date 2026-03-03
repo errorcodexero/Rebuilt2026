@@ -39,6 +39,7 @@ import frc.robot.RobotState;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.subsystems.hopper.Hopper;
+import frc.robot.util.LoggedTracer;
 import frc.robot.util.MapleSimUtil;
 import frc.robot.util.Mechanism3d;
 import frc.robot.subsystems.drive.Drive;
@@ -75,6 +76,8 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void periodic() {
+        LoggedTracer.reset();
+
         shooterIO.updateInputs(shooterInputs);
         Logger.processInputs("Shooter", shooterInputs);
         hoodIO.updateInputs(hoodInputs);
@@ -92,6 +95,8 @@ public class Shooter extends SubsystemBase {
         
         Logger.recordOutput("Shooter/VelocitySetPoint", shooterTarget);
         Logger.recordOutput("Shooter/HoodSetPoint", hoodTarget);
+
+        LoggedTracer.record("ShooterPeriodic");
     }
 
     // Shooter Methods

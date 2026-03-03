@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.util.LoggedTracer;
 import frc.robot.util.MapleSimUtil;
 
 public class Hopper extends SubsystemBase {
@@ -36,6 +37,8 @@ public class Hopper extends SubsystemBase {
     
     @Override
     public void periodic() {
+        LoggedTracer.reset();
+
         io.updateInputs(inputs);
         Logger.processInputs("Hopper", inputs);
 
@@ -56,6 +59,8 @@ public class Hopper extends SubsystemBase {
         Logger.recordOutput("Hopper/FeederGoal", feederGoal);
         Logger.recordOutput("Hopper/ScramblerAtGoal", isScramblerAtGoal());
         Logger.recordOutput("Hopper/FeederAtGoal", isFeederAtGoal());
+
+        LoggedTracer.record("HopperPeriodic");
     }
     
     // Scrambler control

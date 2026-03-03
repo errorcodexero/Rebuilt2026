@@ -65,6 +65,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.generated.CompTunerConstants;
 import frc.robot.util.LocalADStarAK;
+import frc.robot.util.LoggedTracer;
 
 public class Drive extends SubsystemBase {
     // These Constants should be the same for every drivebase, so just use the comp bot constants.
@@ -207,6 +208,8 @@ public class Drive extends SubsystemBase {
 
     @Override
     public void periodic() {
+        LoggedTracer.reset();
+
         odometryLock.lock(); // Prevents odometry updates while reading data
         gyroIO.updateInputs(gyroInputs);
         Logger.processInputs("Drive/Gyro", gyroInputs);
@@ -265,6 +268,8 @@ public class Drive extends SubsystemBase {
 
         ChassisSpeeds speed = getChassisSpeeds();
         Logger.recordOutput("Drive/LinearVelocity", Math.hypot(speed.vxMetersPerSecond, speed.vyMetersPerSecond));
+
+        LoggedTracer.record("DrivePeriodic");
     }
     
     /**
