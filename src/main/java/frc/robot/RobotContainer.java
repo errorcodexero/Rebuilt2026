@@ -310,7 +310,6 @@ public class RobotContainer {
 
         // Cycle through shooter tunings when the X button is pressed.
         gamepad_.x().or(operatorGamepad_.x()).onTrue(shooter_.cycleTuning()) ;
-        gamepad_.a().whileTrue(intake_.ejectSequence());
     }
 
     private void configureDriveBindings() {

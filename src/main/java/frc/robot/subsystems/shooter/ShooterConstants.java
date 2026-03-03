@@ -29,7 +29,7 @@ public class ShooterConstants {
 
     public static final Distance allowedTrenchDistance = Meters.of(1.0);
 
-    public static final Time hangTimeOnShot = Seconds.of(8/4.5);//number taken from video, 8 frames / 4.5 frames/sec seems to be about the right hang time. this should be tuned better later tho
+    public static final Time hangTimeOnShot = Seconds.of(1.8);
     public static final Time dbRotationDelay = Seconds.of(0.5);
     public static final double timeBeforeShoot = 0.2;
 
