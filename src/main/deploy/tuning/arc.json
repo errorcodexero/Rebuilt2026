@@ -1,0 +1,77 @@
+{
+    "name" : "arc",
+    "data" : [
+        {
+            "hood" : 5.0,
+            "points" : [
+                {
+                    "distance" : 1.616,
+                    "velocity" : 55.0
+                },
+                {
+                    "distance" : 1.86,
+                    "velocity" : 58.0
+                },
+                {
+                    "distance" : 2.18,
+                    "velocity" : 65.0
+                }
+            ]
+        },
+        {
+            "hood" : 15.0,
+            "points" : [
+                {
+                    "distance" : 2.47,
+                    "velocity" : 62.0
+                },
+                {
+                    "distance" : 2.77,
+                    "velocity" : 64.0
+                },
+                {
+                    "distance" : 3.06,
+                    "velocity" : 68.0
+                },
+                {
+                    "distance" : 3.35,
+                    "velocity" : 73.0
+                }
+            ]
+        },
+        {
+            "hood" : 25.0,
+            "points" : [
+                {
+                    "distance" : 3.69,
+                    "velocity" : 70.0
+                },
+                {
+                    "distance" : 4.02,
+                    "velocity" : 72.0
+                },
+                {
+                    "distance" : 4.30,
+                    "velocity" : 75.0
+                }
+            ]
+        },
+        {
+            "hood" : 35.0,
+            "points" : [
+                {
+                    "distance" : 4.60,
+                    "velocity" : 68.0
+                },
+                {
+                    "distance" : 4.92,
+                    "velocity" : 71.0
+                },
+                {
+                    "distance" : 5.24,
+                    "velocity" : 83.0
+                }
+            ]
+        }
+    ]
+}

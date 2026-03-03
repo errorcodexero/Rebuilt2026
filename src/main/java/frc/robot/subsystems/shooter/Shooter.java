@@ -46,15 +46,15 @@ import frc.robot.commands.drive.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.subsystems.intake.IntakeSubsystem;
-import frc.robot.subsystems.shooter.tunings.ArcShooterTuning;
-import frc.robot.subsystems.shooter.tunings.FlatShooterTuning;
-import frc.robot.subsystems.shooter.tunings.ShooterTuning;
-import frc.robot.subsystems.shooter.tunings.ShooterTuning.ShooterParams;
+import frc.robot.subsystems.shooter.ShooterTuning.ShooterParams;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import frc.robot.util.MapleSimUtil;
 import frc.robot.util.Mechanism3d;
+
+import edu.wpi.first.wpilibj.Filesystem;
 
 
 public class Shooter extends SubsystemBase {
@@ -86,13 +86,16 @@ public class Shooter extends SubsystemBase {
         this.shooterIO = ioShooter;
         this.hoodIO = ioHood;
 
-        tunings_.add(new ArcShooterTuning()) ;
-        tunings_.add(new FlatShooterTuning()) ;
+        loadTunings();
+        if (tunings_.isEmpty()) {
+            throw new RuntimeException("No shooter tunings found! Please add a json file to the tuning folder with shooter values.");
+        }
+
         tuningIndex_ = 0 ;
         this.poseSupplier = poseSupplier;
         this.speedsSupplier = speedsSupplier;
-    }
-
+    }    
+    
     @Override
     public void periodic() {
         shooterIO.updateInputs(shooterInputs);
@@ -131,6 +134,19 @@ public class Shooter extends SubsystemBase {
     }
 
     // Shooter Methods
+
+    private void loadTunings() {
+        File tuningDir = new File(Filesystem.getDeployDirectory(), "tuning") ;
+        if (tuningDir.isDirectory()) {
+            File[] jsonFiles = tuningDir.listFiles((dir, name) -> name.endsWith(".json")) ;
+            if (jsonFiles != null) {
+                for (File f : jsonFiles) {
+                    String name = f.getName().replace(".json", "") ;
+                    tunings_.add(new ShooterTuning(name)) ;
+                }
+            }
+        }
+    }
 
     private void setShooterVelocity(AngularVelocity vel) {
         shooterTarget = vel;
@@ -187,6 +203,17 @@ public class Shooter extends SubsystemBase {
         return runOnce(() -> {
             tuningIndex_ = (tuningIndex_ + 1) % tunings_.size();
         });
+    }
+
+    public Command reloadTunings() {
+        return runOnce(() -> {
+            tunings_.clear();
+            loadTunings();
+            if (tunings_.isEmpty()) {
+                throw new RuntimeException("No shooter tunings found! Please add a json file to the tuning folder with shooter values.");
+            }
+            tuningIndex_ = 0;
+        }) ;
     }
 
     /**

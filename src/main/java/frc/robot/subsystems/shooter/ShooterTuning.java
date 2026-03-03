@@ -1,13 +1,18 @@
-package frc.robot.subsystems.shooter.tunings;
+package frc.robot.subsystems.shooter;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-public abstract class ShooterTuning {
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.wpilibj.Filesystem;
+
+public class ShooterTuning {
 
     public class ShooterParams {
         public double dist ;
@@ -56,15 +61,49 @@ public abstract class ShooterTuning {
 
     public ShooterTuning(String name) {
         this.name_ = name ; 
-        initData() ;
         lastHoodIndex_ = -1 ;
+        readTuningData("tuning/" + name + ".json") ;
     }
 
     public String getName() {
         return name_ ;
     }
 
-    protected abstract void initData() ;
+    private void readTuningData(String filename) {
+        try {
+            File file = new File(Filesystem.getDeployDirectory(), filename) ;
+            ObjectMapper mapper = new ObjectMapper() ;
+            JsonNode root = mapper.readTree(file) ;
+
+            JsonNode dataArray = root.get("data") ;
+            if (dataArray == null || !dataArray.isArray()) {
+                return ;
+            }
+
+            settings_.clear() ;
+
+            for (JsonNode hoodNode : dataArray) {
+                double hood = hoodNode.get("hood").asDouble() ;
+                JsonNode pointsArray = hoodNode.get("points") ;
+
+                if (pointsArray == null || !pointsArray.isArray() || pointsArray.size() < 2) {
+                    continue ;
+                }
+
+                OneTuningValue[] values = new OneTuningValue[pointsArray.size()] ;
+                for (int i = 0 ; i < pointsArray.size() ; i++) {
+                    JsonNode pt = pointsArray.get(i) ;
+                    double distance = pt.get("distance").asDouble() ;
+                    double velocity = pt.get("velocity").asDouble() ;
+                    values[i] = new OneTuningValue(distance, velocity) ;
+                }
+
+                addOneHood(hood, values) ;
+            }
+        } catch (Exception e) {
+            System.err.println("ShooterTuning: failed to read tuning data from " + filename + ": " + e.getMessage()) ;
+        }
+    }
 
     public ShooterParams getShooterParams(double dist) {
         int h = getHoodIndex(dist) ;
