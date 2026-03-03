@@ -137,7 +137,7 @@ public class RobotContainer {
                     );
 
                     intake_= new IntakeSubsystem(new IntakeIOSim(roborioCANBus));
-                    shooter_ = new Shooter(new ShooterIOSim(roborioCANBus), new HoodIOSim());
+                    shooter_ = new Shooter(new ShooterIOSim(roborioCANBus), new HoodIOSim(), drivebase_::getPose, drivebase_::getChassisSpeeds);
                     hopper_ = new Hopper(new HopperIOSim(roborioCANBus));
                     
                     break;
@@ -161,7 +161,13 @@ public class RobotContainer {
                         new CameraIOLimelight4("limelight-br", drivebase_::getRotation)
                     );
 
-                    shooter_ = new Shooter(new ShooterIOTalonFX(roborioCANBus), new HoodIOServo());
+                    shooter_ = new Shooter(
+                        new ShooterIOTalonFX(roborioCANBus),
+                        new HoodIOServo(),
+                        drivebase_::getPose,
+                        drivebase_::getChassisSpeeds
+                    );
+
                     hopper_ = new Hopper(new HopperIOTalonFX(roborioCANBus));
                     intake_ = new IntakeSubsystem(new IntakeIOTalonFX(roborioCANBus));
                    
@@ -209,7 +215,12 @@ public class RobotContainer {
         }
         
         if (shooter_ == null) {
-            shooter_ = new Shooter(new ShooterIO() {}, new HoodIO() {});
+            shooter_ = new Shooter(
+                new ShooterIO() {},
+                new HoodIO() {},
+                drivebase_::getPose,
+                drivebase_::getChassisSpeeds
+            );
         }
 
         if (hopper_ == null) {
