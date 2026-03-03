@@ -59,6 +59,6 @@ public final class IntakeConstants {
 
     public static final double motorToPivotGearRatio = 1.0 ;
     public static final double rollerGearRatio = 1.0 ;
-    public static final MomentOfInertia PIVOT_MOMENTOFINERTIA = KilogramSquareMeters.of(0.01);
+    public static final MomentOfInertia PIVOT_MOMENTOFINERTIA = KilogramSquareMeters.of(0.001);
     public static final MomentOfInertia ROLLER_MOMENTOFINERTIA = KilogramSquareMeters.of(0.001);
 }

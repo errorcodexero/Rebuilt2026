@@ -51,7 +51,7 @@ public class IntakeSubsystem extends SubsystemBase {
         Mechanism3d.setpoints.setIntake(setpointAngle);
 
         if (Constants.getMode() == Mode.SIM) {
-            MapleSimUtil.setIntakeRunning(isIntakeDeployed() && inputs.RollerAngularVelocity.gt(RadiansPerSecond.zero()));
+            // MapleSimUtil.setIntakeRunning(isIntakeDeployed() && inputs.RollerAngularVelocity.gt(RadiansPerSecond.zero()));
         }
     }
 
@@ -123,7 +123,6 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public boolean isPivotAtAngle(Angle angle){
         var ret = inputs.PivotAngle.isNear(angle, IntakeConstants.pivotTolerance);
-        System.out.println("Pivot angle: " + inputs.PivotAngle.in(Rotations) + ", Target angle: " + angle.in(Rotations) + ", At setpoint: " + ret); 
         return ret;
     }
 
@@ -148,7 +147,9 @@ public class IntakeSubsystem extends SubsystemBase {
      * @return
      */
     public Command deployCmd() {
-        return runOnce(this::deploy);
+        var ret = runOnce(this::deploy) ;
+        ret.setName("IntakeDeployCmd");
+        return ret ;
     }
 
     public Command waitCommand() {
