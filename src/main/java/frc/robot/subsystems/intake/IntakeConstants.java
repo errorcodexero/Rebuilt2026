@@ -56,14 +56,16 @@ public final class IntakeConstants {
     }
 
     public class MotionMagic{
-        public static final AngularVelocity lowPivotVelocity= RotationsPerSecond.of(5); 
-        public static final AngularAcceleration lowPivotAcceleration= RotationsPerSecondPerSecond.of(50);
-        public static final double lowPivotJerk= 0; 
+        public static final AngularVelocity deployedToWaitingVelocity= RotationsPerSecond.of(15); 
+        public static final AngularAcceleration deployedToWaitingAcceleration= RotationsPerSecondPerSecond.of(100);
 
-        public static final AngularVelocity highPivotVelocity= RotationsPerSecond.of(15);
-        public static final AngularAcceleration highPivotAcceleration= RotationsPerSecondPerSecond.of(100);
-        public static final double highPivotJerk= 0; 
+        public static final AngularVelocity stowedToDeployedVelocity= RotationsPerSecond.of(5);
+        public static final AngularAcceleration stowedToDeployedAcceleration= RotationsPerSecondPerSecond.of(50);
 
+        public static final AngularVelocity deployedToStowedVelocity= RotationsPerSecond.of(10);
+        public static final AngularAcceleration deployedToStowedAcceleration= RotationsPerSecondPerSecond.of(75);
+
+        public static final double jerk= 0;
     }
 
     public static final AngularVelocity rollerMaxVelocity= DegreesPerSecond.of(360); //Temporary speed to be changed as needed 

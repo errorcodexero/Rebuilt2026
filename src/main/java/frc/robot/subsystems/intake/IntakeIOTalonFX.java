@@ -59,8 +59,10 @@ public class IntakeIOTalonFX implements IntakeIO {
     private StatusSignal<Voltage> rollerAppliedVoltsSignal;
     private StatusSignal<Current> rollerCurrentAmpsSignal; 
 
-    private MotionMagicConfigs slowPivotConfigs;
-    private MotionMagicConfigs fastPivotConfigs;
+    //Separate Motion Magic Profiles for the pivot motor depending on intake pivot position
+    private MotionMagicConfigs deployedWaitingMotionMagic;
+    private MotionMagicConfigs stowedDeployedMotionMagic;
+    private MotionMagicConfigs deployedStowedMotionMagic;
 
     public IntakeIOTalonFX(CANBus canbus) {
         // Initialize motor objects
@@ -92,27 +94,37 @@ public class IntakeIOTalonFX implements IntakeIO {
         pivotConfigs.SoftwareLimitSwitch.ReverseSoftLimitEnable= true;
         pivotConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold= IntakeConstants.Positions.pivotMinAngle.in(Degrees);
 
-        //Motion Magic Configurations for slow pivot
-        final MotionMagicConfigs slowConfigs= new MotionMagicConfigs();
-
-        slowConfigs.MotionMagicCruiseVelocity= IntakeConstants.MotionMagic.lowPivotVelocity.in(RotationsPerSecond); 
-        slowConfigs.MotionMagicAcceleration= IntakeConstants.MotionMagic.lowPivotAcceleration.in(RotationsPerSecondPerSecond); 
-        slowConfigs.MotionMagicJerk= IntakeConstants.MotionMagic.lowPivotJerk; 
-
-        this.slowPivotConfigs= slowConfigs;
-
-
-        //Motion Magic Configuration for fast pivot
-        final MotionMagicConfigs fastConfigs= new MotionMagicConfigs();
-
-        fastConfigs.MotionMagicCruiseVelocity= IntakeConstants.MotionMagic.highPivotVelocity.in(RotationsPerSecond);
-        fastConfigs.MotionMagicAcceleration= IntakeConstants.MotionMagic.highPivotAcceleration.in(RotationsPerSecondPerSecond);
-        fastConfigs.MotionMagicJerk= IntakeConstants.MotionMagic.highPivotJerk;
-
-        this.fastPivotConfigs= fastConfigs;
-
-
         tryUntilOk(5, () -> pivotMotor.getConfigurator().apply(pivotConfigs, 0.25));
+
+
+        //Motion Magic Configurations for deployed to waiting positons
+        final MotionMagicConfigs deployedWaitingConfigs= new MotionMagicConfigs();
+
+        deployedWaitingConfigs.MotionMagicCruiseVelocity= IntakeConstants.MotionMagic.deployedToWaitingVelocity.in(RotationsPerSecond); 
+        deployedWaitingConfigs.MotionMagicAcceleration= IntakeConstants.MotionMagic.deployedToWaitingAcceleration.in(RotationsPerSecondPerSecond); 
+        deployedWaitingConfigs.MotionMagicJerk= IntakeConstants.MotionMagic.jerk; 
+
+        this.deployedWaitingMotionMagic= deployedWaitingConfigs;
+
+
+        //Motion Magic Configuration for stowed to deployed positions
+        final MotionMagicConfigs stowedDeployedConfigs= new MotionMagicConfigs();
+
+        stowedDeployedConfigs.MotionMagicCruiseVelocity= IntakeConstants.MotionMagic.stowedToDeployedVelocity.in(RotationsPerSecond);
+        stowedDeployedConfigs.MotionMagicAcceleration= IntakeConstants.MotionMagic.stowedToDeployedAcceleration.in(RotationsPerSecondPerSecond);
+        stowedDeployedConfigs.MotionMagicJerk= IntakeConstants.MotionMagic.jerk;
+
+        this.stowedDeployedMotionMagic= stowedDeployedConfigs;
+
+        //Motion Magic Configuration for deployed to stowed positions
+        final MotionMagicConfigs deployedStowedConfigs= new MotionMagicConfigs();
+
+        deployedStowedConfigs.MotionMagicCruiseVelocity= IntakeConstants.MotionMagic.deployedToStowedVelocity.in(RotationsPerSecond);
+        deployedStowedConfigs.MotionMagicAcceleration= IntakeConstants.MotionMagic.deployedToStowedAcceleration.in(RotationsPerSecondPerSecond);
+        deployedStowedConfigs.MotionMagicJerk= IntakeConstants.MotionMagic.jerk;
+        
+        this.deployedStowedMotionMagic= deployedStowedConfigs;
+        
         // Configuration for the roller motor
         final TalonFXConfiguration rollerConfigs= new TalonFXConfiguration();
         
@@ -209,12 +221,16 @@ public class IntakeIOTalonFX implements IntakeIO {
     }
 
     @Override
-    public void pivotSlow(){
-        tryUntilOk(5, () -> pivotMotor.getConfigurator().apply(slowPivotConfigs, 0.25));
+    public void deployedWaitingPivot(){
+        tryUntilOk(5, () -> pivotMotor.getConfigurator().apply(deployedWaitingMotionMagic, 0.25));
+    }
+    @Override
+    public void stowedDeployedPivot(){
+        tryUntilOk(5, () -> pivotMotor.getConfigurator().apply(stowedDeployedMotionMagic, 0.25));
     }
 
     @Override
-    public void pivotFast(){
-        tryUntilOk(5, () -> pivotMotor.getConfigurator().apply(fastPivotConfigs, 0.25));
+    public void deployedStowedPivot(){
+        tryUntilOk(5, () -> pivotMotor.getConfigurator().apply(deployedStowedMotionMagic, 0.25));
     }
 }

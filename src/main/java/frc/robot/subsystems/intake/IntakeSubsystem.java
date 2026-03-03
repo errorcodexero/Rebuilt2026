@@ -86,7 +86,7 @@ public class IntakeSubsystem extends SubsystemBase {
      * Stows the intake and hopper.
      */
     private void stow() {
-        io.pivotSlow();
+        io.deployedStowedPivot();
         setPivotAngle(IntakeConstants.Positions.stowedAngle);
     }
 
@@ -94,12 +94,12 @@ public class IntakeSubsystem extends SubsystemBase {
      * Deploys the intake and hopper.
      */
     private void deploy() {
-        io.pivotFast();
+        io.stowedDeployedPivot();
         setPivotAngle(IntakeConstants.Positions.deployedAngle);
     }
 
     private void waiting(){
-        io.pivotFast();
+        io.deployedWaitingPivot();
         setPivotAngle(IntakeConstants.Positions.waitingAngle);
     }
     

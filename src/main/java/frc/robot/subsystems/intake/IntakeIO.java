@@ -39,4 +39,10 @@ public interface IntakeIO {
 
     public default void stopRoller() {}
 
+    public default void deployedWaitingPivot() {}
+
+    public default void stowedDeployedPivot() {}
+
+    public default void deployedStowedPivot() {}
+
 }

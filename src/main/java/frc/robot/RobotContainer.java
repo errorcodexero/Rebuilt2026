@@ -61,6 +61,7 @@ import frc.robot.subsystems.vision.CameraIOPhotonSim;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.MapleSimUtil;
 import frc.robot.util.Mechanism3d;
+import frc.robot.subsystems.shooter.RobotCommands;
 
 public class RobotContainer {
 
@@ -273,7 +274,6 @@ public class RobotContainer {
         // While the right trigger is held, we will shoot into the hub or ferry.
         gamepad_.rightTrigger().whileTrue(RobotCommands.shoot(shooter_, hopper_, drivebase_));
             
-
         // When the hopper isnt shooting, set it to run its idle velocity.
         // hopper_.setDefaultCommand(hopper_.idleScrambler());
 
