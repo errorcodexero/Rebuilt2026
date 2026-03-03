@@ -291,7 +291,7 @@ public class RobotContainer {
         // hopper_.setDefaultCommand(hopper_.idleScrambler());
 
         // When the shooter isnt shooting, get it ready to shoot.
-        shooter_.setDefaultCommand(shooter_.awaitShooting(drivebase_::getPose, drivebase_::getVirtualTarget));
+        shooter_.setDefaultCommand(shooter_.awaitShooting(drivebase_::getPose, () -> drivebase_.getVirtualTarget(shooter_)));
         // while in alliance zone, point drivebase at virtual target, but still allow translational driving
         //lowkey we are not gonna need this but like maybe so idk imma just keep it
 
@@ -309,7 +309,7 @@ public class RobotContainer {
         gamepad_.a().or(operatorGamepad_.a()).whileTrue(intake_.ejectSequence());
 
         // Cycle through shooter tunings when the X button is pressed.
-        gamepad_.x().or(operatorGamepad_.x()).onTrue(shooter_.cycleTuning()) ;
+        gamepad_.back().or(operatorGamepad_.back()).onTrue(shooter_.cycleTuning()) ;
     }
 
     private void configureDriveBindings() {

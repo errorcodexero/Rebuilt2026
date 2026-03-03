@@ -63,6 +63,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.drive.DriveCommands;
+import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.generated.CompTunerConstants;
 import frc.robot.util.LocalADStarAK;
@@ -475,8 +476,8 @@ public class Drive extends SubsystemBase {
 
     
 
-    public Translation2d getVirtualTarget() {
-        return VirtualTarget.getVirtualTargetFromTarget(this, DriveCommands.getTarget(this), ShooterConstants.hangTimeOnShot);
+    public Translation2d getVirtualTarget(Shooter shooter) {
+        return VirtualTarget.getVirtualTargetFromTarget(this, DriveCommands.getTarget(this), shooter.getTuning(), ShooterConstants.hangtimeLoopPasses);
     }
     
     /** Returns an array of module translations. */

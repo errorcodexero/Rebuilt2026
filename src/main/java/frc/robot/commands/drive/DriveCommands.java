@@ -64,6 +64,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.util.MapleSimUtil;
 import frc.robot.util.VirtualTarget;
@@ -278,8 +279,9 @@ public class DriveCommands {
   }
 
   // make sure this isnt bad with intellisense later
-  public static Command pointAtShootingTarget(Drive drive, CommandXboxController gamepad, boolean shootOnMove){
-    return pointAtTarget(drive, gamepad, () -> (shootOnMove ? VirtualTarget.getVirtualTargetFromTarget(drive, getTarget(drive), ShooterConstants.hangTimeOnShot) : getTarget(drive)), shootOnMove);
+  public static Command pointAtShootingTarget(Drive drive, Shooter shooter, CommandXboxController gamepad, boolean shootOnMove){
+    
+    return pointAtTarget(drive, gamepad, () -> (shootOnMove ? VirtualTarget.getVirtualTargetFromTarget(drive, getTarget(drive), shooter.getTuning(), ShooterConstants.hangtimeLoopPasses) : getTarget(drive)), shootOnMove);
   }
 
   /**

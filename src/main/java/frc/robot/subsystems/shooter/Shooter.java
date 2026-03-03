@@ -173,7 +173,7 @@ public class Shooter extends SubsystemBase {
         setHoodAngle(hoodTarget);
     }
 
-    private ShooterTuning getTuning() {
+    public ShooterTuning getTuning() {
         return tunings_.get(tuningIndex_);
     }
 
@@ -191,7 +191,7 @@ public class Shooter extends SubsystemBase {
      * @return
      */
     public Command shoot(Drive drive, Hopper hopper, IntakeSubsystem intake, CommandXboxController gamepad, boolean shootOnMove) {
-        return shootAtDistance(() -> Meters.of(drive.getVirtualTarget().getDistance(drive.getPose().getTranslation())), hopper, intake);
+        return shootAtDistance(() -> Meters.of(drive.getVirtualTarget(this).getDistance(drive.getPose().getTranslation())), hopper, intake);
     }
 
     /**

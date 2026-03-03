@@ -93,9 +93,9 @@ public class RobotCommands {
      */
     public static Command shoot(Shooter shooter, Hopper hopper, Drive drive, IntakeSubsystem intake, CommandXboxController gamepad, boolean shootOnMove) {
         return Commands.parallel(
-                DriveCommands.pointAtShootingTarget(drive, gamepad, shootOnMove),
+                DriveCommands.pointAtShootingTarget(drive, shooter, gamepad, shootOnMove),
                 Commands.sequence(
-                    Commands.waitUntil(() -> drive.rotationIsNear(drive.getVirtualTarget().minus(drive.getPose().getTranslation()).getAngle(), ShooterConstants.aimingTolerance)),
+                    Commands.waitUntil(() -> drive.rotationIsNear(drive.getVirtualTarget(shooter).minus(drive.getPose().getTranslation()).getAngle(), ShooterConstants.aimingTolerance)),
                     shooter.shoot(drive, hopper, intake, gamepad, shootOnMove)
                 )
             );

@@ -13,11 +13,13 @@ public abstract class ShooterTuning {
         public double dist ;
         public double hood ;
         public double velocity ;
+        public double hangtime; 
 
-        public ShooterParams(double d, double h, double v) {
+        public ShooterParams(double d, double h, double v, double ht) {
             dist = d ;
             hood = h ;
             velocity = v ;
+            hangtime = ht;
         }
     } ;
 
@@ -25,17 +27,21 @@ public abstract class ShooterTuning {
         public double hood_ ;
         public double min_dist_ ;
         public double max_dist_ ;
-        public InterpolatingDoubleTreeMap map_ ;
+        public InterpolatingDoubleTreeMap velMap_ ;
+        public InterpolatingDoubleTreeMap hangtimeMap_ ;
 
-        public OneSettings(double h, double[] d, double[] v) {
+        public OneSettings(double h, double[] d, double[] v, double[] ht) {
             hood_ = h ;
-            map_ = new InterpolatingDoubleTreeMap() ;
+            velMap_ = new InterpolatingDoubleTreeMap() ;
+            hangtimeMap_ = new InterpolatingDoubleTreeMap() ;
             for(var i = 0 ; i < d.length ; i++) {
-                map_.put(d[i], v[i]) ;
+                velMap_.put(d[i], v[i]) ;
+                hangtimeMap_.put(d[i], ht[i]) ;
             }
 
             min_dist_ = d[0] ;
-            max_dist_ = d[d.length - 1] ;}
+            max_dist_ = d[d.length - 1] ;
+        }
     }
 
     private final double HYSTERESIS_DIST = 0.06; // in meters, about a foot of hysteresis when
@@ -57,9 +63,10 @@ public abstract class ShooterTuning {
 
     public ShooterParams getShooterParams(double dist) {
         int h = getHoodIndex(dist) ;
-        var ret = new ShooterParams(dist, settings_.get(h).hood_, settings_.get(h).map_.get(dist)) ;
+        var ret = new ShooterParams(dist, settings_.get(h).hood_, settings_.get(h).velMap_.get(dist), settings_.get(h).hangtimeMap_.get(dist)) ;
         Logger.recordOutput("ShooterTuning/hood", ret.hood);
         Logger.recordOutput("ShooterTuning/velocity", ret.velocity);
+        Logger.recordOutput("ShooterTuning/hangtime", ret.hangtime);
         return ret ;
     }
 
@@ -97,7 +104,7 @@ public abstract class ShooterTuning {
         return newIndex ;
     }
 
-    protected void addOneHood(double hood, double[] dist, double[] vels)  {
+    protected void addOneHood(double hood, double[] dist, double[] vels, double[] hangtimes) {
         if (dist.length != vels.length) {
             throw new RuntimeException("invalid data, dist and vel data should be the same size") ;
         }
@@ -106,7 +113,7 @@ public abstract class ShooterTuning {
             throw new RuntimeException("invalid data, each hood value should contain two entries") ;
         }
 
-        settings_.add(new OneSettings(hood, dist, vels));
+        settings_.add(new OneSettings(hood, dist, vels, hangtimes)) ;
 
         settings_.sort((s1, s2) -> {
             return Double.compare(s1.hood_, s2.hood_);

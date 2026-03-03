@@ -29,18 +29,15 @@ public class ShooterConstants {
 
     public static final Distance allowedTrenchDistance = Meters.of(1.0);
 
+    @Deprecated
     public static final Time hangTimeOnShot = Seconds.of(1.8);
-    public static final Time dbRotationDelay = Seconds.of(0.5);
+
+    public static final int hangtimeLoopPasses = 5; // for a for loop in calculating distance from the hub, as you need the distance to get the hangtime, but you also need the hangtime to get the distance
     public static final double timeBeforeShoot = 0.2;
 
     public static final Angle hoodParkedAngle = Degrees.of(5.0) ;
     public static final Angle hoodMaxAngle = Degrees.of(75.0) ;
     public static final Angle hoodMinAngle = Degrees.of(0.0) ;
-
-    public class FerryPositions{
-        public static final Translation2d blueOutpostTarget= new Translation2d(2.135, 1.639);
-        public static final Translation2d redOutpostTarget= new Translation2d(14.0,6.0);
-    }
 
     public class PID {
             // shooter
@@ -124,7 +121,7 @@ public class ShooterConstants {
             public static final int hoodRightPWMPort = 0;
     }
 
-    public class ferryPositions{
+    public class FerryPositions{
         public static final Translation2d blueOutpostFerryTarget= new Translation2d(2.136,1.935); //ferry target for the blue outpost
         public static final Translation2d redOutpostFerryTarget= new Translation2d(14.0,6.0); //ferry target for the red outpost
         public static final Translation2d blueDepotFerryTarget= new Translation2d(2.0,6.0); //ferry target for the blue depot
