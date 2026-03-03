@@ -4,24 +4,34 @@ public class FlatShooterTuning extends ShooterTuning {
     
     // Tested Distances
     private static final double touchingHood = 5 ;
-    private static final double touchingDist[] = { 1.616 , 1.86, 2.18} ;
-    private static final double touchingVelocities[] = {  55.0, 58.0, 65.0 } ;
+    private static final OneTuningValue touchingValues[] = {
+        new OneTuningValue(1.616, 55.0),                                    // Test Mode
+        new OneTuningValue(1.86, 58.0),                                     // Test Mode
+        new OneTuningValue(2.18, 65.0)                                      // Test Mode
+    } ; 
 
     private static final double lowHood = 35 ;
-    private static final double lowDist[] =  { 2.47, 2.78, 3.08, 3.40 } ;
-    private static final double lowVelocities[] = { 52, 54, 56, 59} ;
+    private static final OneTuningValue lowValues[] = {
+        new OneTuningValue(2.47, 62.0),                                   // Test Mode
+        new OneTuningValue(2.77, 64.0),                                   // Test Mode
+        new OneTuningValue(3.06, 68.0),                                   // Test Mode
+        new OneTuningValue(3.35, 73.0)                                    // Test Mode
+    } ;
 
     private static final double medHood = 45 ;
-    private static final double medDist[] = { 4.0, 4.31, 4.93} ;
-    private static final double medVelocities[] = { 58, 61, 66 };
+    private static final OneTuningValue medValues[] = {
+        new OneTuningValue(4.0, 58.0),                                    // Test Mode
+        new OneTuningValue(4.31, 61.0),                                   // Test Mode
+        new OneTuningValue(4.93, 66.0)                                    // Test Mode
+    } ;
 
     public FlatShooterTuning() {
         super("flat") ;
     }
 
     protected void initData() {
-        addOneHood(touchingHood, touchingDist, touchingVelocities) ;
-        addOneHood(lowHood, lowDist, lowVelocities) ;
-        addOneHood(medHood, medDist, medVelocities) ;
+        addOneHood(touchingHood, touchingValues) ;
+        addOneHood(lowHood, lowValues) ;
+        addOneHood(medHood, medValues) ;
     }    
 }

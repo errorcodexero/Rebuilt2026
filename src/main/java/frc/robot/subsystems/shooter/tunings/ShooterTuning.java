@@ -21,13 +21,23 @@ public abstract class ShooterTuning {
         }
     } ;
 
-    private class OneSettings {
+    public static class OneTuningValue {
+        public final double dist_ ;
+        public final double vel_ ;
+
+        public OneTuningValue(double d, double v) {
+            dist_ = d ;
+            vel_ = v ;
+        }
+    }
+
+    private class OneHoodTuning {
         public double hood_ ;
         public double min_dist_ ;
         public double max_dist_ ;
         public InterpolatingDoubleTreeMap map_ ;
 
-        public OneSettings(double h, double[] d, double[] v) {
+        public OneHoodTuning(double h, double[] d, double[] v) {
             hood_ = h ;
             map_ = new InterpolatingDoubleTreeMap() ;
             for(var i = 0 ; i < d.length ; i++) {
@@ -40,7 +50,7 @@ public abstract class ShooterTuning {
 
 
     private final double HYSTERESIS_DIST = 0.06; // in meters, about a foot of hysteresis when
-    private List<OneSettings> settings_ = new ArrayList<OneSettings>() ;
+    private List<OneHoodTuning> settings_ = new ArrayList<OneHoodTuning>() ;
     private int lastHoodIndex_ ;
     private String name_ ;
 
@@ -98,16 +108,24 @@ public abstract class ShooterTuning {
         return newIndex ;
     }
 
-    protected void addOneHood(double hood, double[] dist, double[] vels)  {
-        if (dist.length != vels.length) {
-            throw new RuntimeException("invalid data, dist and vel data should be the same size") ;
-        }
+    protected void addOneHood(double hood, OneTuningValue[] values) {
 
-        if (dist.length < 2) {
+        if (values.length < 2) {
             throw new RuntimeException("invalid data, each hood value should contain two entries") ;
         }
 
-        settings_.add(new OneSettings(hood, dist, vels));
+        double [] dist = new double[values.length] ;
+        double [] vels = new double[values.length] ;
+
+        for(int i = 0 ; i < values.length ; i++) {
+            var v = values[i] ;
+            if (v.dist_ < 0 || v.vel_ < 0) {
+                throw new RuntimeException("invalid data, distance and velocity should be positive") ;
+            }
+            dist[i] = v.dist_ ;
+            vels[i] = v.vel_ ;
+        }   
+        settings_.add(new OneHoodTuning(hood, dist, vels));
 
         settings_.sort((s1, s2) -> {
             return Double.compare(s1.hood_, s2.hood_);
