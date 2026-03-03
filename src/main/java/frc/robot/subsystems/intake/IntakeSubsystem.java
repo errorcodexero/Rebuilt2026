@@ -184,14 +184,15 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     private Command moveIntakeWhileShooting() {
-        return new MoveIntakeCmd(this, IntakeConstants.shootAngles, IntakeConstants.angleChangeDelay);
+        return new MoveIntakeCmd(this, IntakeConstants.shootAngles, IntakeConstants.angleChangeDelay)
+            .finallyDo(interruped -> waiting());
     }
 
     public Command enableShootMode() {
         return new ParallelCommandGroup(
             runShootIntakeCmd(),
             moveIntakeWhileShooting()
-        ) ;
+        );
     }
 
     ////////////////////////////

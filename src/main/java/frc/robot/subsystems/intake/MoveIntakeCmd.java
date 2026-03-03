@@ -51,8 +51,8 @@ public class MoveIntakeCmd extends Command {
         }
     }
 
-     @Override
-     public boolean isFinished() {
+    @Override
+    public boolean isFinished() {
         return false;
-     }
+    }
 }

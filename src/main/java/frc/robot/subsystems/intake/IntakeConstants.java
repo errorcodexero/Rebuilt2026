@@ -41,7 +41,7 @@ public final class IntakeConstants {
     public static final Angle stowedAngle= Rotations.of(0);
     public static final Angle waitingAngle= Rotations.of(11.0);
     public static final Angle deployedAngle= Rotations.of(18.5);
-    public static final Angle[] shootAngles= {Rotations.of(18.5), Rotations.of(8)};
+    public static final Angle[] shootAngles= {Rotations.of(18.5), Rotations.of(11)};
     public static final Time angleChangeDelay = Seconds.of(0.2);
 
     public static final Angle pivotMinAngle= Rotations.of(0) ;

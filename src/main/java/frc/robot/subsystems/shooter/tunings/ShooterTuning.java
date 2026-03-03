@@ -39,7 +39,7 @@ public abstract class ShooterTuning {
     }
 
 
-    private final double HYSTERESIS_DIST = 0.2 ; // in meters, about a foot of hysteresis when
+    private final double HYSTERESIS_DIST = 0.06; // in meters, about a foot of hysteresis when
     private List<OneSettings> settings_ = new ArrayList<OneSettings>() ;
     private int lastHoodIndex_ ;
     private String name_ ;

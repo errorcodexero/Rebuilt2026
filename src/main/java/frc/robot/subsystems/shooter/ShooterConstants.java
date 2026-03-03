@@ -23,7 +23,7 @@ public class ShooterConstants {
 
     public static final double gearRatio = 1.04;
 
-    public static final AngularVelocity shooterTolerance = RotationsPerSecond.of(1.0);
+    public static final AngularVelocity shooterTolerance = RotationsPerSecond.of(0.1);
 
     public static final Angle aimingTolerance = Degrees.of(5);
 

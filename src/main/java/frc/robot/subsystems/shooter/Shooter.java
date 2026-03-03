@@ -197,11 +197,12 @@ public class Shooter extends SubsystemBase {
      */
     public Command awaitShooting(Supplier<Pose2d> robotPose) {
         return runDynamicSetpoints(
-            () -> RotationsPerSecond.of(
-                RobotState.inAllianceZone()
-                    ? getTuning().getShooterParams(RobotState.hubDistance().in(Meters)).velocity
-                    : 0.0
-            ),             
+            // () -> RotationsPerSecond.of(
+            //     RobotState.inAllianceZone()
+            //         ? getTuning().getShooterParams(RobotState.hubDistance().in(Meters)).velocity
+            //         : 0.0
+            // ),      
+            () -> RotationsPerSecond.of(0.0) ,      
             () -> {
                 Pose2d pose = robotPose.get();
                 Pose2d nearestTrench = pose.nearest(FieldConstants.trenches);
