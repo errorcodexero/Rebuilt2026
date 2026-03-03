@@ -51,7 +51,7 @@ public class IntakeSubsystem extends SubsystemBase {
         Mechanism3d.setpoints.setIntake(setpointAngle);
 
         if (Constants.getMode() == Mode.SIM) {
-            // MapleSimUtil.setIntakeRunning(isIntakeDeployed() && inputs.RollerAngularVelocity.gt(RadiansPerSecond.zero()));
+            MapleSimUtil.setIntakeRunning(isIntakeDeployed() && inputs.RollerAngularVelocity.gt(RadiansPerSecond.zero()));
         }
     }
 

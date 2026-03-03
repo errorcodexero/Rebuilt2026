@@ -14,7 +14,6 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Time;
 
-
 public final class IntakeConstants {
     public static final int rollerMotorCANID= 9;
     public static final int pivotMotorCANID= 8;
@@ -42,14 +41,14 @@ public final class IntakeConstants {
     public static final Angle stowedAngle= Rotations.of(0);
     public static final Angle waitingAngle= Rotations.of(11.0);
     public static final Angle deployedAngle= Rotations.of(18.5);
-    public static final Angle[] shootAngles= {Rotations.of(5), Rotations.of(10)};
-    public static final Time angleChangeDelay = Seconds.of(0.5);
+    public static final Angle[] shootAngles= {Rotations.of(18.5), Rotations.of(8)};
+    public static final Time angleChangeDelay = Seconds.of(0.2);
 
     public static final Angle pivotMinAngle= Rotations.of(0) ;
     public static final Angle pivotMaxAngle= Rotations.of(18.5);
 
-    public static final AngularVelocity pivotCruiseVelocity= RotationsPerSecond.of(15);
-    public static final AngularVelocity pivotCruiseAcceleration= RotationsPerSecond.of(100);
+    public static final AngularVelocity pivotCruiseVelocity= RotationsPerSecond.of(4);
+    public static final AngularVelocity pivotCruiseAcceleration= RotationsPerSecond.of(40);
     public static final double pivotMaxJerk= 0;
 
     public static final AngularVelocity rollerCollectVelocity= RotationsPerSecond.of(38);
