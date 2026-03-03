@@ -14,9 +14,9 @@ public class AutoCommands {
         return Commands.sequence(
             DriveCommands.initialFollowPathCommand(drive,"TopToBottom Trench").deadlineFor(intake.intakeSequence()),
 
-            RobotCommands.shoot(shooter, hopper, drive, null, false),
+            RobotCommands.shoot(shooter, hopper, drive, intake, null, false),
             DriveCommands.followPathCommand("BottomToTop").deadlineFor(intake.intakeSequence()),
-            RobotCommands.shoot(shooter, hopper, drive, null, false)
+            RobotCommands.shoot(shooter, hopper, drive, intake, null, false)
         );
     }
 }

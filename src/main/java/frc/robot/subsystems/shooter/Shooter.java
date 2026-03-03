@@ -8,8 +8,11 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.util.Set;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
@@ -17,6 +20,7 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -25,21 +29,32 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
-import frc.robot.RobotState;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Mode;
+import frc.robot.RobotState;
+import frc.robot.commands.drive.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.hopper.Hopper;
+import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.shooter.tunings.ArcShooterTuning;
+import frc.robot.subsystems.shooter.tunings.FlatShooterTuning;
+import frc.robot.subsystems.shooter.tunings.ShooterTuning;
+import frc.robot.subsystems.shooter.tunings.ShooterTuning.ShooterParams;
+
+import java.util.ArrayList;
+import java.util.List;
 import frc.robot.util.MapleSimUtil;
 import frc.robot.util.Mechanism3d;
 import frc.robot.subsystems.shooter.ShooterConstants.Positions.HubDistance;
-import frc.robot.subsystems.shooter.ShooterTuning.ShooterParams;
+import frc.robot.subsystems.shooter.tunings.ShooterTuning.ShooterParams;
 
 import java.util.Set;
 
@@ -57,14 +72,27 @@ public class Shooter extends SubsystemBase {
     private final Alert disconnectionAlert =
         new Alert("One or more shooter motors are disconnected!", AlertType.kError);
 
+    private final Supplier<Pose2d> poseSupplier;
+    private final Supplier<ChassisSpeeds> speedsSupplier;
+
     private AngularVelocity shooterTarget = RadiansPerSecond.zero();
     private Angle hoodTarget = Radians.zero();
 
-    private ShooterTuning tuning_ = new ShooterTuning();
+    private int tuningIndex_ = 0 ;
+    private List<ShooterTuning> tunings_ = new ArrayList<ShooterTuning>() ;
 
-    public Shooter(ShooterIO ioShooter, HoodIO ioHood) {
+    @AutoLogOutput
+    private boolean hoodParked = false;
+
+    public Shooter(ShooterIO ioShooter, HoodIO ioHood, Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedsSupplier) {
         this.shooterIO = ioShooter;
         this.hoodIO = ioHood;
+
+        tunings_.add(new ArcShooterTuning()) ;
+        tunings_.add(new FlatShooterTuning()) ;
+        tuningIndex_ = 0 ;
+        this.poseSupplier = poseSupplier;
+        this.speedsSupplier = speedsSupplier;
     }
 
     @Override
@@ -83,7 +111,23 @@ public class Shooter extends SubsystemBase {
             MapleSimUtil.setShooterVelocity(shooterInputs.wheelVelocity);
             MapleSimUtil.setHoodAngle(hoodInputs.position);
         }
-        
+
+        // Hood Protection
+        Pose2d pose = poseSupplier.get();
+        ChassisSpeeds speed = speedsSupplier.get();
+        Pose2d trench = pose.nearest(FieldConstants.trenches);
+        Distance nearestDistance = Meters.of(pose.getTranslation().getDistance(trench.getTranslation()));
+
+        if (
+            nearestDistance.lte(ShooterConstants.allowedTrenchDistance) && // Too Close
+            trench.getMeasureX().minus(pose.getMeasureX()).in(Meters) * speed.vxMetersPerSecond > 0 // And moving towards it
+        ) {
+            hoodIO.goToAngle(ShooterConstants.hoodParkedAngle);
+            hoodParked = true;
+        } else {
+            hoodParked = false;
+        }
+
         Logger.recordOutput("Shooter/VelocitySetPoint", shooterTarget);
         Logger.recordOutput("Shooter/HoodSetPoint", hoodTarget);
     }
@@ -125,6 +169,7 @@ public class Shooter extends SubsystemBase {
 
     private void setHoodAngle(Angle pos) {
         hoodTarget = pos;
+        if (hoodParked) return;
         hoodIO.goToAngle(pos);
     }
 
@@ -135,14 +180,25 @@ public class Shooter extends SubsystemBase {
         setHoodAngle(hoodTarget);
     }
 
+    private ShooterTuning getTuning() {
+        return tunings_.get(tuningIndex_);
+    }
+
+    // Commands
+    public Command cycleTuning() {
+        return runOnce(() -> {
+            tuningIndex_ = (tuningIndex_ + 1) % tunings_.size();
+        });
+    }
+
     /**
      * Runs specified setpoints until the command ends, then stops.
      * @param vel
      * @param pos
      * @return
      */
-    public Command shoot(Drive drive, Hopper hopper, CommandXboxController gamepad, boolean shootOnMove) {
-        return shootAtDistance(() -> Meters.of(drive.getVirtualTarget().getDistance(drive.getPose().getTranslation())), hopper);
+    public Command shoot(Drive drive, Hopper hopper, IntakeSubsystem intake, CommandXboxController gamepad, boolean shootOnMove) {
+        return shootAtDistance(() -> Meters.of(drive.getVirtualTarget().getDistance(drive.getPose().getTranslation())), hopper, intake);
     }
 
     /**
@@ -180,11 +236,12 @@ public class Shooter extends SubsystemBase {
     }
     public Command awaitShooting(Supplier<Pose2d> robotPose) {
         return runDynamicSetpoints(
-            () -> RotationsPerSecond.of(
-                RobotState.inAllianceZone()
-                    ? tuning_.getShooterParams(RobotState.hubDistance().in(Meters)).velocity
-                    : 0.0
-            ),             
+            // () -> RotationsPerSecond.of(
+            //     RobotState.inAllianceZone()
+            //         ? getTuning().getShooterParams(RobotState.hubDistance().in(Meters)).velocity
+            //         : 0.0
+            // ),      
+            () -> RotationsPerSecond.of(0.0) ,      
             () -> {
                 Pose2d pose = robotPose.get();
                 Pose2d nearestTrench = pose.nearest(FieldConstants.trenches);
@@ -194,7 +251,7 @@ public class Shooter extends SubsystemBase {
                     return Degrees.zero();
                 }
 
-                var params = tuning_.getShooterParams(RobotState.hubDistance().in(Meters));
+                var params = getTuning().getShooterParams(RobotState.hubDistance().in(Meters));
                 return Degrees.of(params.hood);
             }
         );
@@ -233,14 +290,31 @@ public class Shooter extends SubsystemBase {
      * 
      * 
      */
-    public Command shootAtDistance(Supplier<Distance> distance, Hopper hopper) {
+    public Command shootAtDistance(Supplier<Distance> distance, Hopper hopper, IntakeSubsystem intake) {
         Supplier<ShooterParams> shooterParams =
-            () -> tuning_.getShooterParams(distance.get().in(Meters));
+            () -> getTuning().getShooterParams(distance.get().in(Meters));
 
-        return runDynamicSetpoints(
-            () -> RotationsPerSecond.of(shooterParams.get().velocity),
-            () -> Degrees.of(shooterParams.get().hood)
-        ).alongWith(hopper.forwardFeed());
+        return Commands.defer(() -> {
+            var startVelocity = RotationsPerSecond.of(shooterParams.get().velocity);
+
+            return Commands.parallel(
+                runDynamicSetpoints(
+                    () -> startVelocity,
+                    () -> Degrees.of(shooterParams.get().hood)
+                ),
+                Commands.waitUntil(this::isShooterReady).andThen(hopper.forwardFeed()),
+                intake.enableShootMode()
+            );
+        }, Set.of(this, hopper, intake));
+
+        // return Commands.parallel(
+        //     runDynamicSetpoints(
+        //         () -> RotationsPerSecond.of(shooterParams.get().velocity),
+        //         () -> Degrees.of(shooterParams.get().hood)
+        //     ),
+        //     Commands.waitUntil(this::isShooterReady).andThen(hopper.forwardFeed()),
+        //     intake.enableShootMode()
+        // );
     }
 
     /**
@@ -344,7 +418,7 @@ public class Shooter extends SubsystemBase {
     //             return Degrees.zero();
     //         }
 
-    //         return Degrees.of(45); // TODO: replace this with whatever determines shooter angle
+    //         return Degrees.of(45); // replace this with whatever determines shooter angle
     //     });
     // }
 }

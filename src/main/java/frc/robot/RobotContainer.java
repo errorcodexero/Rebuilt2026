@@ -30,6 +30,8 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.Constants.RobotType;
 import frc.robot.commands.drive.DriveCommands;
+import frc.robot.commands.robot.StartupCmd;
+import frc.robot.commands.robot.TestTuningCmd;
 import frc.robot.commands.robot.RobotCommands;
 import frc.robot.generated.CompTunerConstants;
 import frc.robot.subsystems.drive.Drive;
@@ -79,6 +81,7 @@ public class RobotContainer {
 
     // Trigger Devices
     private final CommandXboxController gamepad_ = new CommandXboxController(0);
+    private final CommandXboxController operatorGamepad_ = new CommandXboxController(2);
     
     public RobotContainer() {
         /**
@@ -133,7 +136,7 @@ public class RobotContainer {
                     );
 
                     intake_= new IntakeSubsystem(new IntakeIOSim(roborioCANBus));
-                    shooter_ = new Shooter(new ShooterIOSim(roborioCANBus), new HoodIOSim());
+                    shooter_ = new Shooter(new ShooterIOSim(roborioCANBus), new HoodIOSim(), drivebase_::getPose, drivebase_::getChassisSpeeds);
                     hopper_ = new Hopper(new HopperIOSim(roborioCANBus));
                     
                     break;
@@ -157,7 +160,13 @@ public class RobotContainer {
                         new CameraIOLimelight4("limelight-br", drivebase_::getRotation)
                     );
 
-                    shooter_ = new Shooter(new ShooterIOTalonFX(roborioCANBus), new HoodIOServo());
+                    shooter_ = new Shooter(
+                        new ShooterIOTalonFX(roborioCANBus),
+                        new HoodIOServo(),
+                        drivebase_::getPose,
+                        drivebase_::getChassisSpeeds
+                    );
+
                     hopper_ = new Hopper(new HopperIOTalonFX(roborioCANBus));
                     intake_ = new IntakeSubsystem(new IntakeIOTalonFX(roborioCANBus));
                    
@@ -205,7 +214,12 @@ public class RobotContainer {
         }
         
         if (shooter_ == null) {
-            shooter_ = new Shooter(new ShooterIO() {}, new HoodIO() {});
+            shooter_ = new Shooter(
+                new ShooterIO() {},
+                new HoodIO() {},
+                drivebase_::getPose,
+                drivebase_::getChassisSpeeds
+            );
         }
 
         if (hopper_ == null) {
@@ -245,6 +259,8 @@ public class RobotContainer {
         testBindings_.addOption("Swerve Feedforward", DriveCommands.feedforwardCharacterization(drivebase_));
         testBindings_.addOption("Shooter Setpoints", shooter_.testCommand(hopper_));
         testBindings_.addOption("Hood Calibration", shooter_.hoodCalibration());
+        testBindings_.addOption("Startup Sequence Test", new StartupCmd(intake_, hopper_, shooter_)) ;
+        testBindings_.addOption("Test Tuning Command", new TestTuningCmd());
 
         // Sets the selected test binding to be triggered when the A button is pressed in test mode.
         RobotModeTriggers.test().and(gamepad_.a()).toggleOnTrue(Commands.deferredProxy(testBindings_::get));
@@ -256,14 +272,15 @@ public class RobotContainer {
     // Bind robot actions to commands here.
     private void configureBindings() {
         // Manually deploying and undeploying the intake.
-        gamepad_.start().onTrue(Commands.either(
+        gamepad_.start().or(operatorGamepad_.start()).onTrue(Commands.either(
             intake_.deployCmd(),
             intake_.stowCmd(),
             intake_::isIntakeStowed
         ));
+       
 
         // While the left trigger is held, we will run the intake. If the intake is stowed, it will also deploy it.
-        gamepad_.leftTrigger().whileTrue(
+        gamepad_.leftTrigger().or(operatorGamepad_.leftTrigger()).whileTrue(
             new ParallelCommandGroup(
                 intake_.intakeSequence(),
                 hopper_.collectScrambler()
@@ -284,13 +301,16 @@ public class RobotContainer {
         // we might want to limit the acceleration on this while shooting, but idk how to do that and hopefully it wont matter too much. 
         // just realized we could interrupt this with POV driving, but we would still be shooting, so we might want to create a block for that, but this too probably wont come up that much and i think i am not that numb-skulled to actually do this so idk
         gamepad_.rightTrigger().whileTrue(
-            RobotCommands.shoot(shooter_, hopper_, drivebase_, gamepad_, Constants.shootOnMove)
+            RobotCommands.shoot(shooter_, hopper_, drivebase_, intake_, gamepad_, Constants.shootOnMove)
         );
         // shooter_.setDefaultCommand(shooter_.awaitShooting(drivebase_::getPose));
 
         //While the A button is held, the intake will run the eject sequence. If it the intake is stowed, it will also deploy it.
-        gamepad_.a().whileTrue(intake_.ejectSequence());
+        gamepad_.a().or(operatorGamepad_.a()).whileTrue(intake_.ejectSequence());
 
+        // Cycle through shooter tunings when the X button is pressed.
+        gamepad_.x().or(operatorGamepad_.x()).onTrue(shooter_.cycleTuning()) ;
+        gamepad_.a().whileTrue(intake_.ejectSequence());
     }
 
     private void configureDriveBindings() {
@@ -306,7 +326,7 @@ public class RobotContainer {
                 () -> -gamepad_.getRightX() * DriveConstants.slowModeJoystickMultiplier));
 
         // Switch to X pattern / brake while X button is pressed
-        gamepad_.x().whileTrue(drivebase_.stopWithXCmd());
+        gamepad_.x().whileTrue(drivebase_.stopWithXCmd()); 
 
         // Robot Relative
         gamepad_.povUp().whileTrue(

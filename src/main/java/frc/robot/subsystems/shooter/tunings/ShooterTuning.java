@@ -1,4 +1,4 @@
-package frc.robot.subsystems.shooter;
+package frc.robot.subsystems.shooter.tunings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,7 +7,7 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 
-public class ShooterTuning {
+public abstract class ShooterTuning {
 
     public class ShooterParams {
         public double dist ;
@@ -37,40 +37,23 @@ public class ShooterTuning {
             min_dist_ = d[0] ;
             max_dist_ = d[d.length - 1] ;}
     }
-    
-    // Tested Distances
-    private static final double touchingHood = 5 ;
-    private static final double touchingDist[] = { 1.37 , 2.13} ;
-    private static final double touchingVelocities[] = {  55.0, 60.0 } ;
 
-    private static final double lowHood = 15 ;
-    private static final double lowDist[] =  {2.16, 2.76 } ;
-    private static final double lowVelocities[] = { 53.0, 60.0} ;
-
-    private static final double medHood = 25 ;
-    private static final double medDist[] = { 3.937, 4.15 } ;
-    private static final double medVelocities[] = { 65.0, 67.0 };
-
-    private static final double highPlusHood = 50 ;
-    private static final double highPlusDist[] = { 4.47, 5.2 } ;
-    private static final double highPlusVelocity[] = { 68, 62} ;
-
-    private static final double maxHood = highPlusHood;
-    private static final double maxDist[] = { highPlusDist[0], 50.0 }; // just a big number that will never be crossed
-    private static final double maxVelocities[] = {highPlusVelocity[1], highPlusVelocity[1]};
-
+    private final double HYSTERESIS_DIST = 0.06; // in meters, about a foot of hysteresis when
     private List<OneSettings> settings_ = new ArrayList<OneSettings>() ;
     private int lastHoodIndex_ ;
+    private String name_ ;
 
-    public ShooterTuning() {
-        try {
-            initData() ;
-        }
-        catch(Exception ex) {
-        }
-
+    public ShooterTuning(String name) {
+        this.name_ = name ; 
+        initData() ;
         lastHoodIndex_ = -1 ;
     }
+
+    public String getName() {
+        return name_ ;
+    }
+
+    protected abstract void initData() ;
 
     public ShooterParams getShooterParams(double dist) {
         int h = getHoodIndex(dist) ;
@@ -83,32 +66,29 @@ public class ShooterTuning {
     private int getHoodIndex(double dist) {
         for(int i = 0 ; i < settings_.size() ; i++) {
             if (dist < settings_.get(i).max_dist_) {
-                return processHysteresis(i) ;
+                return processHysteresis(dist, i) ;
             }
         }
 
-        return -1 ;
+        return settings_.size() - 1 ;
     }
 
-    private int processHysteresis(int newIndex) {
+    private int processHysteresis(double dist, int newIndex) {
         if (lastHoodIndex_ == -1) {
             lastHoodIndex_ = newIndex ;
             return newIndex ;
         }
 
-        if (newIndex == lastHoodIndex_) {
-            return newIndex ;
-        }
-
-        if (newIndex > lastHoodIndex_) {
-            // moving up, add some hysteresis
-            if (settings_.get(newIndex).min_dist_ - settings_.get(lastHoodIndex_).min_dist_ < 0.5) {
+        if (newIndex == lastHoodIndex_ + 1) {
+            // We moved to the next hood index
+            // Stay at the old hood index until we exceed its max distance plus hysteresis
+            if (dist <= settings_.get(lastHoodIndex_).max_dist_ + HYSTERESIS_DIST) {
                 return lastHoodIndex_ ;
             }
         }
-        else {
-            // moving down, add some hysteresis
-            if (settings_.get(lastHoodIndex_).min_dist_ - settings_.get(newIndex).min_dist_ < 0.5) {
+        else if (newIndex == lastHoodIndex_ - 1) {
+            // We moved to the previous hood index
+            if (dist > settings_.get(lastHoodIndex_).min_dist_ - HYSTERESIS_DIST) {
                 return lastHoodIndex_ ;
             }
         }
@@ -117,16 +97,7 @@ public class ShooterTuning {
         return newIndex ;
     }
 
-
-    private void initData() {
-        addOneHood(touchingHood, touchingDist, touchingVelocities) ;
-        addOneHood(lowHood, lowDist, lowVelocities) ;
-        addOneHood(medHood, medDist, medVelocities) ;
-        addOneHood(highPlusHood, highPlusDist, highPlusVelocity) ;
-        addOneHood(maxHood, maxDist, maxVelocities) ;
-    }
-
-    private void addOneHood(double hood, double[] dist, double[] vels)  {
+    protected void addOneHood(double hood, double[] dist, double[] vels)  {
         if (dist.length != vels.length) {
             throw new RuntimeException("invalid data, dist and vel data should be the same size") ;
         }

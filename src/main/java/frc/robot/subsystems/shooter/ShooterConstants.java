@@ -23,7 +23,7 @@ public class ShooterConstants {
 
     public static final double gearRatio = 1.04;
 
-    public static final AngularVelocity shooterTolerance = RotationsPerSecond.of(1.0);
+    public static final AngularVelocity shooterTolerance = RotationsPerSecond.of(0.1);
 
     public static final Angle aimingTolerance = Degrees.of(5);
 
@@ -124,4 +124,10 @@ public class ShooterConstants {
             public static final int hoodRightPWMPort = 0;
     }
 
+    public class ferryPositions{
+        public static final Translation2d blueOutpostFerryTarget= new Translation2d(2.136,1.935); //ferry target for the blue outpost
+        public static final Translation2d redOutpostFerryTarget= new Translation2d(14.0,6.0); //ferry target for the red outpost
+        public static final Translation2d blueDepotFerryTarget= new Translation2d(2.0,6.0); //ferry target for the blue depot
+        public static final Translation2d redDepotFerryTarget= new Translation2d(14.0,2.0); //ferry target for the red depot
+    }
 }

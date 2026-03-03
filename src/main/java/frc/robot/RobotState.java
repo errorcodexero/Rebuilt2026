@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Meters;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -21,7 +22,9 @@ import frc.robot.subsystems.shooter.ShooterConstants;
 public class RobotState {
     private static Supplier<Pose2d> pose = () -> Pose2d.kZero;
 
+    @AutoLogOutput
     private static Distance hubDistance = Meters.zero();
+
     private static Rotation2d rotationToHub = Rotation2d.kZero;
     private static boolean inAllianceZone = false;
 
@@ -45,6 +48,7 @@ public class RobotState {
             : ShooterConstants.Positions.redHubPose;
              
         hubDistance = Meters.of(pose.get().getTranslation().getDistance(hubTranslation));
+        Logger.recordOutput("RobotState/hubDistance", hubDistance) ;
 
         Translation2d translationToHub = hubTranslation.minus(currentPose.getTranslation());
 
@@ -58,7 +62,7 @@ public class RobotState {
         inAllianceZone = currentPose.getMeasureX().minus(allianceWall).abs(Meters) < ShooterConstants.Positions.spinUpZone.in(Meters);
     }
 
-    @AutoLogOutput
+
     public static Distance hubDistance() {
         return hubDistance;
     }

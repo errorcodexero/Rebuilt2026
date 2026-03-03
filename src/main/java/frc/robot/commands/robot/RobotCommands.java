@@ -17,6 +17,7 @@ import frc.robot.RobotState;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.hopper.Hopper;
+import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
 
@@ -28,7 +29,7 @@ public class RobotCommands {
      * @param drive
      * @return
      */
-    private static Command shootHub(Shooter shooter, Hopper hopper, Drive drive) {
+    private static Command shootHub(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive) {
         BooleanSupplier aimedAtHub =
             () -> drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.aimingTolerance);
 
@@ -41,7 +42,7 @@ public class RobotCommands {
             ).finallyDo(drive::stopWithX),
             Commands.repeatingSequence(
                 Commands.waitUntil(aimedAtHub),
-                shooter.shootAtDistance(RobotState::hubDistance, hopper)
+                shooter.shootAtDistance(RobotState::hubDistance, hopper, intake)
                     .until(() -> !aimedAtHub.getAsBoolean())
             )
         );
@@ -54,7 +55,7 @@ public class RobotCommands {
      * @param drive
      * @return
      */
-    private static Command ferry(Shooter shooter, Hopper hopper, Drive drive) {
+    private static Command ferry(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive) {
         Translation2d rightTarget =
             DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
                 ? ShooterConstants.Positions.blueTargetRight
@@ -80,7 +81,7 @@ public class RobotCommands {
             };
 
         return DriveCommands.joystickDriveAtAngle(targetingAngle)
-            .alongWith(shooter.shootAtDistance(targetDistance, hopper));
+            .alongWith(shooter.shootAtDistance(targetDistance, hopper, intake));
     }
 
     /**
@@ -90,12 +91,12 @@ public class RobotCommands {
      * @param drive
      * @return
      */
-    public static Command shoot(Shooter shooter, Hopper hopper, Drive drive, CommandXboxController gamepad, boolean shootOnMove) {
+    public static Command shoot(Shooter shooter, Hopper hopper, Drive drive, IntakeSubsystem intake, CommandXboxController gamepad, boolean shootOnMove) {
         return Commands.parallel(
                 DriveCommands.pointAtShootingTarget(drive, gamepad, shootOnMove),
                 Commands.sequence(
                     Commands.waitUntil(() -> drive.rotationIsNear(drive.getVirtualTarget().minus(drive.getPose().getTranslation()).getAngle(), ShooterConstants.aimingTolerance)),
-                    shooter.shoot(drive, hopper, gamepad, shootOnMove)
+                    shooter.shoot(drive, hopper, intake, gamepad, shootOnMove)
                 )
             );
     }

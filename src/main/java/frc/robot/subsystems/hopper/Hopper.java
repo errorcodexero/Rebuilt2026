@@ -145,7 +145,7 @@ public class Hopper extends SubsystemBase {
     // idk how to do this but like we should run the feeder motor backwards for about 0.5 secs to get arid of the balls stuck in there after we stop shooting
     // theoretically this would improve consistency
     public Command forwardFeed() {
-        return feed(HopperConstants.scramblerShootingVelocity, HopperConstants.feedingVelocity);
+        return feed(HopperConstants.feedingShootingVelocity, HopperConstants.scramblerShootingVelocity);
     }
     
     /**
@@ -153,7 +153,7 @@ public class Hopper extends SubsystemBase {
      * @return
      */
     public Command reverseFeed() {
-        return feed(HopperConstants.scramblerShootingVelocity.times(-1), HopperConstants.feedingVelocity.times(-1));
+        return feed(HopperConstants.feedingShootingVelocity.times(-1), HopperConstants.scramblerShootingVelocity.times(-1));
     }
     
     // Readbacks + state checks
