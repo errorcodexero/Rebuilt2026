@@ -47,8 +47,8 @@ public final class IntakeConstants {
     public static final Angle pivotMinAngle= Rotations.of(0) ;
     public static final Angle pivotMaxAngle= Rotations.of(18.5);
 
-    public static final AngularVelocity pivotCruiseVelocity= RotationsPerSecond.of(4);
-    public static final AngularVelocity pivotCruiseAcceleration= RotationsPerSecond.of(40);
+    public static final AngularVelocity pivotCruiseVelocity= RotationsPerSecond.of(15);
+    public static final AngularVelocity pivotCruiseAcceleration= RotationsPerSecond.of(100);
     public static final double pivotMaxJerk= 0;
 
     public static final AngularVelocity rollerCollectVelocity= RotationsPerSecond.of(38);
