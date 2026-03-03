@@ -180,18 +180,7 @@ public class Shooter extends SubsystemBase {
                     ? tuning_.getShooterParams(RobotState.hubDistance().in(Meters)).velocity
                     : 0.0
             ),             
-            () -> {
-                Pose2d pose = robotPose.get();
-                Pose2d nearestTrench = pose.nearest(FieldConstants.trenches);
-                Distance nearestDistance = Meters.of(pose.getTranslation().getDistance(nearestTrench.getTranslation()));
-
-                if (nearestDistance.lte(ShooterConstants.allowedTrenchDistance)) {
-                    return Degrees.zero();
-                }
-
-                var params = tuning_.getShooterParams(RobotState.hubDistance().in(Meters));
-                return Degrees.of(params.hood);
-            }
+            () -> Degrees.of(tuning_.getShooterParams(RobotState.hubDistance().in(Meters)).hood)
         );
     }
 
