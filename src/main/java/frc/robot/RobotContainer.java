@@ -293,6 +293,9 @@ public class RobotContainer {
             )
         );
 
+        // TODO: remove this, just temporary to test the startup command
+        gamepad_.rightBumper().onTrue(new StartupCmd(intake_, hopper_, shooter_)) ;
+
         // While the right trigger is held, we will shoot into the hub or ferry.
         gamepad_.rightTrigger().or(operatorGamepad_.rightTrigger()).whileTrue(RobotCommands.shoot(shooter_, hopper_, intake_, drivebase_));
 
