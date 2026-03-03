@@ -82,7 +82,8 @@ public abstract class ShooterTuning {
 
         if (newIndex == lastHoodIndex_ + 1) {
             // We moved to the next hood index
-            if (dist < settings_.get(lastHoodIndex_).max_dist_ + HYSTERESIS_DIST) {
+            // Stay at the old hood index until we exceed its max distance plus hysteresis
+            if (dist <= settings_.get(lastHoodIndex_).max_dist_ + HYSTERESIS_DIST) {
                 return lastHoodIndex_ ;
             }
         }

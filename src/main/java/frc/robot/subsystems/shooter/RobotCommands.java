@@ -34,7 +34,7 @@ public class RobotCommands {
                                 return rotation;
                             }).andThen(drive.stopWithXCmd()),
                     // Parallel two
-                    Commands.waitUntil(() -> Math.abs(drive.getChassisSpeeds().omegaRadiansPerSecond) < .001).andThen(shooter.shoot(() -> drive.getPose(), hopper, intake))
+                    Commands.waitUntil(() -> Math.abs(drive.getChassisSpeeds().omegaRadiansPerSecond) < .001).andThen(shooter.shootAtDistance(frc.robot.RobotState::hubDistance, hopper, intake))
                 ),  // End on true
 
                 // On false
@@ -67,7 +67,7 @@ public class RobotCommands {
 
                         return rotation;
                     }),
-                    Commands.waitUntil(() -> Math.abs(drive.getChassisSpeeds().omegaRadiansPerSecond) < .001).andThen(shooter.shoot(() -> drive.getPose(), hopper, intake))
+                    Commands.waitUntil(() -> Math.abs(drive.getChassisSpeeds().omegaRadiansPerSecond) < .001).andThen(shooter.shootAtDistance(frc.robot.RobotState::hubDistance, hopper, intake))
                 ),  // End on false
 
             () -> { 

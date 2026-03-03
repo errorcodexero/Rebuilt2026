@@ -25,6 +25,8 @@ public class ShooterConstants {
 
     public static final AngularVelocity shooterTolerance = RotationsPerSecond.of(1.0);
 
+    public static final Angle aimingTolerance = Degrees.of(5);
+
     public static final Distance allowedTrenchDistance = Meters.of(1.0);
 
     public static final double timeBeforeShoot = 0.2;
