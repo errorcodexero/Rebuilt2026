@@ -274,6 +274,13 @@ public class Shooter extends SubsystemBase {
         return runOnce(() -> setHoodAngle(pos)).withName("Set Hood Position");
     }
 
+    private AngularVelocity calcWheelVelocity(AngularVelocity velocity, boolean feederAtGoal) {
+        if (!feederAtGoal) {
+            return velocity.times(ShooterConstants.shooterVelocityMultiplierWhileFeederSlow);
+        }
+        return velocity;
+    }
+
     /**
      * Calculates Velocity and Hood Angle based on distance and Shoots
      * 
@@ -288,7 +295,7 @@ public class Shooter extends SubsystemBase {
 
             return Commands.parallel(
                 runDynamicSetpoints(
-                    () -> startVelocity,
+                    () -> calcWheelVelocity(startVelocity, hopper.isFeederAtGoal()),
                     () -> Degrees.of(shooterParams.get().hood)
                 ),
                 Commands.waitUntil(this::isShooterReady).andThen(hopper.forwardFeed()),

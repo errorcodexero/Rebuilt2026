@@ -102,6 +102,8 @@ public class ShooterTuning {
 
                 addOneHood(hood, values) ;
             }
+
+            System.out.println("ShooterTuning: successfully read tuning data from " + filename) ;
         } catch (Exception e) {
             System.err.println("ShooterTuning: failed to read tuning data from " + filename + ": " + e.getMessage()) ;
         }
