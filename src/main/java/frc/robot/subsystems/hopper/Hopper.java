@@ -1,6 +1,7 @@
 package frc.robot.subsystems.hopper;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
@@ -65,6 +66,10 @@ public class Hopper extends SubsystemBase {
     
     // Scrambler control
     private void setScramblerVelocity(AngularVelocity velocity) {
+        if (velocity.equals(DegreesPerSecond.zero())) {
+            setScramblerVoltage(Volts.zero());
+            return;
+        }
         scramblerGoal = velocity;
         io.setScramblerVelocity(velocity);
     }
@@ -80,6 +85,10 @@ public class Hopper extends SubsystemBase {
     
     // Feeder control
     private void setFeederVelocity(AngularVelocity velocity) {
+        if (velocity.equals(DegreesPerSecond.zero())) {
+            setFeederVoltage(Volts.zero());
+            return;
+        }
         feederGoal = velocity;
         io.setFeederVelocity(velocity);
     }
