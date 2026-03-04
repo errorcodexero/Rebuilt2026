@@ -1,7 +1,5 @@
 package frc.robot.subsystems.intake; 
 
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -18,7 +16,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
-import frc.robot.util.MapleSimUtil;
+import frc.robot.util.LoggedTracer;
 import frc.robot.util.Mechanism3d;
 
 public class IntakeSubsystem extends SubsystemBase {
@@ -39,6 +37,8 @@ public class IntakeSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        LoggedTracer.reset();
+
         io.updateInputs(inputs);
         Logger.processInputs("Intake", inputs);
 
@@ -51,8 +51,10 @@ public class IntakeSubsystem extends SubsystemBase {
         Mechanism3d.setpoints.setIntake(setpointAngle);
 
         if (Constants.getMode() == Mode.SIM) {
-            MapleSimUtil.setIntakeRunning(isIntakeDeployed() && inputs.RollerAngularVelocity.gt(RadiansPerSecond.zero()));
+            // MapleSimUtil.setIntakeRunning(isIntakeDeployed() && inputs.RollerAngularVelocity.gt(RadiansPerSecond.zero()));
         }
+
+        LoggedTracer.record("IntakePeriodic");
     }
 
     //Intake control methods
@@ -123,7 +125,6 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public boolean isPivotAtAngle(Angle angle){
         var ret = inputs.PivotAngle.isNear(angle, IntakeConstants.pivotTolerance);
-        System.out.println("Pivot angle: " + inputs.PivotAngle.in(Rotations) + ", Target angle: " + angle.in(Rotations) + ", At setpoint: " + ret); 
         return ret;
     }
 
@@ -148,7 +149,9 @@ public class IntakeSubsystem extends SubsystemBase {
      * @return
      */
     public Command deployCmd() {
-        return runOnce(this::deploy);
+        var ret = runOnce(this::deploy) ;
+        ret.setName("IntakeDeployCmd");
+        return ret ;
     }
 
     public Command waitCommand() {

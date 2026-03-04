@@ -21,6 +21,12 @@ public class ShooterConstants {
     public static final Current currentLimit = Amps.of(80);
     public static final Time currentLimitTime = Seconds.of(1);
 
+    //
+    // The shooter velocity multiplier while the feeder is slow. This is to compensate for the 
+    // fact that when the feeder is ramping, the shots are short
+    //
+    public static final double shooterVelocityMultiplierWhileFeederSlow = 1.1 ;
+
     public static final double gearRatio = 1.04;
 
     public static final AngularVelocity shooterTolerance = RotationsPerSecond.of(0.1);

@@ -28,12 +28,14 @@ public class StartupCmd extends SequentialCommandGroup {
 
         addCommands(
             intake_.deployCmd(),
-            Commands.runOnce(()-> System.out.println("Intake deployment started")),            
+            Commands.runOnce(()-> System.out.println("Intake deployment started")),          
             Commands.waitUntil(intake_::isIntakeDeployed),
             Commands.runOnce(()-> System.out.println("Intake deployment finished")),
             moveShooterBalls(),                                     // Run the startup sequence to deploy the intake and move balls from shooter to hopper
             intake_.waitCommand()                                   // Move the intake to the waiting position to avoid collisions with the ground and the robot during auto
         );
+
+        setName("StartupCmd") ;
     }
 
     private Command moveShooterBalls() {

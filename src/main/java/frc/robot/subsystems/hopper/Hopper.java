@@ -1,12 +1,14 @@
 package frc.robot.subsystems.hopper;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -17,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.util.LoggedTracer;
 import frc.robot.util.MapleSimUtil;
 
 public class Hopper extends SubsystemBase {
@@ -36,6 +39,8 @@ public class Hopper extends SubsystemBase {
     
     @Override
     public void periodic() {
+        LoggedTracer.reset();
+
         io.updateInputs(inputs);
         Logger.processInputs("Hopper", inputs);
 
@@ -56,10 +61,16 @@ public class Hopper extends SubsystemBase {
         Logger.recordOutput("Hopper/FeederGoal", feederGoal);
         Logger.recordOutput("Hopper/ScramblerAtGoal", isScramblerAtGoal());
         Logger.recordOutput("Hopper/FeederAtGoal", isFeederAtGoal());
+
+        LoggedTracer.record("HopperPeriodic");
     }
     
     // Scrambler control
     private void setScramblerVelocity(AngularVelocity velocity) {
+        if (velocity.equals(DegreesPerSecond.zero())) {
+            setScramblerVoltage(Volts.zero());
+            return;
+        }
         scramblerGoal = velocity;
         io.setScramblerVelocity(velocity);
     }
@@ -75,6 +86,10 @@ public class Hopper extends SubsystemBase {
     
     // Feeder control
     private void setFeederVelocity(AngularVelocity velocity) {
+        if (velocity.equals(DegreesPerSecond.zero())) {
+            setFeederVoltage(Volts.zero());
+            return;
+        }
         feederGoal = velocity;
         io.setFeederVelocity(velocity);
     }
@@ -138,6 +153,17 @@ public class Hopper extends SubsystemBase {
     }
 
     /**
+     * Runs the feeder and scrambler at supplied speeds.
+     * @return
+     */
+    public Command dynamicFeed(Supplier<AngularVelocity> feeder, Supplier<AngularVelocity> scrambler) {
+        return runEnd(() -> {
+            setFeederVelocity(feeder.get());
+            setScramblerVelocity(scrambler.get());
+        }, this::stopAll);
+    }
+
+    /**
      * Runs the scrambler at its active speed, and the feeder.
      * @return
      */
@@ -153,7 +179,15 @@ public class Hopper extends SubsystemBase {
      * @return
      */
     public Command reverseFeed() {
-        return feed(HopperConstants.feedingShootingVelocity.times(-1), HopperConstants.scramblerShootingVelocity.times(-1));
+        return feed(HopperConstants.feedingShootingVelocity.unaryMinus(), HopperConstants.scramblerShootingVelocity.unaryMinus());
+    }
+
+    /**
+     * Runs the scrambler in reverse for before our shooting starts.
+     * @return
+     */
+    public Command preShoot() {
+        return feed(DegreesPerSecond.zero(), HopperConstants.scramblerBeforeShootingVelocity.unaryMinus());
     }
     
     // Readbacks + state checks
@@ -171,6 +205,11 @@ public class Hopper extends SubsystemBase {
     
     public double getFeederCurrent() {
         return inputs.feederCurrent.in(Amps);
+    }
+
+    @AutoLogOutput
+    public double getTargetPercent() {
+        return inputs.feederVelocity.div(HopperConstants.feedingShootingVelocity).magnitude() ;
     }
     
     public boolean isScramblerAtGoal() {

@@ -1,0 +1,100 @@
+{
+    "name" : "arc",
+    "data" : [
+        {
+            "hood" : 5.0,
+            "points" : [
+                {
+                    // Test mode
+                    "distance" : 1.616,
+                    "velocity" : 55.0
+                },
+                {
+                    // Test mode
+                    "distance" : 1.86,
+                    "velocity" : 58.0
+                },
+                {
+                    // Test mode                    
+                    "distance" : 2.18,
+                    "velocity" : 65.0
+                }
+            ]
+        },
+        {
+            "hood" : 15.0,
+            "points" : [
+                {
+                    // Shoot cmd
+                    "distance" : 2.22,
+                    "velocity" : 58.0
+                },
+                {
+                    // Shoot mode                    
+                    "distance" : 2.43,
+                    "velocity" : 59.0
+                },
+                {
+                    // Test mode
+                    "distance" : 2.77,
+                    "velocity" : 64.0
+                },
+                {
+                    // Test mode                    
+                    "distance" : 3.06,
+                    "velocity" : 68.0
+                },
+                {
+                    // Test mode                    
+                    "distance" : 3.35,
+                    "velocity" : 71.0
+                }
+            ]
+        },
+        {
+            "hood" : 25.0,
+            "points" : [
+                {
+                    // Shoot cmd
+                    "distance" : 3.40,
+                    "velocity" : 58.5
+                },
+                {
+                    // Shoot cmd
+                    "distance" : 3.70,
+                    "velocity" : 64.0
+                },
+                {
+                    // Test mode
+                    "distance" : 4.02,
+                    "velocity" : 72.0
+                },
+                {
+                    // Test mode
+                    "distance" : 4.30,
+                    "velocity" : 75.0
+                }
+            ]
+        },
+        {
+            "hood" : 35.0,
+            "points" : [
+                {
+                    // Test mode
+                    "distance" : 4.60,
+                    "velocity" : 68.0
+                },
+                {
+                    // Test mode
+                    "distance" : 4.92,
+                    "velocity" : 71.0
+                },
+                {
+                    // Test mode
+                    "distance" : 5.24,
+                    "velocity" : 83.0
+                }
+            ]
+        }
+    ]
+}

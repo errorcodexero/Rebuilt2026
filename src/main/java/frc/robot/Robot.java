@@ -55,6 +55,7 @@ public class Robot extends LoggedRobot {
                 
                 // Silence Joystick Warnings
                 DriverStation.silenceJoystickConnectionWarning(RobotBase.isSimulation());
+                monitorCommandStatus() ;
                 break;
             
             case REPLAY:
@@ -76,6 +77,13 @@ public class Robot extends LoggedRobot {
         SignalLogger.enableAutoLogging(false);
         
         m_robotContainer = new RobotContainer();
+
+    }
+
+    private void monitorCommandStatus() {
+        // CommandScheduler.getInstance().onCommandInterrupt(command -> System.out.println("CommandInterrupt: " + command.getName()));   
+        // CommandScheduler.getInstance().onCommandFinish(command -> System.out.println("CommandFinish: " + command.getName()));
+        // CommandScheduler.getInstance().onCommandInitialize(command -> System.out.println("CommandInitialize: " + command.getName()));
     }
     
     @Override

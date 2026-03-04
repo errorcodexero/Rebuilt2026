@@ -15,6 +15,7 @@ import java.util.Arrays;
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
 import com.ctre.phoenix6.CANBus;
 
@@ -26,13 +27,13 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.Constants.RobotType;
 import frc.robot.commands.drive.DriveCommands;
-import frc.robot.commands.robot.StartupCmd;
-import frc.robot.commands.robot.TestTuningCmd;
 import frc.robot.commands.robot.RobotCommands;
+import frc.robot.commands.robot.StartupCmd;
 import frc.robot.generated.CompTunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -260,7 +261,6 @@ public class RobotContainer {
         testBindings_.addOption("Shooter Setpoints", shooter_.testCommand(hopper_));
         testBindings_.addOption("Hood Calibration", shooter_.hoodCalibration());
         testBindings_.addOption("Startup Sequence Test", new StartupCmd(intake_, hopper_, shooter_)) ;
-        testBindings_.addOption("Test Tuning Command", new TestTuningCmd());
 
         // Sets the selected test binding to be triggered when the A button is pressed in test mode.
         RobotModeTriggers.test().and(gamepad_.a()).toggleOnTrue(Commands.deferredProxy(testBindings_::get));
@@ -287,6 +287,9 @@ public class RobotContainer {
             )
         );
 
+        gamepad_.rightBumper().onTrue(new StartupCmd(intake_, hopper_, shooter_));
+
+        // While the right trigger is held, we will shoot into the hub or ferry.
         // When the hopper isnt shooting, set it to run its idle velocity.
         // hopper_.setDefaultCommand(hopper_.idleScrambler());
 
@@ -306,10 +309,15 @@ public class RobotContainer {
         // shooter_.setDefaultCommand(shooter_.awaitShooting(drivebase_::getPose));
 
         //While the A button is held, the intake will run the eject sequence. If it the intake is stowed, it will also deploy it.
-        gamepad_.a().or(operatorGamepad_.a()).whileTrue(intake_.ejectSequence());
 
         // Cycle through shooter tunings when the X button is pressed.
         gamepad_.back().or(operatorGamepad_.back()).onTrue(shooter_.cycleTuning()) ;
+        gamepad_.a().or(operatorGamepad_.a()).whileTrue(intake_.ejectSequence().alongWith(hopper_.reverseFeed()));
+
+        // Bind dashboard button to refreshing the tuning.
+        var refreshTuningButton = new LoggedNetworkBoolean("/Tuning/RefreshTuning", false);
+        new Trigger(refreshTuningButton::get)
+            .onTrue(shooter_.reloadTunings().finallyDo(() -> refreshTuningButton.set(false)));
     }
 
     private void configureDriveBindings() {

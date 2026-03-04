@@ -18,7 +18,7 @@ public final class IntakeConstants {
     public static final int rollerMotorCANID= 9;
     public static final int pivotMotorCANID= 8;
 
-    public static final Current rollerCurrentLimit = Amps.of(100) ;
+    public static final Current rollerCurrentLimit = Amps.of(180) ;
     public static final Current pivotCurrentLimit = Amps.of(80) ;
     public static final Time currentLimitTime= Seconds.of(1); //Temporary
 
@@ -51,7 +51,7 @@ public final class IntakeConstants {
     public static final AngularVelocity pivotCruiseAcceleration= RotationsPerSecond.of(100);
     public static final double pivotMaxJerk= 0;
 
-    public static final AngularVelocity rollerCollectVelocity= RotationsPerSecond.of(38);
+    public static final AngularVelocity rollerCollectVelocity= RotationsPerSecond.of(32);
     public static final AngularVelocity rollerShootVelocity= RotationsPerSecond.of(15);
     public static final Voltage rollerEjectVoltage= Volts.of(-6);
 
@@ -59,6 +59,6 @@ public final class IntakeConstants {
 
     public static final double motorToPivotGearRatio = 1.0 ;
     public static final double rollerGearRatio = 1.0 ;
-    public static final MomentOfInertia PIVOT_MOMENTOFINERTIA = KilogramSquareMeters.of(0.01);
+    public static final MomentOfInertia PIVOT_MOMENTOFINERTIA = KilogramSquareMeters.of(0.001);
     public static final MomentOfInertia ROLLER_MOMENTOFINERTIA = KilogramSquareMeters.of(0.001);
 }

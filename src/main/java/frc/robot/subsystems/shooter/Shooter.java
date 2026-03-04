@@ -8,7 +8,9 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
-import java.util.Set;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -28,6 +30,7 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -40,13 +43,8 @@ import frc.robot.RobotState;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.subsystems.intake.IntakeSubsystem;
-import frc.robot.subsystems.shooter.tunings.ArcShooterTuning;
-import frc.robot.subsystems.shooter.tunings.FlatShooterTuning;
-import frc.robot.subsystems.shooter.tunings.ShooterTuning;
-import frc.robot.subsystems.shooter.tunings.ShooterTuning.ShooterParams;
-
-import java.util.ArrayList;
-import java.util.List;
+import frc.robot.subsystems.shooter.ShooterTuning.ShooterParams;
+import frc.robot.util.LoggedTracer;
 import frc.robot.util.MapleSimUtil;
 import frc.robot.util.Mechanism3d;
 import frc.robot.subsystems.shooter.ShooterConstants.Positions.HubDistance;
@@ -71,6 +69,7 @@ public class Shooter extends SubsystemBase {
     private AngularVelocity shooterTarget = RadiansPerSecond.zero();
     private Angle hoodTarget = Radians.zero();
 
+    @AutoLogOutput
     private int tuningIndex_ = 0 ;
     private List<ShooterTuning> tunings_ = new ArrayList<ShooterTuning>() ;
 
@@ -81,15 +80,20 @@ public class Shooter extends SubsystemBase {
         this.shooterIO = ioShooter;
         this.hoodIO = ioHood;
 
-        tunings_.add(new ArcShooterTuning()) ;
-        tunings_.add(new FlatShooterTuning()) ;
+        loadTunings();
+        if (tunings_.isEmpty()) {
+            throw new RuntimeException("No shooter tunings found! Please add a json file to the tuning folder with shooter values.");
+        }
+
         tuningIndex_ = 0 ;
         this.poseSupplier = poseSupplier;
         this.speedsSupplier = speedsSupplier;
-    }
-
+    }    
+    
     @Override
     public void periodic() {
+        LoggedTracer.reset();
+
         shooterIO.updateInputs(shooterInputs);
         Logger.processInputs("Shooter", shooterInputs);
         hoodIO.updateInputs(hoodInputs);
@@ -123,9 +127,24 @@ public class Shooter extends SubsystemBase {
 
         Logger.recordOutput("Shooter/VelocitySetPoint", shooterTarget);
         Logger.recordOutput("Shooter/HoodSetPoint", hoodTarget);
+
+        LoggedTracer.record("ShooterPeriodic");
     }
 
     // Shooter Methods
+
+    private void loadTunings() {
+        File tuningDir = new File(Filesystem.getDeployDirectory(), "tuning") ;
+        if (tuningDir.isDirectory()) {
+            File[] jsonFiles = tuningDir.listFiles((dir, name) -> name.endsWith(".json")) ;
+            if (jsonFiles != null) {
+                for (File f : jsonFiles) {
+                    String name = f.getName().replace(".json", "") ;
+                    tunings_.add(new ShooterTuning(name)) ;
+                }
+            }
+        }
+    }
 
     private void setShooterVelocity(AngularVelocity vel) {
         shooterTarget = vel;
@@ -181,7 +200,18 @@ public class Shooter extends SubsystemBase {
     public Command cycleTuning() {
         return runOnce(() -> {
             tuningIndex_ = (tuningIndex_ + 1) % tunings_.size();
-        });
+        }).ignoringDisable(true);
+    }
+
+    public Command reloadTunings() {
+        return runOnce(() -> {
+            tunings_.clear();
+            loadTunings();
+            if (tunings_.isEmpty()) {
+                throw new RuntimeException("No shooter tunings found! Please add a json file to the tuning folder with shooter values.");
+            }
+            tuningIndex_ = 0;
+        }).ignoringDisable(true);
     }
 
     /**
@@ -260,8 +290,8 @@ public class Shooter extends SubsystemBase {
     }
 
     public Command requestToVelocityCmd(AngularVelocity vel) {
-        return runOnce(() -> setShooterVelocity(vel)) ;
-    }    
+        return startEnd(() -> setShooterVelocity(vel), this::stopShooter);
+    }
 
     public Command stopCmd() {
         return runOnce(() -> stopShooter())
@@ -287,27 +317,23 @@ public class Shooter extends SubsystemBase {
         Supplier<ShooterParams> shooterParams =
             () -> getTuning().getShooterParams(distance.get().in(Meters));
 
-        return Commands.defer(() -> {
-            var startVelocity = RotationsPerSecond.of(shooterParams.get().velocity);
+        return Commands.parallel(
+            run(() -> setSetpoints(
+                RotationsPerSecond.of(shooterParams.get().velocity).times(ShooterConstants.shooterVelocityMultiplierWhileFeederSlow),
+                Degrees.of(shooterParams.get().hood)
+            ))
+            .alongWith(Commands.runOnce(() -> Logger.recordOutput("Shooting/Boost", true)))
+            .until(() -> hopper.getTargetPercent() > 0.9)
+            .andThen(runDynamicSetpoints(
+                () -> RotationsPerSecond.of(shooterParams.get().velocity),
+                () -> Degrees.of(shooterParams.get().hood)
+            )
+            .alongWith(Commands.runOnce(() -> Logger.recordOutput("Shooting/Boost", false)))),
 
-            return Commands.parallel(
-                runDynamicSetpoints(
-                    () -> startVelocity,
-                    () -> Degrees.of(shooterParams.get().hood)
-                ),
-                Commands.waitUntil(this::isShooterReady).andThen(hopper.forwardFeed()),
-                intake.enableShootMode()
-            );
-        }, Set.of(this, hopper, intake));
+            hopper.preShoot().until(this::isShooterReady).andThen(hopper.forwardFeed()),
 
-        // return Commands.parallel(
-        //     runDynamicSetpoints(
-        //         () -> RotationsPerSecond.of(shooterParams.get().velocity),
-        //         () -> Degrees.of(shooterParams.get().hood)
-        //     ),
-        //     Commands.waitUntil(this::isShooterReady).andThen(hopper.forwardFeed()),
-        //     intake.enableShootMode()
-        // );
+            intake.enableShootMode()
+        );
     }
 
     /**
@@ -357,13 +383,13 @@ public class Shooter extends SubsystemBase {
         LoggedNetworkNumber feederVelocity = new LoggedNetworkNumber("/Tuning/Shooter/FeederRPS", 40.0);
         LoggedNetworkNumber scramblerVelocity = new LoggedNetworkNumber("/Tuning/Shooter/ScramblerRPS", 10.0);
         
-        return Commands.defer(() -> Commands.parallel(
+        return Commands.parallel(
             runDynamicSetpoints(() -> RotationsPerSecond.of(shooterVelocity.get()), () -> Degrees.of(hoodAngle.get())),
-            hopper.feed(
-                RotationsPerSecond.of(feederVelocity.get()),
-                RotationsPerSecond.of(scramblerVelocity.get())
+            hopper.dynamicFeed(
+                () -> RotationsPerSecond.of(feederVelocity.get()),
+                () -> RotationsPerSecond.of(scramblerVelocity.get())
             )
-        ), Set.of(this, hopper));
+        );
     }
 
     /**
