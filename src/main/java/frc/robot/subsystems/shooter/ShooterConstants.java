@@ -25,7 +25,7 @@ public class ShooterConstants {
     // The shooter velocity multiplier while the feeder is slow. This is to compensate for the 
     // fact that when the feeder is ramping, the shots are short
     //
-    public static final double shooterVelocityMultiplierWhileFeederSlow = 1.15 ;
+    public static final double shooterVelocityMultiplierWhileFeederSlow = 1.1 ;
 
     public static final double gearRatio = 1.04;
 

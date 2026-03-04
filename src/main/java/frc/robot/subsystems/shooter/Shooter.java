@@ -12,7 +12,6 @@ import static edu.wpi.first.units.Units.Volts;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -75,6 +74,7 @@ public class Shooter extends SubsystemBase {
     private AngularVelocity shooterTarget = RadiansPerSecond.zero();
     private Angle hoodTarget = Radians.zero();
 
+    @AutoLogOutput
     private int tuningIndex_ = 0 ;
     private List<ShooterTuning> tunings_ = new ArrayList<ShooterTuning>() ;
 
@@ -205,7 +205,7 @@ public class Shooter extends SubsystemBase {
     public Command cycleTuning() {
         return runOnce(() -> {
             tuningIndex_ = (tuningIndex_ + 1) % tunings_.size();
-        });
+        }).ignoringDisable(true);
     }
 
     public Command reloadTunings() {
@@ -216,7 +216,7 @@ public class Shooter extends SubsystemBase {
                 throw new RuntimeException("No shooter tunings found! Please add a json file to the tuning folder with shooter values.");
             }
             tuningIndex_ = 0;
-        }) ;
+        }).ignoringDisable(true);
     }
 
     /**
@@ -274,13 +274,6 @@ public class Shooter extends SubsystemBase {
         return runOnce(() -> setHoodAngle(pos)).withName("Set Hood Position");
     }
 
-    private AngularVelocity calcWheelVelocity(AngularVelocity velocity, boolean feederAtGoal) {
-        if (!feederAtGoal) {
-            return velocity.times(ShooterConstants.shooterVelocityMultiplierWhileFeederSlow);
-        }
-        return velocity;
-    }
-
     /**
      * Calculates Velocity and Hood Angle based on distance and Shoots
      * 
@@ -290,27 +283,23 @@ public class Shooter extends SubsystemBase {
         Supplier<ShooterParams> shooterParams =
             () -> getTuning().getShooterParams(distance.get().in(Meters));
 
-        return Commands.defer(() -> {
-            var startVelocity = RotationsPerSecond.of(shooterParams.get().velocity);
+        return Commands.parallel(
+            run(() -> setSetpoints(
+                RotationsPerSecond.of(shooterParams.get().velocity).times(ShooterConstants.shooterVelocityMultiplierWhileFeederSlow),
+                Degrees.of(shooterParams.get().hood)
+            ))
+            .alongWith(Commands.runOnce(() -> Logger.recordOutput("Shooting/Boost", true)))
+            .until(() -> hopper.getTargetPercent() > 0.9)
+            .andThen(runDynamicSetpoints(
+                () -> RotationsPerSecond.of(shooterParams.get().velocity),
+                () -> Degrees.of(shooterParams.get().hood)
+            )
+            .alongWith(Commands.runOnce(() -> Logger.recordOutput("Shooting/Boost", false)))),
 
-            return Commands.parallel(
-                runDynamicSetpoints(
-                    () -> calcWheelVelocity(startVelocity, hopper.isFeederAtGoal()),
-                    () -> Degrees.of(shooterParams.get().hood)
-                ),
-                Commands.waitUntil(this::isShooterReady).andThen(hopper.forwardFeed()),
-                intake.enableShootMode()
-            );
-        }, Set.of(this, hopper, intake));
+            hopper.preShoot().until(this::isShooterReady).andThen(hopper.forwardFeed()),
 
-        // return Commands.parallel(
-        //     runDynamicSetpoints(
-        //         () -> RotationsPerSecond.of(shooterParams.get().velocity),
-        //         () -> Degrees.of(shooterParams.get().hood)
-        //     ),
-        //     Commands.waitUntil(this::isShooterReady).andThen(hopper.forwardFeed()),
-        //     intake.enableShootMode()
-        // );
+            intake.enableShootMode()
+        );
     }
 
     /**

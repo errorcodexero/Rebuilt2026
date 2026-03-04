@@ -308,8 +308,8 @@ public class RobotContainer {
         gamepad_.a().or(operatorGamepad_.a()).whileTrue(intake_.ejectSequence());
 
         // Cycle through shooter tunings when the X button is pressed.
-        gamepad_.x().or(operatorGamepad_.x()).onTrue(shooter_.cycleTuning()) ;
-        gamepad_.a().whileTrue(intake_.ejectSequence());
+        gamepad_.back().or(operatorGamepad_.back()).onTrue(shooter_.cycleTuning()) ;
+        gamepad_.a().whileTrue(intake_.ejectSequence().alongWith(hopper_.reverseFeed()));
 
         // Bind dashboard button to refreshing the tuning.
         var refreshTuningButton = new LoggedNetworkBoolean("/Tuning/RefreshTuning", false);

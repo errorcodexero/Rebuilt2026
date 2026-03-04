@@ -25,9 +25,14 @@
             "hood" : 15.0,
             "points" : [
                 {
-                    // Test mode                    
-                    "distance" : 2.47,
-                    "velocity" : 62.0
+                    // Shoot cmd
+                    "distance" : 2.22,
+                    "velocity" : 58.0
+                },
+                {
+                    // Shoot mode                    
+                    "distance" : 2.43,
+                    "velocity" : 59.0
                 },
                 {
                     // Test mode
@@ -42,7 +47,7 @@
                 {
                     // Test mode                    
                     "distance" : 3.35,
-                    "velocity" : 73.0
+                    "velocity" : 71.0
                 }
             ]
         },
@@ -50,9 +55,14 @@
             "hood" : 25.0,
             "points" : [
                 {
-                    // Test mode
-                    "distance" : 3.69,
-                    "velocity" : 70.0
+                    // Shoot cmd
+                    "distance" : 3.40,
+                    "velocity" : 58.5
+                },
+                {
+                    // Shoot cmd
+                    "distance" : 3.70,
+                    "velocity" : 64.0
                 },
                 {
                     // Test mode

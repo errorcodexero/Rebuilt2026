@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.Volts;
 
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -175,7 +176,15 @@ public class Hopper extends SubsystemBase {
      * @return
      */
     public Command reverseFeed() {
-        return feed(HopperConstants.feedingShootingVelocity.times(-1), HopperConstants.scramblerShootingVelocity.times(-1));
+        return feed(HopperConstants.feedingShootingVelocity.unaryMinus(), HopperConstants.scramblerShootingVelocity.unaryMinus());
+    }
+
+    /**
+     * Runs the scrambler in reverse for before our shooting starts.
+     * @return
+     */
+    public Command preShoot() {
+        return feed(DegreesPerSecond.zero(), HopperConstants.scramblerBeforeShootingVelocity.unaryMinus());
     }
     
     // Readbacks + state checks
@@ -193,6 +202,11 @@ public class Hopper extends SubsystemBase {
     
     public double getFeederCurrent() {
         return inputs.feederCurrent.in(Amps);
+    }
+
+    @AutoLogOutput
+    public double getTargetPercent() {
+        return inputs.feederVelocity.div(HopperConstants.feedingShootingVelocity).magnitude() ;
     }
     
     public boolean isScramblerAtGoal() {
