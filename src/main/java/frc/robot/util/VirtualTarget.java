@@ -8,10 +8,10 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.shooter.tunings.ShooterTuning;
+import frc.robot.subsystems.shooter.ShooterTuning;
 
 public class VirtualTarget {
-    public static Translation2d getVirtualTargetFromTarget(Drive drive, Translation2d target, ShooterTuning tuning, double loopPasses){
+    public static Translation2d getVirtualTargetFromTarget(Drive drive, Translation2d target, ShooterTuning tuning, int loopPasses){
         Distance distToHub;
         if(loopPasses == 0){
             distToHub = Meters.of(target.getDistance(drive.getPose().getTranslation()));

@@ -7,17 +7,20 @@
                 {
                     // Test mode
                     "distance" : 1.616,
-                    "velocity" : 55.0
+                    "velocity" : 55.0, 
+                    "hangtime" : 1.8
                 },
                 {
                     // Test mode
                     "distance" : 1.86,
-                    "velocity" : 58.0
+                    "velocity" : 58.0, 
+                    "hangtime" : 1.8
                 },
                 {
                     // Test mode                    
                     "distance" : 2.18,
-                    "velocity" : 65.0
+                    "velocity" : 65.0, 
+                    "hangtime" : 1.8
                 }
             ]
         },
@@ -27,27 +30,32 @@
                 {
                     // Shoot cmd
                     "distance" : 2.22,
-                    "velocity" : 58.0
+                    "velocity" : 58.0, 
+                    "hangtime" : 1.8
                 },
                 {
                     // Shoot mode                    
                     "distance" : 2.43,
-                    "velocity" : 59.0
+                    "velocity" : 59.0, 
+                    "hangtime" : 1.8
                 },
                 {
                     // Test mode
                     "distance" : 2.77,
-                    "velocity" : 64.0
+                    "velocity" : 64.0, 
+                    "hangtime" : 1.8
                 },
                 {
                     // Test mode                    
                     "distance" : 3.06,
-                    "velocity" : 68.0
+                    "velocity" : 68.0, 
+                    "hangtime" : 1.8
                 },
                 {
                     // Test mode                    
                     "distance" : 3.35,
-                    "velocity" : 71.0
+                    "velocity" : 71.0, 
+                    "hangtime" : 1.8
                 }
             ]
         },
@@ -57,22 +65,26 @@
                 {
                     // Shoot cmd
                     "distance" : 3.40,
-                    "velocity" : 58.5
+                    "velocity" : 58.5, 
+                    "hangtime" : 1.8
                 },
                 {
                     // Shoot cmd
                     "distance" : 3.70,
-                    "velocity" : 64.0
+                    "velocity" : 64.0, 
+                    "hangtime" : 1.8
                 },
                 {
                     // Test mode
                     "distance" : 4.02,
-                    "velocity" : 72.0
+                    "velocity" : 72.0, 
+                    "hangtime" : 1.8
                 },
                 {
                     // Test mode
                     "distance" : 4.30,
-                    "velocity" : 75.0
+                    "velocity" : 75.0, 
+                    "hangtime" : 1.8
                 }
             ]
         },
@@ -82,17 +94,20 @@
                 {
                     // Test mode
                     "distance" : 4.60,
-                    "velocity" : 68.0
+                    "velocity" : 68.0, 
+                    "hangtime" : 1.8
                 },
                 {
                     // Test mode
                     "distance" : 4.92,
-                    "velocity" : 71.0
+                    "velocity" : 71.0, 
+                    "hangtime" : 1.8
                 },
                 {
                     // Test mode
                     "distance" : 5.24,
-                    "velocity" : 83.0
+                    "velocity" : 83.0, 
+                    "hangtime" : 1.8
                 }
             ]
         }
