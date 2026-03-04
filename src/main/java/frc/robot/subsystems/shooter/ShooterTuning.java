@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -73,6 +74,7 @@ public class ShooterTuning {
         try {
             File file = new File(Filesystem.getDeployDirectory(), filename) ;
             ObjectMapper mapper = new ObjectMapper() ;
+            mapper.enable(JsonParser.Feature.ALLOW_COMMENTS) ;
             JsonNode root = mapper.readTree(file) ;
 
             JsonNode dataArray = root.get("data") ;
