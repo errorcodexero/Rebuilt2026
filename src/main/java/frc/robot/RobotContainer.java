@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.Constants.RobotType;
 import frc.robot.commands.drive.DriveCommands;
@@ -226,6 +227,10 @@ public class RobotContainer {
         if (hopper_ == null) {
             hopper_ = new Hopper(new HopperIO() {});
         }
+        
+        for (var tag : FieldConstants.layout.getTags()) {
+            System.out.println("Tag Loaded: " + tag.ID);
+        }
 
         DriveCommands.configure(
             drivebase_,
@@ -303,7 +308,7 @@ public class RobotContainer {
         //CHANGE BACK TO RIGHT TRIGGER!
         // we might want to limit the acceleration on this while shooting, but idk how to do that and hopefully it wont matter too much. 
         // just realized we could interrupt this with POV driving, but we would still be shooting, so we might want to create a block for that, but this too probably wont come up that much and i think i am not that numb-skulled to actually do this so idk
-        gamepad_.rightTrigger().whileTrue(
+        gamepad_.rightTrigger().or(operatorGamepad_.rightTrigger()).whileTrue(
             RobotCommands.shoot(shooter_, hopper_, drivebase_, intake_, gamepad_, Constants.shootOnMove)
         );
         // shooter_.setDefaultCommand(shooter_.awaitShooting(drivebase_::getPose));
