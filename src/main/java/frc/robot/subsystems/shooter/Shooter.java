@@ -9,6 +9,9 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -33,6 +36,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
@@ -47,14 +51,9 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.shooter.ShooterTuning.ShooterParams;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import frc.robot.util.LoggedTracer;
 import frc.robot.util.MapleSimUtil;
 import frc.robot.util.Mechanism3d;
-
-import edu.wpi.first.wpilibj.Filesystem;
 
 
 public class Shooter extends SubsystemBase {
@@ -98,6 +97,8 @@ public class Shooter extends SubsystemBase {
     
     @Override
     public void periodic() {
+        LoggedTracer.reset();
+
         shooterIO.updateInputs(shooterInputs);
         Logger.processInputs("Shooter", shooterInputs);
         hoodIO.updateInputs(hoodInputs);
@@ -131,6 +132,8 @@ public class Shooter extends SubsystemBase {
 
         Logger.recordOutput("Shooter/VelocitySetPoint", shooterTarget);
         Logger.recordOutput("Shooter/HoodSetPoint", hoodTarget);
+
+        LoggedTracer.record("ShooterPeriodic");
     }
 
     // Shooter Methods
@@ -255,8 +258,8 @@ public class Shooter extends SubsystemBase {
     }
 
     public Command requestToVelocityCmd(AngularVelocity vel) {
-        return runOnce(() -> setShooterVelocity(vel)) ;
-    }    
+        return startEnd(() -> setShooterVelocity(vel), this::stopShooter);
+    }
 
     public Command stopCmd() {
         return runOnce(() -> stopShooter())

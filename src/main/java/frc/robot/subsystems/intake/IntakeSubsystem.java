@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.util.LoggedTracer;
 import frc.robot.util.Mechanism3d;
 
 public class IntakeSubsystem extends SubsystemBase {
@@ -36,6 +37,8 @@ public class IntakeSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        LoggedTracer.reset();
+
         io.updateInputs(inputs);
         Logger.processInputs("Intake", inputs);
 
@@ -50,6 +53,8 @@ public class IntakeSubsystem extends SubsystemBase {
         if (Constants.getMode() == Mode.SIM) {
             // MapleSimUtil.setIntakeRunning(isIntakeDeployed() && inputs.RollerAngularVelocity.gt(RadiansPerSecond.zero()));
         }
+
+        LoggedTracer.record("IntakePeriodic");
     }
 
     //Intake control methods
