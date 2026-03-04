@@ -353,13 +353,13 @@ public class Shooter extends SubsystemBase {
         LoggedNetworkNumber feederVelocity = new LoggedNetworkNumber("/Tuning/Shooter/FeederRPS", 40.0);
         LoggedNetworkNumber scramblerVelocity = new LoggedNetworkNumber("/Tuning/Shooter/ScramblerRPS", 10.0);
         
-        return Commands.defer(() -> Commands.parallel(
+        return Commands.parallel(
             runDynamicSetpoints(() -> RotationsPerSecond.of(shooterVelocity.get()), () -> Degrees.of(hoodAngle.get())),
-            hopper.feed(
-                RotationsPerSecond.of(feederVelocity.get()),
-                RotationsPerSecond.of(scramblerVelocity.get())
+            hopper.dynamicFeed(
+                () -> RotationsPerSecond.of(feederVelocity.get()),
+                () -> RotationsPerSecond.of(scramblerVelocity.get())
             )
-        ), Set.of(this, hopper));
+        );
     }
 
     /**

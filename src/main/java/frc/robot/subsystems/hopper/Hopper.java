@@ -143,6 +143,17 @@ public class Hopper extends SubsystemBase {
     }
 
     /**
+     * Runs the feeder and scrambler at supplied speeds.
+     * @return
+     */
+    public Command dynamicFeed(Supplier<AngularVelocity> feeder, Supplier<AngularVelocity> scrambler) {
+        return runEnd(() -> {
+            setFeederVelocity(feeder.get());
+            setScramblerVelocity(scrambler.get());
+        }, this::stopAll);
+    }
+
+    /**
      * Runs the scrambler at its active speed, and the feeder.
      * @return
      */
