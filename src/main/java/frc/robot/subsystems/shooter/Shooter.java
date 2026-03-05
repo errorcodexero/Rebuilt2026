@@ -24,7 +24,6 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -68,9 +67,6 @@ public class Shooter extends SubsystemBase {
     private final Alert disconnectionAlert =
         new Alert("One or more shooter motors are disconnected!", AlertType.kError);
 
-    private final Supplier<Pose2d> poseSupplier;
-    private final Supplier<ChassisSpeeds> speedsSupplier;
-
     private AngularVelocity shooterTarget = RadiansPerSecond.zero();
     private Angle hoodTarget = Radians.zero();
 
@@ -78,10 +74,7 @@ public class Shooter extends SubsystemBase {
     private int tuningIndex_ = 0 ;
     private List<ShooterTuning> tunings_ = new ArrayList<ShooterTuning>() ;
 
-    @AutoLogOutput
-    private boolean hoodParked = false;
-
-    public Shooter(ShooterIO ioShooter, HoodIO ioHood, Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speedsSupplier) {
+    public Shooter(ShooterIO ioShooter, HoodIO ioHood) {
         this.shooterIO = ioShooter;
         this.hoodIO = ioHood;
 
@@ -91,8 +84,6 @@ public class Shooter extends SubsystemBase {
         }
 
         tuningIndex_ = 0 ;
-        this.poseSupplier = poseSupplier;
-        this.speedsSupplier = speedsSupplier;
     }    
     
     @Override
@@ -112,22 +103,6 @@ public class Shooter extends SubsystemBase {
         if (Constants.getMode() == Mode.SIM) {
             MapleSimUtil.setShooterVelocity(shooterInputs.wheelVelocity);
             MapleSimUtil.setHoodAngle(hoodInputs.position);
-        }
-
-        // Hood Protection
-        Pose2d pose = poseSupplier.get();
-        ChassisSpeeds speed = speedsSupplier.get();
-        Pose2d trench = pose.nearest(FieldConstants.trenches);
-        Distance nearestDistance = Meters.of(pose.getTranslation().getDistance(trench.getTranslation()));
-
-        if (
-            nearestDistance.lte(ShooterConstants.allowedTrenchDistance) && // Too Close
-            trench.getMeasureX().minus(pose.getMeasureX()).in(Meters) * speed.vxMetersPerSecond > 0 // And moving towards it
-        ) {
-            hoodIO.goToAngle(ShooterConstants.hoodParkedAngle);
-            hoodParked = true;
-        } else {
-            hoodParked = false;
         }
 
         Logger.recordOutput("Shooter/VelocitySetPoint", shooterTarget);
@@ -186,7 +161,6 @@ public class Shooter extends SubsystemBase {
 
     private void setHoodAngle(Angle pos) {
         hoodTarget = pos;
-        if (hoodParked) return;
         hoodIO.goToAngle(pos);
     }
 
