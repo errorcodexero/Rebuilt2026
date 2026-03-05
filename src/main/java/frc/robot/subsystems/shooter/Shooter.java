@@ -249,12 +249,11 @@ public class Shooter extends SubsystemBase {
     }
 
     public Command runToSetpointsCmd(AngularVelocity vel, Angle pos) {
-        return runOnce(() -> setSetpoints(vel, pos)).andThen(Commands.waitUntil(this::isShooterReady));
+        return startEnd(() -> setSetpoints(vel, pos), this::stopShooter).withName("Set Shooter Setpoints");
     }
 
     public Command runToVelocityCmd(AngularVelocity vel) {
-        return runOnce(() -> setShooterVelocity(vel))
-            .andThen(Commands.waitUntil(this::isShooterReady)).withName("Set Shooter Velocity");
+        return startEnd(() -> setShooterVelocity(vel), this::stopShooter).withName("Set Shooter Velocity");
     }
 
     public Command requestToVelocityCmd(AngularVelocity vel) {
@@ -308,6 +307,17 @@ public class Shooter extends SubsystemBase {
      */
     public Command ejectUp() {
         return startEnd(() -> setShooterVelocity(ShooterConstants.ejectVelocity), this::stopShooter);
+    }
+
+    /**
+     * Idles the shooter at 0 velocity and the hood at the parked position.
+     * @return
+     */
+    public Command idleCommand() {
+        return runToSetpointsCmd(
+            RotationsPerSecond.of(0.0),
+            ShooterConstants.hoodParkedAngle
+        );
     }
 
     /**

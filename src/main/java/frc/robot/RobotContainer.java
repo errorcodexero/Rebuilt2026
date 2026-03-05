@@ -305,7 +305,7 @@ public class RobotContainer {
         gamepad_.rightTrigger().or(operatorGamepad_.rightTrigger()).whileTrue(RobotCommands.shoot(shooter_, hopper_, intake_, drivebase_));
 
         // When the shooter isnt shooting, get it ready to shoot.
-        shooter_.setDefaultCommand(shooter_.hoodToPosCmd(ShooterConstants.hoodParkedAngle)) ;
+        shooter_.setDefaultCommand(shooter_.idleCommand());
 
         //While the A button is held, the intake will run the eject sequence. If it the intake is stowed, it will also deploy it.
         operatorGamepad_.a().whileTrue(intake_.hopperEjectSequence().alongWith(hopper_.reverseFeed()));
