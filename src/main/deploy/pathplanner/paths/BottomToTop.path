@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.3652999999999995,
-        "y": 0.6992555555555555
+        "x": 6.333345195729537,
+        "y": 0.4898457888493476
       },
       "isLocked": false,
       "linkedName": "TrenchShoot"
@@ -20,12 +20,12 @@
         "y": 2.1202222222222225
       },
       "prevControl": {
-        "x": 7.645097583636076,
-        "y": 1.282361650861512
+        "x": 7.6017871522579545,
+        "y": 1.2808359181195108
       },
       "nextControl": {
-        "x": 8.178426645000048,
-        "y": 2.9241247243533683
+        "x": 8.25121086428979,
+        "y": 3.008676067223456
       },
       "isLocked": false,
       "linkedName": null
@@ -36,28 +36,28 @@
         "y": 5.214099999999999
       },
       "prevControl": {
-        "x": 6.730689542682786,
-        "y": 4.640336955408756
+        "x": 6.672309330348179,
+        "y": 4.23391294257215
       },
       "nextControl": {
-        "x": 5.751142069211068,
-        "y": 6.3172509585588275
+        "x": 6.052372697332093,
+        "y": 6.429384626033102
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.448222222222222,
-        "y": 7.421133333333334
+        "x": 5.7523487544484,
+        "y": 7.290122222222222
       },
       "prevControl": {
-        "x": 5.919735859562582,
-        "y": 7.0308848317434816
+        "x": 6.294757676958652,
+        "y": 6.995540253605104
       },
       "nextControl": {
-        "x": 4.969169956812667,
-        "y": 7.8176211842761365
+        "x": 5.139074733096087,
+        "y": 7.623190984578885
       },
       "isLocked": false,
       "linkedName": null
@@ -68,8 +68,8 @@
         "y": 7.290122222222222
       },
       "prevControl": {
-        "x": 4.422869448570292,
-        "y": 7.46532047175657
+        "x": 4.536559905100831,
+        "y": 7.386488730723606
       },
       "nextControl": null,
       "isLocked": false,
@@ -83,7 +83,7 @@
     },
     {
       "waypointRelativePos": 2,
-      "rotationDegrees": 89.24615166692935
+      "rotationDegrees": 62.750331745229154
     },
     {
       "waypointRelativePos": 3,
@@ -94,8 +94,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 1.0,
+    "maxAcceleration": 1.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
