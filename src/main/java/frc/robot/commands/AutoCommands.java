@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.Seconds;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.drive.DriveCommands;
@@ -19,9 +21,12 @@ public class AutoCommands {
                 DriveCommands.initialFollowPathCommand(drive,"TopToBottom Trench").deadlineFor(intake.intakeSequence())
             ),
 
-            RobotCommands.shoot(shooter, hopper, intake, drive),
+            // Added: timeout on shoot
+            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(5.0)),
             DriveCommands.followPathCommand("BottomToTop").deadlineFor(intake.intakeSequence()),
-            RobotCommands.shoot(shooter, hopper, intake, drive)
+
+            // Added: timeout on shoot
+            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(5.0))
         );
     }
 }
