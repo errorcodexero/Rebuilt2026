@@ -49,8 +49,8 @@ public final class Constants {
     public static final boolean shootOnMove = true; // if true, we will allow the driver to shoot while moving, but with reduced max speed. if false, we will not allow the driver to shoot while moving.
     //change to 0 if it really doesnt work, bc the db velocity will go to 0 and the target will just be the hub
     //but I think it will work so yeah trust me butch <insert prayge hare>
-    public static final double shootOnMoveMaxSpeed = 2.0/5.0; 
-    public static final double aimOnMoveMaxSpeed = 2.0/3.0; // obsolete rn, but change if we ever add a aim mode again
+    public static final double shootOnMoveMaxSpeed = 0.4; 
+    public static final double ferryOnMoveMaxSpeed = 0.8; 
 
     public static class DriveConstants {
         public static final double slowModeJoystickMultiplier = 0.4;

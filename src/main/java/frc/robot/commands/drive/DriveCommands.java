@@ -244,11 +244,11 @@ public class DriveCommands {
         .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
   }
   
-  public static Command pointAtTarget(Drive drive, CommandXboxController gamepad, Supplier<Translation2d> target, boolean shootOnMove){
+  public static Command pointAtTarget(Drive drive, CommandXboxController gamepad, Supplier<Translation2d> target, double gamepadMaxSpeed, boolean shootOnMove){
     return joystickDriveAtAngle(
                     drive,
-                    () -> shootOnMove ? -gamepad.getLeftY() * Constants.shootOnMoveMaxSpeed : 0.0,
-                    () -> shootOnMove ? -gamepad.getLeftX() * Constants.shootOnMoveMaxSpeed : 0.0,
+                    () -> shootOnMove ? -gamepad.getLeftY() * gamepadMaxSpeed : 0.0,
+                    () -> shootOnMove ? -gamepad.getLeftX() * gamepadMaxSpeed : 0.0,
                     () -> {
                         Logger.recordOutput("Drive/Target", target.get());
                         var translation = target.get().minus(drive.getPose().getTranslation());
@@ -278,10 +278,24 @@ public class DriveCommands {
     return target;
   }
 
+  public static double getGamepadMaxSpeed(Drive drive){
+    boolean blueDS = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue;
+
+    boolean robotInAllianceZone = blueDS ? 
+      drive.getPose().getMeasureX().lt(DriveConstants.allianceZoneBlue):
+      drive.getPose().getMeasureX().gt(DriveConstants.allianceZoneRed);
+
+    if(robotInAllianceZone){
+      return Constants.shootOnMoveMaxSpeed;
+    }else{
+      return Constants.ferryOnMoveMaxSpeed;
+    }
+  }
+
   // make sure this isnt bad with intellisense later
   public static Command pointAtShootingTarget(Drive drive, Shooter shooter, CommandXboxController gamepad, boolean shootOnMove){
     
-    return pointAtTarget(drive, gamepad, () -> (shootOnMove ? VirtualTarget.getVirtualTargetFromTarget(drive, getTarget(drive), shooter.getTuning(), ShooterConstants.hangtimeLoopPasses) : getTarget(drive)), shootOnMove);
+    return pointAtTarget(drive, gamepad, () -> (shootOnMove ? VirtualTarget.getVirtualTargetFromTarget(drive, getTarget(drive), shooter.getTuning(), ShooterConstants.hangtimeLoopPasses) : getTarget(drive)), getGamepadMaxSpeed(drive), shootOnMove);
   }
 
   /**
