@@ -303,6 +303,14 @@ public class Shooter extends SubsystemBase {
     }
 
     /**
+     * Ejects balls from the shooter at a low velocity to get them out of the shooter without shooting them towards the target.
+     * @return
+     */
+    public Command ejectUp() {
+        return startEnd(() -> setShooterVelocity(ShooterConstants.ejectVelocity), this::stopShooter);
+    }
+
+    /**
      * Runs supplied setpoints until the command ends, then stops.
      * @param vel
      * @param pos

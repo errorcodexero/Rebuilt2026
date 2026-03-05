@@ -186,6 +186,14 @@ public class Hopper extends SubsystemBase {
     public Command preShoot() {
         return feed(DegreesPerSecond.zero(), HopperConstants.scramblerBeforeShootingVelocity.unaryMinus());
     }
+
+    /**
+     * Runs the feeder in reverse to eject balls from the shooter without shooting them towards the target.
+     * @return
+     */
+    public Command ejectUp() {
+        return startEnd(() -> setFeederVelocity(HopperConstants.feedingEjectVelocity), this::stopAll);
+    }
     
     // Readbacks + state checks
     public AngularVelocity getScramblerVelocity() {

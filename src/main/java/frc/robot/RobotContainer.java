@@ -55,6 +55,7 @@ import frc.robot.subsystems.shooter.HoodIO;
 import frc.robot.subsystems.shooter.HoodIOServo;
 import frc.robot.subsystems.shooter.HoodIOSim;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterIOSim;
 import frc.robot.subsystems.shooter.ShooterIOTalonFX;
@@ -284,6 +285,8 @@ public class RobotContainer {
             intake_::isIntakeStowed
         ));
        
+        // Cycle through shooter tunings when the back button is pressed.
+        gamepad_.back().or(operatorGamepad_.back()).onTrue(shooter_.cycleTuning()) ;
 
         // While the left trigger is held, we will run the intake. If the intake is stowed, it will also deploy it.
         gamepad_.leftTrigger().or(operatorGamepad_.leftTrigger()).whileTrue(
@@ -293,23 +296,21 @@ public class RobotContainer {
             )
         );
 
-        gamepad_.rightBumper().onTrue(new StartupCmd(intake_, hopper_, shooter_));
+        // TODO: remove me just for testing
+        operatorGamepad_.rightBumper().onTrue(new StartupCmd(intake_, hopper_, shooter_));
+
+        operatorGamepad_.b().whileTrue(RobotCommands.ejectUp(shooter_, hopper_));
 
         // While the right trigger is held, we will shoot into the hub or ferry.
         gamepad_.rightTrigger().or(operatorGamepad_.rightTrigger()).whileTrue(RobotCommands.shoot(shooter_, hopper_, intake_, drivebase_));
 
-        // When the hopper isnt shooting, set it to run its idle velocity.
-        // hopper_.setDefaultCommand(hopper_.idleScrambler());
-
         // When the shooter isnt shooting, get it ready to shoot.
-        shooter_.setDefaultCommand(shooter_.awaitShooting(drivebase_::getPose));
+        shooter_.setDefaultCommand(shooter_.hoodToPosCmd(ShooterConstants.hoodParkedAngle)) ;
 
         //While the A button is held, the intake will run the eject sequence. If it the intake is stowed, it will also deploy it.
-        gamepad_.a().or(operatorGamepad_.a()).whileTrue(intake_.ejectSequence());
+        operatorGamepad_.a().whileTrue(intake_.hopperEjectSequence().alongWith(hopper_.reverseFeed()));
 
-        // Cycle through shooter tunings when the X button is pressed.
-        gamepad_.back().or(operatorGamepad_.back()).onTrue(shooter_.cycleTuning()) ;
-        gamepad_.a().whileTrue(intake_.ejectSequence().alongWith(hopper_.reverseFeed()));
+
 
         // Bind dashboard button to refreshing the tuning.
         var refreshTuningButton = new LoggedNetworkBoolean("/Tuning/RefreshTuning", false);
