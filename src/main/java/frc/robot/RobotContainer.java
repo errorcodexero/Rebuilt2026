@@ -55,7 +55,6 @@ import frc.robot.subsystems.shooter.HoodIO;
 import frc.robot.subsystems.shooter.HoodIOServo;
 import frc.robot.subsystems.shooter.HoodIOSim;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterIOSim;
 import frc.robot.subsystems.shooter.ShooterIOTalonFX;
@@ -295,9 +294,6 @@ public class RobotContainer {
                 hopper_.collectScrambler()
             )
         );
-
-        // TODO: remove me just for testing
-        operatorGamepad_.rightBumper().onTrue(new StartupCmd(intake_, hopper_, shooter_));
 
         operatorGamepad_.b().whileTrue(RobotCommands.ejectUp(shooter_, hopper_));
 
