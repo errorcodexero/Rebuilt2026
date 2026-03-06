@@ -1,6 +1,6 @@
 {
-  "robotWidth": 0.876,
-  "robotLength": 0.711,
+  "robotWidth": 0.943,
+  "robotLength": 0.781,
   "holonomicMode": true,
   "pathFolders": [
     "NoClimbAutos"
@@ -20,15 +20,18 @@
   "driveMotorType": "krakenX60",
   "driveCurrentLimit": 60.0,
   "wheelCOF": 1.2,
-  "flModuleX": 0.238125,
-  "flModuleY": 0.314325,
-  "frModuleX": 0.238125,
-  "frModuleY": -0.314325,
-  "blModuleX": -0.238125,
+  "flModuleX": 0.238,
+  "flModuleY": 0.314,
+  "frModuleX": 0.238,
+  "frModuleY": -0.314,
+  "blModuleX": -0.238,
   "blModuleY": 0.314,
   "brModuleX": -0.238,
-  "brModuleY": -0.314325,
+  "brModuleY": -0.314,
   "bumperOffsetX": 0.0,
   "bumperOffsetY": 0.0,
-  "robotFeatures": []
+  "robotFeatures": [
+    "{\"name\":\"Intake\",\"type\":\"rounded_rect\",\"data\":{\"center\":{\"x\":0.283,\"y\":0.0},\"size\":{\"width\":0.756,\"length\":0.622},\"borderRadius\":0.05,\"strokeWidth\":0.02,\"filled\":false}}",
+    "{\"name\":\"Shooter\",\"type\":\"rounded_rect\",\"data\":{\"center\":{\"x\":-0.2,\"y\":0.0},\"size\":{\"width\":0.382,\"length\":0.3},\"borderRadius\":0.05,\"strokeWidth\":0.02,\"filled\":false}}"
+  ]
 }
