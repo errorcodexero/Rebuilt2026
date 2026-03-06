@@ -276,6 +276,21 @@ public class Shooter extends SubsystemBase {
     }
 
     /**
+     * Spins the shooter up to shoot, without actually shooting.
+     * @param distance
+     * @return
+     */
+    public Command spinUpForDistance(Supplier<Distance> distance) {
+        Supplier<ShooterParams> shooterParams =
+            () -> getTuning().getShooterParams(distance.get().in(Meters));
+
+        return runDynamicSetpoints(
+            () -> RotationsPerSecond.of(shooterParams.get().velocity),
+            () -> Degrees.of(shooterParams.get().hood)
+        );
+    }
+
+    /**
      * Ejects balls from the shooter at a low velocity to get them out of the shooter without shooting them towards the target.
      * @return
      */

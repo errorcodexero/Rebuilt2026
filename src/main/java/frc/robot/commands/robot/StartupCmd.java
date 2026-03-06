@@ -1,10 +1,10 @@
 package frc.robot.commands.robot;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -12,7 +12,7 @@ import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.shooter.Shooter;
 
-public class StartupCmd extends SequentialCommandGroup {
+public class StartupCmd extends ParallelCommandGroup {
     private final static AngularVelocity startupScramblerVelocity = RotationsPerSecond.of(-10);
     private final static AngularVelocity startupFeederVelocity = RotationsPerSecond.of(-10);
     private final static AngularVelocity startupShooterVelocity = RotationsPerSecond.of(-45);
@@ -27,16 +27,15 @@ public class StartupCmd extends SequentialCommandGroup {
         shooter_ = shooter ;
 
         addCommands(
-            intake_.intakeSequence().withTimeout(Seconds.of(1.5)),
-            moveShooterBalls(),                                     // Run the startup sequence to deploy the intake and move balls from shooter to hopper
-            intake_.waitCommand()                                   // Move the intake to the waiting position to avoid collisions with the ground and the robot during auto
+            intake_.intakeSequence(),
+            moveShooterBalls()
         );
 
         setName("StartupCmd") ;
     }
 
     private Command moveShooterBalls() {
-        return new ParallelCommandGroup(
+        return Commands.parallel(
             new SequentialCommandGroup(
                 new WaitCommand(0.0),
                 hopper_.feed(startupFeederVelocity, startupScramblerVelocity).withTimeout(3.0)

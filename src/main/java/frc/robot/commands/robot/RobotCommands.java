@@ -40,7 +40,7 @@ public class RobotCommands {
                 () -> RobotState.rotationToHub()
             ).finallyDo(drive::stopWithX),
             Commands.repeatingSequence(
-                Commands.waitUntil(aimedAtHub),
+                Commands.waitUntil(aimedAtHub).deadlineFor(shooter.spinUpForDistance(RobotState::hubDistance)),
                 shooter.shootAtDistance(RobotState::hubDistance, hopper, intake)
                     .until(() -> !aimedAtHub.getAsBoolean())
             )
