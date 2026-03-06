@@ -52,6 +52,8 @@ public class Mechanism3d extends SubsystemBase {
     }
 
     public void periodic() {
+        LoggedTracer.reset();
+
         Angle deltaIntake = intake.minus(previousIntake);
 
         // If outside the catch, add this intake delta to the hopper.
@@ -71,6 +73,8 @@ public class Mechanism3d extends SubsystemBase {
             pitchUp(intakeZero, intake),
             pitchUp(intakeZero, hopper)
         });
+
+        LoggedTracer.record("Mechanism3d");
     }
 
     public static final Mechanism3d measured = new Mechanism3d("Measured");

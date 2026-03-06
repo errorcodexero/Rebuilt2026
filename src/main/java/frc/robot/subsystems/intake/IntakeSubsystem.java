@@ -180,7 +180,7 @@ public class IntakeSubsystem extends SubsystemBase {
         return startEnd(this::eject, this::stopIntaking);
     }
 
-    public Command ejectSequence() {
+    public Command hopperEjectSequence() {
         return runEjectCmd().beforeStarting(
             deployCmd().unless(this::isIntakeDeployed)
         ).finallyDo(interrupted -> waiting());

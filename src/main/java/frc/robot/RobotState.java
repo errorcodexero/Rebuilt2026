@@ -14,6 +14,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.subsystems.shooter.ShooterConstants;
+import frc.robot.util.LoggedTracer;
 
 /**
  * Object that calculates robot-wide values that change periodically,
@@ -40,6 +41,8 @@ public class RobotState {
      * This method gets called periodically so that the variables can update.
      */
     public static void periodic() {
+        LoggedTracer.reset();
+        
         Pose2d currentPose = pose.get();
 
         Translation2d hubTranslation =
@@ -60,6 +63,8 @@ public class RobotState {
                 : ShooterConstants.Positions.redAllianceWall;
                 
         inAllianceZone = currentPose.getMeasureX().minus(allianceWall).abs(Meters) < ShooterConstants.Positions.spinUpZone.in(Meters);
+
+        LoggedTracer.record("RobotState");
     }
 
 

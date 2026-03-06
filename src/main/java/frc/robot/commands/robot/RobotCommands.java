@@ -100,4 +100,13 @@ public class RobotCommands {
                 )
             );
     }
+
+    /**
+     * Ejects balls from the shooter at a low velocity to get them out of the shooter without shooting them towards the target.
+     * @param shooter
+     * @return
+     */
+    public static Command ejectUp(Shooter shooter, Hopper hopper) {
+        return shooter.ejectUp().alongWith(hopper.ejectUp());
+    }
 }
