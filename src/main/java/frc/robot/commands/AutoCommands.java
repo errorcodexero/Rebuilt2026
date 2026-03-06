@@ -21,11 +21,11 @@ public class AutoCommands {
             ),
 
             // Added: timeout on shoot
-            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(5.0)),
+            RobotCommands.shoot(shooter, hopper, drive, intake, null, false).withTimeout(Seconds.of(5.0)),
             DriveCommands.followPathCommand("BottomToTop", mirroredX).deadlineFor(intake.intakeSequence()),
 
             // Added: timeout on shoot
-            RobotCommands.shoot(shooter, hopper, intake, drive, null, false).withTimeout(Seconds.of(5.0))
+            RobotCommands.shoot(shooter, hopper, drive, intake, null, false).withTimeout(Seconds.of(5.0))
         );
     }
 }
