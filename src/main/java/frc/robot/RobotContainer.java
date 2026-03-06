@@ -32,6 +32,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.Constants.RobotType;
+import frc.robot.commands.AutoCommands;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.robot.RobotCommands;
 import frc.robot.commands.robot.StartupCmd;
@@ -243,6 +244,8 @@ public class RobotContainer {
 
         // AutoModes
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
+
+        autoChooser_.addDefaultOption("Trench To Trench", AutoCommands.neutralZoneTrenchToTrench(drivebase_, intake_, hopper_, shooter_));
 
         autoChooser_.onChange(auto -> {
             System.out.println("Auto \"" + auto.getName() + "\" selected!");

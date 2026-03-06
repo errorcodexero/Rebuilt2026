@@ -13,12 +13,11 @@ import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.shooter.Shooter;
 
 public class AutoCommands {
-    public static Command NeutralZoneTrenchToTrench(Drive drive, IntakeSubsystem intake, Hopper hopper, Shooter shooter){
+    public static Command neutralZoneTrenchToTrench(Drive drive, IntakeSubsystem intake, Hopper hopper, Shooter shooter){
         return Commands.sequence(
-            Commands.parallel(
-                // Added: startup sequence to deploy intake and move balls from shooter to hopper
-                new StartupCmd(intake, hopper, shooter),
-                DriveCommands.initialFollowPathCommand(drive,"TopToBottom Trench").deadlineFor(intake.intakeSequence())
+            Commands.deadline(
+                DriveCommands.initialFollowPathCommand(drive,"TopToBottom Trench"),
+                new StartupCmd(intake, hopper, shooter).andThen(intake.intakeSequence())
             ),
 
             // Added: timeout on shoot
