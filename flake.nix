@@ -29,12 +29,18 @@
             tar -xzf $src/WPILib_Linux-${version}-artifacts.tar.gz jdk
             cp -r jdk/* $out/
           '';
+
+      deployScript =
+        let
+          source = builtins.readFile ./deptuning.sh;
+        in
+        pkgs.writeShellScriptBin "deploytuning" source;
     in
     {
       devShells.x86_64-linux.default = pkgs.mkShell {
-        name = "nix-simgui";
+        name = "relic";
 
-        packages = [ wpilibJdk pkgs.libGL ];
+        packages = [ wpilibJdk pkgs.libGL deployScript ];
 
         JAVA_HOME = wpilibJdk;
       };

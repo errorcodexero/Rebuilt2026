@@ -32,6 +32,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.Constants.RobotType;
+import frc.robot.commands.AutoCommands;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.robot.RobotCommands;
 import frc.robot.commands.robot.StartupCmd;
@@ -62,6 +63,7 @@ import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIO;
 import frc.robot.subsystems.vision.CameraIOLimelight4;
 import frc.robot.subsystems.vision.CameraIOPhotonSim;
+import frc.robot.subsystems.vision.PoseEstimateConsumer;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.MapleSimUtil;
 import frc.robot.util.Mechanism3d;
@@ -243,7 +245,11 @@ public class RobotContainer {
         // AutoModes
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
 
+        autoChooser_.addDefaultOption("Left Trench To Right Trench", AutoCommands.trenchToTrench(drivebase_, intake_, hopper_, shooter_, false));
+        autoChooser_.addOption("Right Trench To Left Trench", AutoCommands.trenchToTrench(drivebase_, intake_, hopper_, shooter_, true));
+
         autoChooser_.onChange(auto -> {
+            if (auto == null) return;
             System.out.println("Auto \"" + auto.getName() + "\" selected!");
             // Anything you may want to do when the auto is selected.
         });
