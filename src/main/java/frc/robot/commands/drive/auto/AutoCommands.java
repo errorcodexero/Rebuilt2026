@@ -16,17 +16,11 @@ public class AutoCommands {
 
             DriveCommands.initialFollowPathCommand(drive, "GoToCollectDepot",fieldside).deadlineFor(intake.intakeSequence()),
 
-            DriveCommands.followPathCommand("GoToShoot", fieldside),
-
-            shooter.shootCmd(hopper).withTimeout(2.5),
+            shooter.shootCmd(hopper).withTimeout(4),
 
             shooter.stopCmd(),
 
-            DriveCommands.followPathCommand("GoToOutpost",fieldside), 
-
-            Commands.waitSeconds(2),
-
-            DriveCommands.followPathCommand("OutpostToNZ",fieldside).deadlineFor(intake.intakeSequence())
+            DriveCommands.followPathCommand("DepotToNZ").deadlineFor(intake.intakeSequence())
         );
     }
 }

@@ -1,0 +1,54 @@
+{
+    "name": "Relic",
+    "rotations": [
+      {"axis": "x", "degrees": 90},
+      {"axis": "z", "degrees": 90}
+    ],
+    "position": [0, 0, 0],
+    "disableSimplification": true,
+    "dynamicColoring": true,
+    "cameras": [
+      {
+        "name": "Front Camera",
+        "rotations": [
+          {
+            "axis": "y",
+            "degrees": -20
+          }
+        ],
+        "position": [
+          0.3048,
+          0.12,
+          0.12
+        ],
+        "resolution": [
+          1280,
+          960
+        ],
+        "fov": 83
+      }
+    ],
+    "components": [
+      {
+        "zeroedRotations": [
+          {"axis": "x", "degrees": 90},
+          {"axis": "z", "degrees": 90}
+        ],
+        "zeroedPosition": [0.098, 0, -0.457]
+      },
+      {
+        "zeroedRotations": [
+          {"axis": "x", "degrees": 90},
+          {"axis": "z", "degrees": 90}
+        ],
+        "zeroedPosition": [-0.252, 0, -0.207]
+      },
+      {
+        "zeroedRotations": [
+          {"axis": "x", "degrees": 90},
+          {"axis": "z", "degrees": 90}
+        ],
+        "zeroedPosition": [-0.252, 0, -0.207]
+      }
+    ]
+  }
