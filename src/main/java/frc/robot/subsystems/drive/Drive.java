@@ -360,7 +360,7 @@ public class Drive extends SubsystemBase {
     }
 
     public Command resetGyroCmd() {
-        return resetGyroCmd(Rotation2d.kZero);
+        return resetGyroCmd(DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? Rotation2d.kZero : Rotation2d.fromDegrees(180.0));
     }
     
     public Command stopWithXCmd() {
