@@ -1,6 +1,5 @@
 package frc.robot.subsystems.intake; 
 
-import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -9,22 +8,28 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
-import frc.robot.util.MapleSimUtil;
+import frc.robot.util.LoggedTracer;
 import frc.robot.util.Mechanism3d;
 
 public class IntakeSubsystem extends SubsystemBase {
     private final IntakeIO io; 
     private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
-    private final Angle pivotDeployedAngle = IntakeConstants.deployedAngle;
-    private final Angle pivotStowedAngle = IntakeConstants.stowedAngle;
 
-    private Angle setpointAngle = pivotStowedAngle;
+    private final Alert pivotAlert =
+        new Alert("The intake pivot is disconnected!", AlertType.kError);
+
+    private final Alert rollerAlert =
+        new Alert("The intake roller is disconnected!", AlertType.kError);
+
+    private Angle setpointAngle = IntakeConstants.stowedAngle;
 
     public IntakeSubsystem(IntakeIO io) {
         this.io = io;
@@ -32,8 +37,13 @@ public class IntakeSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        LoggedTracer.reset();
+
         io.updateInputs(inputs);
         Logger.processInputs("Intake", inputs);
+
+        pivotAlert.set(!inputs.pivotConnected);
+        rollerAlert.set(!inputs.rollerConnected);
 
         Logger.recordOutput("Intake/PivotSetpoint", setpointAngle);
 
@@ -41,8 +51,10 @@ public class IntakeSubsystem extends SubsystemBase {
         Mechanism3d.setpoints.setIntake(setpointAngle);
 
         if (Constants.getMode() == Mode.SIM) {
-            MapleSimUtil.setIntakeRunning(isIntakeDeployed() && inputs.RollerAngularVelocity.gt(RadiansPerSecond.zero()));
+            // MapleSimUtil.setIntakeRunning(isIntakeDeployed() && inputs.RollerAngularVelocity.gt(RadiansPerSecond.zero()));
         }
+
+        LoggedTracer.record("IntakePeriodic");
     }
 
     //Intake control methods
@@ -50,7 +62,7 @@ public class IntakeSubsystem extends SubsystemBase {
         io.setRollerVoltage(volts);
     }
 
-    private void setPivotAngle(Angle angle) {
+    public void setPivotAngle(Angle angle) {
         setpointAngle = angle;
         io.setPivotAngle(angle);
     }
@@ -59,7 +71,11 @@ public class IntakeSubsystem extends SubsystemBase {
      * Runs the roller.
      */
     private void startIntaking() {
-        io.setRollerVoltage(IntakeConstants.rollerCollectVoltage);
+        io.setRollerVelocity(IntakeConstants.rollerCollectVelocity);
+    }
+
+    private void startShootIntake() {
+        io.setRollerVelocity(IntakeConstants.rollerShootVelocity) ;
     }
 
     /**
@@ -91,22 +107,30 @@ public class IntakeSubsystem extends SubsystemBase {
         setPivotAngle(IntakeConstants.waitingAngle);
     }
     
-
     public Angle getPivotAngle(){
         return inputs.PivotAngle;
     }
 
     public boolean isIntakeDeployed() {
-        return isPivotAtAngle(pivotDeployedAngle);
+        return isPivotAtAngle(IntakeConstants.deployedAngle);
     }
 
+    public boolean isIntakeWaiting() {
+        return isPivotAtAngle(IntakeConstants.waitingAngle);
+    }    
+
     public boolean isIntakeStowed(){
-        return isPivotAtAngle(pivotStowedAngle);
+        return isPivotAtAngle(IntakeConstants.stowedAngle);
     }
 
     public boolean isPivotAtAngle(Angle angle){
-        return inputs.PivotAngle.isNear(angle, IntakeConstants.pivotTolerance);
+        var ret = inputs.PivotAngle.isNear(angle, IntakeConstants.pivotTolerance);
+        return ret;
     }
+
+    public boolean isPivotAtSetpoint() {
+        return isPivotAtAngle(setpointAngle);
+    }   
 
     /////////////
     ///Commands//
@@ -117,17 +141,7 @@ public class IntakeSubsystem extends SubsystemBase {
      * @return
      */
     public Command stowCmd() {
-        return runOnce(() -> stow())
-            .andThen(Commands.waitUntil(() -> isIntakeStowed())
-            .withTimeout(2)).withName("Stow Intake");
-    }
-
-    /**
-     * Command that stops the rollers, mainly for in automodes
-     * @return
-     */
-    public Command stopIntake(){
-        return runOnce(() -> stopIntaking()).withName("Stop Rollers");
+        return runOnce(this::stow);
     }
 
     /**
@@ -135,17 +149,13 @@ public class IntakeSubsystem extends SubsystemBase {
      * @return
      */
     public Command deployCmd() {
-        return startDeployCmd()
-            .andThen(Commands.waitUntil(this::isIntakeDeployed)
-            .withTimeout(2)).withName("Deploy Intake");
+        var ret = runOnce(this::deploy) ;
+        ret.setName("IntakeDeployCmd");
+        return ret ;
     }
 
-    /**
-     * Command that starts the deployment of the intake, but doesnt wait until its done. 
-     * @return
-     */
-    public Command startDeployCmd() {
-        return runOnce(this::deploy);
+    public Command waitCommand() {
+        return runOnce(this::waiting);
     }
 
     /**
@@ -154,6 +164,10 @@ public class IntakeSubsystem extends SubsystemBase {
      */
     public Command runIntakeCmd() {
         return startEnd(this::startIntaking, this::stopIntaking);
+    }
+
+    private Command runShootIntakeCmd() {
+        return startEnd(this::startShootIntake, this::stopIntaking);
     }
 
     public Command intakeSequence() {
@@ -166,10 +180,22 @@ public class IntakeSubsystem extends SubsystemBase {
         return startEnd(this::eject, this::stopIntaking);
     }
 
-    public Command ejectSequence() {
+    public Command hopperEjectSequence() {
         return runEjectCmd().beforeStarting(
             deployCmd().unless(this::isIntakeDeployed)
         ).finallyDo(interrupted -> waiting());
+    }
+
+    private Command moveIntakeWhileShooting() {
+        return new MoveIntakeCmd(this, IntakeConstants.shootAngles, IntakeConstants.angleChangeDelay)
+            .finallyDo(interruped -> waiting());
+    }
+
+    public Command enableShootMode() {
+        return new ParallelCommandGroup(
+            runShootIntakeCmd(),
+            moveIntakeWhileShooting()
+        );
     }
 
     ////////////////////////////

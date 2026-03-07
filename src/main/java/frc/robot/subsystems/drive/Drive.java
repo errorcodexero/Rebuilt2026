@@ -51,6 +51,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.Alert;
@@ -64,7 +65,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.generated.CompTunerConstants;
 import frc.robot.util.LocalADStarAK;
-import frc.robot.util.MapleSimUtil;
+import frc.robot.util.LoggedTracer;
 
 public class Drive extends SubsystemBase {
     // These Constants should be the same for every drivebase, so just use the comp bot constants.
@@ -171,8 +172,8 @@ public class Drive extends SubsystemBase {
             this::getChassisSpeeds,
             this::runVelocity,
             new PPHolonomicDriveController(
-                new PIDConstants(16.0, 0.0, 0.8),           // 8 - original     13, 0.5
-                new PIDConstants(16.0, 0.0, 0.5)),          // 8 - original
+                new PIDConstants(8.0, 0.0, 0.0),           // 8 - original     13, 0.5
+                new PIDConstants(8.0, 0.0, 0.0)),          // 8 - original
             PP_CONFIG,
             () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
             this
@@ -207,6 +208,8 @@ public class Drive extends SubsystemBase {
 
     @Override
     public void periodic() {
+        LoggedTracer.reset();
+
         odometryLock.lock(); // Prevents odometry updates while reading data
         gyroIO.updateInputs(gyroInputs);
         Logger.processInputs("Drive/Gyro", gyroInputs);
@@ -265,6 +268,8 @@ public class Drive extends SubsystemBase {
 
         ChassisSpeeds speed = getChassisSpeeds();
         Logger.recordOutput("Drive/LinearVelocity", Math.hypot(speed.vxMetersPerSecond, speed.vyMetersPerSecond));
+
+        LoggedTracer.record("DrivePeriodic");
     }
     
     /**
@@ -362,20 +367,14 @@ public class Drive extends SubsystemBase {
         return runOnce(() -> stopWithX());
     }
     
-    public Command stopCmd() {
-        return runOnce(() -> stop());
-    }
-    
     public Command runVelocityCmd(ChassisSpeeds speeds) {
-        return run(() -> {
+        return startEnd(() -> {
             runVelocity(speeds);
-        });
+        }, this::stop);
     }
     
     public Command runVelocityCmd(LinearVelocity x, LinearVelocity y, AngularVelocity omega) {
-        return run(() -> {
-            runVelocity(x, y, omega);
-        });
+        return runVelocityCmd(new ChassisSpeeds(x, y, omega));
     }
     
     /** Returns the module states (turn angles and drive velocities) for all of the modules. */
@@ -444,6 +443,11 @@ public class Drive extends SubsystemBase {
     /** Returns the current odometry rotation. */
     public Rotation2d getRotation() {
         return getPose().getRotation();
+    }
+
+    /** Whether the rotation of the robot is near to a target. */
+    public boolean rotationIsNear(Rotation2d target, Angle tolerance) {
+        return target.getMeasure().isNear(getRotation().getMeasure(), tolerance);
     }
     
     /** Resets the current odometry pose. */

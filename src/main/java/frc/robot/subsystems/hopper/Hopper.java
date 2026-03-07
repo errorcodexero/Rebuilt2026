@@ -1,12 +1,14 @@
 package frc.robot.subsystems.hopper;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -17,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.util.LoggedTracer;
 import frc.robot.util.MapleSimUtil;
 
 public class Hopper extends SubsystemBase {
@@ -36,6 +39,8 @@ public class Hopper extends SubsystemBase {
     
     @Override
     public void periodic() {
+        LoggedTracer.reset();
+
         io.updateInputs(inputs);
         Logger.processInputs("Hopper", inputs);
 
@@ -56,10 +61,16 @@ public class Hopper extends SubsystemBase {
         Logger.recordOutput("Hopper/FeederGoal", feederGoal);
         Logger.recordOutput("Hopper/ScramblerAtGoal", isScramblerAtGoal());
         Logger.recordOutput("Hopper/FeederAtGoal", isFeederAtGoal());
+
+        LoggedTracer.record("HopperPeriodic");
     }
     
     // Scrambler control
     private void setScramblerVelocity(AngularVelocity velocity) {
+        if (velocity.equals(DegreesPerSecond.zero())) {
+            setScramblerVoltage(Volts.zero());
+            return;
+        }
         scramblerGoal = velocity;
         io.setScramblerVelocity(velocity);
     }
@@ -75,6 +86,10 @@ public class Hopper extends SubsystemBase {
     
     // Feeder control
     private void setFeederVelocity(AngularVelocity velocity) {
+        if (velocity.equals(DegreesPerSecond.zero())) {
+            setFeederVoltage(Volts.zero());
+            return;
+        }
         feederGoal = velocity;
         io.setFeederVelocity(velocity);
     }
@@ -101,7 +116,25 @@ public class Hopper extends SubsystemBase {
      */
     public Command idleScrambler() {
         return startEnd(
-            () -> setScramblerVelocity(HopperConstants.scramblerActiveVelocity.times(0.15)),
+            () -> setScramblerVelocity(HopperConstants.scramblerIdleVelocity),
+            this::stopScrambler
+        );
+    }
+
+    public Command collectScrambler() {
+        return startEnd(
+            () -> setScramblerVelocity(HopperConstants.scramblerCollectVelocity),
+            this::stopScrambler
+        );
+    }    
+
+    /**
+     * Runs the scrambler at backwards to move balls out of the shooter/feeder
+     * @return
+     */
+    public Command reverseScrambler() {
+        return startEnd(
+            () -> setScramblerVelocity(HopperConstants.scramblerShootingVelocity.times(-1)),
             this::stopScrambler
         );
     }
@@ -120,11 +153,22 @@ public class Hopper extends SubsystemBase {
     }
 
     /**
+     * Runs the feeder and scrambler at supplied speeds.
+     * @return
+     */
+    public Command dynamicFeed(Supplier<AngularVelocity> feeder, Supplier<AngularVelocity> scrambler) {
+        return runEnd(() -> {
+            setFeederVelocity(feeder.get());
+            setScramblerVelocity(scrambler.get());
+        }, this::stopAll);
+    }
+
+    /**
      * Runs the scrambler at its active speed, and the feeder.
      * @return
      */
     public Command forwardFeed() {
-        return feed(HopperConstants.scramblerActiveVelocity, HopperConstants.feedingVelocity);
+        return feed(HopperConstants.feedingShootingVelocity, HopperConstants.scramblerShootingVelocity);
     }
     
     /**
@@ -132,7 +176,23 @@ public class Hopper extends SubsystemBase {
      * @return
      */
     public Command reverseFeed() {
-        return feed(HopperConstants.scramblerActiveVelocity.times(-1), HopperConstants.feedingVelocity.times(-1));
+        return feed(HopperConstants.feedingShootingVelocity.unaryMinus(), HopperConstants.scramblerShootingVelocity.unaryMinus());
+    }
+
+    /**
+     * Runs the scrambler in reverse for before our shooting starts.
+     * @return
+     */
+    public Command preShoot() {
+        return feed(DegreesPerSecond.zero(), HopperConstants.scramblerBeforeShootingVelocity.unaryMinus());
+    }
+
+    /**
+     * Runs the feeder in reverse to eject balls from the shooter without shooting them towards the target.
+     * @return
+     */
+    public Command ejectUp() {
+        return startEnd(() -> setFeederVelocity(HopperConstants.feedingEjectVelocity), this::stopAll);
     }
     
     // Readbacks + state checks
@@ -151,6 +211,11 @@ public class Hopper extends SubsystemBase {
     public double getFeederCurrent() {
         return inputs.feederCurrent.in(Amps);
     }
+
+    @AutoLogOutput
+    public double getTargetPercent() {
+        return inputs.feederVelocity.div(HopperConstants.feedingShootingVelocity).magnitude() ;
+    }
     
     public boolean isScramblerAtGoal() {
         return inputs.scramblerVelocity.isNear(scramblerGoal, RotationsPerSecond.one());
@@ -164,28 +229,4 @@ public class Hopper extends SubsystemBase {
         return runEnd(() -> setFeederVoltage(v.get()), this::stopFeeder);
     }
     
-    public Command setFeederVoltageCommand(Voltage voltage) {
-        return runOnce(() -> setFeederVoltage(voltage))
-            .withName("Hopper.SetFeederVoltage");
-    }
-    
-    public Command setScramblerVoltageCommand(Voltage voltage) {
-        return runOnce(() -> setScramblerVoltage(voltage))
-            .withName("Hopper.SetScramblerVoltage");
-    }
-    
-    public Command stopFeederCommand() {
-        return runOnce(this::stopFeeder)
-            .withName("Hopper.StopFeeder");
-    }
-    
-    public Command stopScramblerCommand() {
-        return runOnce(this::stopScrambler)
-            .withName("Hopper.StopScrambler");
-    }
-    
-    public Command stopAllCommand() {
-        return runOnce(this::stopAll)
-            .withName("Hopper.StopAll");
-    }
 }

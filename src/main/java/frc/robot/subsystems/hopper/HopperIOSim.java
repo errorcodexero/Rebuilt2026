@@ -1,4 +1,5 @@
 package frc.robot.subsystems.hopper;
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -15,7 +16,9 @@ public class HopperIOSim extends HopperIOTalonFX{
     private double feederGearRatio;
     private double scramblerGearRatio;
     
-    public HopperIOSim() {
+    public HopperIOSim(CANBus canbus) {
+        super(canbus) ;
+
         feederGearRatio = HopperConstants.feederGearRatio;
         scramblerGearRatio = HopperConstants.scramblerGearRatio;
         feederSim = new DCMotorSim(

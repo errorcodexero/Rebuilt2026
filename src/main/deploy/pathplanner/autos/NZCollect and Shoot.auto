@@ -7,13 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "A1_TopToBottomTrench"
+            "pathName": "a2TrenchToNZ"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "A1_BottomToTop"
+            "pathName": "a2NZtoShoot1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "a2Shoot1toHub"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "a2HubToShoot2"
           }
         }
       ]

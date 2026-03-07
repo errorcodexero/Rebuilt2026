@@ -9,14 +9,21 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -25,16 +32,27 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Mode;
+import frc.robot.RobotState;
+import frc.robot.commands.drive.DriveCommands;
+import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.hopper.Hopper;
+import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.shooter.ShooterTuning.ShooterParams;
+import frc.robot.util.LoggedTracer;
 import frc.robot.util.MapleSimUtil;
 import frc.robot.util.Mechanism3d;
+
 
 public class Shooter extends SubsystemBase {
     
@@ -52,13 +70,26 @@ public class Shooter extends SubsystemBase {
     private AngularVelocity shooterTarget = RadiansPerSecond.zero();
     private Angle hoodTarget = Radians.zero();
 
+    @AutoLogOutput
+    private int tuningIndex_ = 0 ;
+    private List<ShooterTuning> tunings_ = new ArrayList<ShooterTuning>() ;
+
     public Shooter(ShooterIO ioShooter, HoodIO ioHood) {
         this.shooterIO = ioShooter;
         this.hoodIO = ioHood;
-    }
 
+        loadTunings();
+        if (tunings_.isEmpty()) {
+            throw new RuntimeException("No shooter tunings found! Please add a json file to the tuning folder with shooter values.");
+        }
+
+        tuningIndex_ = 0 ;
+    }    
+    
     @Override
     public void periodic() {
+        LoggedTracer.reset();
+
         shooterIO.updateInputs(shooterInputs);
         Logger.processInputs("Shooter", shooterInputs);
         hoodIO.updateInputs(hoodInputs);
@@ -73,12 +104,27 @@ public class Shooter extends SubsystemBase {
             MapleSimUtil.setShooterVelocity(shooterInputs.wheelVelocity);
             MapleSimUtil.setHoodAngle(hoodInputs.position);
         }
-        
+
         Logger.recordOutput("Shooter/VelocitySetPoint", shooterTarget);
         Logger.recordOutput("Shooter/HoodSetPoint", hoodTarget);
+
+        LoggedTracer.record("ShooterPeriodic");
     }
 
     // Shooter Methods
+
+    private void loadTunings() {
+        File tuningDir = new File(Filesystem.getDeployDirectory(), "tuning") ;
+        if (tuningDir.isDirectory()) {
+            File[] jsonFiles = tuningDir.listFiles((dir, name) -> name.endsWith(".json")) ;
+            if (jsonFiles != null) {
+                for (File f : jsonFiles) {
+                    String name = f.getName().replace(".json", "") ;
+                    tunings_.add(new ShooterTuning(name)) ;
+                }
+            }
+        }
+    }
 
     private void setShooterVelocity(AngularVelocity vel) {
         shooterTarget = vel;
@@ -110,8 +156,7 @@ public class Shooter extends SubsystemBase {
     public Current getShooterCurrent() {
         return (shooterInputs.shooter1Current)
             .plus(shooterInputs.shooter2Current)
-            .plus(shooterInputs.shooter3Current)
-            .plus(shooterInputs.shooter4Current);
+            .plus(shooterInputs.shooter3Current);
     }
 
     private void setHoodAngle(Angle pos) {
@@ -126,15 +171,26 @@ public class Shooter extends SubsystemBase {
         setHoodAngle(hoodTarget);
     }
 
-    /**
-     * Shoot balls from the shooter until the command ends.
-     * @return
-     */
-    public Command shootCmd(Hopper hopper) {
-        return Commands.parallel(
-            runDynamicSetpoints(() -> RPM.of(5000), () -> Degrees.of(30)),
-            hopper.forwardFeed()
-        );
+    private ShooterTuning getTuning() {
+        return tunings_.get(tuningIndex_);
+    }
+
+    // Commands
+    public Command cycleTuning() {
+        return runOnce(() -> {
+            tuningIndex_ = (tuningIndex_ + 1) % tunings_.size();
+        }).ignoringDisable(true);
+    }
+
+    public Command reloadTunings() {
+        return runOnce(() -> {
+            tunings_.clear();
+            loadTunings();
+            if (tunings_.isEmpty()) {
+                throw new RuntimeException("No shooter tunings found! Please add a json file to the tuning folder with shooter values.");
+            }
+            tuningIndex_ = 0;
+        }).ignoringDisable(true);
     }
 
     /**
@@ -144,26 +200,38 @@ public class Shooter extends SubsystemBase {
      * @return A command that does so.
      */
     public Command awaitShooting(Supplier<Pose2d> robotPose) {
-        return runDynamicSetpoints(() -> RadiansPerSecond.zero(), () -> {
-            Pose2d pose = robotPose.get();
-            Pose2d nearestTrench = pose.nearest(FieldConstants.trenches);
-            Distance nearestDistance = Meters.of(pose.getTranslation().getDistance(nearestTrench.getTranslation()));
+        return runDynamicSetpoints(
+            // () -> RotationsPerSecond.of(
+            //     RobotState.inAllianceZone()
+            //         ? getTuning().getShooterParams(RobotState.hubDistance().in(Meters)).velocity
+            //         : 0.0
+            // ),      
+            () -> RotationsPerSecond.of(0.0) ,      
+            () -> {
+                Pose2d pose = robotPose.get();
+                Pose2d nearestTrench = pose.nearest(FieldConstants.trenches);
+                Distance nearestDistance = Meters.of(pose.getTranslation().getDistance(nearestTrench.getTranslation()));
 
-            if (nearestDistance.lte(ShooterConstants.allowedTrenchDistance)) {
-                return Degrees.zero();
+                if (nearestDistance.lte(ShooterConstants.allowedTrenchDistance)) {
+                    return Degrees.zero();
+                }
+
+                var params = getTuning().getShooterParams(RobotState.hubDistance().in(Meters));
+                return Degrees.of(params.hood);
             }
-
-            return Degrees.of(45); // TODO: replace this with whatever determines shooter angle
-        });
+        );
     }
 
     public Command runToSetpointsCmd(AngularVelocity vel, Angle pos) {
-        return runOnce(() -> setSetpoints(vel, pos)).andThen(Commands.waitUntil(this::isShooterReady));
+        return startEnd(() -> setSetpoints(vel, pos), this::stopShooter).withName("Set Shooter Setpoints");
     }
 
     public Command runToVelocityCmd(AngularVelocity vel) {
-        return runOnce(() -> setShooterVelocity(vel))
-            .andThen(Commands.waitUntil(this::isShooterReady)).withName("Set Shooter Velocity");
+        return startEnd(() -> setShooterVelocity(vel), this::stopShooter).withName("Set Shooter Velocity");
+    }
+
+    public Command requestToVelocityCmd(AngularVelocity vel) {
+        return startEnd(() -> setShooterVelocity(vel), this::stopShooter);
     }
 
     public Command stopCmd() {
@@ -180,6 +248,68 @@ public class Shooter extends SubsystemBase {
     }
 
     /**
+     * Calculates Velocity and Hood Angle based on distance and Shoots
+     * 
+     * 
+     */
+    public Command shootAtDistance(Supplier<Distance> distance, Hopper hopper, IntakeSubsystem intake) {
+        Supplier<ShooterParams> shooterParams =
+            () -> getTuning().getShooterParams(distance.get().in(Meters));
+
+        return Commands.parallel(
+            run(() -> setSetpoints(
+                RotationsPerSecond.of(shooterParams.get().velocity).times(ShooterConstants.shooterVelocityMultiplierWhileFeederSlow),
+                Degrees.of(shooterParams.get().hood)
+            ))
+            .alongWith(Commands.runOnce(() -> Logger.recordOutput("Shooting/Boost", true)))
+            .until(() -> hopper.getTargetPercent() > 0.9)
+            .andThen(runDynamicSetpoints(
+                () -> RotationsPerSecond.of(shooterParams.get().velocity),
+                () -> Degrees.of(shooterParams.get().hood)
+            )
+            .alongWith(Commands.runOnce(() -> Logger.recordOutput("Shooting/Boost", false)))),
+
+            hopper.preShoot().until(this::isShooterReady).andThen(hopper.forwardFeed()),
+
+            intake.enableShootMode()
+        );
+    }
+
+    /**
+     * Spins the shooter up to shoot, without actually shooting.
+     * @param distance
+     * @return
+     */
+    public Command spinUpForDistance(Supplier<Distance> distance) {
+        Supplier<ShooterParams> shooterParams =
+            () -> getTuning().getShooterParams(distance.get().in(Meters));
+
+        return runDynamicSetpoints(
+            () -> RotationsPerSecond.of(shooterParams.get().velocity),
+            () -> Degrees.of(shooterParams.get().hood)
+        );
+    }
+
+    /**
+     * Ejects balls from the shooter at a low velocity to get them out of the shooter without shooting them towards the target.
+     * @return
+     */
+    public Command ejectUp() {
+        return startEnd(() -> setShooterVelocity(ShooterConstants.ejectVelocity), this::stopShooter);
+    }
+
+    /**
+     * Idles the shooter at 0 velocity and the hood at the parked position.
+     * @return
+     */
+    public Command idleCommand() {
+        return runToSetpointsCmd(
+            RotationsPerSecond.of(0.0),
+            ShooterConstants.hoodParkedAngle
+        );
+    }
+
+    /**
      * Runs supplied setpoints until the command ends, then stops.
      * @param vel
      * @param pos
@@ -189,7 +319,12 @@ public class Shooter extends SubsystemBase {
         return runEnd(() -> setSetpoints(vel.get(), pos.get()), this::stopShooter);
     }
 
-    public Command setDynamicVoltage(Supplier<Voltage> voltage) {
+    /**
+     * Runs supplied voltage until the command ends, then stops.
+     * @param voltage
+     * @return
+     */
+    public Command runDynamicVoltage(Supplier<Voltage> voltage) {
         return runEnd(() -> setShooterVoltage(voltage.get()), this::stopShooter);
     }   
 
@@ -216,13 +351,17 @@ public class Shooter extends SubsystemBase {
     }
 
     public Command testCommand(Hopper hopper) {
-        LoggedNetworkNumber shooterVelocity = new LoggedNetworkNumber("Tuning/Shooter/TargetShooterRPS", 0);
-        LoggedNetworkNumber hoodAngle = new LoggedNetworkNumber("Tuning/Shooter/TargetHoodAngle", ShooterConstants.SoftwareLimits.hoodMinAngle);
-        LoggedNetworkNumber feederVoltage = new LoggedNetworkNumber("Tuning/Shooter/Feeder", 0.0) ;
+        LoggedNetworkNumber shooterVelocity = new LoggedNetworkNumber("/Tuning/Shooter/TargetShooterRPS", 0);
+        LoggedNetworkNumber hoodAngle = new LoggedNetworkNumber("/Tuning/Shooter/TargetHoodAngle", ShooterConstants.hoodMinAngle.in(Degrees));
+        LoggedNetworkNumber feederVelocity = new LoggedNetworkNumber("/Tuning/Shooter/FeederRPS", 40.0);
+        LoggedNetworkNumber scramblerVelocity = new LoggedNetworkNumber("/Tuning/Shooter/ScramblerRPS", 10.0);
         
         return Commands.parallel(
             runDynamicSetpoints(() -> RotationsPerSecond.of(shooterVelocity.get()), () -> Degrees.of(hoodAngle.get())),
-            hopper.dynamicFeederVoltageCommand(() -> Volts.of(feederVoltage.get()))
+            hopper.dynamicFeed(
+                () -> RotationsPerSecond.of(feederVelocity.get()),
+                () -> RotationsPerSecond.of(scramblerVelocity.get())
+            )
         );
     }
 
@@ -241,5 +380,113 @@ public class Shooter extends SubsystemBase {
                 hoodIO.goToAngle(Degrees.zero());
             });
         });
+    }
+
+
+    /**
+     * Shoot balls from the shooter until the command ends.
+     * @return
+     */
+    public Command shootCmd(Hopper hopper) {
+        return Commands.parallel(
+            runDynamicSetpoints(() -> RPM.of(5000), () -> Degrees.of(30)),
+            hopper.forwardFeed()
+        );
+    }
+
+    public Command ferryToOutpost(Drive drive, Hopper hopper, IntakeSubsystem intake, DoubleSupplier xSupplier, DoubleSupplier ySupplier){
+        return new ConditionalCommand(
+            Commands.parallel(
+                DriveCommands.joystickDriveAtAngle(
+                    drive,
+                    ()-> 0,
+                    () -> 0,
+                    () -> {
+                        Translation2d ferryTarget = ShooterConstants.FerryPositions.blueOutpostTarget;
+
+                        var targetTranslation= ferryTarget.minus(drive.getPose().getTranslation());
+                        var targetRotation= new Rotation2d(targetTranslation.getX(), targetTranslation.getY());
+                        return targetRotation;
+                    }
+                ),
+                shootCmd(hopper)
+            ),
+            Commands.parallel(
+                DriveCommands.joystickDriveAtAngle(
+                    drive,
+                    ()-> 0,
+                    () -> 0,
+                    () -> {
+                        Translation2d ferryTarget= ShooterConstants.FerryPositions.redOutpostTarget;
+
+                        var targetTranslation= ferryTarget.minus(drive.getPose().getTranslation());
+                        var targetRotation= new Rotation2d(targetTranslation.getX(), targetTranslation.getY());
+                        return targetRotation;
+                    }
+                ),
+                shootCmd(hopper)
+            ),
+
+            () -> {
+                if(DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue){
+                    return true;
+                }
+                return false;
+            }
+        );
+    }
+
+    public Command ferryOnMove(Drive drive, Hopper hopper, DoubleSupplier xSupplier, DoubleSupplier ySupplier, IntakeSubsystem intake){
+        return new ConditionalCommand(
+
+            Commands.parallel(
+                DriveCommands.joystickDriveAtAngle(
+                    drive,
+                    xSupplier,
+                    ySupplier,
+                    () -> {
+                        Translation2d ferryTarget= 
+                        DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                        ? ShooterConstants.FerryPositions.blueOutpostTarget
+                        : ShooterConstants.FerryPositions.redOutpostTarget;
+
+                        var targetTranslation= ferryTarget.minus(drive.getPose().getTranslation());
+                        var targetRotation= new Rotation2d(targetTranslation.getX(), targetTranslation.getY());
+                        return targetRotation;
+                }),
+                intake.intakeSequence(),
+                shootCmd(hopper)
+            ),
+            
+            Commands.parallel(
+                DriveCommands.joystickDriveAtAngle(
+                    drive,
+                    xSupplier,
+                    ySupplier,
+                    () -> {
+                        Translation2d ferryTarget= 
+                        DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                        ? ShooterConstants.FerryPositions.blueOutpostTarget
+                        : ShooterConstants.FerryPositions.redOutpostTarget;
+
+                        var targetTranslation= ferryTarget.minus(drive.getPose().getTranslation());
+                        var targetRotation= new Rotation2d(targetTranslation.getX(), targetTranslation.getY());
+                        return targetRotation;
+                }),
+                intake.intakeSequence(),
+                shootCmd(hopper)
+            ),
+
+            () -> {
+                var robotPose= drive.getPose().getTranslation();
+
+                if(robotPose.getY()<3){
+                    return true;
+                } else if (robotPose.getY()>5){
+                    return false;
+                } 
+                return false;
+            }
+        );
     }
 }

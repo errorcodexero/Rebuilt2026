@@ -25,7 +25,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "ShootToClimb"
+            "pathName": "ShootToOutpost"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "OutpostToNZ"
           }
         }
       ]

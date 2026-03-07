@@ -15,6 +15,7 @@ import java.util.Arrays;
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
 import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -22,13 +23,18 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.Constants.RobotType;
+import frc.robot.commands.AutoCommands;
 import frc.robot.commands.drive.DriveCommands;
-import frc.robot.commands.drive.auto.AutoCommands;
+import frc.robot.commands.robot.RobotCommands;
+import frc.robot.commands.robot.StartupCmd;
 import frc.robot.generated.CompTunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -40,8 +46,10 @@ import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.subsystems.hopper.HopperIO;
 import frc.robot.subsystems.hopper.HopperIOSim;
+import frc.robot.subsystems.hopper.HopperIOTalonFX;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOSim;
+import frc.robot.subsystems.intake.IntakeIOTalonFX;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.shooter.HoodIO;
 import frc.robot.subsystems.shooter.HoodIOServo;
@@ -50,12 +58,11 @@ import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterIOSim;
 import frc.robot.subsystems.shooter.ShooterIOTalonFX;
-import frc.robot.subsystems.thriftyclimb.ThriftyClimb;
-import frc.robot.subsystems.thriftyclimb.ThriftyClimbIOSim;
-import frc.robot.subsystems.thriftyclimb.ThriftyClimbIO;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIO;
+import frc.robot.subsystems.vision.CameraIOLimelight4;
 import frc.robot.subsystems.vision.CameraIOPhotonSim;
+import frc.robot.subsystems.vision.PoseEstimateConsumer;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.MapleSimUtil;
 import frc.robot.util.Mechanism3d;
@@ -68,7 +75,6 @@ public class RobotContainer {
     private IntakeSubsystem intake_;
     private Shooter shooter_;
     private Hopper hopper_;
-    private ThriftyClimb climb_;
 
     private CANBus roborioCANBus = new CANBus();
 
@@ -78,7 +84,8 @@ public class RobotContainer {
 
     // Trigger Devices
     private final CommandXboxController gamepad_ = new CommandXboxController(0);
-
+    private final CommandXboxController operatorGamepad_ = new CommandXboxController(2);
+    
     public RobotContainer() {
         /**
          * Subsystem setup
@@ -126,17 +133,15 @@ public class RobotContainer {
 
                     vision_ = new AprilTagVision(
                         drivebase_::addVisionMeasurement,
-                        new CameraIOPhotonSim("front", VisionConstants.frontTransform, MapleSimUtil::getPosition, true)
+                        new CameraIOPhotonSim("front", VisionConstants.frontTransform, MapleSimUtil::getPosition, true),
+                        new CameraIOPhotonSim("backleft", VisionConstants.backLeftTransform, MapleSimUtil::getPosition, true),
+                        new CameraIOPhotonSim("backright", VisionConstants.backRightTransform, MapleSimUtil::getPosition, true)
                     );
 
-                    intake_= new IntakeSubsystem(new IntakeIOSim());
-
-                    shooter_ = new Shooter(new ShooterIOSim(), new HoodIOSim());
-
-                    hopper_ = new Hopper(new HopperIOSim());
+                    intake_= new IntakeSubsystem(new IntakeIOSim(roborioCANBus));
+                    shooter_ = new Shooter(new ShooterIOSim(roborioCANBus), new HoodIOSim());
+                    hopper_ = new Hopper(new HopperIOSim(roborioCANBus));
                     
-                    climb_ = new ThriftyClimb(new ThriftyClimbIOSim());
-
                     break;
 
                 case COMPETITION:
@@ -153,6 +158,18 @@ public class RobotContainer {
 
                     shooter_ = new Shooter(new ShooterIOTalonFX(roborioCANBus), new HoodIOServo());
                     // hopper_ = new Hopper(new HopperIOSim());
+
+                    vision_ = new AprilTagVision(
+                        drivebase_::addVisionMeasurement,
+                        new CameraIOLimelight4("limelight-front", drivebase_::getRotation),
+                        new CameraIOLimelight4("limelight-bl", drivebase_::getRotation),
+                        new CameraIOLimelight4("limelight-br", drivebase_::getRotation)
+                    );
+
+                    shooter_ = new Shooter(new ShooterIOTalonFX(roborioCANBus), new HoodIOServo());
+
+                    hopper_ = new Hopper(new HopperIOTalonFX(roborioCANBus));
+                    intake_ = new IntakeSubsystem(new IntakeIOTalonFX(roborioCANBus));
                    
                     break;
             }
@@ -181,11 +198,11 @@ public class RobotContainer {
 
         if (vision_ == null) {
             int numCams = switch (Constants.getRobot()) {
-                default -> 1;
+                default -> 3;
             };
 
             CameraIO[] cams = new CameraIO[numCams];
-            Arrays.fill(cams, new CameraIO() {});
+            Arrays.setAll(cams, i -> new CameraIO() {});
 
             vision_ = new AprilTagVision(
                 drivebase_::addVisionMeasurement,
@@ -205,8 +222,9 @@ public class RobotContainer {
             hopper_ = new Hopper(new HopperIO() {});
         }
 
-        if (climb_ == null) {
-            climb_ = new ThriftyClimb(new ThriftyClimbIO() {});
+        // Force Load Apriltag Layout
+        for (var tag : FieldConstants.layout.getTags()) {
+            System.out.println("Tag Loaded: " + tag.ID);
         }
 
         DriveCommands.configure(
@@ -215,6 +233,8 @@ public class RobotContainer {
             () -> -gamepad_.getLeftX(),
             () -> -gamepad_.getRightX()
         );
+
+        RobotState.initialize(drivebase_::getPose);
 
         // Initialize the visualizers.
         Mechanism3d.measured.zero();
@@ -227,9 +247,14 @@ public class RobotContainer {
 
         // AutoModes
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
-    
-        autoChooser_.addDefaultOption( "Depot, Shoot, Climb", AutoCommands.a3DepotShootNZ(drivebase_, intake_, hopper_, shooter_, false));
+
+        autoChooser_.addDefaultOption("Left Trench To Right Trench", AutoCommands.a1TrenchToTrench(drivebase_, intake_, hopper_, shooter_, false));
+        autoChooser_.addOption("Right Trench To Left Trench", AutoCommands.a1TrenchToTrench(drivebase_, intake_, hopper_, shooter_, true));
+        autoChooser_.addOption("Neutral Zone Collect - Left Trench", AutoCommands.a2NZCollectAuto(drivebase_, shooter_, intake_, hopper_, false));
+        autoChooser_.addOption("Neutral Zone Collect - Right Trench", AutoCommands.a2NZCollectAuto(drivebase_, shooter_, intake_, hopper_, true));
+
         autoChooser_.onChange(auto -> {
+            if (auto == null) return;
             System.out.println("Auto \"" + auto.getName() + "\" selected!");
             // Anything you may want to do when the auto is selected.
         });
@@ -239,6 +264,7 @@ public class RobotContainer {
         testBindings_.addOption("Swerve Feedforward", DriveCommands.feedforwardCharacterization(drivebase_));
         testBindings_.addOption("Shooter Setpoints", shooter_.testCommand(hopper_));
         testBindings_.addOption("Hood Calibration", shooter_.hoodCalibration());
+        testBindings_.addOption("Startup Sequence Test", new StartupCmd(intake_, hopper_, shooter_)) ;
 
         // Sets the selected test binding to be triggered when the A button is pressed in test mode.
         RobotModeTriggers.test().and(gamepad_.a()).toggleOnTrue(Commands.deferredProxy(testBindings_::get));
@@ -246,35 +272,49 @@ public class RobotContainer {
         configureBindings();
         configureDriveBindings();
     }
-
+    
     // Bind robot actions to commands here.
     private void configureBindings() {
         // Manually deploying and undeploying the intake.
-        gamepad_.start().onTrue(Commands.either(
+        gamepad_.start().or(operatorGamepad_.start()).onTrue(Commands.either(
             intake_.deployCmd(),
             intake_.stowCmd(),
             intake_::isIntakeStowed
         ));
+       
+        // Cycle through shooter tunings when the back button is pressed.
+        gamepad_.back().or(operatorGamepad_.back()).onTrue(shooter_.cycleTuning()) ;
 
         // While the left trigger is held, we will run the intake. If the intake is stowed, it will also deploy it.
-        gamepad_.leftTrigger().whileTrue(intake_.intakeSequence());
+        gamepad_.leftTrigger().or(operatorGamepad_.leftTrigger()).whileTrue(
+            new ParallelCommandGroup(
+                intake_.intakeSequence(),
+                hopper_.collectScrambler()
+            )
+        );
 
-        // While the right trigger is held, we will shoot into the hub.
-        gamepad_.rightTrigger().whileTrue(shooter_.shootCmd(hopper_));
+        operatorGamepad_.b().whileTrue(RobotCommands.ejectUp(shooter_, hopper_));
 
-        // When the hopper isnt shooting, set it to run its idle velocity.
-        hopper_.setDefaultCommand(hopper_.idleScrambler());
+        // While the right trigger is held, we will shoot into the hub or ferry.
+        gamepad_.rightTrigger().or(operatorGamepad_.rightTrigger()).whileTrue(RobotCommands.shoot(shooter_, hopper_, intake_, drivebase_));
 
         // When the shooter isnt shooting, get it ready to shoot.
-        shooter_.setDefaultCommand(shooter_.awaitShooting(drivebase_::getPose));
+        shooter_.setDefaultCommand(shooter_.idleCommand());
 
         //While the A button is held, the intake will run the eject sequence. If it the intake is stowed, it will also deploy it.
-        gamepad_.a().whileTrue(intake_.ejectSequence());
+        operatorGamepad_.a().whileTrue(intake_.hopperEjectSequence().alongWith(hopper_.reverseFeed()));
+
+
+
+        // Bind dashboard button to refreshing the tuning.
+        var refreshTuningButton = new LoggedNetworkBoolean("/Tuning/RefreshTuning", false);
+        new Trigger(refreshTuningButton::get)
+            .onTrue(shooter_.reloadTunings().finallyDo(() -> refreshTuningButton.set(false)));
     }
 
     private void configureDriveBindings() {
         // Default command, normal field-relative drive
-        drivebase_.setDefaultCommand(DriveCommands.joystickDrive());
+        drivebase_.setDefaultCommand(DriveCommands.joystickDrive().withName("JoystickDrive"));
 
         // Slow Mode, during left bumper
         gamepad_.leftBumper().whileTrue(
@@ -285,7 +325,7 @@ public class RobotContainer {
                 () -> -gamepad_.getRightX() * DriveConstants.slowModeJoystickMultiplier));
 
         // Switch to X pattern / brake while X button is pressed
-        gamepad_.x().whileTrue(drivebase_.stopWithXCmd());
+        gamepad_.x().whileTrue(drivebase_.stopWithXCmd()); 
 
         // Robot Relative
         gamepad_.povUp().whileTrue(

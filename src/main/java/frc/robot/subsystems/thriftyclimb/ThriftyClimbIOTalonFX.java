@@ -51,7 +51,7 @@ public class ThriftyClimbIOTalonFX implements ThriftyClimbIO {
     public void updateInputs(ThriftyClimbInputs inputs) {
         inputs.position = Inches.of(climb_.getPosition().getValue().in(Revolutions) / (ThriftyClimbConstants.thriftyGearRatio * Math.PI * ThriftyClimbConstants.thriftyClimbSpoolDiameter.in(Inches)));
         inputs.velocity = InchesPerSecond.of(climb_.getVelocity().getValue().in(RevolutionsPerSecond) / (ThriftyClimbConstants.thriftyGearRatio * Math.PI * ThriftyClimbConstants.thriftyClimbSpoolDiameter.in(Inches)));;
-        inputs.current = climb_.getStatorCurrent().getValue();
+        inputs.current = climb_.getSupplyCurrent().getValue();
     }
 
     public void applyOutputs(ThriftyClimbOutputs outputs) {
