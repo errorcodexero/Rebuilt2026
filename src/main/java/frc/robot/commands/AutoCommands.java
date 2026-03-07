@@ -29,20 +29,23 @@ public class AutoCommands {
         );
     }
 
-    public static Command NZCollectAuto(Drive drive, Shooter shooter, IntakeSubsystem intake, Hopper hopper){
+    public static Command NZCollectAuto(Drive drive, Shooter shooter, IntakeSubsystem intake, Hopper hopper, boolean mirroredX){
         return Commands.sequence(
-            //Drive to the first shooting position and shoot preloaded balls   
-            DriveCommands.initialFollowPathCommand(drive, "TrenchToNZ", false)
-                .deadlineFor(intake.intakeSequence()),
-            
-            DriveCommands.followPathCommand("NZ to Shoot1", false),
-            shooter.shootCmd(hopper).withTimeout(3.8),
+            //Drive from trench to a point in neutral zone, collecting balls and bringing down intake
+            Commands.deadline(
+                DriveCommands.initialFollowPathCommand(drive, "TrenchToNZ", mirroredX),
+                new StartupCmd(intake, hopper, shooter).beforeStarting(Commands.waitTime(Seconds.of(0.4)))
+            ),
+            //Drive robot to the shoot position and shoot balls into hub
+            DriveCommands.followPathCommand("NZ to Shoot1", mirroredX),
+            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(3.8)),
 
-            DriveCommands.followPathCommand("Shoot1 to Hub")
-                .deadlineFor(intake.intakeSequence()),
+            //Drive back into the neutral zone, collecting more balls along the way
+            DriveCommands.followPathCommand("Shoot1 to Hub").deadlineFor(intake.intakeSequence()),
             
-            DriveCommands.followPathCommand("HubToShoot2", false),
-            shooter.shootCmd(hopper).withTimeout(4)
+            //Drive back to alliance zone and shoot the rest of the balls into the hub
+            DriveCommands.followPathCommand("HubToShoot2", mirroredX),
+            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(4.0))
             
         ); 
     }
