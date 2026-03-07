@@ -13,16 +13,32 @@ import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.shooter.Shooter;
 
 public class AutoCommands {
-    public static Command trenchToTrench(Drive drive, IntakeSubsystem intake, Hopper hopper, Shooter shooter, boolean mirroredX){
+    public static Command a1TrenchToTrench(Drive drive, IntakeSubsystem intake, Hopper hopper, Shooter shooter, boolean mirroredX){
         return Commands.sequence(
             Commands.deadline(
-                DriveCommands.initialFollowPathCommand(drive,"TopToBottom Trench", mirroredX),
+                DriveCommands.initialFollowPathCommand(drive,"A1_TopToBottomTrench", mirroredX),
                 new StartupCmd(intake, hopper, shooter).beforeStarting(Commands.waitTime(Seconds.of(0.4)))
             ),
 
             // Added: timeout on shoot
             RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(5.0)),
-            DriveCommands.followPathCommand("BottomToTop", mirroredX).deadlineFor(intake.intakeSequence()),
+            DriveCommands.followPathCommand("A1_BottomToTopTrench", mirroredX).deadlineFor(intake.intakeSequence()),
+
+            // Added: timeout on shoot
+            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(5.0))
+        );
+    }
+
+        public static Command a2SameTrenchTwice(Drive drive, IntakeSubsystem intake, Hopper hopper, Shooter shooter, boolean mirroredX){
+        return Commands.sequence(
+            Commands.deadline(
+                DriveCommands.initialFollowPathCommand(drive,"A1_TopToBottomTrench", mirroredX),
+                new StartupCmd(intake, hopper, shooter).beforeStarting(Commands.waitTime(Seconds.of(0.4)))
+            ),
+
+            // Added: timeout on shoot
+            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(5.0)),
+            DriveCommands.followPathCommand("A1_BottomToTopTrench", mirroredX).deadlineFor(intake.intakeSequence()),
 
             // Added: timeout on shoot
             RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(5.0))
