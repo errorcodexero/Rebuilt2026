@@ -249,9 +249,12 @@ public class RobotContainer {
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
 
         autoChooser_.addDefaultOption("Left Trench To Right Trench", AutoCommands.a1TrenchToTrench(drivebase_, intake_, hopper_, shooter_, false));
-        autoChooser_.addOption("Right Trench To Left Trench", AutoCommands.a1TrenchToTrench(drivebase_, intake_, hopper_, shooter_, true));
+        autoChooser_.addOption("Right Trench To Left Trench", AutoCommands.a1TrenchToTrench(drivebase_, intake_, hopper_, shooter_, trues));
         autoChooser_.addOption("Neutral Zone Collect - Left Trench", AutoCommands.a2NZCollectAuto(drivebase_, shooter_, intake_, hopper_, false));
         autoChooser_.addOption("Neutral Zone Collect - Right Trench", AutoCommands.a2NZCollectAuto(drivebase_, shooter_, intake_, hopper_, true));
+        autoChooser_.addOption("Depot Collect to NZ Collect- Depot Top to NZ", AutoCommands.a3DepotShootNZ(drivebase_, intake_, hopper_, shooter_, false));
+        autoChooser_.addOption("Depot Collect to NZ Collect- Depot Bottom to NZ", AutoCommands.a3DepotShootNZ(drivebase_, intake_, hopper_, shooter_, true));
+
 
         autoChooser_.onChange(auto -> {
             if (auto == null) return;
