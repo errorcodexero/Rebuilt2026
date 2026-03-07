@@ -52,17 +52,15 @@ public class AutoCommands {
 
     public static Command a3DepotShootNZ(Drive drive, IntakeSubsystem intake, Hopper hopper, Shooter shooter, boolean fieldside){
         return Commands.sequence(
-            Commands.runOnce(() -> drive.resetGyroCmd()),
-
             DriveCommands.initialFollowPathCommand(drive, "GoToCollectDepot",fieldside).deadlineFor(intake.intakeSequence()),
 
-            shooter.shootCmd(hopper).withTimeout(4),
-
-            shooter.stopCmd()
+            shooter.shootCmd(hopper).withTimeout(4)
 
             /*DriveCommands.followPathCommand("DepotToNZ", fieldside).deadlineFor(intake.intakeSequence()),
 
-            shooter.shootCmd(hopper).withTimeout(5)*/
+            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(5.0))*/
+
+            //For later 
         );
     }
 }

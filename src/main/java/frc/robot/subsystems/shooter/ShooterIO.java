@@ -27,10 +27,6 @@ public interface ShooterIO {
         public Current shooter3Current = Amps.zero();
         public AngularVelocity shooter3Velocity = RadiansPerSecond.zero();
 
-        public Voltage shooter4Voltage = Volts.zero();
-        public Current shooter4Current = Amps.zero();
-        public AngularVelocity shooter4Velocity = RadiansPerSecond.zero();
-
         public AngularVelocity wheelVelocity = RadiansPerSecond.zero();
     }
 
