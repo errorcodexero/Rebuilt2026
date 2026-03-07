@@ -10,7 +10,7 @@ import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.thriftyclimb.ThriftyClimb;
 
 public class AutoCommands {
-    public static Command DepotShootClimbAuto(Drive drive, IntakeSubsystem intake, Hopper hopper, Shooter shooter, ThriftyClimb climber, boolean fieldside){
+    public static Command a3DepotShootNZ(Drive drive, IntakeSubsystem intake, Hopper hopper, Shooter shooter, boolean fieldside){
         return Commands.sequence(
             Commands.runOnce(() -> drive.resetGyroCmd()),
 
@@ -18,7 +18,7 @@ public class AutoCommands {
 
             shooter.shootCmd(hopper).withTimeout(4),
 
-            shooter.stopCmd(),
+            shooter.stopCmd()
 
             /*DriveCommands.followPathCommand("DepotToNZ", fieldside).deadlineFor(intake.intakeSequence()),
 

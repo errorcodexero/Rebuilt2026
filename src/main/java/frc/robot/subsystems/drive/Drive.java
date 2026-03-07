@@ -62,14 +62,13 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
-import frc.robot.Constants.RobotType;
-import frc.robot.generated.BetaTunerConstants;
+import frc.robot.generated.CompTunerConstants;
 import frc.robot.util.LocalADStarAK;
 import frc.robot.util.MapleSimUtil;
 
 public class Drive extends SubsystemBase {
     // These Constants should be the same for every drivebase, so just use the comp bot constants.
-    static final double ODOMETRY_FREQUENCY = BetaTunerConstants.kCANBus.isNetworkFD() ? 250.0 : 100.0;
+    static final double ODOMETRY_FREQUENCY = CompTunerConstants.kCANBus.isNetworkFD() ? 250.0 : 100.0;
     public final double DRIVE_BASE_RADIUS;
 
     // Gyro degrees-per-rotation correction/trim
