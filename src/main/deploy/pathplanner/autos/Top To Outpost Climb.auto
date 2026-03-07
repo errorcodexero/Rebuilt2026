@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "TopToBottom Trench"
+            "pathName": null
           }
         },
         {
@@ -25,7 +25,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "ShootToOutpost"
+            "pathName": null
           }
         },
         {

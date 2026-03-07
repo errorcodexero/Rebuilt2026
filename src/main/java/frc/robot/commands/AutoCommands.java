@@ -58,16 +58,18 @@ public class AutoCommands {
                 new StartupCmd(intake, hopper, shooter).beforeStarting(Commands.waitTime(Seconds.of(0.4)))
             ),
             
+            //Shoot the balls from collecting the depot
             RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(3)),
 
             //Drive to the Neutral Zone and Collect
-            DriveCommands.followPathCommand("DepotToNZ", fieldside).deadlineFor(intake.intakeSequence())
+            DriveCommands.followPathCommand("DepotToNZ", fieldside).deadlineFor(intake.intakeSequence()),
 
-            /*DriveCommands.followPathCommand("DepotToNZ", fieldside).deadlineFor(intake.intakeSequence()),
+            //Drive from the Neutral Zone to the Alliance Zone to shoot
+            DriveCommands.followPathCommand("NZToShoot", fieldside),
 
-            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(5.0))*/
+            //Shoot the remainging balls
+            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(5.0))
 
-            //For later 
         );
     }
 }
