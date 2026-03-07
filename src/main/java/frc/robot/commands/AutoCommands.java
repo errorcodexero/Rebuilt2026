@@ -29,22 +29,22 @@ public class AutoCommands {
         );
     }
 
-    public static Command NZCollectAuto(Drive drive, Shooter shooter, IntakeSubsystem intake, Hopper hopper, boolean mirroredX){
+    public static Command a2NZCollectAuto(Drive drive, Shooter shooter, IntakeSubsystem intake, Hopper hopper, boolean mirroredX){
         return Commands.sequence(
             //Drive from trench to a point in neutral zone, collecting balls and bringing down intake
             Commands.deadline(
-                DriveCommands.initialFollowPathCommand(drive, "TrenchToNZ", mirroredX),
+                DriveCommands.initialFollowPathCommand(drive, "a2TrenchToNZ", mirroredX),
                 new StartupCmd(intake, hopper, shooter).beforeStarting(Commands.waitTime(Seconds.of(0.4)))
             ),
             //Drive robot to the shoot position and shoot balls into hub
-            DriveCommands.followPathCommand("NZ to Shoot1", mirroredX),
+            DriveCommands.followPathCommand("a2NZtoShoot1", mirroredX),
             RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(3.8)),
 
             //Drive back into the neutral zone, collecting more balls along the way
-            DriveCommands.followPathCommand("Shoot1 to Hub").deadlineFor(intake.intakeSequence()),
+            DriveCommands.followPathCommand("a2Shoot1toHub").deadlineFor(intake.intakeSequence()),
             
             //Drive back to alliance zone and shoot the rest of the balls into the hub
-            DriveCommands.followPathCommand("HubToShoot2", mirroredX),
+            DriveCommands.followPathCommand("a2HubToShoot2", mirroredX),
             RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(4.0))
             
         ); 

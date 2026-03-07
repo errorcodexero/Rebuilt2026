@@ -7,25 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "TrenchToNZ"
+            "pathName": "a2TrenchToNZ"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "NZtoShoot1"
+            "pathName": "a2NZtoShoot1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Shoot1 to Hub"
+            "pathName": "a2Shoot1toHub"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "HubToShoot2"
+            "pathName": "a2HubToShoot2"
           }
         }
       ]
