@@ -20,7 +20,9 @@ public class AutoCommands {
 
             shooter.stopCmd(),
 
-            DriveCommands.followPathCommand("DepotToNZ").deadlineFor(intake.intakeSequence())
+            /*DriveCommands.followPathCommand("DepotToNZ", fieldside).deadlineFor(intake.intakeSequence()),
+
+            shooter.shootCmd(hopper).withTimeout(5)*/
         );
     }
 }

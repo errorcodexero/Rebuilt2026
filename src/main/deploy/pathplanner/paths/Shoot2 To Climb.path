@@ -45,7 +45,7 @@
     "rotation": -0.939190945735607
   },
   "reversed": false,
-  "folder": "Neutral Zone Climb",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": 59.058463533677475
