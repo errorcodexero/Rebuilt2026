@@ -15,12 +15,6 @@
           "data": {
             "pathName": "TopTrenchToNZ"
           }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "NZBottomToShoot"
-          }
         }
       ]
     }

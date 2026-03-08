@@ -52,27 +52,20 @@ public class AutoCommands {
 
     public static Command a3DepotShootNZ(Drive drive, IntakeSubsystem intake, Hopper hopper, Shooter shooter, boolean fieldside){
         return Commands.sequence(
-            //Drive to the depot and collect the balls from it
+            //Drive to the depot and collect the balls from it, then drive to the starting position trench to shoot collected balls
             Commands.deadline(
                 DriveCommands.initialFollowPathCommand(drive, "GoToCollectDepot",fieldside),
                 new StartupCmd(intake, hopper, shooter).beforeStarting(Commands.waitTime(Seconds.of(0.4)))
             ),
             
-            //Drive to a shooting position so it doesn't hit the tower
-            DriveCommands.followPathCommand("CollectToTrenchShoot", fieldside),
-
             //Shoot the balls from collecting the depot
             RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(3)),
 
-            //Drive to the Neutral Zone and Collect
+            //Drive to the Neutral Zone and Collect, then drive to the opposite trench
             DriveCommands.followPathCommand("TopTrenchToNZ", fieldside).deadlineFor(intake.intakeSequence()),
-
-            //Drive from the Neutral Zone to the Alliance Zone to shoot
-            DriveCommands.followPathCommand("NZBottomToShoot", fieldside),
 
             //Shoot the remainging balls
             RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(5.0))
-
         );
     }
 }
