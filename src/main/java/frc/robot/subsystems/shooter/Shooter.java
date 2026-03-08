@@ -139,6 +139,7 @@ public class Shooter extends SubsystemBase {
     private void stopShooter() {
         shooterTarget = RotationsPerSecond.zero();
         shooterIO.stop();
+        setHoodAngle(ShooterConstants.hoodParkedAngle);
     }
 
     public AngularVelocity getShooterVelocity() {
@@ -257,20 +258,11 @@ public class Shooter extends SubsystemBase {
             () -> getTuning().getShooterParams(distance.get().in(Meters));
 
         return Commands.parallel(
-            run(() -> setSetpoints(
-                RotationsPerSecond.of(shooterParams.get().velocity).times(ShooterConstants.shooterVelocityMultiplierWhileFeederSlow),
-                Degrees.of(shooterParams.get().hood)
-            ))
-            .alongWith(Commands.runOnce(() -> Logger.recordOutput("Shooting/Boost", true)))
-            .until(() -> hopper.getTargetPercent() > 0.9)
-            .andThen(runDynamicSetpoints(
+            runDynamicSetpoints(
                 () -> RotationsPerSecond.of(shooterParams.get().velocity),
                 () -> Degrees.of(shooterParams.get().hood)
-            )
-            .alongWith(Commands.runOnce(() -> Logger.recordOutput("Shooting/Boost", false)))),
-
+            ),
             hopper.preShoot().until(this::isShooterReady).andThen(hopper.forwardFeed()),
-
             intake.enableShootMode()
         );
     }
@@ -287,6 +279,21 @@ public class Shooter extends SubsystemBase {
         return runDynamicSetpoints(
             () -> RotationsPerSecond.of(shooterParams.get().velocity),
             () -> Degrees.of(shooterParams.get().hood)
+        );
+    }
+
+    /**
+     * Spins the shooter up to shoot, without actually shooting, keeping the hood down.
+     * @param distance
+     * @return
+     */
+    public Command spinUpForDistanceHoodParked(Supplier<Distance> distance) {
+        Supplier<ShooterParams> shooterParams =
+            () -> getTuning().getShooterParams(distance.get().in(Meters));
+
+        return runDynamicSetpoints(
+            () -> RotationsPerSecond.of(shooterParams.get().velocity),
+            () -> ShooterConstants.hoodParkedAngle
         );
     }
 

@@ -1,5 +1,6 @@
 package frc.robot.subsystems.intake; 
 
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -17,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.util.LoggedTracer;
+import frc.robot.util.MapleSimUtil;
 import frc.robot.util.Mechanism3d;
 
 public class IntakeSubsystem extends SubsystemBase {
@@ -51,10 +53,8 @@ public class IntakeSubsystem extends SubsystemBase {
         Mechanism3d.setpoints.setIntake(setpointAngle);
 
         if (Constants.getMode() == Mode.SIM) {
-            // MapleSimUtil.setIntakeRunning(isIntakeDeployed() && inputs.RollerAngularVelocity.gt(RadiansPerSecond.zero()));
+            MapleSimUtil.setIntakeRunning(isIntakeDeployed() && inputs.rollerAngularVelocity.gt(RadiansPerSecond.zero()));
         }
-
-        LoggedTracer.record("IntakePeriodic");
 
         if (inputs.pivotAngle.gt(IntakeConstants.deployedAngle.times(0.9)) && 
                 inputs.rollerAngularVelocity.gt(IntakeConstants.rollerCollectVelocity.times(0.5))) {
@@ -64,6 +64,8 @@ public class IntakeSubsystem extends SubsystemBase {
         else {
             Logger.recordOutput("Intake/Pivot", "Not Holding") ;
         }
+
+        LoggedTracer.record("IntakePeriodic");
     }
 
     //Intake control methods
@@ -182,7 +184,7 @@ public class IntakeSubsystem extends SubsystemBase {
     public Command intakeSequence() {
         return runIntakeCmd().beforeStarting(
             deployCmd().unless(this::isIntakeDeployed)
-        ) ;
+        );
     }
 
     public Command runEjectCmd() {
@@ -197,7 +199,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     private Command moveIntakeWhileShooting() {
         return new MoveIntakeCmd(this, IntakeConstants.shootAngles, IntakeConstants.angleChangeDelay)
-            .finallyDo(interruped -> waiting());
+            .finallyDo(interrupted -> waiting());
     }
 
     public Command enableShootMode() {

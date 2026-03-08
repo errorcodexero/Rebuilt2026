@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -29,7 +30,7 @@ public class AutoCommands {
         );
     }
 
-    public static Command a2NZCollectAuto(Drive drive, Shooter shooter, IntakeSubsystem intake, Hopper hopper, boolean mirroredX){
+    public static Command a2NZCollectAuto(Drive drive, Shooter shooter, IntakeSubsystem intake, Hopper hopper, boolean mirroredX) {
         return Commands.sequence(
             //Drive from trench to a point in neutral zone, collecting balls and bringing down intake
             Commands.deadline(
@@ -37,15 +38,23 @@ public class AutoCommands {
                 new StartupCmd(intake, hopper, shooter).beforeStarting(Commands.waitTime(Seconds.of(0.6)))
             ),
             //Drive robot to the shoot position and shoot balls into hub
-            DriveCommands.followPathCommand("a2NZtoShoot1", mirroredX),
+            DriveCommands.followPathCommand("a2NZtoShoot1", mirroredX).deadlineFor(
+                shooter.spinUpForDistanceHoodParked(() -> Meters.of(3.7)),
+                hopper.preShoot()
+            ),
+
             RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(5.0)),
 
             //Drive back into the neutral zone, collecting more balls along the way
             DriveCommands.followPathCommand("a2Shoot1toHub").deadlineFor(intake.intakeSequence()),
             
             //Drive back to alliance zone and shoot the rest of the balls into the hub
-            DriveCommands.followPathCommand("a2HubToShoot2", mirroredX),
-            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(4.0))
+            DriveCommands.followPathCommand("a2HubToShoot2", mirroredX).deadlineFor(
+                shooter.spinUpForDistanceHoodParked(() -> Meters.of(3.7)),
+                hopper.preShoot()
+            ),
+
+            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(10.0))
             
         ); 
     }
