@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "TopToBottom Trench"
+            "pathName": "A1_TopToBottomTrench"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "BottomToTop"
+            "pathName": "A1_BottomToTop"
           }
         }
       ]
