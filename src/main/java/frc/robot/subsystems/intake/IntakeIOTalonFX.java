@@ -11,13 +11,17 @@ import static frc.robot.util.PhoenixUtil.tryUntilOk;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
@@ -30,8 +34,9 @@ import edu.wpi.first.units.measure.Voltage;
 public class IntakeIOTalonFX implements IntakeIO {
 
     //Creating motor objects
-    public final TalonFX rollerMotor;
-    public final TalonFX pivotMotor;
+    protected final TalonFX rollerMotor;
+    protected final TalonFX pivotMotor;
+    protected final CANcoder pivotCancoder;
 
     //Pivot motor control requests
     private final MotionMagicVoltage pivotAngleRequest= new MotionMagicVoltage(Degrees.of(0));
@@ -62,6 +67,7 @@ public class IntakeIOTalonFX implements IntakeIO {
         // Initialize motor objects
         rollerMotor = new TalonFX(IntakeConstants.rollerMotorCANID, canbus);
         pivotMotor = new TalonFX(IntakeConstants.pivotMotorCANID, canbus);
+        pivotCancoder = new CANcoder(IntakeConstants.pivotEncoderCANID, canbus);
 
         // Configuration for the pivot motor
         final TalonFXConfiguration pivotConfigs= new TalonFXConfiguration();
@@ -93,12 +99,24 @@ public class IntakeIOTalonFX implements IntakeIO {
         pivotConfigs.MotionMagic.MotionMagicAcceleration= IntakeConstants.pivotCruiseAcceleration.in(RotationsPerSecond); 
         pivotConfigs.MotionMagic.MotionMagicJerk= IntakeConstants.pivotMaxJerk; 
 
-        //Used to apply configs once instead of having multiple iterations to do this
-        //Also trys the configuartion 5 times until it receives an OK status signal 
+        // Fused CANCoder
+        pivotConfigs.Feedback.FeedbackRemoteSensorID = IntakeConstants.pivotEncoderCANID;
+        pivotConfigs.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+        pivotConfigs.Feedback.SensorToMechanismRatio = IntakeConstants.encoderToPivotGearRatio;
+        pivotConfigs.Feedback.RotorToSensorRatio = IntakeConstants.motorToEncoderGearRatio;
+
+        var encoderConfig = new CANcoderConfiguration();
+
+        encoderConfig.MagnetSensor.withMagnetOffset(IntakeConstants.pivotEncoderOffset);
+
+        encoderConfig.MagnetSensor.SensorDirection = IntakeConstants.pivotEncoderInverted
+            ? SensorDirectionValue.Clockwise_Positive
+            : SensorDirectionValue.CounterClockwise_Positive;
+
+        tryUntilOk(5, () -> pivotCancoder.getConfigurator().apply(encoderConfig, 0.25));
         tryUntilOk(5, () -> pivotMotor.getConfigurator().apply(pivotConfigs, 0.25));
 
         pivotMotor.setPosition(Rotations.of(0)) ;
-
 
         // Configuration for the roller motor
         final TalonFXConfiguration rollerConfigs= new TalonFXConfiguration();
