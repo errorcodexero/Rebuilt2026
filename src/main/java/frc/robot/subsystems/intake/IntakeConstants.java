@@ -18,7 +18,7 @@ import edu.wpi.first.units.measure.Time;
 public final class IntakeConstants {
     public static final int rollerMotorCANID = 9;
     public static final int pivotMotorCANID = 8;
-    public static final int pivotEncoderCANID = 0; // TODO: SET THE CAN ID
+    public static final int pivotEncoderCANID = 7;
 
     public static final Current rollerCurrentLimit = Amps.of(180) ;
     public static final Current pivotCurrentLimit = Amps.of(80) ;

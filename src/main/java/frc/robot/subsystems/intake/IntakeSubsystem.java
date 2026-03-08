@@ -47,7 +47,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
         Logger.recordOutput("Intake/PivotSetpoint", setpointAngle);
 
-        Mechanism3d.measured.setIntake(inputs.PivotAngle);
+        Mechanism3d.measured.setIntake(inputs.pivotAngle);
         Mechanism3d.setpoints.setIntake(setpointAngle);
 
         if (Constants.getMode() == Mode.SIM) {
@@ -108,7 +108,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
     
     public Angle getPivotAngle(){
-        return inputs.PivotAngle;
+        return inputs.pivotAngle;
     }
 
     public boolean isIntakeDeployed() {
@@ -124,7 +124,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public boolean isPivotAtAngle(Angle angle){
-        var ret = inputs.PivotAngle.isNear(angle, IntakeConstants.pivotTolerance);
+        var ret = inputs.pivotAngle.isNear(angle, IntakeConstants.pivotTolerance);
         return ret;
     }
 
