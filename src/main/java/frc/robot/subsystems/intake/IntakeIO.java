@@ -17,7 +17,7 @@ public interface IntakeIO {
     public class IntakeIOInputs{
         public boolean pivotConnected = false;
         public Angle pivotAngle = Degrees.of(0);
-        public Angle pivotCancoderValues = Degrees.of(0);
+        public Angle pivotCancoderPosition = Degrees.of(0);
         public AngularVelocity pivotAngularVelocity = DegreesPerSecond.of(0); 
         public AngularVelocity pivotCancoderVelocity = DegreesPerSecond.of(0);
         public Voltage pivotAppliedVolts = Volts.of(0);

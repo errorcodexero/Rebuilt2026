@@ -17,7 +17,7 @@ public class AutoCommands {
         return Commands.sequence(
             Commands.deadline(
                 DriveCommands.initialFollowPathCommand(drive,"A1_TopToBottomTrench", mirroredX),
-                new StartupCmd(intake, hopper, shooter).beforeStarting(Commands.waitTime(Seconds.of(0.4)))
+                new StartupCmd(intake, hopper, shooter).beforeStarting(Commands.waitTime(Seconds.of(0.8)))
             ),
 
             // Added: timeout on shoot
@@ -34,11 +34,11 @@ public class AutoCommands {
             //Drive from trench to a point in neutral zone, collecting balls and bringing down intake
             Commands.deadline(
                 DriveCommands.initialFollowPathCommand(drive, "a2TrenchToNZ", mirroredX),
-                new StartupCmd(intake, hopper, shooter).beforeStarting(Commands.waitTime(Seconds.of(0.4)))
+                new StartupCmd(intake, hopper, shooter).beforeStarting(Commands.waitTime(Seconds.of(0.6)))
             ),
             //Drive robot to the shoot position and shoot balls into hub
             DriveCommands.followPathCommand("a2NZtoShoot1", mirroredX),
-            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(3.8)),
+            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(4.5)),
 
             //Drive back into the neutral zone, collecting more balls along the way
             DriveCommands.followPathCommand("a2Shoot1toHub").deadlineFor(intake.intakeSequence()),

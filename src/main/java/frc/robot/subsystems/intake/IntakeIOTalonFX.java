@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.util.PhoenixUtil.tryUntilOk;
 
@@ -57,7 +58,7 @@ public class IntakeIOTalonFX implements IntakeIO {
     private StatusSignal<AngularVelocity> pivotAngularVelocitySignal;
     private StatusSignal<Current> pivotCurrentAmpsSignal;
     private StatusSignal<Voltage> pivotAppliedVoltsSignal;
-    private StatusSignal<Angle> pivotCancoderValuesSignal;
+    private StatusSignal<Angle> pivotCancoderPositionSignal;
     private StatusSignal<AngularVelocity> pivotCancoderVelocitySignal;
 
     //Roller status signals
@@ -91,21 +92,21 @@ public class IntakeIOTalonFX implements IntakeIO {
         pivotConfigs.Slot0.kS= IntakeConstants.pivotKS;
 
         //Soft Limit Configurations
-        // pivotConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable= true;
-        // pivotConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold= IntakeConstants.pivotMaxAngle.in(Rotations);
-        // pivotConfigs.SoftwareLimitSwitch.ReverseSoftLimitEnable= true;
-        // pivotConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold= IntakeConstants.pivotMinAngle.in(Rotations);
+        pivotConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable= true;
+        pivotConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold= IntakeConstants.pivotMaxAngle.in(Rotations) ;
+        pivotConfigs.SoftwareLimitSwitch.ReverseSoftLimitEnable= true;
+        pivotConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold= IntakeConstants.pivotMinAngle.in(Rotations) ;
 
         //Motion Magic Configurations
         pivotConfigs.MotionMagic.MotionMagicCruiseVelocity= IntakeConstants.pivotCruiseVelocity.in(RotationsPerSecond); 
-        pivotConfigs.MotionMagic.MotionMagicAcceleration= IntakeConstants.pivotCruiseAcceleration.in(RotationsPerSecond); 
-        pivotConfigs.MotionMagic.MotionMagicJerk= IntakeConstants.pivotMaxJerk; 
+        pivotConfigs.MotionMagic.MotionMagicAcceleration= IntakeConstants.pivotCruiseAcceleration.in(RotationsPerSecondPerSecond); 
+        pivotConfigs.MotionMagic.MotionMagicJerk= IntakeConstants.pivotMaxJerk;
 
         // Fused CANCoder
         pivotConfigs.Feedback.FeedbackRemoteSensorID = IntakeConstants.pivotEncoderCANID;
         pivotConfigs.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
         pivotConfigs.Feedback.SensorToMechanismRatio = IntakeConstants.encoderToPivotGearRatio;
-        pivotConfigs.Feedback.RotorToSensorRatio = IntakeConstants.motorToEncoderGearRatio;
+        pivotConfigs.Feedback.RotorToSensorRatio = 1.0 / IntakeConstants.motorToEncoderGearRatio;
 
         var encoderConfig = new CANcoderConfiguration();
 
@@ -119,7 +120,6 @@ public class IntakeIOTalonFX implements IntakeIO {
         tryUntilOk(5, () -> pivotMotor.getConfigurator().apply(pivotConfigs, 0.25));
 
         pivotMotor.setPosition(Rotations.of(0)) ;
-        pivotCancoder.setPosition(Rotations.of(0)) ;
 
         // Configuration for the roller motor
         final TalonFXConfiguration rollerConfigs= new TalonFXConfiguration();
@@ -154,13 +154,13 @@ public class IntakeIOTalonFX implements IntakeIO {
         pivotAppliedVoltsSignal = pivotMotor.getMotorVoltage();
         rollerCurrentAmpsSignal = rollerMotor.getSupplyCurrent();
         pivotCurrentAmpsSignal = pivotMotor.getSupplyCurrent();
-        pivotCancoderValuesSignal = pivotCancoder.getPosition();
+        pivotCancoderPositionSignal = pivotCancoder.getPosition();
         pivotCancoderVelocitySignal = pivotCancoder.getVelocity();
 
         BaseStatusSignal.setUpdateFrequencyForAll(1, rollerAppliedVoltsSignal, rollerCurrentAmpsSignal, 
-                            pivotAppliedVoltsSignal, pivotCurrentAmpsSignal, rollerAngularVelocitySignal,
-                            pivotCancoderValuesSignal, pivotCancoderVelocitySignal);
-        BaseStatusSignal.setUpdateFrequencyForAll(50, pivotAngleSignal,pivotAngularVelocitySignal);
+                            pivotAppliedVoltsSignal, pivotCurrentAmpsSignal, rollerAngularVelocitySignal) ;
+        BaseStatusSignal.setUpdateFrequencyForAll(50, pivotAngleSignal,pivotAngularVelocitySignal, 
+                            pivotCancoderPositionSignal, pivotCancoderVelocitySignal);
 
         // Optimize CAN bus for these parent devices-motors
         ParentDevice.optimizeBusUtilizationForAll(rollerMotor, pivotMotor);
@@ -173,7 +173,7 @@ public class IntakeIOTalonFX implements IntakeIO {
             pivotAngularVelocitySignal,
             pivotAppliedVoltsSignal,
             pivotCurrentAmpsSignal,
-            pivotCancoderValuesSignal,
+            pivotCancoderPositionSignal,
             pivotCancoderVelocitySignal
         );
 
@@ -188,7 +188,7 @@ public class IntakeIOTalonFX implements IntakeIO {
         inputs.pivotAngularVelocity = pivotAngularVelocitySignal.getValue();
         inputs.pivotAppliedVolts = pivotAppliedVoltsSignal.getValue();
         inputs.pivotCurrentAmps = pivotCurrentAmpsSignal.getValue();
-        inputs.pivotCancoderValues = pivotCancoderValuesSignal.getValue();
+        inputs.pivotCancoderPosition = pivotCancoderPositionSignal.getValue();
         inputs.pivotCancoderVelocity = pivotCancoderVelocitySignal.getValue();
 
         inputs.rollerConnected = rollerConnectedDebounce.calculate(rollerStatus.isOK());

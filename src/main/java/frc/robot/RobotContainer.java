@@ -63,7 +63,6 @@ import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.CameraIO;
 import frc.robot.subsystems.vision.CameraIOLimelight4;
 import frc.robot.subsystems.vision.CameraIOPhotonSim;
-import frc.robot.subsystems.vision.PoseEstimateConsumer;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.MapleSimUtil;
 import frc.robot.util.Mechanism3d;
