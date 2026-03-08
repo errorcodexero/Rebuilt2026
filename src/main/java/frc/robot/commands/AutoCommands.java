@@ -58,14 +58,17 @@ public class AutoCommands {
                 new StartupCmd(intake, hopper, shooter).beforeStarting(Commands.waitTime(Seconds.of(0.4)))
             ),
             
+            //Drive to a shooting position so it doesn't hit the tower
+            DriveCommands.followPathCommand("CollectToTrenchShoot", fieldside),
+
             //Shoot the balls from collecting the depot
             RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(3)),
 
             //Drive to the Neutral Zone and Collect
-            DriveCommands.followPathCommand("DepotToNZ", fieldside).deadlineFor(intake.intakeSequence()),
+            DriveCommands.followPathCommand("TopTrenchToNZ", fieldside).deadlineFor(intake.intakeSequence()),
 
             //Drive from the Neutral Zone to the Alliance Zone to shoot
-            DriveCommands.followPathCommand("NZToShoot", fieldside),
+            DriveCommands.followPathCommand("NZBottomToShoot", fieldside),
 
             //Shoot the remainging balls
             RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(5.0))

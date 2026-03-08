@@ -13,13 +13,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "DepotToNZ"
+            "pathName": "TopTrenchToNZ"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "NZToShoot"
+            "pathName": "NZBottomToShoot"
           }
         }
       ]
