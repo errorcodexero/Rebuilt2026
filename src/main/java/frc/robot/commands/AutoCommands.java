@@ -38,7 +38,7 @@ public class AutoCommands {
             ),
             //Drive robot to the shoot position and shoot balls into hub
             DriveCommands.followPathCommand("a2NZtoShoot1", mirroredX),
-            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(4.5)),
+            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(5.0)),
 
             //Drive back into the neutral zone, collecting more balls along the way
             DriveCommands.followPathCommand("a2Shoot1toHub").deadlineFor(intake.intakeSequence()),
