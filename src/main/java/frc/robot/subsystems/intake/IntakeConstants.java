@@ -26,7 +26,7 @@ public final class IntakeConstants {
     public static final Current pivotCurrentLimit = Amps.of(80) ;
     public static final Time currentLimitTime = Seconds.of(1); //Temporary
 
-    public static final double pivotKP = 600.0;
+    public static final double pivotKP = 10.0;
     public static final double pivotKD = 0;
     public static final double pivotKV = 7.0;
     public static final double pivotKI = 0;
@@ -42,7 +42,7 @@ public final class IntakeConstants {
     public static final double rollerKS = 0;
     public static final double rollerKG = 0;
 
-    public static final Angle stowedAngle = Degrees.of(0);
+    public static final Angle stowedAngle = Degrees.of(5);
     public static final Angle waitingAngle = Degrees.of(96);
     public static final Angle deployedAngle = Degrees.of(130);
     public static final Angle[] shootAngles = { deployedAngle, waitingAngle };
@@ -52,7 +52,7 @@ public final class IntakeConstants {
     public static final Angle pivotTolerance = Degrees.of(3); //Tolerance to compare current angle to target
 
     public static final boolean pivotEncoderInverted = false;
-    public static final Angle pivotEncoderOffset = Degrees.of(-153 + 2.2) ;
+    public static final Angle pivotEncoderOffset = Degrees.of(-150.8) ;
 
     // Gear Ratios
     public static final double motorToEncoderGearRatio = (1.0/45.0) * (24.0/31.0);
