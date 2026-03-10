@@ -63,6 +63,8 @@ public final class IntakeConstants {
     public static final Angle pivotMinAngle = Rotations.of(0) ;
     public static final Angle pivotMaxAngle = Degrees.of(135);
 
+    public static final Voltage pivotHoldDownVoltage = Volts.of(4.0);
+
     public static final AngularVelocity pivotCruiseVelocity = RotationsPerSecond.of(0.5) ;
     public static final AngularAcceleration pivotCruiseAcceleration = RotationsPerSecondPerSecond.of(3);
     public static final double pivotMaxJerk = 0;

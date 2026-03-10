@@ -58,15 +58,6 @@ public class IntakeSubsystem extends SubsystemBase {
             MapleSimUtil.setIntakeRunning(isIntakeDeployed() && inputs.rollerAngularVelocity.gt(RadiansPerSecond.zero()));
         }
 
-        if (inputs.pivotAngle.gt(IntakeConstants.deployedAngle.times(0.9)) && 
-                inputs.rollerAngularVelocity.gt(IntakeConstants.rollerCollectVelocity.times(0.5))) {
-            this.io.setPivotVoltage(Volts.of(4.0)) ;
-            Logger.recordOutput("Intake/Pivot", "Holding") ;
-        }
-        else {
-            Logger.recordOutput("Intake/Pivot", "Not Holding") ;
-        }
-
         LoggedTracer.record("IntakePeriodic");
     }
 
@@ -118,6 +109,10 @@ public class IntakeSubsystem extends SubsystemBase {
 
     private void waiting(){
         setPivotAngle(IntakeConstants.waitingAngle);
+    }
+
+    private void holdDown() {
+        io.setPivotVoltage(IntakeConstants.pivotHoldDownVoltage);
     }
     
     public Angle getPivotAngle(){
@@ -176,7 +171,13 @@ public class IntakeSubsystem extends SubsystemBase {
      * @return The command
      */
     public Command runIntakeCmd() {
-        return startEnd(this::startIntaking, this::stopIntaking);
+        return startEnd(() -> {
+            startIntaking();
+            holdDown();
+        }, () -> {
+            stopIntaking();
+            deploy();
+        });
     }
 
     private Command runShootIntakeCmd() {
