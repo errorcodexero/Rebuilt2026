@@ -26,7 +26,7 @@ public final class IntakeConstants {
     public static final Current pivotCurrentLimit = Amps.of(80) ;
     public static final Time currentLimitTime = Seconds.of(1); //Temporary
 
-    public static final double pivotKP = 600.0;
+    public static final double pivotKP = 100.0;
     public static final double pivotKD = 0;
     public static final double pivotKV = 7.0;
     public static final double pivotKI = 0;
