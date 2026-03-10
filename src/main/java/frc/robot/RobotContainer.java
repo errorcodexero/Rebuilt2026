@@ -286,12 +286,7 @@ public class RobotContainer {
         gamepad_.back().or(operatorGamepad_.back()).onTrue(shooter_.cycleTuning()) ;
 
         // While the left trigger is held, we will run the intake. If the intake is stowed, it will also deploy it.
-        gamepad_.leftTrigger().or(operatorGamepad_.leftTrigger()).whileTrue(
-            new ParallelCommandGroup(
-                intake_.intakeSequence(),
-                hopper_.collectScrambler()
-            )
-        );
+        gamepad_.leftTrigger().or(operatorGamepad_.leftTrigger()).whileTrue(RobotCommands.intake(intake_, hopper_));
 
         operatorGamepad_.b().whileTrue(RobotCommands.ejectUp(shooter_, hopper_));
 

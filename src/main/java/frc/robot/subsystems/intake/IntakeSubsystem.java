@@ -183,6 +183,14 @@ public class IntakeSubsystem extends SubsystemBase {
         return startEnd(this::startShootIntake, this::stopIntaking);
     }
 
+    /**
+     * This is a command that makes the intake subsystem deploy and collect balls,
+     * this command does not run the scrambler, and should ONLY be used when you understand
+     * that fact.
+     * 
+     * For most situations, RobotCommands.intake() is preferred as it also runs the scrambler.
+     * @return
+     */
     public Command intakeSequence() {
         return runIntakeCmd().beforeStarting(
             deployCmd().unless(this::isIntakeDeployed)

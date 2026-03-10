@@ -106,4 +106,17 @@ public class RobotCommands {
     public static Command ejectUp(Shooter shooter, Hopper hopper) {
         return shooter.ejectUp().alongWith(hopper.ejectUp());
     }
+
+    /**
+     * The full sequence for intaking balls, with scrambler movement. For intake while shooting, or
+     * any situation where we want to intake while the hopper is already required, just use intake.intakeSequence().
+     * 
+     * For most cases, this command is preferred.
+     * @param intake
+     * @param hopper
+     * @return
+     */
+    public static Command intake(IntakeSubsystem intake, Hopper hopper) {
+        return intake.intakeSequence().alongWith(hopper.collectScrambler());
+    }
 }
