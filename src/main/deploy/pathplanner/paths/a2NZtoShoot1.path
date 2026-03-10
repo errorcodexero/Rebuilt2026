@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.8165,
-        "y": 4.478422222222222
+        "x": 7.86566686255531,
+        "y": 5.741918245298672
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.786266666666666,
-        "y": 5.536588888888889
+        "x": 7.8465976908185855,
+        "y": 7.0836118293694685
       },
       "isLocked": false,
       "linkedName": "NZNoClimb"
     },
     {
       "anchor": {
-        "x": 4.259044444444445,
-        "y": 7.441288888888889
+        "x": 3.310077777777778,
+        "y": 7.499149999999999
       },
       "prevControl": {
-        "x": 5.982344444444445,
-        "y": 7.804088888888889
+        "x": 5.671105330475664,
+        "y": 7.810756637168142
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,8 +33,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 3.4,
+    "maxAcceleration": 3.4,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -85.68397248013444
+    "rotation": -76.47683934958391
   },
   "reversed": false,
   "folder": "NoClimbAutos",
@@ -50,5 +50,5 @@
     "velocity": 0,
     "rotation": -90.0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

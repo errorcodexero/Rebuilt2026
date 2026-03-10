@@ -7,10 +7,10 @@ import static edu.wpi.first.units.Units.*;
 public class HopperConstants {
 
     // Command Constants
-    public static final AngularVelocity feedingShootingVelocity = RotationsPerSecond.of(30);
+    public static final AngularVelocity feedingShootingVelocity = RotationsPerSecond.of(93);
     public static final AngularVelocity feedingEjectVelocity = RotationsPerSecond.of(-20);
 
-    public static final AngularVelocity scramblerShootingVelocity = RotationsPerSecond.of(50);
+    public static final AngularVelocity scramblerShootingVelocity = RotationsPerSecond.of(70);
     public static final AngularVelocity scramblerBeforeShootingVelocity = RotationsPerSecond.of(40);
 
     public static final AngularVelocity scramblerIdleVelocity = RotationsPerSecond.of(2);

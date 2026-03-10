@@ -16,15 +16,17 @@ public interface IntakeIO {
     @AutoLog
     public class IntakeIOInputs{
         public boolean pivotConnected = false;
-        public Angle PivotAngle = Degrees.of(0);
-        public AngularVelocity PivotAngularVelocity = DegreesPerSecond.of(0); 
-        public Voltage PivotAppliedVolts = Volts.of(0);
-        public Current PivotCurrentAmps = Amps.of(0); 
+        public Angle pivotAngle = Degrees.of(0);
+        public Angle pivotCancoderPosition = Degrees.of(0);
+        public AngularVelocity pivotAngularVelocity = DegreesPerSecond.of(0); 
+        public AngularVelocity pivotCancoderVelocity = DegreesPerSecond.of(0);
+        public Voltage pivotAppliedVolts = Volts.of(0);
+        public Current pivotCurrentAmps = Amps.of(0); 
 
         public boolean rollerConnected = false;
-        public AngularVelocity RollerAngularVelocity = DegreesPerSecond.of(0); 
-        public Voltage RollerAppliedVolts = Volts.of(0); 
-        public Current RollerCurrentAmps = Amps.of(0); 
+        public AngularVelocity rollerAngularVelocity = DegreesPerSecond.of(0); 
+        public Voltage rollerAppliedVolts = Volts.of(0); 
+        public Current rollerCurrentAmps = Amps.of(0); 
     }
     
     public default void updateInputs(IntakeIOInputsAutoLogged inputs) {}

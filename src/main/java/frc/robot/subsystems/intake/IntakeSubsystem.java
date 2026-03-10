@@ -1,5 +1,6 @@
 package frc.robot.subsystems.intake; 
 
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -17,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.util.LoggedTracer;
+import frc.robot.util.MapleSimUtil;
 import frc.robot.util.Mechanism3d;
 
 public class IntakeSubsystem extends SubsystemBase {
@@ -47,11 +49,20 @@ public class IntakeSubsystem extends SubsystemBase {
 
         Logger.recordOutput("Intake/PivotSetpoint", setpointAngle);
 
-        Mechanism3d.measured.setIntake(inputs.PivotAngle);
+        Mechanism3d.measured.setIntake(inputs.pivotAngle);
         Mechanism3d.setpoints.setIntake(setpointAngle);
 
         if (Constants.getMode() == Mode.SIM) {
-            // MapleSimUtil.setIntakeRunning(isIntakeDeployed() && inputs.RollerAngularVelocity.gt(RadiansPerSecond.zero()));
+            MapleSimUtil.setIntakeRunning(isIntakeDeployed() && inputs.rollerAngularVelocity.gt(RadiansPerSecond.zero()));
+        }
+
+        if (inputs.pivotAngle.gt(IntakeConstants.deployedAngle.times(0.9)) && 
+                inputs.rollerAngularVelocity.gt(IntakeConstants.rollerCollectVelocity.times(0.5))) {
+            this.io.setPivotVoltage(Volts.of(4.0)) ;
+            Logger.recordOutput("Intake/Pivot", "Holding") ;
+        }
+        else {
+            Logger.recordOutput("Intake/Pivot", "Not Holding") ;
         }
 
         LoggedTracer.record("IntakePeriodic");
@@ -108,7 +119,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
     
     public Angle getPivotAngle(){
-        return inputs.PivotAngle;
+        return inputs.pivotAngle;
     }
 
     public boolean isIntakeDeployed() {
@@ -124,7 +135,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public boolean isPivotAtAngle(Angle angle){
-        var ret = inputs.PivotAngle.isNear(angle, IntakeConstants.pivotTolerance);
+        var ret = inputs.pivotAngle.isNear(angle, IntakeConstants.pivotTolerance);
         return ret;
     }
 
@@ -173,7 +184,7 @@ public class IntakeSubsystem extends SubsystemBase {
     public Command intakeSequence() {
         return runIntakeCmd().beforeStarting(
             deployCmd().unless(this::isIntakeDeployed)
-        ).finallyDo(interrupted -> waiting());
+        );
     }
 
     public Command runEjectCmd() {
@@ -188,7 +199,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     private Command moveIntakeWhileShooting() {
         return new MoveIntakeCmd(this, IntakeConstants.shootAngles, IntakeConstants.angleChangeDelay)
-            .finallyDo(interruped -> waiting());
+            .finallyDo(interrupted -> waiting());
     }
 
     public Command enableShootMode() {
