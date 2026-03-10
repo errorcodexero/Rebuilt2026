@@ -44,6 +44,8 @@ public class IntakeSubsystem extends SubsystemBase {
         io.updateInputs(inputs);
         Logger.processInputs("Intake", inputs);
 
+        Logger.recordOutput("Intake/Deployed", isIntakeDeployed());
+
         pivotAlert.set(!inputs.pivotConnected);
         rollerAlert.set(!inputs.rollerConnected);
 

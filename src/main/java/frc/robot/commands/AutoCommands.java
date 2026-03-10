@@ -58,4 +58,25 @@ public class AutoCommands {
             
         ); 
     }
+
+    public static Command a3DepotAuto(Drive drive, Shooter shooter, IntakeSubsystem intake, Hopper hopper) {
+        return Commands.sequence(
+            //Drive from trench to a point in neutral zone, collecting balls and bringing down intake
+            Commands.deadline(
+                DriveCommands.initialFollowPathCommand(drive, "a3BumpToDepot"),
+                new StartupCmd(intake, hopper, shooter).beforeStarting(Commands.waitTime(Seconds.of(0.6)))
+            ),
+
+            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(5.0)),
+
+            Commands.parallel(
+                intake.intakeSequence(),
+                hopper.collectScrambler()
+            ).withDeadline(DriveCommands.followPathCommand("a3DepotToOutpost")),
+
+            DriveCommands.followPathCommand("a3OutpostToShoot"),
+
+            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(8.0))
+        ); 
+    }    
 }
