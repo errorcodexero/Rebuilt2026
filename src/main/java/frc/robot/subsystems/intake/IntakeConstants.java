@@ -52,7 +52,7 @@ public final class IntakeConstants {
     public static final Angle pivotTolerance = Degrees.of(3); //Tolerance to compare current angle to target
 
     public static final boolean pivotEncoderInverted = false;
-    public static final Angle pivotEncoderOffset = Degrees.of(-150.8) ;
+    public static final Angle pivotEncoderOffset = Degrees.of(-154.3) ;
 
     // Gear Ratios
     public static final double motorToEncoderGearRatio = (1.0/45.0) * (24.0/31.0);

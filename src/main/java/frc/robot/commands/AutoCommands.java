@@ -46,7 +46,7 @@ public class AutoCommands {
             RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(5.0)),
 
             //Drive back into the neutral zone, collecting more balls along the way
-            DriveCommands.followPathCommand("a2Shoot1toHub").deadlineFor(intake.intakeSequence()),
+            DriveCommands.followPathCommand("a2Shoot1toHub", mirroredX).deadlineFor(intake.intakeSequence()),
             
             //Drive back to alliance zone and shoot the rest of the balls into the hub
             DriveCommands.followPathCommand("a2HubToShoot2", mirroredX).deadlineFor(
