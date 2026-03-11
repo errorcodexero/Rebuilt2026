@@ -29,9 +29,11 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
@@ -249,13 +251,23 @@ public class Shooter extends SubsystemBase {
         Supplier<ShooterParams> shooterParams =
             () -> getTuning().getShooterParams(distance.get().in(Meters));
 
+        Timer timer = new Timer();
+        Trigger timerElapsed = new Trigger(() -> timer.hasElapsed(Seconds.of(3)));
+
         return Commands.parallel(
             runDynamicSetpoints(
                 () -> RotationsPerSecond.of(shooterParams.get().velocity),
                 () -> Degrees.of(shooterParams.get().hood)
             ),
             hopper.preShoot().until(this::isShooterReady).andThen(hopper.forwardFeed()),
-            Commands.waitUntil(shakeTrigger).andThen(intake.shakeBalls()).until(shakeTrigger.negate()).repeatedly()
+
+            Commands.waitUntil(shakeTrigger)
+            
+            .andThen(intake.shakeBalls()).until(shakeTrigger.negate()).repeatedly(),
+
+            Commands.waitUntil(shakeTrigger.or(timerElapsed.and(RobotModeTriggers.autonomous())))
+                .andThen(intake.shakeBalls())
+                .until(shakeTrigger.negate().and(RobotModeTriggers.autonomous().negate()))
         );
     }
 
