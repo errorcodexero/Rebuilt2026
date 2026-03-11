@@ -223,7 +223,7 @@ public class Drive extends SubsystemBase {
                 module.stop();
             }
         }
-
+        
         // Log empty setpoint states when disabled
         if (DriverStation.isDisabled()) {
             Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
