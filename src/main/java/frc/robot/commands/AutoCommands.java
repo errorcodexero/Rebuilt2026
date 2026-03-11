@@ -14,7 +14,7 @@ import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.shooter.Shooter;
 
 public class AutoCommands {
-    public static Command a1TrenchToTrench(Drive drive, IntakeSubsystem intake, Hopper hopper, Shooter shooter, boolean mirroredX){
+    public static Command a1TrenchToTrench(Drive drive, IntakeSubsystem intake, Hopper hopper, Shooter shooter, boolean mirroredX) {
         return Commands.sequence(
             Commands.deadline(
                 DriveCommands.initialFollowPathCommand(drive,"A1_TopToBottomTrench", mirroredX),
@@ -23,7 +23,8 @@ public class AutoCommands {
 
             // Added: timeout on shoot
             RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(5.0)),
-            DriveCommands.followPathCommand("A1_BottomToTopTrench", mirroredX).deadlineFor(intake.intakeSequence()),
+            DriveCommands.followPathCommand("A1_BottomToTopTrench", mirroredX)
+                .deadlineFor(RobotCommands.intake(intake, hopper)),
 
             // Added: timeout on shoot
             RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(5.0))
@@ -46,7 +47,8 @@ public class AutoCommands {
             RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(5.0)),
 
             //Drive back into the neutral zone, collecting more balls along the way
-            DriveCommands.followPathCommand("a2Shoot1toHub", mirroredX).deadlineFor(intake.intakeSequence()),
+            DriveCommands.followPathCommand("a2Shoot1toHub", mirroredX)
+                .deadlineFor(RobotCommands.intake(intake, hopper)),
             
             //Drive back to alliance zone and shoot the rest of the balls into the hub
             DriveCommands.followPathCommand("a2HubToShoot2", mirroredX).deadlineFor(
@@ -69,10 +71,8 @@ public class AutoCommands {
 
             RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(5.0)),
 
-            Commands.parallel(
-                intake.intakeSequence(),
-                hopper.collectScrambler()
-            ).withDeadline(DriveCommands.followPathCommand("a3DepotToOutpost")),
+            DriveCommands.followPathCommand("a3DepotToOutpost")
+                .deadlineFor(RobotCommands.intake(intake, hopper)),
 
             DriveCommands.followPathCommand("a3OutpostToShoot"),
 

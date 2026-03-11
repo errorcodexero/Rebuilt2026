@@ -12,6 +12,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
+import frc.robot.Constants.FieldConstants;
 
 public class ShooterConstants {
     public static final int shooter1CANID = 0;
@@ -80,7 +81,7 @@ public class ShooterConstants {
             public static final Distance spinUpZone = Meters.of(6.0);
 
             public static final Distance blueAllianceWall = Meters.of(0);
-            public static final Distance redAllianceWall = Meters.of(15);
+            public static final Distance redAllianceWall = Meters.of(FieldConstants.layout.getFieldLength());
 
             public static final Translation2d blueTargetLeft = new Translation2d(2,6);
             public static final Translation2d blueTargetRight = new Translation2d(2,2);

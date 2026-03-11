@@ -2,7 +2,6 @@ package frc.robot.subsystems.shooter;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
@@ -12,7 +11,7 @@ import static edu.wpi.first.units.Units.Volts;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.DoubleSupplier;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -22,8 +21,6 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -32,20 +29,18 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.RobotState;
-import frc.robot.commands.drive.DriveCommands;
-import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.shooter.ShooterTuning.ShooterParams;
@@ -253,9 +248,15 @@ public class Shooter extends SubsystemBase {
      * 
      * 
      */
-    public Command shootAtDistance(Supplier<Distance> distance, Hopper hopper, IntakeSubsystem intake) {
+    public Command shootAtDistance(Supplier<Distance> distance, Hopper hopper, IntakeSubsystem intake, Trigger shakeTrigger) {
         Supplier<ShooterParams> shooterParams =
             () -> getTuning().getShooterParams(distance.get().in(Meters));
+
+        Timer timer = new Timer();
+        Trigger timerElapsed = new Trigger(() -> timer.hasElapsed(Seconds.of(0.5)));
+
+        BooleanSupplier shakeWhen = shakeTrigger.or(timerElapsed.and(RobotModeTriggers.autonomous()));
+        BooleanSupplier shakeUntil = shakeTrigger.negate().and(RobotModeTriggers.autonomous().negate());
 
         return Commands.parallel(
             runDynamicSetpoints(
@@ -263,7 +264,14 @@ public class Shooter extends SubsystemBase {
                 () -> Degrees.of(shooterParams.get().hood)
             ),
             hopper.preShoot().until(this::isShooterReady).andThen(hopper.forwardFeed()),
-            intake.enableShootMode()
+
+            Commands.runOnce(timer::restart)
+                .andThen(
+                    Commands.waitUntil(shakeWhen),
+                    intake.shakeBalls()
+                )
+                .until(shakeUntil)
+                .repeatedly()
         );
     }
 
@@ -389,111 +397,4 @@ public class Shooter extends SubsystemBase {
         });
     }
 
-
-    /**
-     * Shoot balls from the shooter until the command ends.
-     * @return
-     */
-    public Command shootCmd(Hopper hopper) {
-        return Commands.parallel(
-            runDynamicSetpoints(() -> RPM.of(5000), () -> Degrees.of(30)),
-            hopper.forwardFeed()
-        );
-    }
-
-    public Command ferryToOutpost(Drive drive, Hopper hopper, IntakeSubsystem intake, DoubleSupplier xSupplier, DoubleSupplier ySupplier){
-        return new ConditionalCommand(
-            Commands.parallel(
-                DriveCommands.joystickDriveAtAngle(
-                    drive,
-                    ()-> 0,
-                    () -> 0,
-                    () -> {
-                        Translation2d ferryTarget = ShooterConstants.FerryPositions.blueOutpostTarget;
-
-                        var targetTranslation= ferryTarget.minus(drive.getPose().getTranslation());
-                        var targetRotation= new Rotation2d(targetTranslation.getX(), targetTranslation.getY());
-                        return targetRotation;
-                    }
-                ),
-                shootCmd(hopper)
-            ),
-            Commands.parallel(
-                DriveCommands.joystickDriveAtAngle(
-                    drive,
-                    ()-> 0,
-                    () -> 0,
-                    () -> {
-                        Translation2d ferryTarget= ShooterConstants.FerryPositions.redOutpostTarget;
-
-                        var targetTranslation= ferryTarget.minus(drive.getPose().getTranslation());
-                        var targetRotation= new Rotation2d(targetTranslation.getX(), targetTranslation.getY());
-                        return targetRotation;
-                    }
-                ),
-                shootCmd(hopper)
-            ),
-
-            () -> {
-                if(DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue){
-                    return true;
-                }
-                return false;
-            }
-        );
-    }
-
-    public Command ferryOnMove(Drive drive, Hopper hopper, DoubleSupplier xSupplier, DoubleSupplier ySupplier, IntakeSubsystem intake){
-        return new ConditionalCommand(
-
-            Commands.parallel(
-                DriveCommands.joystickDriveAtAngle(
-                    drive,
-                    xSupplier,
-                    ySupplier,
-                    () -> {
-                        Translation2d ferryTarget= 
-                        DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                        ? ShooterConstants.FerryPositions.blueOutpostTarget
-                        : ShooterConstants.FerryPositions.redOutpostTarget;
-
-                        var targetTranslation= ferryTarget.minus(drive.getPose().getTranslation());
-                        var targetRotation= new Rotation2d(targetTranslation.getX(), targetTranslation.getY());
-                        return targetRotation;
-                }),
-                intake.intakeSequence(),
-                shootCmd(hopper)
-            ),
-            
-            Commands.parallel(
-                DriveCommands.joystickDriveAtAngle(
-                    drive,
-                    xSupplier,
-                    ySupplier,
-                    () -> {
-                        Translation2d ferryTarget= 
-                        DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                        ? ShooterConstants.FerryPositions.blueOutpostTarget
-                        : ShooterConstants.FerryPositions.redOutpostTarget;
-
-                        var targetTranslation= ferryTarget.minus(drive.getPose().getTranslation());
-                        var targetRotation= new Rotation2d(targetTranslation.getX(), targetTranslation.getY());
-                        return targetRotation;
-                }),
-                intake.intakeSequence(),
-                shootCmd(hopper)
-            ),
-
-            () -> {
-                var robotPose= drive.getPose().getTranslation();
-
-                if(robotPose.getY()<3){
-                    return true;
-                } else if (robotPose.getY()>5){
-                    return false;
-                } 
-                return false;
-            }
-        );
-    }
 }

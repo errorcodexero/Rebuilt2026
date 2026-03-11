@@ -5,6 +5,8 @@ import static edu.wpi.first.units.Units.Meters;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Distance;
@@ -12,6 +14,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.RobotState;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
@@ -28,7 +31,7 @@ public class RobotCommands {
      * @param drive
      * @return
      */
-    private static Command shootHub(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive) {
+    private static Command shootHub(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive, Trigger shakeTrigger) {
         BooleanSupplier aimedAtHub =
             () -> drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.aimingTolerance);
 
@@ -41,7 +44,7 @@ public class RobotCommands {
             ).finallyDo(drive::stopWithX),
             Commands.repeatingSequence(
                 Commands.waitUntil(aimedAtHub).deadlineFor(shooter.spinUpForDistance(RobotState::hubDistance)),
-                shooter.shootAtDistance(RobotState::hubDistance, hopper, intake)
+                shooter.shootAtDistance(RobotState::hubDistance, hopper, intake, shakeTrigger)
                     .until(() -> !aimedAtHub.getAsBoolean())
             )
         );
@@ -54,7 +57,7 @@ public class RobotCommands {
      * @param drive
      * @return
      */
-    private static Command ferry(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive) {
+    private static Command ferry(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive, Trigger shakeTrigger) {
         Translation2d rightTarget =
             DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
                 ? ShooterConstants.Positions.blueTargetRight
@@ -70,17 +73,37 @@ public class RobotCommands {
                 ? rightTarget
                 : leftTarget;
 
-        Supplier<Distance> targetDistance =
-            () -> Meters.of(target.get().getDistance(drive.getPose().getTranslation()));
+        Supplier<Distance> targetDistance = () -> Meters.of(target.get().getDistance(drive.getPose().getTranslation()));
 
-        Supplier<Rotation2d> targetingAngle = 
-            () -> {
-                var botToHub = target.get().minus(drive.getPose().getTranslation());
-                return new Rotation2d(botToHub.getX(), botToHub.getY());
-            };
+        Supplier<Rotation2d> targetingAngle = () -> {
+            var botToTarget = target.get().minus(drive.getPose().getTranslation());
+            return new Rotation2d(botToTarget.getX(), botToTarget.getY());
+        };
 
         return DriveCommands.joystickDriveAtAngle(targetingAngle)
-            .alongWith(shooter.shootAtDistance(targetDistance, hopper, intake));
+            .alongWith(
+                shooter.shootAtDistance(targetDistance, hopper, intake, shakeTrigger),
+                Commands.runOnce(() -> {
+                    Logger.recordOutput("Ferry/Target", target.get());
+                    Logger.recordOutput("Ferry/IsFerrying", true);
+                })
+            ).finallyDo(i -> Logger.recordOutput("Ferry/IsFerrying", false));
+    }
+
+    /**
+     * Shoots at either the hub, or ferrying targets based on the current robot position.
+     * @param shooter
+     * @param hopper
+     * @param drive
+     * @param shakeTrigger
+     * @return
+     */
+    public static Command shoot(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive, Trigger shakeTrigger) {
+        return Commands.either(
+            shootHub(shooter, hopper, intake, drive, shakeTrigger),
+            ferry(shooter, hopper, intake, drive, shakeTrigger),
+            RobotState::inAllianceZone
+        );
     }
 
     /**
@@ -91,11 +114,7 @@ public class RobotCommands {
      * @return
      */
     public static Command shoot(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive) {
-        return Commands.either(
-            shootHub(shooter, hopper, intake, drive),
-            ferry(shooter, hopper, intake, drive),
-            RobotState::inAllianceZone
-        );
+        return shoot(shooter, hopper, intake, drive, new Trigger(() -> false));
     }
 
     /**
@@ -105,5 +124,18 @@ public class RobotCommands {
      */
     public static Command ejectUp(Shooter shooter, Hopper hopper) {
         return shooter.ejectUp().alongWith(hopper.ejectUp());
+    }
+
+    /**
+     * The full sequence for intaking balls, with scrambler movement. For intake while shooting, or
+     * any situation where we want to intake while the hopper is already required, just use intake.intakeSequence().
+     * 
+     * For most cases, this command is preferred.
+     * @param intake
+     * @param hopper
+     * @return
+     */
+    public static Command intake(IntakeSubsystem intake, Hopper hopper) {
+        return intake.intakeSequence().alongWith(hopper.collectScrambler());
     }
 }

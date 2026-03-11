@@ -7,11 +7,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 public class MoveIntakeCmd extends Command {
     private final IntakeSubsystem intake;
-    private int index ;
-    private final Angle[] intakeAngles ;
-    private Angle current ;
-    private final Time delay;
+    private final Angle[] intakeAngles;
+
     private final Timer delayTimer;
+    private final Time delay;
+
+    private int index;
+    private Angle current;
     private boolean waitingForDelay;
 
     public MoveIntakeCmd(IntakeSubsystem intake, Angle[] shootAngles, Time delay) {
@@ -20,13 +22,17 @@ public class MoveIntakeCmd extends Command {
         this.delay = delay;
         this.delayTimer = new Timer();
         this.waitingForDelay = false;
+        addRequirements(intake);
     }
 
     @Override
     public void initialize() {
         index = 0 ;
         current = intakeAngles[index];
+
         intake.setPivotAngle(current);
+        intake.setRollerVelocity(IntakeConstants.rollerShootVelocity);
+
         waitingForDelay = false;
     }
 
@@ -49,6 +55,11 @@ public class MoveIntakeCmd extends Command {
                 delayTimer.restart();
             }
         }
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        intake.stopRoller();
     }
 
     @Override

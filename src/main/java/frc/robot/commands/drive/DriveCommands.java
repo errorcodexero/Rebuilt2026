@@ -71,7 +71,7 @@ public class DriveCommands {
   private static final double ANGLE_KP = 4.0;
   private static final double ANGLE_KD = 0.0;
   private static final double ANGLE_MAX_VELOCITY = 8.0;
-  private static final double ANGLE_MAX_ACCELERATION = 20.0;
+  private static final double ANGLE_MAX_ACCELERATION = 40.0;
   private static final double FF_START_DELAY = 2.0; // Secs
   private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
   private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
@@ -582,33 +582,35 @@ public class DriveCommands {
   public static Command initialFollowPathCommand(Drive drive, String pathName, boolean mirroredX) {
     Optional<PathPlannerPath> path = findPath(pathName, mirroredX);
 
-    if (path.isPresent()) {
-      PathPlannerPath initPosePath = path.get();
-      Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+    return Commands.defer(() -> {
+      if (path.isPresent()) {
+        PathPlannerPath initPosePath = path.get();
+        Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
 
-      if (alliance == Alliance.Red) {
-        initPosePath = path.get().flipPath();
+        if (alliance == Alliance.Red) {
+          initPosePath = path.get().flipPath();
+        }
+
+        if (initPosePath.getStartingHolonomicPose().isEmpty()) {
+          return Commands.none();
+        }
+
+        var startingPose = initPosePath.getStartingHolonomicPose().orElseThrow();
+
+        return Commands.sequence(
+            setPoseCommand(
+                drive,
+                startingPose,
+                false
+            ).alongWith(
+              Commands.runOnce(() -> MapleSimUtil.placeRobotOnField(startingPose))
+                .onlyIf(() -> Constants.getMode() == Mode.SIM)
+            ),
+            AutoBuilder.followPath(path.get()));
       }
 
-      if (initPosePath.getStartingHolonomicPose().isEmpty()) {
-        return Commands.none();
-      }
-
-      var startingPose = initPosePath.getStartingHolonomicPose().orElseThrow();
-
-      return Commands.sequence(
-          setPoseCommand(
-              drive,
-              startingPose,
-              false
-          ).alongWith(
-            Commands.runOnce(() -> MapleSimUtil.placeRobotOnField(startingPose))
-              .onlyIf(() -> Constants.getMode() == Mode.SIM)
-          ),
-          AutoBuilder.followPath(path.get()));
-    }
-
-    return Commands.none();
+      return Commands.none();
+    }, Set.of(drive));
   }
 
   /**
