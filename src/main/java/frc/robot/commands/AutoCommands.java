@@ -55,7 +55,7 @@ public class AutoCommands {
                 shooter.spinUpForDistanceHoodParked(() -> Meters.of(3.7)),
                 hopper.preShoot()
             ),
-            
+
             RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(10.0))
             
         ); 

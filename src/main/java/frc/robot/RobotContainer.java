@@ -218,6 +218,7 @@ public class RobotContainer {
             hopper_ = new Hopper(new HopperIO() {});
         }
         
+        // Force Preload Static Apriltag Layout
         for (var tag : FieldConstants.layout.getTags()) {
             System.out.println("Tag Loaded: " + tag.ID);
         }
@@ -288,14 +289,11 @@ public class RobotContainer {
         // While the left trigger is held, we will run the intake. If the intake is stowed, it will also deploy it.
         gamepad_.leftTrigger().or(operatorGamepad_.leftTrigger()).whileTrue(RobotCommands.intake(intake_, hopper_));
 
-        operatorGamepad_.b().whileTrue(RobotCommands.ejectUp(shooter_, hopper_));
-
         // While the right trigger is held, we will shoot into the hub or ferry.
-        gamepad_.rightTrigger().or(operatorGamepad_.rightTrigger()).whileTrue(
-            RobotCommands.shoot(shooter_, hopper_, intake_, drivebase_, gamepad_.a().or(operatorGamepad_.a()))
-        );
+        gamepad_.rightTrigger().or(operatorGamepad_.rightTrigger())
+            .whileTrue(RobotCommands.shoot(shooter_, hopper_, intake_, drivebase_, gamepad_.a().or(operatorGamepad_.a())));
 
-        //While the X button is held, the intake will run the eject sequence. If it the intake is stowed, it will also deploy it.
+        // While the X button is held, the intake will run the eject sequence. If it the intake is stowed, it will also deploy it.
         operatorGamepad_.x().whileTrue(intake_.hopperEjectSequence().alongWith(hopper_.reverseFeed()));
         operatorGamepad_.y().whileTrue(RobotCommands.ejectUp(shooter_, hopper_));
 

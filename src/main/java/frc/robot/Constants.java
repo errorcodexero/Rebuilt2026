@@ -13,20 +13,14 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Inches;
-
 import java.util.Set;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
-import frc.robot.subsystems.shooter.ShooterConstants;
 
 /**
 * This class defines the runtime mode used by AdvantageKit. The mode is always "real" when running
@@ -54,24 +48,6 @@ public final class Constants {
 
     public static class DriveConstants {
         public static final double slowModeJoystickMultiplier = 0.4;
-
-        public static final Distance fieldLength = Inches.of(651.22);
-        public static final Distance fieldWidth = Inches.of(317.69);
-
-        public static final Distance allianceZoneBlue = Inches.of(156.61);
-        public static final Distance allianceZoneRed = fieldLength.minus(allianceZoneBlue);
-
-        public static final Translation2d blueLeftFerryTarget = new Translation2d(allianceZoneBlue.div(2.0), fieldWidth.times(5.0/6.0));
-        public static final Translation2d blueRightFerryTarget = new Translation2d(allianceZoneBlue.div(2.0), fieldWidth.times(1.0/6.0));
-        public static final Translation2d redLeftFerryTarget = new Translation2d(fieldLength.minus(allianceZoneBlue.div(2.0)), fieldWidth.times(5.0/6.0));
-        public static final Translation2d redRightFerryTarget = new Translation2d(fieldLength.minus(allianceZoneBlue.div(2.0)), fieldWidth.times(1.0/6.0));
-        public static Translation2d getHubTranslation(Alliance alliance){
-            return (
-                    alliance == Alliance.Blue
-                    ? ShooterConstants.Positions.blueHubPose
-                    : ShooterConstants.Positions.redHubPose
-                );
-        }
     }
     
     public static class FieldConstants {

@@ -101,7 +101,6 @@ public class AprilTagVision extends SubsystemBase {
 
         // Iterate cameras for logging and pose estimations.
         for (int cam = 0; cam < io_.length; cam++) {
-            LoggedTracer.reset();
 
             // Activate disconnected alert.
             alerts_[cam].set(!inputs_[cam].connected);
@@ -111,8 +110,6 @@ public class AprilTagVision extends SubsystemBase {
 
             ArrayList<Pose3d> tagPoses = new ArrayList<>();
 
-            // Loop through visible tags.
-            LoggedTracer.record("Vision/Camera" + cam + "/PreLoop");
             for (Fiducial fid : inputs_[cam].fiducials) {
                 Optional<Pose3d> pose = FieldConstants.layout.getTagPose(fid.id());
                 if (pose.isPresent()) {
@@ -120,21 +117,15 @@ public class AprilTagVision extends SubsystemBase {
                 }
             }
 
-            LoggedTracer.record("Vision/Camera" + cam + "/GatherFiducials");
-
             PoseEstimation est = inputs_[cam].poseEstimate;
             poseEstimates.add(est);
 
             // Add to summaries.
             summaryTagPoses.addAll(tagPoses);
 
-            LoggedTracer.record("Vision/Camera" + cam + "/AddArrays");
-
             // Log camera-specific outputs.
             Logger.recordOutput(getCameraKey(cam, "TagPoses"), tagPoses.toArray(new Pose3d[0]));
             Logger.recordOutput(getCameraKey(cam, "BotPose"), est.pose());
-
-            LoggedTracer.record("Vision/Camera" + cam + "/LogOutputs");
         }
 
         LoggedTracer.record("Vision/GatherPoses");

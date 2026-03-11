@@ -20,8 +20,6 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -39,12 +37,9 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
-import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Mode;
-import frc.robot.RobotState;
 import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.subsystems.intake.IntakeSubsystem;
-import frc.robot.subsystems.shooter.ShooterConstants.Positions.HubDistance;
 import frc.robot.subsystems.shooter.ShooterTuning.ShooterParams;
 import frc.robot.util.LoggedTracer;
 import frc.robot.util.MapleSimUtil;
@@ -191,62 +186,6 @@ public class Shooter extends SubsystemBase {
         }).ignoringDisable(true);
     }
 
-    /**
-     * The command that the shooter can run whenever its not shooting to manage
-     * things like going to different hood angles to get ready to shoot,
-     * or lowering the hood under the trench.
-     * @return A command that does so.
-     */
-    public Command awaitShooting(Supplier<Pose2d> robotPose, Supplier<Translation2d> targetPose) {
-        return runDynamicSetpoints(() -> RadiansPerSecond.zero(), () -> {
-            Pose2d pose = robotPose.get();
-            Pose2d nearestTrench = pose.nearest(FieldConstants.trenches);
-            Distance nearestDistance = Meters.of(pose.getTranslation().getDistance(nearestTrench.getTranslation()));
-
-            if (nearestDistance.lte(ShooterConstants.allowedTrenchDistance)) {
-                return Degrees.zero();
-            }
-
-            Translation2d hubTranslation = targetPose.get(); 
-
-            Distance distanceToHub = Meters.of(pose.getTranslation().getDistance(hubTranslation));
-
-            switch(HubDistance.fromDistance(distanceToHub)) {
-                case LOW:
-                    return Degrees.of(ShooterConstants.Positions.hoodLOW);
-                case MEDIUM:
-                    return Degrees.of(ShooterConstants.Positions.hoodMEDIUM);
-                case HIGH:
-                    return Degrees.of(ShooterConstants.Positions.hoodHIGH);
-                default:  
-                    return Degrees.of(ShooterConstants.Positions.hoodLOW);  
-                    
-            }
-        });
-    }
-    public Command awaitShooting(Supplier<Pose2d> robotPose) {
-        return runDynamicSetpoints(
-            // () -> RotationsPerSecond.of(
-            //     RobotState.inAllianceZone()
-            //         ? getTuning().getShooterParams(RobotState.hubDistance().in(Meters)).velocity
-            //         : 0.0
-            // ),      
-            () -> RotationsPerSecond.of(0.0) ,      
-            () -> {
-                Pose2d pose = robotPose.get();
-                Pose2d nearestTrench = pose.nearest(FieldConstants.trenches);
-                Distance nearestDistance = Meters.of(pose.getTranslation().getDistance(nearestTrench.getTranslation()));
-
-                if (nearestDistance.lte(ShooterConstants.allowedTrenchDistance)) {
-                    return Degrees.zero();
-                }
-
-                var params = getTuning().getShooterParams(RobotState.hubDistance().in(Meters));
-                return Degrees.of(params.hood);
-            }
-        );
-    }
-
     public Command runToSetpointsCmd(AngularVelocity vel, Angle pos) {
         return startEnd(() -> setSetpoints(vel, pos), this::stopShooter).withName("Set Shooter Setpoints");
     }
@@ -271,9 +210,7 @@ public class Shooter extends SubsystemBase {
     public Command hoodToPosCmd(Angle pos) {
         return runOnce(() -> setHoodAngle(pos)).withName("Set Hood Position");
     }
-    public Command runSetpoints(AngularVelocity vel, Angle pos) {
-        return startEnd(() -> setSetpoints(vel, pos), this::stopShooter);
-    }
+
     /**
      * Calculates Velocity and Hood Angle based on distance and Shoots
      * 
