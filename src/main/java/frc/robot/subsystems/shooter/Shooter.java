@@ -42,14 +42,13 @@ import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.RobotState;
-import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.shooter.ShooterConstants.Positions.HubDistance;
 import frc.robot.subsystems.shooter.ShooterTuning.ShooterParams;
 import frc.robot.util.LoggedTracer;
 import frc.robot.util.MapleSimUtil;
 import frc.robot.util.Mechanism3d;
-import frc.robot.subsystems.shooter.ShooterConstants.Positions.HubDistance;
 
 
 public class Shooter extends SubsystemBase {
@@ -190,16 +189,6 @@ public class Shooter extends SubsystemBase {
             }
             tuningIndex_ = 0;
         }).ignoringDisable(true);
-    }
-
-    /**
-     * Runs specified setpoints until the command ends, then stops.
-     * @param vel
-     * @param pos
-     * @return
-     */
-    public Command shoot(Drive drive, Hopper hopper, IntakeSubsystem intake, Trigger shakeTrigger) {
-        return shootAtDistance(() -> Meters.of(drive.getVirtualTarget(this).getDistance(drive.getPose().getTranslation())), hopper, intake, shakeTrigger);
     }
 
     /**

@@ -229,7 +229,11 @@ public class RobotContainer {
             () -> -gamepad_.getRightX()
         );
 
-        RobotState.initialize(drivebase_::getPose);
+        RobotState.initialize(
+            drivebase_::getPose,
+            drivebase_::getFieldChassisSpeeds,
+            shooter_::getTuning
+        );
 
         // Initialize the visualizers.
         Mechanism3d.measured.zero();
@@ -287,31 +291,16 @@ public class RobotContainer {
         operatorGamepad_.b().whileTrue(RobotCommands.ejectUp(shooter_, hopper_));
 
         // While the right trigger is held, we will shoot into the hub or ferry.
-        // When the hopper isnt shooting, set it to run its idle velocity.
-        // hopper_.setDefaultCommand(hopper_.idleScrambler());
-
-                // while in alliance zone, point drivebase at virtual target, but still allow translational driving
-        //lowkey we are not gonna need this but like maybe so idk imma just keep it
-
-        // While the right trigger is held, we will shoot into the hub.
-        // i wish i knew if this shoot command would interrrupt the other aim command, so this is kind of a "just in case", but if it is unnesecary it will be removed. 
-        //CHANGE BACK TO RIGHT TRIGGER!
-        // we might want to limit the acceleration on this while shooting, but idk how to do that and hopefully it wont matter too much. 
-        // just realized we could interrupt this with POV driving, but we would still be shooting, so we might want to create a block for that, but this too probably wont come up that much and i think i am not that numb-skulled to actually do this so idk
         gamepad_.rightTrigger().or(operatorGamepad_.rightTrigger()).whileTrue(
-            RobotCommands.shoot(shooter_, hopper_, drivebase_, intake_, gamepad_, Constants.shootOnMove, gamepad_.a().or(operatorGamepad_.a()))
+            RobotCommands.shoot(shooter_, hopper_, intake_, drivebase_, gamepad_.a().or(operatorGamepad_.a()))
         );
-        // When the shooter isnt shooting, get it ready to shoot.
-        shooter_.setDefaultCommand(shooter_.awaitShooting(drivebase_::getPose, () -> drivebase_.getVirtualTarget(shooter_)));
-
-        // When the shooter isnt shooting, get it ready to shoot.
-        shooter_.setDefaultCommand(shooter_.idleCommand());
 
         //While the X button is held, the intake will run the eject sequence. If it the intake is stowed, it will also deploy it.
-
         operatorGamepad_.x().whileTrue(intake_.hopperEjectSequence().alongWith(hopper_.reverseFeed()));
-
         operatorGamepad_.y().whileTrue(RobotCommands.ejectUp(shooter_, hopper_));
+
+        // When the shooter isnt shooting, stow it.
+        shooter_.setDefaultCommand(shooter_.idleCommand());
 
         // Bind dashboard button to refreshing the tuning.
         var refreshTuningButton = new LoggedNetworkBoolean("/Tuning/RefreshTuning", false);

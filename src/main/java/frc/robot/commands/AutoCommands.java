@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.robot.RobotCommands;
 import frc.robot.commands.robot.StartupCmd;
@@ -23,12 +22,12 @@ public class AutoCommands {
             ),
 
             // Added: timeout on shoot
-            RobotCommands.shoot(shooter, hopper, drive, intake, null, false, new Trigger(() -> false)).withTimeout(Seconds.of(5.0)),
+            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(5.0)),
             DriveCommands.followPathCommand("A1_BottomToTopTrench", mirroredX)
                 .deadlineFor(RobotCommands.intake(intake, hopper)),
 
             // Added: timeout on shoot
-            RobotCommands.shoot(shooter, hopper, drive, intake, null, false, new Trigger(() -> false)).withTimeout(Seconds.of(5.0))
+            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(5.0))
         );
     }
 
@@ -44,7 +43,7 @@ public class AutoCommands {
                 shooter.spinUpForDistanceHoodParked(() -> Meters.of(3.7)),
                 hopper.preShoot()
             ),
-            RobotCommands.shoot(shooter, hopper, drive, intake, null, false, new Trigger(() -> false)).withTimeout(Seconds.of(3.8)),
+            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(3.8)),
 
             //Drive back into the neutral zone, collecting more balls along the way
             DriveCommands.followPathCommand("a2Shoot1toHub", mirroredX)
@@ -55,7 +54,7 @@ public class AutoCommands {
                 shooter.spinUpForDistanceHoodParked(() -> Meters.of(3.7)),
                 hopper.preShoot()
             ),
-            RobotCommands.shoot(shooter, hopper, drive, intake, null, false, new Trigger(() -> false)).withTimeout(Seconds.of(4.0))
+            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(4.0))
             
         ); 
     }
@@ -68,14 +67,14 @@ public class AutoCommands {
                 new StartupCmd(intake, hopper, shooter).beforeStarting(Commands.waitTime(Seconds.of(0.6)))
             ),
 
-            RobotCommands.shoot(shooter, hopper, drive, intake, null, false, new Trigger(() -> false)).withTimeout(Seconds.of(5.0)),
+            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(5.0)),
 
             DriveCommands.followPathCommand("a3DepotToOutpost")
                 .deadlineFor(RobotCommands.intake(intake, hopper)),
 
             DriveCommands.followPathCommand("a3OutpostToShoot"),
 
-            RobotCommands.shoot(shooter, hopper, drive, intake, null, false, new Trigger(() -> false)).withTimeout(Seconds.of(8.0))
+            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(8.0))
         ); 
     }    
 }

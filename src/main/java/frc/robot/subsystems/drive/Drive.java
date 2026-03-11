@@ -62,12 +62,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
-import frc.robot.commands.drive.DriveCommands;
-import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.generated.CompTunerConstants;
 import frc.robot.util.LocalADStarAK;
-import frc.robot.util.VirtualTarget;
 import frc.robot.util.LoggedTracer;
 
 public class Drive extends SubsystemBase {
@@ -477,12 +473,6 @@ public class Drive extends SubsystemBase {
 
     public RobotConfig getPathplannerConfig() {
         return PP_CONFIG;
-    }
-
-    
-
-    public Translation2d getVirtualTarget(Shooter shooter) {
-        return VirtualTarget.getVirtualTargetFromTarget(this, DriveCommands.getTarget(this), shooter.getTuning(), ShooterConstants.hangtimeLoopPasses);
     }
     
     /** Returns an array of module translations. */

@@ -243,56 +243,8 @@ public class DriveCommands {
         // Reset PID controller when command starts
         .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
   }
-  
-  public static Command pointAtTarget(Drive drive, CommandXboxController gamepad, Supplier<Translation2d> target, double gamepadMaxSpeed, boolean shootOnMove){
-    return joystickDriveAtAngle(
-                    drive,
-                    () -> shootOnMove ? -gamepad.getLeftY() * gamepadMaxSpeed : 0.0,
-                    () -> shootOnMove ? -gamepad.getLeftX() * gamepadMaxSpeed : 0.0,
-                    () -> {
-                        Logger.recordOutput("Drive/Target", target.get());
-                        var translation = target.get().minus(drive.getPose().getTranslation());
-                        var rotation = new Rotation2d(translation.getX(), translation.getY());
 
-                        return rotation;
-                });
-  }
-
-  public static Translation2d getTarget(Drive drive) {
-    Translation2d target;
-
-    boolean blueDS = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue;
-
-    boolean robotInAllianceZone = blueDS ? 
-      drive.getPose().getMeasureX().lt(DriveConstants.allianceZoneBlue):
-      drive.getPose().getMeasureX().gt(DriveConstants.allianceZoneRed);
-
-    if(robotInAllianceZone){
-      target = DriveConstants.getHubTranslation(DriverStation.getAlliance().orElse(Alliance.Blue));
-    }else if(drive.getPose().getMeasureY().gt(DriveConstants.fieldWidth.div(2.0))){
-        target = blueDS ? DriveConstants.blueLeftFerryTarget : DriveConstants.redLeftFerryTarget ;
-    }else{
-        target = blueDS ? DriveConstants.blueRightFerryTarget : DriveConstants.redRightFerryTarget ;
-    }
-
-    return target;
-  }
-
-  public static double getGamepadMaxSpeed(Drive drive){
-    boolean blueDS = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue;
-
-    boolean robotInAllianceZone = blueDS ? 
-      drive.getPose().getMeasureX().lt(DriveConstants.allianceZoneBlue):
-      drive.getPose().getMeasureX().gt(DriveConstants.allianceZoneRed);
-
-    if(robotInAllianceZone){
-      return Constants.shootOnMoveMaxSpeed;
-    }else{
-      return Constants.ferryOnMoveMaxSpeed;
-    }
-  }
-
-  // make sure this isnt bad with intellisense later
+  @Deprecated
   public static Command pointAtShootingTarget(Drive drive, Shooter shooter, CommandXboxController gamepad, boolean shootOnMove){
     
     return pointAtTarget(drive, gamepad, () -> (shootOnMove ? VirtualTarget.getVirtualTargetFromTarget(drive, getTarget(drive), shooter.getTuning(), ShooterConstants.hangtimeLoopPasses) : getTarget(drive)), getGamepadMaxSpeed(drive), shootOnMove);
