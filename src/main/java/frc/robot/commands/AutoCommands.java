@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.robot.RobotCommands;
 import frc.robot.commands.robot.StartupCmd;

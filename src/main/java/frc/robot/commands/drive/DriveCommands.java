@@ -582,33 +582,35 @@ public class DriveCommands {
   public static Command initialFollowPathCommand(Drive drive, String pathName, boolean mirroredX) {
     Optional<PathPlannerPath> path = findPath(pathName, mirroredX);
 
-    if (path.isPresent()) {
-      PathPlannerPath initPosePath = path.get();
-      Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+    return Commands.defer(() -> {
+      if (path.isPresent()) {
+        PathPlannerPath initPosePath = path.get();
+        Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
 
-      if (alliance == Alliance.Red) {
-        initPosePath = path.get().flipPath();
+        if (alliance == Alliance.Red) {
+          initPosePath = path.get().flipPath();
+        }
+
+        if (initPosePath.getStartingHolonomicPose().isEmpty()) {
+          return Commands.none();
+        }
+
+        var startingPose = initPosePath.getStartingHolonomicPose().orElseThrow();
+
+        return Commands.sequence(
+            setPoseCommand(
+                drive,
+                startingPose,
+                false
+            ).alongWith(
+              Commands.runOnce(() -> MapleSimUtil.placeRobotOnField(startingPose))
+                .onlyIf(() -> Constants.getMode() == Mode.SIM)
+            ),
+            AutoBuilder.followPath(path.get()));
       }
 
-      if (initPosePath.getStartingHolonomicPose().isEmpty()) {
-        return Commands.none();
-      }
-
-      var startingPose = initPosePath.getStartingHolonomicPose().orElseThrow();
-
-      return Commands.sequence(
-          setPoseCommand(
-              drive,
-              startingPose,
-              false
-          ).alongWith(
-            Commands.runOnce(() -> MapleSimUtil.placeRobotOnField(startingPose))
-              .onlyIf(() -> Constants.getMode() == Mode.SIM)
-          ),
-          AutoBuilder.followPath(path.get()));
-    }
-
-    return Commands.none();
+      return Commands.none();
+    }, Set.of(drive));
   }
 
   /**

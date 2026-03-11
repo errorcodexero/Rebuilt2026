@@ -3,6 +3,7 @@ package frc.robot.subsystems.intake;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
+import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
@@ -22,9 +23,9 @@ public final class IntakeConstants {
     public static final int pivotMotorCANID = 8;
     public static final int pivotEncoderCANID = 7;
 
-    public static final Current rollerCurrentLimit = Amps.of(180) ;
-    public static final Current pivotCurrentLimit = Amps.of(80) ;
-    public static final Time currentLimitTime = Seconds.of(1); //Temporary
+    public static final Current rollerCurrentLimit = Amps.of(120);
+    public static final Current pivotCurrentLimit = Amps.of(80);
+    public static final Time currentLimitTime = Milliseconds.of(200);
 
     public static final double pivotKP = 100.0;
     public static final double pivotKD = 0;

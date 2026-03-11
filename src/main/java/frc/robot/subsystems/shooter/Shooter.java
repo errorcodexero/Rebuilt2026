@@ -11,6 +11,7 @@ import static edu.wpi.first.units.Units.Volts;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -252,7 +253,10 @@ public class Shooter extends SubsystemBase {
             () -> getTuning().getShooterParams(distance.get().in(Meters));
 
         Timer timer = new Timer();
-        Trigger timerElapsed = new Trigger(() -> timer.hasElapsed(Seconds.of(3)));
+        Trigger timerElapsed = new Trigger(() -> timer.hasElapsed(Seconds.of(0.5)));
+
+        BooleanSupplier shakeWhen = shakeTrigger.or(timerElapsed.and(RobotModeTriggers.autonomous()));
+        BooleanSupplier shakeUntil = shakeTrigger.negate().and(RobotModeTriggers.autonomous().negate());
 
         return Commands.parallel(
             runDynamicSetpoints(
@@ -261,13 +265,13 @@ public class Shooter extends SubsystemBase {
             ),
             hopper.preShoot().until(this::isShooterReady).andThen(hopper.forwardFeed()),
 
-            Commands.waitUntil(shakeTrigger)
-            
-            .andThen(intake.shakeBalls()).until(shakeTrigger.negate()).repeatedly(),
-
-            Commands.waitUntil(shakeTrigger.or(timerElapsed.and(RobotModeTriggers.autonomous())))
-                .andThen(intake.shakeBalls())
-                .until(shakeTrigger.negate().and(RobotModeTriggers.autonomous().negate()))
+            Commands.runOnce(timer::restart)
+                .andThen(
+                    Commands.waitUntil(shakeWhen),
+                    intake.shakeBalls()
+                )
+                .until(shakeUntil)
+                .repeatedly()
         );
     }
 

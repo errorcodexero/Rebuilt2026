@@ -5,6 +5,8 @@ import static edu.wpi.first.units.Units.Meters;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Distance;
@@ -71,17 +73,37 @@ public class RobotCommands {
                 ? rightTarget
                 : leftTarget;
 
-        Supplier<Distance> targetDistance =
-            () -> Meters.of(target.get().getDistance(drive.getPose().getTranslation()));
+        Supplier<Distance> targetDistance = () -> Meters.of(target.get().getDistance(drive.getPose().getTranslation()));
 
-        Supplier<Rotation2d> targetingAngle = 
-            () -> {
-                var botToHub = target.get().minus(drive.getPose().getTranslation());
-                return new Rotation2d(botToHub.getX(), botToHub.getY());
-            };
+        Supplier<Rotation2d> targetingAngle = () -> {
+            var botToTarget = target.get().minus(drive.getPose().getTranslation());
+            return new Rotation2d(botToTarget.getX(), botToTarget.getY());
+        };
 
         return DriveCommands.joystickDriveAtAngle(targetingAngle)
-            .alongWith(shooter.shootAtDistance(targetDistance, hopper, intake, shakeTrigger));
+            .alongWith(
+                shooter.shootAtDistance(targetDistance, hopper, intake, shakeTrigger),
+                Commands.runOnce(() -> {
+                    Logger.recordOutput("Ferry/Target", target.get());
+                    Logger.recordOutput("Ferry/IsFerrying", true);
+                })
+            ).finallyDo(i -> Logger.recordOutput("Ferry/IsFerrying", false));
+    }
+
+    /**
+     * Shoots at either the hub, or ferrying targets based on the current robot position.
+     * @param shooter
+     * @param hopper
+     * @param drive
+     * @param shakeTrigger
+     * @return
+     */
+    public static Command shoot(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive, Trigger shakeTrigger) {
+        return Commands.either(
+            shootHub(shooter, hopper, intake, drive, shakeTrigger),
+            ferry(shooter, hopper, intake, drive, shakeTrigger),
+            RobotState::inAllianceZone
+        );
     }
 
     /**
@@ -91,12 +113,8 @@ public class RobotCommands {
      * @param drive
      * @return
      */
-    public static Command shoot(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive, Trigger shakeTrigger) {
-        return Commands.either(
-            shootHub(shooter, hopper, intake, drive, shakeTrigger),
-            ferry(shooter, hopper, intake, drive, shakeTrigger),
-            RobotState::inAllianceZone
-        );
+    public static Command shoot(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive) {
+        return shoot(shooter, hopper, intake, drive, new Trigger(() -> false));
     }
 
     /**
