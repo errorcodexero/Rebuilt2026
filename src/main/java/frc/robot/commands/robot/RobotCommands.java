@@ -7,6 +7,7 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants;
 import frc.robot.RobotState;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
@@ -28,7 +29,9 @@ public class RobotCommands {
             () -> drive.rotationIsNear(RobotState.rotationToVirtualHub(), ShooterConstants.aimingTolerance);
 
         return Commands.parallel(
-            DriveCommands.joystickDriveAtAngle(RobotState::rotationToVirtualHub),
+            Constants.shootOnMove
+                ? DriveCommands.joystickDriveAtAngle(RobotState::rotationToVirtualHub, () -> Constants.speedMultiplierShooting)
+                : DriveCommands.joystickDriveAtAngle(drive, () -> 0.0, () -> 0.0, RobotState::rotationToHub, () -> 1.0),
             Commands.repeatingSequence(
                 Commands.waitUntil(aimedAtHub).deadlineFor(shooter.spinUpForDistance(RobotState::hubDistance)),
                 shooter.shootAtDistance(RobotState::virtualHubDistance, hopper, intake, shakeTrigger)
@@ -45,7 +48,7 @@ public class RobotCommands {
      * @return
      */
     private static Command ferry(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive, Trigger shakeTrigger) {
-        return DriveCommands.joystickDriveAtAngle(RobotState::rotationToVirtualFerry)
+        return DriveCommands.joystickDriveAtAngle(RobotState::rotationToVirtualFerry, () -> Constants.speedMultiplierFerrying)
             .alongWith(
                 shooter.shootAtDistance(RobotState::virtualFerryDistance, hopper, intake, shakeTrigger),
                 Commands.runOnce(() -> Logger.recordOutput("Ferry/IsFerrying", true))
