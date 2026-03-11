@@ -36,7 +36,7 @@ public class RobotCommands {
                 Commands.waitUntil(aimedAtHub).deadlineFor(shooter.spinUpForDistance(RobotState::hubDistance)),
                 shooter.shootAtDistance(RobotState::virtualHubDistance, hopper, intake, shakeTrigger)
                     .until(() -> !aimedAtHub.getAsBoolean())
-            )
+            ).alongWith(Commands.run(() -> Logger.recordOutput("Shooter/AimedAtHub", aimedAtHub.getAsBoolean())))
         );
     }
 

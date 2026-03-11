@@ -43,7 +43,7 @@ public final class Constants {
 
     public static final boolean shootOnMove = true;
 
-    public static final double speedMultiplierShooting = 0.4; 
+    public static final double speedMultiplierShooting = 0.2; 
     public static final double speedMultiplierFerrying = 0.8; 
 
     public static class DriveConstants {
