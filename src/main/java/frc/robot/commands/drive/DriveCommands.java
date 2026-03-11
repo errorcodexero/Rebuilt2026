@@ -58,16 +58,11 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.util.MapleSimUtil;
-import frc.robot.util.VirtualTarget;
 
 public class DriveCommands {
   private static final double kStoppedVelocity = 0.15 ;
@@ -242,12 +237,6 @@ public class DriveCommands {
 
         // Reset PID controller when command starts
         .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
-  }
-
-  @Deprecated
-  public static Command pointAtShootingTarget(Drive drive, Shooter shooter, CommandXboxController gamepad, boolean shootOnMove){
-    
-    return pointAtTarget(drive, gamepad, () -> (shootOnMove ? VirtualTarget.getVirtualTargetFromTarget(drive, getTarget(drive), shooter.getTuning(), ShooterConstants.hangtimeLoopPasses) : getTarget(drive)), getGamepadMaxSpeed(drive), shootOnMove);
   }
 
   /**
