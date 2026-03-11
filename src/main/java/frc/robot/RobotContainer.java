@@ -217,8 +217,8 @@ public class RobotContainer {
         if (hopper_ == null) {
             hopper_ = new Hopper(new HopperIO() {});
         }
-
-        // Force Load Apriltag Layout
+        
+        // Force Preload Static Apriltag Layout
         for (var tag : FieldConstants.layout.getTags()) {
             System.out.println("Tag Loaded: " + tag.ID);
         }
@@ -230,7 +230,11 @@ public class RobotContainer {
             () -> -gamepad_.getRightX()
         );
 
-        RobotState.initialize(drivebase_::getPose);
+        RobotState.initialize(
+            drivebase_::getPose,
+            drivebase_::getFieldChassisSpeeds,
+            shooter_::getTuning
+        );
 
         // Initialize the visualizers.
         Mechanism3d.measured.zero();
@@ -285,18 +289,16 @@ public class RobotContainer {
         // While the left trigger is held, we will run the intake. If the intake is stowed, it will also deploy it.
         gamepad_.leftTrigger().or(operatorGamepad_.leftTrigger()).whileTrue(RobotCommands.intake(intake_, hopper_));
 
-        // While the right trigger is held, we will shoot into the hub or ferry. Binding A to the shaking of the shooter.
+        // While the right trigger is held, we will shoot into the hub or ferry.
         gamepad_.rightTrigger().or(operatorGamepad_.rightTrigger())
             .whileTrue(RobotCommands.shoot(shooter_, hopper_, intake_, drivebase_, gamepad_.a().or(operatorGamepad_.a())));
 
-        // When the shooter isnt shooting, get it ready to shoot.
-        shooter_.setDefaultCommand(shooter_.idleCommand());
-
-        //While the X button is held, the intake will run the eject sequence. If it the intake is stowed, it will also deploy it.
-
+        // While the X button is held, the intake will run the eject sequence. If it the intake is stowed, it will also deploy it.
         operatorGamepad_.x().whileTrue(intake_.hopperEjectSequence().alongWith(hopper_.reverseFeed()));
-
         operatorGamepad_.y().whileTrue(RobotCommands.ejectUp(shooter_, hopper_));
+
+        // When the shooter isnt shooting, stow it.
+        shooter_.setDefaultCommand(shooter_.idleCommand());
 
         // Bind dashboard button to refreshing the tuning.
         var refreshTuningButton = new LoggedNetworkBoolean("/Tuning/RefreshTuning", false);

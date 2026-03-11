@@ -1,20 +1,13 @@
 package frc.robot.commands.robot;
 
-import static edu.wpi.first.units.Units.Meters;
-
 import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants;
 import frc.robot.RobotState;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
@@ -33,20 +26,17 @@ public class RobotCommands {
      */
     private static Command shootHub(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive, Trigger shakeTrigger) {
         BooleanSupplier aimedAtHub =
-            () -> drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.aimingTolerance);
+            () -> drive.rotationIsNear(RobotState.rotationToVirtualHub(), ShooterConstants.aimingTolerance);
 
         return Commands.parallel(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> 0,
-                () -> 0, 
-                () -> RobotState.rotationToHub()
-            ).finallyDo(drive::stopWithX),
+            Constants.shootOnMove
+                ? DriveCommands.joystickDriveAtAngle(RobotState::rotationToVirtualHub, () -> Constants.speedMultiplierShooting)
+                : DriveCommands.joystickDriveAtAngle(drive, () -> 0.0, () -> 0.0, RobotState::rotationToHub, () -> 1.0),
             Commands.repeatingSequence(
                 Commands.waitUntil(aimedAtHub).deadlineFor(shooter.spinUpForDistance(RobotState::hubDistance)),
-                shooter.shootAtDistance(RobotState::hubDistance, hopper, intake, shakeTrigger)
+                shooter.shootAtDistance(RobotState::virtualHubDistance, hopper, intake, shakeTrigger)
                     .until(() -> !aimedAtHub.getAsBoolean())
-            )
+            ).alongWith(Commands.run(() -> Logger.recordOutput("Shooter/AimedAtHub", aimedAtHub.getAsBoolean())))
         );
     }
 
@@ -58,36 +48,12 @@ public class RobotCommands {
      * @return
      */
     private static Command ferry(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive, Trigger shakeTrigger) {
-        Translation2d rightTarget =
-            DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                ? ShooterConstants.Positions.blueTargetRight
-                : ShooterConstants.Positions.redTargetRight;
-
-        Translation2d leftTarget =
-            DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                ? ShooterConstants.Positions.blueTargetLeft
-                : ShooterConstants.Positions.redTargetLeft;
-
-        Supplier<Translation2d> target =
-            () -> drive.getPose().getY() < ShooterConstants.Positions.centerLineY
-                ? rightTarget
-                : leftTarget;
-
-        Supplier<Distance> targetDistance = () -> Meters.of(target.get().getDistance(drive.getPose().getTranslation()));
-
-        Supplier<Rotation2d> targetingAngle = () -> {
-            var botToTarget = target.get().minus(drive.getPose().getTranslation());
-            return new Rotation2d(botToTarget.getX(), botToTarget.getY());
-        };
-
-        return DriveCommands.joystickDriveAtAngle(targetingAngle)
+        return DriveCommands.joystickDriveAtAngle(RobotState::rotationToVirtualFerry, () -> Constants.speedMultiplierFerrying)
             .alongWith(
-                shooter.shootAtDistance(targetDistance, hopper, intake, shakeTrigger),
-                Commands.runOnce(() -> {
-                    Logger.recordOutput("Ferry/Target", target.get());
-                    Logger.recordOutput("Ferry/IsFerrying", true);
-                })
-            ).finallyDo(i -> Logger.recordOutput("Ferry/IsFerrying", false));
+                shooter.shootAtDistance(RobotState::virtualFerryDistance, hopper, intake, shakeTrigger),
+                Commands.runOnce(() -> Logger.recordOutput("Ferry/IsFerrying", true))
+            )
+            .finallyDo(i -> Logger.recordOutput("Ferry/IsFerrying", false));
     }
 
     /**

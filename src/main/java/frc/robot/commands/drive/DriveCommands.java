@@ -142,10 +142,24 @@ public class DriveCommands {
    * absolute rotation with a joystick.
    * This is preconfigured with {@link #configure(Drive, DoubleSupplier, DoubleSupplier, DoubleSupplier)}
    */
+  public static Command joystickDriveAtAngle(Supplier<Rotation2d> rotationSupplier, DoubleSupplier throttle) {
+    if (!configured) throw new IllegalStateException("DriveCommands joystickDriveAtAngle called without first configuring!");
+
+    return joystickDriveAtAngle(drive_, xSupplier_, ySupplier_, rotationSupplier, throttle);
+  }
+
+  /**
+   * Field relative drive command using joystick for linear control and PID for
+   * angular control.
+   * Possible use cases include snapping to an angle, aiming at a vision target,
+   * or controlling
+   * absolute rotation with a joystick.
+   * This is preconfigured with {@link #configure(Drive, DoubleSupplier, DoubleSupplier, DoubleSupplier)}
+   */
   public static Command joystickDriveAtAngle(Supplier<Rotation2d> rotationSupplier) {
     if (!configured) throw new IllegalStateException("DriveCommands joystickDriveAtAngle called without first configuring!");
 
-    return joystickDriveAtAngle(drive_, xSupplier_, ySupplier_, rotationSupplier);
+    return joystickDriveAtAngle(rotationSupplier, () -> 1.0);
   }
 
   /**
@@ -197,7 +211,9 @@ public class DriveCommands {
       Drive drive,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
-      Supplier<Rotation2d> rotationSupplier) {
+      Supplier<Rotation2d> rotationSupplier,
+      DoubleSupplier throttle
+  ) {
 
     // Create PID controller
     ProfiledPIDController angleController = new ProfiledPIDController(
@@ -220,9 +236,11 @@ public class DriveCommands {
 
           // Convert to field relative speeds & send command
           ChassisSpeeds speeds = new ChassisSpeeds(
-              linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-              linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-              omega);
+              linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec() * throttle.getAsDouble(),
+              linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec() * throttle.getAsDouble(),
+              omega
+          );
+
           boolean isFlipped = DriverStation.getAlliance().isPresent()
               && DriverStation.getAlliance().get() == Alliance.Red;
           drive.runVelocity(

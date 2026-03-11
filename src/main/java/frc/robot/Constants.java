@@ -36,9 +36,15 @@ public final class Constants {
     // Sets the currently running robot. Change to SIMBOT when running the
     // desktop physics simulation so AdvantageKit runs in SIM mode instead of
     // falling back to REPLAY.
+    //REMEMBER TO CHANGE BACK TO COMPETITION!
     private static final RobotType robotType = RobotType.COMPETITION;
 
     public static final boolean spawnLessFuelInSim = true;
+
+    public static final boolean shootOnMove = true;
+
+    public static final double speedMultiplierShooting = 0.2; 
+    public static final double speedMultiplierFerrying = 0.8; 
 
     public static class DriveConstants {
         public static final double slowModeJoystickMultiplier = 0.4;

@@ -101,6 +101,7 @@ public class AprilTagVision extends SubsystemBase {
 
         // Iterate cameras for logging and pose estimations.
         for (int cam = 0; cam < io_.length; cam++) {
+
             // Activate disconnected alert.
             alerts_[cam].set(!inputs_[cam].connected);
 

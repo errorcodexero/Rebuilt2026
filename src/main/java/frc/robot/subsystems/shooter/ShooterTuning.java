@@ -19,21 +19,25 @@ public class ShooterTuning {
         public double dist ;
         public double hood ;
         public double velocity ;
+        public double hangtime;
 
-        public ShooterParams(double d, double h, double v) {
+        public ShooterParams(double d, double h, double v, double ht) {
             dist = d ;
             hood = h ;
             velocity = v ;
+            hangtime = ht ;
         }
     } ;
 
     public static class OneTuningValue {
         public final double dist_ ;
         public final double vel_ ;
+        public final double hangtime_ ;
 
-        public OneTuningValue(double d, double v) {
+        public OneTuningValue(double d, double v, double ht) {
             dist_ = d ;
             vel_ = v ;
+            hangtime_ = ht ;
         }
     }
 
@@ -41,13 +45,17 @@ public class ShooterTuning {
         public double hood_ ;
         public double min_dist_ ;
         public double max_dist_ ;
-        public InterpolatingDoubleTreeMap map_ ;
+        public InterpolatingDoubleTreeMap velmap_ ;
+        public InterpolatingDoubleTreeMap hangmap_ ;
 
-        public OneHoodTuning(double h, double[] d, double[] v) {
+
+        public OneHoodTuning(double h, double[] d, double[] v, double[] ht) {
             hood_ = h ;
-            map_ = new InterpolatingDoubleTreeMap() ;
+            velmap_ = new InterpolatingDoubleTreeMap() ;
+            hangmap_ = new InterpolatingDoubleTreeMap() ;
             for(var i = 0 ; i < d.length ; i++) {
-                map_.put(d[i], v[i]) ;
+                velmap_.put(d[i], v[i]) ;
+                hangmap_.put(d[i], ht[i]) ;
             }
 
             min_dist_ = d[0] ;
@@ -97,7 +105,9 @@ public class ShooterTuning {
                     JsonNode pt = pointsArray.get(i) ;
                     double distance = pt.get("distance").asDouble() ;
                     double velocity = pt.get("velocity").asDouble() ;
-                    values[i] = new OneTuningValue(distance, velocity) ;
+                    double hangtime = pt.get("hangtime").asDouble() ;
+                    
+                    values[i] = new OneTuningValue(distance, velocity, hangtime) ;
                 }
 
                 addOneHood(hood, values) ;
@@ -111,9 +121,10 @@ public class ShooterTuning {
 
     public ShooterParams getShooterParams(double dist) {
         int h = getHoodIndex(dist) ;
-        var ret = new ShooterParams(dist, settings_.get(h).hood_, settings_.get(h).map_.get(dist)) ;
+        var ret = new ShooterParams(dist, settings_.get(h).hood_, settings_.get(h).velmap_.get(dist), settings_.get(h).hangmap_.get(dist)) ;
         Logger.recordOutput("ShooterTuning/hood", ret.hood);
         Logger.recordOutput("ShooterTuning/velocity", ret.velocity);
+        Logger.recordOutput("ShooterTuning/hangtime", ret.hangtime);
         return ret ;
     }
 
@@ -159,6 +170,7 @@ public class ShooterTuning {
 
         double [] dist = new double[values.length] ;
         double [] vels = new double[values.length] ;
+        double [] hangtimes = new double[values.length] ;
 
         for(int i = 0 ; i < values.length ; i++) {
             var v = values[i] ;
@@ -167,8 +179,9 @@ public class ShooterTuning {
             }
             dist[i] = v.dist_ ;
             vels[i] = v.vel_ ;
+            hangtimes[i] = v.hangtime_;
         }   
-        settings_.add(new OneHoodTuning(hood, dist, vels));
+        settings_.add(new OneHoodTuning(hood, dist, vels, hangtimes));
 
         settings_.sort((s1, s2) -> {
             return Double.compare(s1.hood_, s2.hood_);

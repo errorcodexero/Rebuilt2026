@@ -33,20 +33,16 @@ public class ShooterConstants {
     public static final AngularVelocity shooterTolerance = RotationsPerSecond.of(0.1);
     public static final AngularVelocity ejectVelocity = RotationsPerSecond.of(-20);
 
-    public static final Angle aimingTolerance = Degrees.of(5);
+    public static final Angle aimingTolerance = Degrees.of(8.0);
 
     public static final Distance allowedTrenchDistance = Meters.of(1.0);
 
+    public static final int hangtimeLoopPasses = 5; // for a for loop in calculating distance from the hub, as you need the distance to get the hangtime, but you also need the hangtime to get the distance
     public static final double timeBeforeShoot = 0.2;
 
     public static final Angle hoodParkedAngle = Degrees.of(5.0) ;
     public static final Angle hoodMaxAngle = Degrees.of(75.0) ;
     public static final Angle hoodMinAngle = Degrees.of(0.0) ;
-
-    public class FerryPositions{
-        public static final Translation2d blueOutpostTarget= new Translation2d(2.135, 1.639);
-        public static final Translation2d redOutpostTarget= new Translation2d(14.0,6.0);
-    }
 
     public class PID {
             // shooter
@@ -57,78 +53,62 @@ public class ShooterConstants {
             public static final double shooterkA = 0.0;
             public static final double shooterkG = 0.0;
             public static final double shooterkS = 0.0;
-        }
+    }
 
-        public class MotionMagic {
+    public class MotionMagic {
 
-            // shooter
-            public static final double shooterkMaxVelocity = 1000.0;
-            public static final double shooterkMaxAcceleration = 3000.0;
-            public static final double shooterkJerk = 0.0;
-        }
+        // shooter
+        public static final double shooterkMaxVelocity = 1000.0;
+        public static final double shooterkMaxAcceleration = 3000.0;
+        public static final double shooterkJerk = 0.0;
+    }
 
-        public class SoftwareLimits {
-            public static final double hoodMaxAngle = 0.0;
-            public static final double hoodMinAngle = 0.0;
-        }
+    public class Positions {
+        // Field Positions
+        public static final Translation2d blueHubPose = new Translation2d(4.5974,4.034536);
+        public static final Translation2d redHubPose = new Translation2d(11.938,4.034536);
 
-        public class Positions {
-            // Field Positions
-            public static final Translation2d blueHubPose = new Translation2d(4.5974,4.034536);
-            public static final Translation2d redHubPose = new Translation2d(11.938,4.034536);
+        public static final Distance allianceZone = Meters.of(4.5974);
+        public static final Distance spinUpZone = Meters.of(6.0);
 
-            public static final Distance allianceZone = Meters.of(4.5974);
-            public static final Distance spinUpZone = Meters.of(6.0);
+        public static final Distance blueAllianceWall = Meters.of(0);
+        public static final Distance redAllianceWall = Meters.of(FieldConstants.layout.getFieldLength());
 
-            public static final Distance blueAllianceWall = Meters.of(0);
-            public static final Distance redAllianceWall = Meters.of(FieldConstants.layout.getFieldLength());
+        public static final Translation2d blueTargetLeft = new Translation2d(2,6);
+        public static final Translation2d blueTargetRight = new Translation2d(2,2);
 
-            public static final Translation2d blueTargetLeft = new Translation2d(2,6);
-            public static final Translation2d blueTargetRight = new Translation2d(2,2);
+        public static final Translation2d redTargetLeft = new Translation2d(14,6);
+        public static final Translation2d redTargetRight = new Translation2d(14,2);
 
-            public static final Translation2d redTargetLeft = new Translation2d(14,6);
-            public static final Translation2d redTargetRight = new Translation2d(14,2);
+        public static final double centerLineY = FieldConstants.layout.getFieldWidth() / 2.0;
+    
+        public enum HubDistance {
+            LOW(Meters.of(2)), // 0-2 m
+            MEDIUM(Meters.of(3)), //  in
+            HIGH(Meters.of(4)); // 96+ in
 
-            public static final double centerLineY = 4.034536;
+            private final Distance maxDistance;
 
-            // Hood Setpoints
-            public static final double hoodLOW = 0;
-            public static final double hoodMEDIUM = 1;
-            public static final double hoodHIGH = 2;
-        
-            public enum HubDistance {
-                LOW(Meters.of(2)), // 0-2 m
-                MEDIUM(Meters.of(3)), //  in
-                HIGH(Meters.of(4)); // 96+ in
-
-                private final Distance maxDistance;
-
-                private HubDistance(Distance maxDistance) {
-                    this.maxDistance = maxDistance;
-                }
-
-                public Distance maxDistance() { return maxDistance; }
-
-                public static HubDistance fromDistance(Distance pos) {
-                    for(HubDistance vol : values()) {
-                        if (pos.baseUnitMagnitude() <= vol.maxDistance().baseUnitMagnitude()) {
-                            return vol;
-                        } 
-                    }
-                    return HubDistance.HIGH;
-                }
+            private HubDistance(Distance maxDistance) {
+                this.maxDistance = maxDistance;
             }
+
+            public Distance maxDistance() { return maxDistance; }
+
+            public static HubDistance fromDistance(Distance pos) {
+                for(HubDistance vol : values()) {
+                    if (pos.baseUnitMagnitude() <= vol.maxDistance().baseUnitMagnitude()) {
+                        return vol;
+                    } 
+                }
+                return HubDistance.HIGH;
+            }
+        }
     }
 
     public class HoodPWMs {
-            public static final int hoodLeftPWMPort = 2;
-            public static final int hoodRightPWMPort = 0;
+        public static final int hoodLeftPWMPort = 2;
+        public static final int hoodRightPWMPort = 0;
     }
 
-    public class ferryPositions{
-        public static final Translation2d blueOutpostFerryTarget= new Translation2d(2.136,1.935); //ferry target for the blue outpost
-        public static final Translation2d redOutpostFerryTarget= new Translation2d(14.0,6.0); //ferry target for the red outpost
-        public static final Translation2d blueDepotFerryTarget= new Translation2d(2.0,6.0); //ferry target for the blue depot
-        public static final Translation2d redDepotFerryTarget= new Translation2d(14.0,2.0); //ferry target for the red depot
-    }
 }
