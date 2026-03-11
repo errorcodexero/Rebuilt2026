@@ -2,6 +2,7 @@ package frc.robot.commands.robot;
 
 import static edu.wpi.first.units.Units.Meters;
 
+import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
@@ -58,36 +59,38 @@ public class RobotCommands {
      * @return
      */
     private static Command ferry(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive, Trigger shakeTrigger) {
-        Translation2d rightTarget =
-            DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                ? ShooterConstants.Positions.blueTargetRight
-                : ShooterConstants.Positions.redTargetRight;
+        return Commands.defer(() -> {
+            Translation2d rightTarget =
+                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                    ? ShooterConstants.Positions.blueTargetRight
+                    : ShooterConstants.Positions.redTargetRight;
 
-        Translation2d leftTarget =
-            DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                ? ShooterConstants.Positions.blueTargetLeft
-                : ShooterConstants.Positions.redTargetLeft;
+            Translation2d leftTarget =
+                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                    ? ShooterConstants.Positions.blueTargetLeft
+                    : ShooterConstants.Positions.redTargetLeft;
 
-        Supplier<Translation2d> target =
-            () -> drive.getPose().getY() < ShooterConstants.Positions.centerLineY
-                ? rightTarget
-                : leftTarget;
+            Supplier<Translation2d> target =
+                () -> drive.getPose().getY() < ShooterConstants.Positions.centerLineY
+                    ? rightTarget
+                    : leftTarget;
 
-        Supplier<Distance> targetDistance = () -> Meters.of(target.get().getDistance(drive.getPose().getTranslation()));
+            Supplier<Distance> targetDistance = () -> Meters.of(target.get().getDistance(drive.getPose().getTranslation()));
 
-        Supplier<Rotation2d> targetingAngle = () -> {
-            var botToTarget = target.get().minus(drive.getPose().getTranslation());
-            return new Rotation2d(botToTarget.getX(), botToTarget.getY());
-        };
+            Supplier<Rotation2d> targetingAngle = () -> {
+                var botToTarget = target.get().minus(drive.getPose().getTranslation());
+                return new Rotation2d(botToTarget.getX(), botToTarget.getY());
+            };
 
-        return DriveCommands.joystickDriveAtAngle(targetingAngle)
-            .alongWith(
-                shooter.shootAtDistance(targetDistance, hopper, intake, shakeTrigger),
-                Commands.runOnce(() -> {
-                    Logger.recordOutput("Ferry/Target", target.get());
-                    Logger.recordOutput("Ferry/IsFerrying", true);
-                })
-            ).finallyDo(i -> Logger.recordOutput("Ferry/IsFerrying", false));
+            return DriveCommands.joystickDriveAtAngle(targetingAngle)
+                .alongWith(
+                    shooter.shootAtDistance(targetDistance, hopper, intake, shakeTrigger),
+                    Commands.runOnce(() -> {
+                        Logger.recordOutput("Ferry/Target", target.get());
+                        Logger.recordOutput("Ferry/IsFerrying", true);
+                    })
+                ).finallyDo(i -> Logger.recordOutput("Ferry/IsFerrying", false));
+        }, Set.of(shooter, hopper, intake, drive));
     }
 
     /**
