@@ -3,6 +3,7 @@ package frc.robot.commands.robot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.hopper.Hopper;
@@ -22,12 +23,12 @@ public class RobotCommands {
      * 
      * @return
      */
-    public static Command shoot(Shooter shooter, Hopper hopper, Drive drive, IntakeSubsystem intake, CommandXboxController gamepad, boolean shootOnMove) {
+    public static Command shoot(Shooter shooter, Hopper hopper, Drive drive, IntakeSubsystem intake, CommandXboxController gamepad, boolean shootOnMove, Trigger shakeTrigger) {
         return Commands.parallel(
                 DriveCommands.pointAtShootingTarget(drive, shooter, gamepad, shootOnMove),
                 Commands.repeatingSequence(
                     Commands.waitUntil(() -> drive.rotationIsNear(drive.getVirtualTarget(shooter).minus(drive.getPose().getTranslation()).getAngle(), ShooterConstants.aimingTolerance)),
-                    shooter.shoot(drive, hopper, intake, gamepad, shootOnMove)
+                    shooter.shoot(drive, hopper, intake, shakeTrigger)
                 )
             );
     }
@@ -39,5 +40,18 @@ public class RobotCommands {
      */
     public static Command ejectUp(Shooter shooter, Hopper hopper) {
         return shooter.ejectUp().alongWith(hopper.ejectUp());
+    }
+
+    /**
+     * The full sequence for intaking balls, with scrambler movement. For intake while shooting, or
+     * any situation where we want to intake while the hopper is already required, just use intake.intakeSequence().
+     * 
+     * For most cases, this command is preferred.
+     * @param intake
+     * @param hopper
+     * @return
+     */
+    public static Command intake(IntakeSubsystem intake, Hopper hopper) {
+        return intake.intakeSequence().alongWith(hopper.collectScrambler());
     }
 }

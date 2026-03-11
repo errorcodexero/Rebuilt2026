@@ -7,12 +7,12 @@ import static edu.wpi.first.units.Units.Volts;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
@@ -44,6 +44,8 @@ public class IntakeSubsystem extends SubsystemBase {
         io.updateInputs(inputs);
         Logger.processInputs("Intake", inputs);
 
+        Logger.recordOutput("Intake/Deployed", isIntakeDeployed());
+
         pivotAlert.set(!inputs.pivotConnected);
         rollerAlert.set(!inputs.rollerConnected);
 
@@ -56,15 +58,6 @@ public class IntakeSubsystem extends SubsystemBase {
             MapleSimUtil.setIntakeRunning(isIntakeDeployed() && inputs.rollerAngularVelocity.gt(RadiansPerSecond.zero()));
         }
 
-        if (inputs.pivotAngle.gt(IntakeConstants.deployedAngle.times(0.9)) && 
-                inputs.rollerAngularVelocity.gt(IntakeConstants.rollerCollectVelocity.times(0.5))) {
-            this.io.setPivotVoltage(Volts.of(4.0)) ;
-            Logger.recordOutput("Intake/Pivot", "Holding") ;
-        }
-        else {
-            Logger.recordOutput("Intake/Pivot", "Not Holding") ;
-        }
-
         LoggedTracer.record("IntakePeriodic");
     }
 
@@ -73,9 +66,17 @@ public class IntakeSubsystem extends SubsystemBase {
         io.setRollerVoltage(volts);
     }
 
+    public void setRollerVelocity(AngularVelocity velocity) {
+        io.setRollerVelocity(velocity);
+    }
+
     public void setPivotAngle(Angle angle) {
         setpointAngle = angle;
         io.setPivotAngle(angle);
+    }
+
+    public void stopRoller() {
+        io.stopRoller();
     }
 
     /**
@@ -83,10 +84,6 @@ public class IntakeSubsystem extends SubsystemBase {
      */
     private void startIntaking() {
         io.setRollerVelocity(IntakeConstants.rollerCollectVelocity);
-    }
-
-    private void startShootIntake() {
-        io.setRollerVelocity(IntakeConstants.rollerShootVelocity) ;
     }
 
     /**
@@ -116,6 +113,10 @@ public class IntakeSubsystem extends SubsystemBase {
 
     private void waiting(){
         setPivotAngle(IntakeConstants.waitingAngle);
+    }
+
+    private void holdDown() {
+        io.setPivotVoltage(IntakeConstants.pivotHoldDownVoltage);
     }
     
     public Angle getPivotAngle(){
@@ -174,13 +175,23 @@ public class IntakeSubsystem extends SubsystemBase {
      * @return The command
      */
     public Command runIntakeCmd() {
-        return startEnd(this::startIntaking, this::stopIntaking);
+        return startEnd(() -> {
+            startIntaking();
+            holdDown();
+        }, () -> {
+            stopIntaking();
+            deploy();
+        });
     }
 
-    private Command runShootIntakeCmd() {
-        return startEnd(this::startShootIntake, this::stopIntaking);
-    }
-
+    /**
+     * This is a command that makes the intake subsystem deploy and collect balls,
+     * this command does not run the scrambler, and should ONLY be used when you understand
+     * that fact.
+     * 
+     * For most situations, RobotCommands.intake() is preferred as it also runs the scrambler.
+     * @return
+     */
     public Command intakeSequence() {
         return runIntakeCmd().beforeStarting(
             deployCmd().unless(this::isIntakeDeployed)
@@ -194,19 +205,12 @@ public class IntakeSubsystem extends SubsystemBase {
     public Command hopperEjectSequence() {
         return runEjectCmd().beforeStarting(
             deployCmd().unless(this::isIntakeDeployed)
-        ).finallyDo(interrupted -> waiting());
+        ).finallyDo(interrupted -> deploy());
     }
 
-    private Command moveIntakeWhileShooting() {
+    public Command shakeBalls() {
         return new MoveIntakeCmd(this, IntakeConstants.shootAngles, IntakeConstants.angleChangeDelay)
-            .finallyDo(interrupted -> waiting());
-    }
-
-    public Command enableShootMode() {
-        return new ParallelCommandGroup(
-            runShootIntakeCmd(),
-            moveIntakeWhileShooting()
-        );
+            .finallyDo(interrupted -> deploy());
     }
 
     ////////////////////////////

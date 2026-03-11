@@ -24,7 +24,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -244,10 +243,9 @@ public class RobotContainer {
         // AutoModes
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
 
-        autoChooser_.addDefaultOption("Left Trench To Right Trench", AutoCommands.a1TrenchToTrench(drivebase_, intake_, hopper_, shooter_, false));
-        autoChooser_.addOption("Right Trench To Left Trench", AutoCommands.a1TrenchToTrench(drivebase_, intake_, hopper_, shooter_, true));
-        autoChooser_.addOption("Neutral Zone Collect - Left Trench", AutoCommands.a2NZCollectAuto(drivebase_, shooter_, intake_, hopper_, false));
+        autoChooser_.addDefaultOption("Neutral Zone Collect - Left Trench", AutoCommands.a2NZCollectAuto(drivebase_, shooter_, intake_, hopper_, false));
         autoChooser_.addOption("Neutral Zone Collect - Right Trench", AutoCommands.a2NZCollectAuto(drivebase_, shooter_, intake_, hopper_, true));
+        autoChooser_.addOption("Depot Auto", AutoCommands.a3DepotAuto(drivebase_, shooter_, intake_, hopper_)); 
 
         autoChooser_.onChange(auto -> {
             if (auto == null) return;
@@ -284,12 +282,7 @@ public class RobotContainer {
         gamepad_.back().or(operatorGamepad_.back()).onTrue(shooter_.cycleTuning()) ;
 
         // While the left trigger is held, we will run the intake. If the intake is stowed, it will also deploy it.
-        gamepad_.leftTrigger().or(operatorGamepad_.leftTrigger()).whileTrue(
-            new ParallelCommandGroup(
-                intake_.intakeSequence(),
-                hopper_.collectScrambler()
-            )
-        );
+        gamepad_.leftTrigger().or(operatorGamepad_.leftTrigger()).whileTrue(RobotCommands.intake(intake_, hopper_));
 
         operatorGamepad_.b().whileTrue(RobotCommands.ejectUp(shooter_, hopper_));
 
@@ -306,7 +299,7 @@ public class RobotContainer {
         // we might want to limit the acceleration on this while shooting, but idk how to do that and hopefully it wont matter too much. 
         // just realized we could interrupt this with POV driving, but we would still be shooting, so we might want to create a block for that, but this too probably wont come up that much and i think i am not that numb-skulled to actually do this so idk
         gamepad_.rightTrigger().or(operatorGamepad_.rightTrigger()).whileTrue(
-            RobotCommands.shoot(shooter_, hopper_, drivebase_, intake_, gamepad_, Constants.shootOnMove)
+            RobotCommands.shoot(shooter_, hopper_, drivebase_, intake_, gamepad_, Constants.shootOnMove, gamepad_.a().or(operatorGamepad_.a()))
         );
         // When the shooter isnt shooting, get it ready to shoot.
         shooter_.setDefaultCommand(shooter_.awaitShooting(drivebase_::getPose, () -> drivebase_.getVirtualTarget(shooter_)));
@@ -314,9 +307,11 @@ public class RobotContainer {
         // When the shooter isnt shooting, get it ready to shoot.
         shooter_.setDefaultCommand(shooter_.idleCommand());
 
-        //While the A button is held, the intake will run the eject sequence. If it the intake is stowed, it will also deploy it.
-        operatorGamepad_.a().whileTrue(intake_.hopperEjectSequence().alongWith(hopper_.reverseFeed()));
+        //While the X button is held, the intake will run the eject sequence. If it the intake is stowed, it will also deploy it.
 
+        operatorGamepad_.x().whileTrue(intake_.hopperEjectSequence().alongWith(hopper_.reverseFeed()));
+
+        operatorGamepad_.y().whileTrue(RobotCommands.ejectUp(shooter_, hopper_));
 
         // Bind dashboard button to refreshing the tuning.
         var refreshTuningButton = new LoggedNetworkBoolean("/Tuning/RefreshTuning", false);

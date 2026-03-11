@@ -3,6 +3,7 @@ package frc.robot.subsystems.intake;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
+import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
@@ -22,11 +23,11 @@ public final class IntakeConstants {
     public static final int pivotMotorCANID = 8;
     public static final int pivotEncoderCANID = 7;
 
-    public static final Current rollerCurrentLimit = Amps.of(180) ;
-    public static final Current pivotCurrentLimit = Amps.of(80) ;
-    public static final Time currentLimitTime = Seconds.of(1); //Temporary
+    public static final Current rollerCurrentLimit = Amps.of(120);
+    public static final Current pivotCurrentLimit = Amps.of(80);
+    public static final Time currentLimitTime = Milliseconds.of(200);
 
-    public static final double pivotKP = 600.0;
+    public static final double pivotKP = 100.0;
     public static final double pivotKD = 0;
     public static final double pivotKV = 7.0;
     public static final double pivotKI = 0;
@@ -42,7 +43,7 @@ public final class IntakeConstants {
     public static final double rollerKS = 0;
     public static final double rollerKG = 0;
 
-    public static final Angle stowedAngle = Degrees.of(0);
+    public static final Angle stowedAngle = Degrees.of(5);
     public static final Angle waitingAngle = Degrees.of(96);
     public static final Angle deployedAngle = Degrees.of(130);
     public static final Angle[] shootAngles = { deployedAngle, waitingAngle };
@@ -52,7 +53,7 @@ public final class IntakeConstants {
     public static final Angle pivotTolerance = Degrees.of(3); //Tolerance to compare current angle to target
 
     public static final boolean pivotEncoderInverted = false;
-    public static final Angle pivotEncoderOffset = Degrees.of(-153 + 2.2) ;
+    public static final Angle pivotEncoderOffset = Degrees.of(-154.3) ;
 
     // Gear Ratios
     public static final double motorToEncoderGearRatio = (1.0/45.0) * (24.0/31.0);
@@ -62,6 +63,8 @@ public final class IntakeConstants {
 
     public static final Angle pivotMinAngle = Rotations.of(0) ;
     public static final Angle pivotMaxAngle = Degrees.of(135);
+
+    public static final Voltage pivotHoldDownVoltage = Volts.of(4.0);
 
     public static final AngularVelocity pivotCruiseVelocity = RotationsPerSecond.of(0.5) ;
     public static final AngularAcceleration pivotCruiseAcceleration = RotationsPerSecondPerSecond.of(3);

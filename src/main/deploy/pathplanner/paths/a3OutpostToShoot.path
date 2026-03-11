@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 0.7034388888888892,
+        "y": 0.8095888888888885
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.5701644539744928,
+        "y": 1.5884738294116496
+      },
+      "isLocked": false,
+      "linkedName": "OutpostCollect"
+    },
+    {
+      "anchor": {
+        "x": 2.1212555555555554,
+        "y": 1.6671000000000005
+      },
+      "prevControl": {
+        "x": 1.472541637908383,
+        "y": 1.2198978414794677
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 43.8542371618247
+  },
+  "reversed": false,
+  "folder": "NoClimbAutos",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -124.28687697720898
+  },
+  "useDefaultConstraints": true
+}
