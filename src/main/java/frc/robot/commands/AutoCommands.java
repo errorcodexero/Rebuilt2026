@@ -43,7 +43,7 @@ public class AutoCommands {
                 shooter.spinUpForDistanceHoodParked(() -> Meters.of(3.7)),
                 hopper.preShoot()
             ),
-            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(3.8)),
+            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(5.0)),
 
             //Drive back into the neutral zone, collecting more balls along the way
             DriveCommands.followPathCommand("a2Shoot1toHub", mirroredX)
@@ -54,7 +54,7 @@ public class AutoCommands {
                 shooter.spinUpForDistanceHoodParked(() -> Meters.of(3.7)),
                 hopper.preShoot()
             ),
-            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(4.0))
+            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(10.0))
             
         ); 
     }
