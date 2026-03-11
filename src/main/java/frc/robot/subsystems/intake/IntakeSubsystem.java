@@ -7,12 +7,12 @@ import static edu.wpi.first.units.Units.Volts;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
@@ -66,9 +66,17 @@ public class IntakeSubsystem extends SubsystemBase {
         io.setRollerVoltage(volts);
     }
 
+    public void setRollerVelocity(AngularVelocity velocity) {
+        io.setRollerVelocity(velocity);
+    }
+
     public void setPivotAngle(Angle angle) {
         setpointAngle = angle;
         io.setPivotAngle(angle);
+    }
+
+    public void stopRoller() {
+        io.stopRoller();
     }
 
     /**
@@ -76,10 +84,6 @@ public class IntakeSubsystem extends SubsystemBase {
      */
     private void startIntaking() {
         io.setRollerVelocity(IntakeConstants.rollerCollectVelocity);
-    }
-
-    private void startShootIntake() {
-        io.setRollerVelocity(IntakeConstants.rollerShootVelocity) ;
     }
 
     /**
@@ -180,10 +184,6 @@ public class IntakeSubsystem extends SubsystemBase {
         });
     }
 
-    private Command runShootIntakeCmd() {
-        return startEnd(this::startShootIntake, this::stopIntaking);
-    }
-
     /**
      * This is a command that makes the intake subsystem deploy and collect balls,
      * this command does not run the scrambler, and should ONLY be used when you understand
@@ -205,19 +205,12 @@ public class IntakeSubsystem extends SubsystemBase {
     public Command hopperEjectSequence() {
         return runEjectCmd().beforeStarting(
             deployCmd().unless(this::isIntakeDeployed)
-        ).finallyDo(interrupted -> waiting());
+        ).finallyDo(interrupted -> deploy());
     }
 
-    private Command moveIntakeWhileShooting() {
+    public Command shakeBalls() {
         return new MoveIntakeCmd(this, IntakeConstants.shootAngles, IntakeConstants.angleChangeDelay)
-            .finallyDo(interrupted -> waiting());
-    }
-
-    public Command enableShootMode() {
-        return new ParallelCommandGroup(
-            runShootIntakeCmd(),
-            moveIntakeWhileShooting()
-        );
+            .finallyDo(interrupted -> deploy());
     }
 
     ////////////////////////////

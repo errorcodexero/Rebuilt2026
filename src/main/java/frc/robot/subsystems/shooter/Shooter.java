@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
@@ -244,7 +245,7 @@ public class Shooter extends SubsystemBase {
      * 
      * 
      */
-    public Command shootAtDistance(Supplier<Distance> distance, Hopper hopper, IntakeSubsystem intake) {
+    public Command shootAtDistance(Supplier<Distance> distance, Hopper hopper, IntakeSubsystem intake, Trigger shakeTrigger) {
         Supplier<ShooterParams> shooterParams =
             () -> getTuning().getShooterParams(distance.get().in(Meters));
 
@@ -254,7 +255,7 @@ public class Shooter extends SubsystemBase {
                 () -> Degrees.of(shooterParams.get().hood)
             ),
             hopper.preShoot().until(this::isShooterReady).andThen(hopper.forwardFeed()),
-            intake.enableShootMode()
+            Commands.waitUntil(shakeTrigger).andThen(intake.shakeBalls()).until(shakeTrigger.negate()).repeatedly()
         );
     }
 

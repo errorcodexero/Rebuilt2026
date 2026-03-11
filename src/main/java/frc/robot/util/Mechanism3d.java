@@ -30,7 +30,10 @@ public class Mechanism3d extends SubsystemBase {
     private MutAngle hopperUpperCatch = Degrees.zero().mutableCopy();
     private MutAngle hopperLowerCatch = Degrees.of(35).mutableCopy();
 
-    private Mechanism3d(String name) { this.name = name; }
+    private Mechanism3d(String name) {
+        this.name = name;
+        periodic();
+    }
 
     public void setHood(Angle angle) {
         hood.mut_replace(angle);
