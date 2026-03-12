@@ -23,9 +23,11 @@ public final class IntakeConstants {
     public static final int pivotMotorCANID = 8;
     public static final int pivotEncoderCANID = 7;
 
-    public static final Current rollerCurrentLimit = Amps.of(120);
-    public static final Current pivotCurrentLimit = Amps.of(80);
-    public static final Time currentLimitTime = Milliseconds.of(200);
+    public static final Current rollerCurrentLimit = Amps.of(80);
+    public static final Time rollerCurrentLimitTime = Milliseconds.of(200);
+
+    public static final Current pivotCurrentLimit = Amps.of(40);
+    public static final Time pivotCurrentLimitTime = Milliseconds.of(200);
 
     public static final double pivotKP = 100.0;
     public static final double pivotKD = 0;
@@ -46,7 +48,9 @@ public final class IntakeConstants {
     public static final Angle stowedAngle = Degrees.of(5);
     public static final Angle waitingAngle = Degrees.of(96);
     public static final Angle deployedAngle = Degrees.of(130);
-    public static final Angle[] shootAngles = { deployedAngle, waitingAngle };
+
+    public static final int shakeDivisions = 4;
+
     public static final Time angleChangeDelay = Seconds.of(0.2);
 
     // Pivot Angle Constants

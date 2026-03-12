@@ -11,7 +11,6 @@ import static edu.wpi.first.units.Units.Volts;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -30,12 +29,9 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
@@ -248,30 +244,19 @@ public class Shooter extends SubsystemBase {
      * 
      * 
      */
-    public Command shootAtDistance(Supplier<Distance> distance, Hopper hopper, IntakeSubsystem intake, Trigger shakeTrigger) {
+    public Command shootAtDistance(Supplier<Distance> distance, Hopper hopper, IntakeSubsystem intake) {
         Supplier<ShooterParams> shooterParams =
             () -> getTuning().getShooterParams(distance.get().in(Meters));
-
-        Timer timer = new Timer();
-        Trigger timerElapsed = new Trigger(() -> timer.hasElapsed(Seconds.of(0.5)));
-
-        BooleanSupplier shakeWhen = shakeTrigger.or(timerElapsed.and(RobotModeTriggers.autonomous()));
-        BooleanSupplier shakeUntil = shakeTrigger.negate().and(RobotModeTriggers.autonomous().negate());
 
         return Commands.parallel(
             runDynamicSetpoints(
                 () -> RotationsPerSecond.of(shooterParams.get().velocity),
                 () -> Degrees.of(shooterParams.get().hood)
             ),
+            
             hopper.preShoot().until(this::isShooterReady).andThen(hopper.forwardFeed()),
 
-            Commands.runOnce(timer::restart)
-                .andThen(
-                    Commands.waitUntil(shakeWhen),
-                    intake.shakeBalls()
-                )
-                .until(shakeUntil)
-                .repeatedly()
+            intake.shakeBalls()
         );
     }
 

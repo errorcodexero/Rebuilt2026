@@ -3,41 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.310077777777778,
-        "y": 7.499149999999999
+        "x": 3.357823803926991,
+        "y": 7.436497614767699
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.330855555555555,
-        "y": 7.533255555555555
+        "x": 4.449283773506638,
+        "y": 7.510894669524335
       },
       "isLocked": false,
       "linkedName": "ShootLoc1"
     },
     {
       "anchor": {
-        "x": 6.618316666666667,
-        "y": 7.250666666666666
+        "x": 6.50211497511062,
+        "y": 7.033710626382742
       },
       "prevControl": {
-        "x": 5.838761111111111,
-        "y": 7.835333333333333
+        "x": 5.915414063560146,
+        "y": 7.723202203614373
       },
       "nextControl": {
-        "x": 7.118341912939164,
-        "y": 6.875647731962292
+        "x": 6.774178597437317,
+        "y": 6.713981148598819
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 6.944755555555556,
-        "y": 3.9862777777777776
+        "x": 7.084012721238938,
+        "y": 5.122276272123893
       },
       "prevControl": {
-        "x": 7.202983333333334,
-        "y": 5.077655555555555
+        "x": 7.150133331028761,
+        "y": 6.357528104258848
       },
       "nextControl": null,
       "isLocked": false,
@@ -45,6 +45,10 @@
     }
   ],
   "rotationTargets": [
+    {
+      "waypointRelativePos": 0.3501345693779904,
+      "rotationDegrees": -90.0
+    },
     {
       "waypointRelativePos": 2.0,
       "rotationDegrees": 0.0
@@ -83,7 +87,7 @@
   "folder": "NoClimbAutos",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -76.47683934958391
+    "rotation": -70.0
   },
   "useDefaultConstraints": false
 }

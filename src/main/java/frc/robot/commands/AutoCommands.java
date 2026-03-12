@@ -78,5 +78,14 @@ public class AutoCommands {
 
             RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(8.0))
         ); 
-    }    
+    }
+    
+    public static Command a4OnlyPreload(Drive drive, Shooter shooter, IntakeSubsystem intake, Hopper hopper) {
+        return Commands.sequence(
+            DriveCommands.initialFollowPathCommand(drive, "a4OnlyPreload")
+                .deadlineFor(new StartupCmd(intake, hopper, shooter).beforeStarting(Commands.waitTime(Seconds.of(0.3)))),
+
+            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(4))
+        );
+    }
 }

@@ -247,6 +247,7 @@ public class RobotContainer {
         autoChooser_.addDefaultOption("Neutral Zone Collect - Left Trench", AutoCommands.a2NZCollectAuto(drivebase_, shooter_, intake_, hopper_, false));
         autoChooser_.addOption("Neutral Zone Collect - Right Trench", AutoCommands.a2NZCollectAuto(drivebase_, shooter_, intake_, hopper_, true));
         autoChooser_.addOption("Depot Auto", AutoCommands.a3DepotAuto(drivebase_, shooter_, intake_, hopper_)); 
+        autoChooser_.addOption("Preload Only", AutoCommands.a4OnlyPreload(drivebase_, shooter_, intake_, hopper_));
 
         autoChooser_.onChange(auto -> {
             if (auto == null) return;
@@ -287,7 +288,7 @@ public class RobotContainer {
 
         // While the right trigger is held, we will shoot into the hub or ferry. Binding A to the shaking of the shooter.
         gamepad_.rightTrigger().or(operatorGamepad_.rightTrigger())
-            .whileTrue(RobotCommands.shoot(shooter_, hopper_, intake_, drivebase_, gamepad_.a().or(operatorGamepad_.a())));
+            .whileTrue(RobotCommands.shoot(shooter_, hopper_, intake_, drivebase_));
 
         // When the shooter isnt shooting, get it ready to shoot.
         shooter_.setDefaultCommand(shooter_.idleCommand());

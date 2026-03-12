@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.util.PhoenixUtil.tryUntilOk;
 
@@ -80,6 +81,7 @@ public class IntakeIOTalonFX implements IntakeIO {
 
         //Current Limit Configurations
         pivotConfigs.CurrentLimits.SupplyCurrentLimit = IntakeConstants.pivotCurrentLimit.in(Amps);
+        pivotConfigs.CurrentLimits.SupplyCurrentLowerTime = IntakeConstants.pivotCurrentLimitTime.in(Seconds);
         pivotConfigs.CurrentLimits.SupplyCurrentLimitEnable = true;
 
         //PID Configurations
@@ -129,6 +131,7 @@ public class IntakeIOTalonFX implements IntakeIO {
 
         //Current Limit Configurations
         rollerConfigs.CurrentLimits.SupplyCurrentLimit = IntakeConstants.rollerCurrentLimit.in(Amps);
+        rollerConfigs.CurrentLimits.SupplyCurrentLowerTime = IntakeConstants.rollerCurrentLimitTime.in(Seconds);
         rollerConfigs.CurrentLimits.SupplyCurrentLimitEnable= true;
 
         //PID Configurations
