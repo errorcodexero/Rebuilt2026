@@ -5,6 +5,7 @@
 package frc.robot;
 
 import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedPowerDistribution;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
@@ -16,6 +17,7 @@ import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -46,6 +48,10 @@ public class Robot extends LoggedRobot {
                 // Running on a real robot, log to a USB stick ("/U/logs")
                 Logger.addDataReceiver(new WPILOGWriter());
                 Logger.addDataReceiver(new NT4Publisher());
+
+                // Setup PDP Logging
+                LoggedPowerDistribution.getInstance(1, ModuleType.kRev);
+
                 break;
             
             case SIM:
