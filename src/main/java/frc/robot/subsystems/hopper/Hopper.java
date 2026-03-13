@@ -196,9 +196,9 @@ public class Hopper extends SubsystemBase {
     }
     
     // Readbacks + state checks
-    public AngularVelocity getScramblerVelocity() {
-        return inputs.scramblerVelocity;
-    }
+    // public AngularVelocity getScramblerVelocity() {
+    //     return inputs.scramblerVelocity;
+    // }
     
     public AngularVelocity getFeederVelocity() {
         return inputs.feederVelocity;

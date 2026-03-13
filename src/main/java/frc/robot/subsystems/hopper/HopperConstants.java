@@ -14,7 +14,7 @@ public class HopperConstants {
     public static final AngularVelocity scramblerBeforeShootingVelocity = RotationsPerSecond.of(40);
 
     public static final AngularVelocity scramblerIdleVelocity = RotationsPerSecond.of(2);
-    public static final AngularVelocity scramblerCollectVelocity = RotationsPerSecond.of(6);
+    public static final AngularVelocity scramblerCollectVelocity = RotationsPerSecond.of(0);
     
     //Feeder Constants
 
