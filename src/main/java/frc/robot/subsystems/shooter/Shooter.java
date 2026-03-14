@@ -254,10 +254,23 @@ public class Shooter extends SubsystemBase {
                 () -> Degrees.of(shooterParams.get().hood)
             ),
             
-            hopper.preShoot().until(this::isShooterReady).andThen(hopper.forwardFeed()),
+            hopper.preShoot().until(this::isShooterReady).andThen(
+                hopper.forwardFeed().alongWith(Commands.run(() -> {
+                    // Ball counting?
+                    if (shooterTarget.minus(shooterInputs.wheelVelocity).gt(RotationsPerSecond.of(15))) {
+                        addBallToCount();
+                    }
+                }).onlyIf(() -> Constants.getMode() == Mode.REPLAY))
+            ),
 
             intake.shakeBalls()
         );
+    }
+
+    private int ballsShot = 0;
+
+    private void addBallToCount() {
+        Logger.recordOutput("Stats/BallsShot", ++ballsShot);
     }
 
     /**
