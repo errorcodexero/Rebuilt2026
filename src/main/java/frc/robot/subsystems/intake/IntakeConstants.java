@@ -7,7 +7,6 @@ import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
-import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.units.measure.Angle;
@@ -23,7 +22,7 @@ public final class IntakeConstants {
     public static final int pivotMotorCANID = 8;
     public static final int pivotEncoderCANID = 7;
 
-    public static final Current rollerCurrentLimit = Amps.of(80);
+    public static final Current rollerCurrentLimit = Amps.of(60);
     public static final Time rollerCurrentLimitTime = Milliseconds.of(200);
 
     public static final Current pivotCurrentLimit = Amps.of(40);
@@ -49,9 +48,10 @@ public final class IntakeConstants {
     public static final Angle waitingAngle = Degrees.of(96);
     public static final Angle deployedAngle = Degrees.of(130);
 
-    public static final int shakeDivisions = 4;
+    public static final int shakeDivisions = 2;
 
-    public static final Time angleChangeDelay = Seconds.of(0.2);
+    public static final Time angleChangeDelay = Milliseconds.of(150);
+    public static final Time angleDownDelay = Milliseconds.of(40);
 
     // Pivot Angle Constants
     public static final Angle pivotTolerance = Degrees.of(3); //Tolerance to compare current angle to target
