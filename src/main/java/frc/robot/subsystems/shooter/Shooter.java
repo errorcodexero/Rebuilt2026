@@ -255,12 +255,20 @@ public class Shooter extends SubsystemBase {
             ),
             
             hopper.preShoot().until(this::isShooterReady).andThen(
-                hopper.forwardFeed().alongWith(Commands.run(() -> {
+                hopper.forwardFeed().deadlineFor(Commands.run(() -> {
+                    var diff = shooterTarget.minus(shooterInputs.wheelVelocity).abs(RadiansPerSecond);
                     // Ball counting?
-                    if (shooterTarget.minus(shooterInputs.wheelVelocity).gt(RotationsPerSecond.of(15))) {
-                        addBallToCount();
+                    if (diff > 15.0) {
+                        if (!isCounted) {
+                            addBallToCount();
+                        }
+                        isCounted = true;
+                    } else {
+                        isCounted = false;
                     }
-                }).onlyIf(() -> Constants.getMode() == Mode.REPLAY))
+
+                    Logger.recordOutput("Stats/IsCounted", isCounted);
+                }).onlyIf(null))
             ),
 
             intake.shakeBalls()
@@ -268,9 +276,11 @@ public class Shooter extends SubsystemBase {
     }
 
     private int ballsShot = 0;
+    private boolean isCounted = false;
 
     private void addBallToCount() {
-        Logger.recordOutput("Stats/BallsShot", ++ballsShot);
+        ballsShot++;
+        Logger.recordOutput("Stats/BallsShot", ballsShot);
     }
 
     /**
