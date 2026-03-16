@@ -293,9 +293,10 @@ public class RobotContainer {
         // When the shooter isnt shooting, get it ready to shoot.
         shooter_.setDefaultCommand(shooter_.idleCommand());
 
-        //While the X button is held, the intake will run the eject sequence. If it the intake is stowed, it will also deploy it.
+        //While the right bumper is held, the intake will run the eject sequence. If it the intake is stowed, it will also deploy it.
+        // Because anshu already has practice with the button being X, it is kept as X, but this can change after talking to anshu. 
 
-        operatorGamepad_.x().whileTrue(intake_.hopperEjectSequence().alongWith(hopper_.reverseFeed()));
+        gamepad_.rightBumper().or(operatorGamepad_.x()).whileTrue(intake_.hopperEjectSequence().alongWith(hopper_.reverseFeed()));
 
         operatorGamepad_.y().whileTrue(RobotCommands.ejectUp(shooter_, hopper_));
 
