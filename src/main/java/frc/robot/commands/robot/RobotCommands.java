@@ -36,12 +36,12 @@ public class RobotCommands {
             () -> drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.aimingTolerance);
 
         return Commands.parallel(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> 0,
-                () -> 0, 
-                () -> RobotState.rotationToHub()
-            ).finallyDo(drive::stopWithX),
+            Commands.repeatingSequence(
+                DriveCommands.joystickDriveAtAngle(
+                    () -> RobotState.rotationToHub()
+                ).onlyWhile(() -> !aimedAtHub.getAsBoolean()), 
+                Commands.runOnce(drive::stopWithX, drive)
+            ),
             Commands.repeatingSequence(
                 Commands.waitUntil(aimedAtHub).deadlineFor(shooter.spinUpForDistance(RobotState::hubDistance)),
                 shooter.shootAtDistance(RobotState::hubDistance, hopper, intake)
