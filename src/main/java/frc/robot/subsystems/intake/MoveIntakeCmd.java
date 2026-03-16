@@ -7,38 +7,30 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 public class MoveIntakeCmd extends Command {
     private final IntakeSubsystem intake;
+    private final Angle[] intakeAngles;
 
     private final Timer delayTimer;
-    private final Time delayUp;
-    private final Time delayDown;
-
-    private final Angle lower;
-    private final Angle divisionSize;
+    private final Time delay;
 
     private int index;
+    private Angle current;
     private boolean waitingForDelay;
-    private boolean upNext;
 
-    public MoveIntakeCmd(IntakeSubsystem intake, Angle lower, Angle upper, Time delayUp, Time delayDown) {
+    public MoveIntakeCmd(IntakeSubsystem intake, Angle[] shootAngles, Time delay) {
         this.intake = intake;
-        this.lower = lower;
-        this.delayUp = delayUp;
-        this.delayDown = delayDown;
-
-        divisionSize = lower.minus(upper).div(IntakeConstants.shakeDivisions);
-
-        delayTimer = new Timer();
-        waitingForDelay = false;
-
+        this.intakeAngles = shootAngles;
+        this.delay = delay;
+        this.delayTimer = new Timer();
+        this.waitingForDelay = false;
         addRequirements(intake);
     }
 
     @Override
     public void initialize() {
-        index = 1;
-        upNext = true;
+        index = 0 ;
+        current = intakeAngles[index];
 
-        intake.setPivotAngle(lower);
+        intake.setPivotAngle(current);
         intake.setRollerVelocity(IntakeConstants.rollerShootVelocity);
 
         waitingForDelay = false;
@@ -48,21 +40,16 @@ public class MoveIntakeCmd extends Command {
     public void execute() {
         if (waitingForDelay) {
             // Waiting for delay to complete
-            if (delayTimer.hasElapsed(upNext ? delayDown : delayUp)) {
+            if (delayTimer.hasElapsed(delay)) {
                 // Delay complete, move to next angle
                 waitingForDelay = false;
-                if (upNext) {
-                    intake.setPivotAngle(lower.minus(divisionSize.times(index)));
-                    index = Math.min(index + 1, IntakeConstants.shakeDivisions);
-                    upNext = false;
-                } else {
-                    intake.setPivotAngle(lower);
-                    upNext = true;
-                }
+                index = (index + 1) % intakeAngles.length;
+                current = intakeAngles[index];
+                intake.setPivotAngle(current);
             }
         } else {
             // Waiting for angle to be reached
-            if (intake.isPivotAtSetpoint()) {
+            if (intake.isPivotAtAngle(current)) {
                 // Angle reached, start delay
                 waitingForDelay = true;
                 delayTimer.restart();
