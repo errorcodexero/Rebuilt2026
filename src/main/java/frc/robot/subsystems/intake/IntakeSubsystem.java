@@ -13,6 +13,7 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
@@ -209,7 +210,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public Command shakeBalls() {
-        return new MoveIntakeCmd(this, IntakeConstants.deployedAngle, IntakeConstants.waitingAngle, IntakeConstants.angleChangeDelay, IntakeConstants.angleDownDelay)
+        return Commands.sequence(Commands.waitTime(IntakeConstants.timeBeforeShake), Commands.run(this::waiting, this))
             .finallyDo(interrupted -> deploy());
     }
 

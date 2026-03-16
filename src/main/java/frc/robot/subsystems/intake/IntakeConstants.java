@@ -7,6 +7,7 @@ import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.units.measure.Angle;
@@ -18,6 +19,8 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
 
 public final class IntakeConstants {
+    public static final Time timeBeforeShake = Seconds.of(1.0);
+
     public static final int rollerMotorCANID = 9;
     public static final int pivotMotorCANID = 8;
     public static final int pivotEncoderCANID = 7;
