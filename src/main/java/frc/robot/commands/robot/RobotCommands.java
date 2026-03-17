@@ -39,7 +39,7 @@ public class RobotCommands {
             Commands.repeatingSequence(
                 DriveCommands.joystickDriveAtAngle(
                     () -> RobotState.rotationToHub()
-                ).onlyWhile(() -> !aimedAtHub.getAsBoolean() || DriveCommands.getLinearVelocityFromJoysticks().getNorm() != 0.0), 
+                ).until(() -> aimedAtHub.getAsBoolean() && DriveCommands.getLinearVelocityFromJoysticks().getNorm() == 0.0), 
                 Commands.runOnce(drive::stopWithX, drive)
             ),
             Commands.repeatingSequence(
