@@ -88,4 +88,32 @@ public class AutoCommands {
             RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(4))
         );
     }
+
+    public static Command aTest1DriveCollect(Drive drive, Shooter shooter, IntakeSubsystem intake, Hopper hopper) {
+        return Commands.sequence(
+            Commands.deadline(
+                DriveCommands.initialFollowPathCommand(drive, "aTest1DriveCollect"),
+                new StartupCmd(intake, hopper, shooter).beforeStarting(Commands.waitTime(Seconds.of(0.6)))
+            )
+        );
+    }
+
+    public static Command a5NZCollectAutoAlt(Drive drive, Shooter shooter, IntakeSubsystem intake, Hopper hopper, boolean mirroredX) {
+        return Commands.sequence(
+            //Drive from trench to a point in neutral zone, collecting balls and bringing down intake
+            Commands.deadline(
+                DriveCommands.initialFollowPathCommand(drive, "a5FirstPath", mirroredX),
+                new StartupCmd(intake, hopper, shooter).beforeStarting(Commands.waitTime(Seconds.of(0.6)))
+            ),
+
+            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(5.0)),
+
+            //Drive back into the neutral zone, collecting more balls along the way
+            DriveCommands.followPathCommand("a5SecondPath", mirroredX)
+                .deadlineFor(RobotCommands.intake(intake, hopper)),
+
+            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(10.0))
+            
+        ); 
+    }    
 }
