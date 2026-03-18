@@ -41,11 +41,14 @@ public class RobotCommands {
                 .until(aimedAndNotDriving)
                 .andThen(drive.stopWithXCmd(), drive.idle().onlyWhile(aimedAndNotDriving))
                 .repeatedly(),
-            Commands.repeatingSequence(
-                Commands.waitUntil(aimedAndNotDriving).deadlineFor(shooter.spinUpForDistance(RobotState::hubDistance)),
-                shooter.shootAtDistance(RobotState::hubDistance, hopper, intake)
-                    .until(() -> !aimedAndNotDriving.getAsBoolean())
-            )
+            Commands.waitUntil(aimedAndNotDriving)
+                .deadlineFor(shooter.spinUpForDistance(RobotState::hubDistance))
+                .andThen(
+                    shooter.shootAtDistance(RobotState::hubDistance, hopper, intake)
+                        .until(() -> !aimedAndNotDriving.getAsBoolean())
+                ).repeatedly()
+                
+            
         );
     }
 
