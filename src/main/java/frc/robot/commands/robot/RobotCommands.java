@@ -37,9 +37,8 @@ public class RobotCommands {
             DriveCommands.getLinearVelocityFromJoysticks().getNorm() == 0.0;
 
         return Commands.parallel(
-            DriveCommands.joystickDriveAtAngle(
-                    RobotState::rotationToHub
-                ).until(aimedAndNotDriving)
+            DriveCommands.joystickDriveAtAngle(RobotState::rotationToHub)
+                .until(aimedAndNotDriving)
                 .andThen(drive.stopWithXCmd(), drive.idle().onlyWhile(aimedAndNotDriving))
                 .repeatedly(),
             Commands.repeatingSequence(
