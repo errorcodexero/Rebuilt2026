@@ -32,20 +32,20 @@ public class RobotCommands {
      * @return
      */
     private static Command shootHub(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive) {
-        BooleanSupplier aimedAtHub =
-            () -> drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.aimingTolerance);
+        BooleanSupplier aimedAndNotDriving = () -> 
+            drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.aimingTolerance) && 
+            DriveCommands.getLinearVelocityFromJoysticks().getNorm() == 0.0;
 
         return Commands.parallel(
+            DriveCommands.joystickDriveAtAngle(
+                    RobotState::rotationToHub
+                ).until(aimedAndNotDriving)
+                .andThen(drive.stopWithXCmd(), drive.idle().onlyWhile(aimedAndNotDriving))
+                .repeatedly(),
             Commands.repeatingSequence(
-                DriveCommands.joystickDriveAtAngle(
-                    () -> RobotState.rotationToHub()
-                ).until(() -> aimedAtHub.getAsBoolean() && DriveCommands.getLinearVelocityFromJoysticks().getNorm() == 0.0), 
-                Commands.runOnce(drive::stopWithX, drive)
-            ),
-            Commands.repeatingSequence(
-                Commands.waitUntil(aimedAtHub).deadlineFor(shooter.spinUpForDistance(RobotState::hubDistance)),
+                Commands.waitUntil(aimedAndNotDriving).deadlineFor(shooter.spinUpForDistance(RobotState::hubDistance)),
                 shooter.shootAtDistance(RobotState::hubDistance, hopper, intake)
-                    .until(() -> !aimedAtHub.getAsBoolean())
+                    .until(() -> !aimedAndNotDriving.getAsBoolean())
             )
         );
     }
