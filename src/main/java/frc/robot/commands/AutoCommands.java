@@ -90,11 +90,9 @@ public class AutoCommands {
     }
 
     public static Command aTest1DriveCollect(Drive drive, Shooter shooter, IntakeSubsystem intake, Hopper hopper) {
-        return Commands.sequence(
-            Commands.deadline(
-                DriveCommands.initialFollowPathCommand(drive, "aTest1DriveCollect"),
-                new StartupCmd(intake, hopper, shooter).beforeStarting(Commands.waitTime(Seconds.of(0.6)))
-            )
+        return new StartupCmd(intake, hopper, shooter).alongWith(
+            DriveCommands.initialFollowPathCommand(drive, "aTest1DriveCollect")
+                .beforeStarting(Commands.waitTime(Seconds.one()))
         );
     }
 
