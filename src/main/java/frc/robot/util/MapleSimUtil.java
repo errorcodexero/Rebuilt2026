@@ -81,6 +81,7 @@ public class MapleSimUtil {
     }
 
     private static void periodic() {
+        LoggedTracer.reset();
         var arena = (Arena2026Rebuilt) SimulatedArena.getInstance();
         
         arena.simulationPeriodic();
@@ -94,6 +95,7 @@ public class MapleSimUtil {
         Logger.recordOutput("MapleSim/FuelRemaining", getRemainingGamepieces());
         Logger.recordOutput("MapleSim/Intaking", intakeSimulation.isRunning());
         Logger.recordOutput("MapleSim/ActiveHub", arena.isActive(true) ? Alliance.Blue : Alliance.Red);
+        LoggedTracer.record("Simulation/MapleSimUtil");
     }
 
     public static SwerveDriveSimulation createSwerve(DriveTrainSimulationConfig config, Pose2d initialPose) {

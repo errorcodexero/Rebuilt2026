@@ -114,10 +114,6 @@ public class IntakeSubsystem extends SubsystemBase {
     private void waiting(){
         setPivotAngle(IntakeConstants.waitingAngle);
     }
-
-    private void holdDown() {
-        io.setPivotVoltage(IntakeConstants.pivotHoldDownVoltage);
-    }
     
     public Angle getPivotAngle(){
         return inputs.pivotAngle;
@@ -175,13 +171,7 @@ public class IntakeSubsystem extends SubsystemBase {
      * @return The command
      */
     public Command runIntakeCmd() {
-        return startEnd(() -> {
-            startIntaking();
-            holdDown();
-        }, () -> {
-            stopIntaking();
-            deploy();
-        });
+        return startEnd(this::startIntaking, this::stopIntaking);
     }
 
     /**
