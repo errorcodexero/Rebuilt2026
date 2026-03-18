@@ -1,5 +1,6 @@
 package frc.robot.subsystems.intake; 
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -116,6 +117,18 @@ public class IntakeSubsystem extends SubsystemBase {
         setPivotAngle(IntakeConstants.waitingAngle);
     }
 
+    private void moveToPositionAtSpeed(Angle pos, AngularVelocity vel){
+        double multiplier = 1.0;
+        if(inputs.pivotAngle.gt(pos)){
+            multiplier = -1.0;
+        }
+        if(pos.minus(inputs.pivotAngle).abs(Degrees) > IntakeConstants.pivotTolerance.in(Degrees)){
+            setRollerVelocity(vel.times(multiplier));
+        }else{
+            setPivotAngle(pos);
+        }
+    }
+
     private void holdDown() {
         io.setPivotVoltage(IntakeConstants.pivotHoldDownVoltage);
     }
@@ -210,7 +223,9 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public Command shakeBalls() {
-        return Commands.sequence(Commands.waitTime(IntakeConstants.timeBeforeShake), Commands.run(this::waiting, this))
+        return Commands.sequence(Commands.waitTime(IntakeConstants.timeBeforeShake), Commands.run(() -> {
+            moveToPositionAtSpeed(IntakeConstants.waitingAngle, IntakeConstants.shakeVelocity);
+        }, this))
             .finallyDo(interrupted -> deploy());
     }
 

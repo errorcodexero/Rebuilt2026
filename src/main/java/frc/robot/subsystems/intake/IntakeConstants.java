@@ -2,6 +2,7 @@ package frc.robot.subsystems.intake;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.Rotations;
@@ -20,6 +21,7 @@ import edu.wpi.first.units.measure.Voltage;
 
 public final class IntakeConstants {
     public static final Time timeBeforeShake = Seconds.of(1.0);
+    public static final AngularVelocity shakeVelocity = DegreesPerSecond.of(10.0);
 
     public static final int rollerMotorCANID = 9;
     public static final int pivotMotorCANID = 8;
