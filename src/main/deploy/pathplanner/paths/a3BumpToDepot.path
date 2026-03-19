@@ -40,7 +40,7 @@
         "y": 5.522402978787016
       },
       "nextControl": {
-        "x": 0.4951277777777776,
+        "x": 0.49512777777777756,
         "y": 4.697622222222221
       },
       "isLocked": false,
@@ -100,7 +100,7 @@
     "rotation": -23.38522105721393
   },
   "reversed": false,
-  "folder": "NoClimbAutos",
+  "folder": "DepotAuto",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 180.0
