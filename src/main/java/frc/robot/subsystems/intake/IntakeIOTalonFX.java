@@ -41,13 +41,12 @@ public class IntakeIOTalonFX implements IntakeIO {
     protected final CANcoder pivotCancoder;
 
     //Pivot motor control requests
-    private final MotionMagicVoltage pivotAngleRequest = new MotionMagicVoltage(Degrees.zero());
-    private final VoltageOut pivotVoltageRequest = new VoltageOut(Volts.zero());
-    private final VelocityVoltage pivotVelocityRequest = new VelocityVoltage(DegreesPerSecond.zero());
+    private final MotionMagicVoltage pivotAngleRequest= new MotionMagicVoltage(Degrees.of(0));
+    private final VoltageOut pivotVoltageRequest= new VoltageOut(Volts.of(0));
 
     //Roller motor control requests
-    private final VoltageOut rollerVoltageRequest = new VoltageOut(Volts.zero());
-    private final VelocityVoltage rollerVelocityRequest= new VelocityVoltage(DegreesPerSecond.zero());
+    private final VoltageOut rollerVoltageRequest = new VoltageOut(Volts.of(0));
+    private final VelocityVoltage rollerVelocityRequest= new VelocityVoltage(DegreesPerSecond.of(0));
 
     private final Debouncer pivotConnectedDebounce =
         new Debouncer(0.25, DebounceType.kFalling);
@@ -217,10 +216,6 @@ public class IntakeIOTalonFX implements IntakeIO {
     public void setRollerVelocity(AngularVelocity velocity) {
         // Create Velocity control request with desired velocity 
         rollerMotor.setControl(rollerVelocityRequest.withVelocity(velocity));
-    }
-
-    public void setPivotVelocity(AngularVelocity velocity){
-        pivotMotor.setControl(pivotVelocityRequest.withVelocity(velocity));
     }
 
     @Override
