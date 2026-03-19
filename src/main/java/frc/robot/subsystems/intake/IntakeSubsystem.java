@@ -77,6 +77,10 @@ public class IntakeSubsystem extends SubsystemBase {
         io.setPivotAngle(angle);
     }
 
+    public void setPivotVelocity(AngularVelocity vel) {
+        io.setPivotVelocity(vel);
+    }
+
     public void stopRoller() {
         io.stopRoller();
     }
@@ -123,7 +127,7 @@ public class IntakeSubsystem extends SubsystemBase {
             multiplier = -1.0;
         }
         if(pos.minus(inputs.pivotAngle).abs(Degrees) > IntakeConstants.pivotTolerance.in(Degrees)){
-            setRollerVelocity(vel.times(multiplier));
+            setPivotVelocity(vel.times(multiplier));
         }else{
             setPivotAngle(pos);
         }

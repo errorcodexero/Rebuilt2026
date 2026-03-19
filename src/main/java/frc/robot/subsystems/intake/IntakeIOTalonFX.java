@@ -219,6 +219,7 @@ public class IntakeIOTalonFX implements IntakeIO {
         rollerMotor.setControl(rollerVelocityRequest.withVelocity(velocity));
     }
 
+    @Override
     public void setPivotVelocity(AngularVelocity velocity){
         pivotMotor.setControl(pivotVelocityRequest.withVelocity(velocity));
     }

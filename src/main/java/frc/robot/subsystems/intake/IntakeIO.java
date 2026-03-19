@@ -35,6 +35,8 @@ public interface IntakeIO {
 
     public default void setRollerVelocity(AngularVelocity velocity) {}
 
+    public default void setPivotVelocity(AngularVelocity vel) {}
+
     public default void setPivotVoltage(Voltage voltage) {} /*Switched to voltage since velocity control will likely not be needed, 
                                                                     and voltage will be needed for SysId routines*/
     public default void setPivotAngle(Angle angle) {}
