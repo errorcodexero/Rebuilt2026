@@ -101,9 +101,6 @@ public class DriveCommands {
     configured = true;
   }
 
-  public static Translation2d getLinearVelocityFromJoysticks(){
-    return getLinearVelocityFromJoysticks(xSupplier_.getAsDouble(), ySupplier_.getAsDouble());
-  }
 
   private static Translation2d getLinearVelocityFromJoysticks(double x, double y) {
     // Apply deadband
