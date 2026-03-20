@@ -128,6 +128,7 @@ public class IntakeSubsystem extends SubsystemBase {
         if(inputs.pivotAngle.gt(targetPos)){
             multiplier = -1.0;
         }
+        setpointAngle = targetPos;
         if(targetPos.minus(inputs.pivotAngle).abs(Degrees) > IntakeConstants.pivotTolerance.in(Degrees)){
             setPivotVelocity(absVel.times(multiplier));
         }else{
