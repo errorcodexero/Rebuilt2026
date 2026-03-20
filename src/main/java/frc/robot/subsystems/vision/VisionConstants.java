@@ -14,7 +14,7 @@ public class VisionConstants {
     public static final String frontLimelightName = "limelight-front";
 
     // Behavior to use when inegrating pose estimates.
-    public static final IntegrationBehavior integrationBehavior = IntegrationBehavior.ALL;
+    public static final IntegrationBehavior integrationBehavior = IntegrationBehavior.ONLY_NEAREST;
 
     // Transforms
     public static final Transform3d frontTransform = new Transform3d(

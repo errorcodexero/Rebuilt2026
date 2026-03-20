@@ -268,7 +268,7 @@ public class Shooter extends SubsystemBase {
                     }
 
                     Logger.recordOutput("Stats/IsCounted", isCounted);
-                }).onlyIf(null))
+                }).onlyIf(() -> Constants.getMode() == Mode.REPLAY))
             ),
 
             intake.shakeBalls()
