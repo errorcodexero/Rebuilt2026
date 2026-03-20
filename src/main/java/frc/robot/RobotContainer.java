@@ -246,6 +246,8 @@ public class RobotContainer {
 
         autoChooser_.addDefaultOption("Neutral Zone Collect - Left Trench", AutoCommands.a2NZCollectAuto(drivebase_, shooter_, intake_, hopper_, false));
         autoChooser_.addOption("Neutral Zone Collect - Right Trench", AutoCommands.a2NZCollectAuto(drivebase_, shooter_, intake_, hopper_, true));
+        autoChooser_.addOption("Neutral Zone Loop - Left Trench", AutoCommands.a5NZCollectAutoAlt(drivebase_, shooter_, intake_, hopper_, false));
+        autoChooser_.addOption("Neutral Zone Loop - Right Trench", AutoCommands.a5NZCollectAutoAlt(drivebase_, shooter_, intake_, hopper_, true));
         autoChooser_.addOption("Depot Auto", AutoCommands.a3DepotAuto(drivebase_, shooter_, intake_, hopper_)); 
         autoChooser_.addOption("Preload Only", AutoCommands.a4OnlyPreload(drivebase_, shooter_, intake_, hopper_));
         autoChooser_.addOption("Test 1: Drive and Collect", AutoCommands.aTest1DriveCollect(drivebase_, shooter_, intake_, hopper_));
