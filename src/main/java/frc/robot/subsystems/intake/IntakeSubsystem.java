@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.Constants.RobotType;
 import frc.robot.util.LoggedTracer;
 import frc.robot.util.MapleSimUtil;
 import frc.robot.util.Mechanism3d;
@@ -116,6 +117,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     private void holdDown() {
+        if (Constants.getRobot() == RobotType.SIMBOT) return; // dont hold down in sim
         io.setPivotVoltage(IntakeConstants.pivotHoldDownVoltage);
     }
     
