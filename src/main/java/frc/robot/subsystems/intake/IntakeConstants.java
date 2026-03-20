@@ -51,7 +51,6 @@ public final class IntakeConstants {
     public static final int shakeDivisions = 2;
 
     public static final Time angleChangeDelay = Milliseconds.of(150);
-    public static final Time angleDownDelay = Milliseconds.of(40);
 
     // Pivot Angle Constants
     public static final Angle pivotTolerance = Degrees.of(3); //Tolerance to compare current angle to target

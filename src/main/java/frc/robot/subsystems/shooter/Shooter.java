@@ -249,6 +249,7 @@ public class Shooter extends SubsystemBase {
             () -> getTuning().getShooterParams(distance.get().in(Meters));
 
         return Commands.parallel(
+            Commands.runOnce(() -> Logger.recordOutput("Command/ShootAtDistance", true)),
             runDynamicSetpoints(
                 () -> RotationsPerSecond.of(shooterParams.get().velocity),
                 () -> Degrees.of(shooterParams.get().hood)
@@ -272,7 +273,7 @@ public class Shooter extends SubsystemBase {
             ),
 
             intake.shakeBalls()
-        );
+        ).finallyDo(interrupted -> Logger.recordOutput("Command/ShootAtDistance", false));
     }
 
     private int ballsShot = 0;
