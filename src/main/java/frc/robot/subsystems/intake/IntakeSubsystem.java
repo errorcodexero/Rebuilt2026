@@ -1,6 +1,7 @@
 package frc.robot.subsystems.intake; 
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -121,15 +122,16 @@ public class IntakeSubsystem extends SubsystemBase {
         setPivotAngle(IntakeConstants.waitingAngle);
     }
 
-    private void moveToPositionAtSpeed(Angle pos, AngularVelocity vel){
+    private void moveToPositionAtSpeed(Angle targetPos, AngularVelocity vel){
+        AngularVelocity absVel = DegreesPerSecond.of(vel.abs(DegreesPerSecond));
         double multiplier = 1.0;
-        if(inputs.pivotAngle.gt(pos)){
+        if(inputs.pivotAngle.gt(targetPos)){
             multiplier = -1.0;
         }
-        if(pos.minus(inputs.pivotAngle).abs(Degrees) > IntakeConstants.pivotTolerance.in(Degrees)){
-            setPivotVelocity(vel.times(multiplier));
+        if(targetPos.minus(inputs.pivotAngle).abs(Degrees) > IntakeConstants.pivotTolerance.in(Degrees)){
+            setPivotVelocity(absVel.times(multiplier));
         }else{
-            setPivotAngle(pos);
+            setPivotAngle(targetPos);
         }
     }
 
@@ -227,10 +229,12 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public Command shakeBalls() {
-        return Commands.sequence(Commands.waitTime(IntakeConstants.timeBeforeShake), Commands.run(() -> {
-            moveToPositionAtSpeed(IntakeConstants.waitingAngle, IntakeConstants.shakeVelocity);
-        }, this))
-            .finallyDo(interrupted -> deploy());
+        return Commands.sequence(
+                Commands.waitTime(IntakeConstants.timeBeforeShake), 
+                Commands.run(() -> {
+                    moveToPositionAtSpeed(IntakeConstants.waitingAngle, IntakeConstants.shakeVelocity);
+                }, this)
+            ).finallyDo(interrupted -> deploy());
     }
 
     ////////////////////////////

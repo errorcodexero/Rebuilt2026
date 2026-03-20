@@ -253,9 +253,7 @@ public class Shooter extends SubsystemBase {
                 () -> RotationsPerSecond.of(shooterParams.get().velocity),
                 () -> Degrees.of(shooterParams.get().hood)
             ),
-            
             hopper.preShoot().until(this::isShooterReady).andThen(hopper.forwardFeed()),
-
             intake.shakeBalls()
         );
     }
