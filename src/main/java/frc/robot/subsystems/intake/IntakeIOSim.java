@@ -3,7 +3,6 @@ package frc.robot.subsystems.intake;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 
 import com.ctre.phoenix6.CANBus;
-import com.ctre.phoenix6.sim.CANcoderSimState;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -39,19 +38,14 @@ public class IntakeIOSim extends IntakeIOTalonFX {
         //Get the simulation states of each motor
         TalonFXSimState pivotMotorSimState= pivotMotor.getSimState();
         TalonFXSimState rollerMotorSimState= rollerMotor.getSimState();
-        CANcoderSimState cancoderSimState = pivotCancoder.getSimState();
 
         pivotMotorSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
         
         pivotMotorSim.setInputVoltage(pivotMotorSimState.getMotorVoltage());
         pivotMotorSim.update(Robot.defaultPeriodSecs);
 
-        cancoderSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
-        cancoderSimState.setRawPosition(pivotMotorSim.getAngularPosition().times(IntakeConstants.motorToPivotGearRatio));
-        cancoderSimState.setVelocity(pivotMotorSim.getAngularVelocity().times(IntakeConstants.motorToPivotGearRatio));
-
-        pivotMotorSimState.setRawRotorPosition(pivotMotorSim.getAngularPosition());
-        pivotMotorSimState.setRotorVelocity(pivotMotorSim.getAngularVelocity());
+        pivotMotorSimState.setRawRotorPosition(pivotMotorSim.getAngularPosition().times(IntakeConstants.motorToPivotGearRatio));
+        pivotMotorSimState.setRotorVelocity(pivotMotorSim.getAngularVelocity().times(IntakeConstants.motorToPivotGearRatio));
         
         rollerMotorSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
 
