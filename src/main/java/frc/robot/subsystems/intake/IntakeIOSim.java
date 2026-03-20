@@ -47,8 +47,8 @@ public class IntakeIOSim extends IntakeIOTalonFX {
         pivotMotorSim.update(Robot.defaultPeriodSecs);
 
         cancoderSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
-        cancoderSimState.setRawPosition(pivotMotorSim.getAngularPosition().times(IntakeConstants.motorToPivotGearRatio));
-        cancoderSimState.setVelocity(pivotMotorSim.getAngularVelocity().times(IntakeConstants.motorToPivotGearRatio));
+        cancoderSimState.setRawPosition(pivotMotorSim.getAngularPosition());
+        cancoderSimState.setVelocity(pivotMotorSim.getAngularVelocity());
 
         pivotMotorSimState.setRawRotorPosition(pivotMotorSim.getAngularPosition());
         pivotMotorSimState.setRotorVelocity(pivotMotorSim.getAngularVelocity());
