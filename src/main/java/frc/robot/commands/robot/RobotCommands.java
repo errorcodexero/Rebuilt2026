@@ -25,20 +25,18 @@ import frc.robot.subsystems.shooter.ShooterConstants;
 
 public class RobotCommands {
     /**
-     * Shoots into the hub.
+     * Shoots into the hub while also managing the drivebase angle to aim into the hub.
+     * This is the main shooting command for most use cases.
      * @param shooter
      * @param hopper
      * @param drive
      * @return
      */
-    private static Command shootHub(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive) {
-        BooleanSupplier shouldShoot =
-            () -> drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.aimingTolerance);
-
+    public static Command shootHub(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive) {
         BooleanSupplier shouldXWheels =
             () -> drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.xWheelTolerance);
 
-        return Commands.parallel(
+        return shootHubNoAim(shooter, hopper, intake, drive).alongWith(
             DriveCommands.joystickDriveAtAngle(
                 drive,
                 () -> 0,
@@ -47,13 +45,28 @@ public class RobotCommands {
             )
             .until(shouldXWheels)
             .andThen(drive.stopWithXCmd(), drive.idle().onlyWhile(shouldXWheels))
-            .repeatedly(),
+            .repeatedly()
+        );
+    }
 
-            Commands.repeatingSequence(
-                Commands.waitUntil(shouldShoot).deadlineFor(shooter.spinUpForDistance(RobotState::hubDistance)),
-                shooter.shootAtDistance(RobotState::hubDistance, hopper, intake)
-                    .until(() -> !shouldShoot.getAsBoolean())
-            )
+    /**
+     * Shoots into the hub, without aiming. This should not be used in most situations,
+     * and only when you need additional flexibility like trying to squeeze
+     * the most time out of auto.
+     * @param shooter
+     * @param hopper
+     * @param intake
+     * @param drive
+     * @return
+     */
+    public static Command shootHubNoAim(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive) {
+        BooleanSupplier shouldShoot =
+            () -> drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.aimingTolerance);
+
+        return Commands.repeatingSequence(
+            Commands.waitUntil(shouldShoot).deadlineFor(shooter.spinUpForDistance(RobotState::hubDistance)),
+            shooter.shootAtDistance(RobotState::hubDistance, hopper, intake)
+                .until(() -> !shouldShoot.getAsBoolean())
         );
     }
 
@@ -64,7 +77,7 @@ public class RobotCommands {
      * @param drive
      * @return
      */
-    private static Command ferry(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive) {
+    public static Command ferry(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive) {
         return Commands.defer(() -> {
             Translation2d rightTarget =
                 DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
