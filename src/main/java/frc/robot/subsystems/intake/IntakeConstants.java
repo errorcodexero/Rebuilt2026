@@ -48,7 +48,7 @@ public final class IntakeConstants {
     public static final Angle waitingAngle = Degrees.of(96);
     public static final Angle deployedAngle = Degrees.of(130);
 
-    public static final int shakeDivisions = 2;
+    public static final int shakeDivisions = 4;
 
     public static final Time angleChangeDelay = Milliseconds.of(150);
     public static final Time angleDownDelay = Milliseconds.of(40);

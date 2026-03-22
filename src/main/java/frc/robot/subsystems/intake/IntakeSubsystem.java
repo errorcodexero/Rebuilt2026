@@ -209,7 +209,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public Command shakeBalls() {
-        return new MoveIntakeCmd(this, new Angle[] {IntakeConstants.deployedAngle, IntakeConstants.waitingAngle},IntakeConstants.angleChangeDelay)
+        return new MoveIntakeCmd(this, IntakeConstants.deployedAngle, IntakeConstants.waitingAngle, Seconds.zero(), Seconds.zero())
             .finallyDo(interrupted -> deploy());
     }
 
