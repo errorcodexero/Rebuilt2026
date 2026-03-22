@@ -59,7 +59,7 @@ public class MoveIntakeCmd extends Command {
                     index = Math.min(index + 1, IntakeConstants.shakeDivisions);
                     upNext = false;
                 } else {
-                    var setpoint = intake.getPivotAngle().plus(Degrees.of(10));
+                    var setpoint = intake.getPivotAngle().plus(Degrees.of(5));
                     intake.setPivotAngle(setpoint);
                     upNext = true;
                 }
