@@ -249,15 +249,39 @@ public class Shooter extends SubsystemBase {
             () -> getTuning().getShooterParams(distance.get().in(Meters));
 
         return Commands.parallel(
+            Commands.runOnce(() -> Logger.recordOutput("Command/ShootAtDistance", true)),
             runDynamicSetpoints(
                 () -> RotationsPerSecond.of(shooterParams.get().velocity),
                 () -> Degrees.of(shooterParams.get().hood)
             ),
             
-            hopper.preShoot().until(this::isShooterReady).andThen(hopper.forwardFeed()),
+            hopper.preShoot().until(this::isShooterReady).andThen(
+                hopper.forwardFeed().deadlineFor(Commands.run(() -> {
+                    var diff = shooterTarget.minus(shooterInputs.wheelVelocity).abs(RadiansPerSecond);
+                    // Ball counting?
+                    if (diff > 15.0) {
+                        if (!isCounted) {
+                            addBallToCount();
+                        }
+                        isCounted = true;
+                    } else {
+                        isCounted = false;
+                    }
+
+                    Logger.recordOutput("Stats/IsCounted", isCounted);
+                }).onlyIf(() -> Constants.getMode() == Mode.REPLAY))
+            ),
 
             intake.shakeBalls()
-        );
+        ).finallyDo(interrupted -> Logger.recordOutput("Command/ShootAtDistance", false));
+    }
+
+    private int ballsShot = 0;
+    private boolean isCounted = false;
+
+    private void addBallToCount() {
+        ballsShot++;
+        Logger.recordOutput("Stats/BallsShot", ballsShot);
     }
 
     /**

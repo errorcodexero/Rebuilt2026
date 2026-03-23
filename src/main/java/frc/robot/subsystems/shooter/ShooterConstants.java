@@ -34,6 +34,7 @@ public class ShooterConstants {
     public static final AngularVelocity ejectVelocity = RotationsPerSecond.of(-20);
 
     public static final Angle aimingTolerance = Degrees.of(5);
+    public static final Angle xWheelTolerance = Degrees.of(1);
 
     public static final Distance allowedTrenchDistance = Meters.of(1.0);
 
