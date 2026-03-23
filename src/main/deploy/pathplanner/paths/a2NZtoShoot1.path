@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.5856622995022125,
-        "y": 4.903632605088495
+        "x": 8.104258884126107,
+        "y": 4.815380842090708
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.527878767975665,
-        "y": 7.318535536504425
+        "x": 8.04647535259956,
+        "y": 7.230283773506637
       },
       "isLocked": false,
       "linkedName": "NZNoClimb"
@@ -53,7 +53,7 @@
   "folder": "T2NZ2TSame",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": -135.0
   },
   "useDefaultConstraints": false
 }

@@ -272,6 +272,10 @@ public class Shooter extends SubsystemBase {
                 }).onlyIf(() -> Constants.getMode() == Mode.REPLAY))
             ),
 
+            Commands.run(() -> {
+                Logger.recordOutput("Command/ReadyForShoot", isShooterReady());
+            }),
+
             intake.shakeBalls()
         ).finallyDo(interrupted -> Logger.recordOutput("Command/ShootAtDistance", false));
     }

@@ -101,9 +101,9 @@ public class AutoCommands {
     }
 
     private static final Time intakeStartTime1 = Seconds.of(0.7);
-    private static final Time intakeLength1 = Seconds.of(3.0);
-    private static final Time shootingStartTime1 = Seconds.of(5.2);
-    private static final Time shootingLength1 = Seconds.of(6);
+    private static final Time intakeLength1 = Seconds.of(4.0);
+    private static final Time shootingStartTime1 = Seconds.of(4.8);
+    private static final Time shootingLength1 = Seconds.of(5.5);
 
     private static final Time intakeStartTime2 = Seconds.of(0.7);
     private static final Time intakeLength2 = Seconds.of(4.5);

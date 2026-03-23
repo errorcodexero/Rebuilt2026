@@ -16,19 +16,24 @@
     },
     {
       "anchor": {
-        "x": 7.5856622995022125,
-        "y": 4.903632605088495
+        "x": 8.104258884126107,
+        "y": 4.815380842090708
       },
       "prevControl": {
-        "x": 7.448267249723452,
-        "y": 5.933671045353982
+        "x": 8.20530427267699,
+        "y": 6.069034879701327
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": "NZNoClimb"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.5362606095679011,
+      "rotationDegrees": -130.0
+    }
+  ],
   "constraintZones": [
     {
       "name": "Constraints Zone",
@@ -56,7 +61,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": -135.0
   },
   "reversed": false,
   "folder": "T2NZ2TSame",
