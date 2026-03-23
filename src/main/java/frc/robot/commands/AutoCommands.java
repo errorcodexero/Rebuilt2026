@@ -1,12 +1,14 @@
 package frc.robot.commands;
 
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.Seconds;
+
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.RobotState;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.robot.RobotCommands;
 import frc.robot.commands.robot.StartupCmd;
@@ -98,11 +100,15 @@ public class AutoCommands {
         );
     }
 
-    private static final Time shootingStartTime1 = Seconds.of(18);
-    private static final Time shootingLength1 = Seconds.of(5);
+    private static final Time intakeStartTime1 = Seconds.of(0.7);
+    private static final Time intakeLength1 = Seconds.of(3.0);
+    private static final Time shootingStartTime1 = Seconds.of(5.2);
+    private static final Time shootingLength1 = Seconds.of(6);
 
-    private static final Time shootingLength2 = Seconds.of(20);
-    private static final Time shootingOverlap2 = Milliseconds.of(500);
+    private static final Time intakeStartTime2 = Seconds.of(0.7);
+    private static final Time intakeLength2 = Seconds.of(4.5);
+    private static final Time shootingStartTime2 = Seconds.of(5.2);
+    private static final Time shootingLength2 = Seconds.of(6);
 
     public static Command a5NZCollectAutoAlt(Drive drive, Shooter shooter, IntakeSubsystem intake, Hopper hopper, boolean mirroredX) {
         return Commands.sequence(
@@ -117,10 +123,36 @@ public class AutoCommands {
             Commands.parallel(
                 DriveCommands.initialFollowPathCommand(drive, "a5CollectLoop1", mirroredX),
                 Commands.sequence(
-                    new StartupCmd(intake, hopper, shooter).withTimeout(shootingStartTime1),
-                    RobotCommands.shootHubNoAim(shooter, hopper, intake, drive).withTimeout(shootingLength1)
+                    Commands.waitTime(intakeStartTime1)
+                        .alongWith(Commands.runOnce(() -> Logger.recordOutput("AutoState", "Waiting"))),
+
+                    new StartupCmd(intake, hopper, shooter).withTimeout(intakeLength1)
+                        .alongWith(Commands.runOnce(() -> Logger.recordOutput("AutoState", "Intake"))),
+
+                    shooter.spinUpForDistanceHoodParked(() -> Meters.of(2)).withTimeout(shootingStartTime1.minus(intakeLength1))
+                        .alongWith(Commands.runOnce(() -> Logger.recordOutput("AutoState", "Spinup"))),
+
+                    shooter.shootAtDistance(RobotState::hubDistance, hopper, intake).withTimeout(shootingLength1)
+                        .alongWith(Commands.runOnce(() -> Logger.recordOutput("AutoState", "Shooting")))
                 )
             ),
+
+            Commands.parallel(
+                DriveCommands.initialFollowPathCommand(drive, "a5CollectLoop2", mirroredX),
+                Commands.sequence(
+                    Commands.waitTime(intakeStartTime2)
+                        .alongWith(Commands.runOnce(() -> Logger.recordOutput("AutoState", "Waiting"))),
+
+                    RobotCommands.intake(intake, hopper).withTimeout(intakeLength2)
+                        .alongWith(Commands.runOnce(() -> Logger.recordOutput("AutoState", "Intake"))),
+
+                    shooter.spinUpForDistanceHoodParked(() -> Meters.of(2)).withTimeout(shootingStartTime2.minus(intakeLength2))
+                        .alongWith(Commands.runOnce(() -> Logger.recordOutput("AutoState", "Spinup"))),
+                    
+                    shooter.shootAtDistance(RobotState::hubDistance, hopper, intake).withTimeout(shootingLength2)
+                        .alongWith(Commands.runOnce(() -> Logger.recordOutput("AutoState", "Shooting")))
+                )
+            )
 
             // Commands.parallel(
             //     // RobotCommands.shootHubNoAim(shooter, hopper, intake, drive).withTimeout(shootingLength2),
@@ -130,7 +162,7 @@ public class AutoCommands {
             //         .beforeStarting(Commands.waitTime(shootingLength2.minus(shootingOverlap2)))
             // ),
 
-            RobotCommands.shoot(shooter, hopper, intake, drive)
+            // RobotCommands.shoot(shooter, hopper, intake, drive)
         );
     }
 }

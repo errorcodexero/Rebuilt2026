@@ -36,6 +36,8 @@ public class ShooterConstants {
     public static final AngularVelocity minimumVelocitySetpoint = RotationsPerSecond.of(0.5);
 
     public static final Angle aimingTolerance = Degrees.of(5);
+    public static final Angle defenseTolerance = Degrees.of(7.5);
+
     public static final Angle xWheelTolerance = Degrees.of(1);
 
     public static final Distance allowedTrenchDistance = Meters.of(1.0);

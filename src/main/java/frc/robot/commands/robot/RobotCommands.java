@@ -63,10 +63,13 @@ public class RobotCommands {
         BooleanSupplier shouldShoot =
             () -> drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.aimingTolerance);
 
+        BooleanSupplier shouldStopShooting =
+            () -> !drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.defenseTolerance);
+
         return Commands.repeatingSequence(
             Commands.waitUntil(shouldShoot).deadlineFor(shooter.spinUpForDistance(RobotState::hubDistance)),
             shooter.shootAtDistance(RobotState::hubDistance, hopper, intake)
-                .until(() -> !shouldShoot.getAsBoolean())
+                .until(shouldStopShooting)
         );
     }
 
