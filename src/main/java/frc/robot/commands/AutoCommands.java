@@ -99,6 +99,7 @@ public class AutoCommands {
     }
 
     private static final Time shootingStartTime1 = Seconds.of(18);
+    private static final Time shootingLength1 = Seconds.of(5);
 
     private static final Time shootingLength2 = Seconds.of(20);
     private static final Time shootingOverlap2 = Milliseconds.of(500);
@@ -106,20 +107,28 @@ public class AutoCommands {
     public static Command a5NZCollectAutoAlt(Drive drive, Shooter shooter, IntakeSubsystem intake, Hopper hopper, boolean mirroredX) {
         return Commands.sequence(
             //Drive from trench to a point in neutral zone, collecting balls and bringing down intake
-            Commands.parallel(
-                DriveCommands.initialFollowPathCommand(drive, "a5CollectLoop1", mirroredX)
-                    .deadlineFor(new StartupCmd(intake, hopper, shooter).beforeStarting(Commands.waitTime(Seconds.of(0.6)))),
+            // Commands.parallel(
+            //     DriveCommands.initialFollowPathCommand(drive, "a5CollectLoop1", mirroredX)
+            //         .deadlineFor(new StartupCmd(intake, hopper, shooter).beforeStarting(Commands.waitTime(Seconds.of(0.6))))
                 
-                RobotCommands.shootHubNoAim(shooter, hopper, intake, drive).beforeStarting(Commands.waitTime(shootingStartTime1))
-            ),
+            //     // RobotCommands.shootHubNoAim(shooter, hopper, intake, drive).beforeStarting(Commands.waitTime(shootingStartTime1))
+            // ),
 
             Commands.parallel(
-                RobotCommands.shootHubNoAim(shooter, hopper, intake, drive).withTimeout(shootingLength2),
-                
-                DriveCommands.followPathCommand("a5CollectLoop2", mirroredX)
-                    .deadlineFor(RobotCommands.intake(intake, hopper))
-                    .beforeStarting(Commands.waitTime(shootingLength2.minus(shootingOverlap2)))
+                DriveCommands.initialFollowPathCommand(drive, "a5CollectLoop1", mirroredX),
+                Commands.sequence(
+                    new StartupCmd(intake, hopper, shooter).withTimeout(shootingStartTime1),
+                    RobotCommands.shootHubNoAim(shooter, hopper, intake, drive).withTimeout(shootingLength1)
+                )
             ),
+
+            // Commands.parallel(
+            //     // RobotCommands.shootHubNoAim(shooter, hopper, intake, drive).withTimeout(shootingLength2),
+                
+            //     DriveCommands.followPathCommand("a5CollectLoop2", mirroredX)
+            //         .deadlineFor(RobotCommands.intake(intake, hopper))
+            //         .beforeStarting(Commands.waitTime(shootingLength2.minus(shootingOverlap2)))
+            // ),
 
             RobotCommands.shoot(shooter, hopper, intake, drive)
         );
