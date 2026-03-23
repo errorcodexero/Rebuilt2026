@@ -33,6 +33,8 @@ public class ShooterConstants {
     public static final AngularVelocity shooterTolerance = RotationsPerSecond.of(0.1);
     public static final AngularVelocity ejectVelocity = RotationsPerSecond.of(-20);
 
+    public static final AngularVelocity minimumVelocitySetpoint = RotationsPerSecond.of(0.5);
+
     public static final Angle aimingTolerance = Degrees.of(5);
     public static final Angle xWheelTolerance = Degrees.of(1);
 
@@ -51,7 +53,7 @@ public class ShooterConstants {
 
     public class PID {
             // shooter
-            public static final double shooterkP = 0.45; 
+            public static final double shooterkP = 0.6; 
             public static final double shooterkI = 0.0;
             public static final double shooterkD = 0.0;
             public static final double shooterkV = 0.132;
