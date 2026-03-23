@@ -132,7 +132,7 @@ public class ShooterIOTalonFX implements ShooterIO {
             setVoltage(Volts.zero());
             return;
         }
-        shooter1Motor.setControl(new VelocityVoltage(velocity));
+        shooter1Motor.setControl(new VelocityVoltage(velocity).withEnableFOC(true));
     }
 
     public void setVoltage(Voltage vol) {
