@@ -119,7 +119,7 @@
   ],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 2.1,
+    "maxVelocity": 2.8,
     "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
@@ -128,7 +128,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -41.428979515269766
+    "rotation": -41.42897951526977
   },
   "reversed": false,
   "folder": "T2NZ2TSameAlt",
