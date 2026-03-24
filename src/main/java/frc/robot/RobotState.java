@@ -56,6 +56,8 @@ public class RobotState {
         Translation2d translationToHub = hubTranslation.minus(currentPose.getTranslation());
 
         rotationToHub = new Rotation2d(translationToHub.getX(), translationToHub.getY());
+        Logger.recordOutput("RobotState/HubRotation", rotationToHub);
+        Logger.recordOutput("RobotState/AngleDelta", rotationToHub.minus(currentPose.getRotation()));
 
         Distance allianceWall =
             DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue

@@ -1,6 +1,7 @@
 package frc.robot.subsystems.shooter;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.util.PhoenixUtil.tryUntilOk;
 
 import com.ctre.phoenix6.CANBus;
@@ -127,8 +128,11 @@ public class ShooterIOTalonFX implements ShooterIO {
 
     public void setVelocity(AngularVelocity vel) {
         AngularVelocity velocity = vel.div(ShooterConstants.gearRatio);
-        // shooter1Motor.setControl(new MotionMagicVelocityVoltage(velocity)) ;
-        shooter1Motor.setControl(new VelocityVoltage(velocity));
+        if (vel.lt(ShooterConstants.minimumVelocitySetpoint)) {
+            setVoltage(Volts.zero());
+            return;
+        }
+        shooter1Motor.setControl(new VelocityVoltage(velocity).withEnableFOC(true));
     }
 
     public void setVoltage(Voltage vol) {

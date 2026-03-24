@@ -30,10 +30,15 @@ public class ShooterConstants {
 
     public static final double gearRatio = 1.04;
 
-    public static final AngularVelocity shooterTolerance = RotationsPerSecond.of(0.1);
+    public static final AngularVelocity shooterTolerance = RotationsPerSecond.of(1.0);
     public static final AngularVelocity ejectVelocity = RotationsPerSecond.of(-20);
 
+    public static final AngularVelocity minimumVelocitySetpoint = RotationsPerSecond.of(0.5);
+
     public static final Angle aimingTolerance = Degrees.of(5);
+    public static final Angle defenseTolerance = Degrees.of(7.5);
+
+    public static final Angle xWheelTolerance = Degrees.of(1);
 
     public static final Distance allowedTrenchDistance = Meters.of(1.0);
 
@@ -50,7 +55,7 @@ public class ShooterConstants {
 
     public class PID {
             // shooter
-            public static final double shooterkP = 0.45; 
+            public static final double shooterkP = 0.6; 
             public static final double shooterkI = 0.0;
             public static final double shooterkD = 0.0;
             public static final double shooterkV = 0.132;
@@ -90,34 +95,6 @@ public class ShooterConstants {
             public static final Translation2d redTargetRight = new Translation2d(14,2);
 
             public static final double centerLineY = 4.034536;
-
-            // Hood Setpoints
-            public static final double hoodLOW = 0;
-            public static final double hoodMEDIUM = 1;
-            public static final double hoodHIGH = 2;
-        
-            public enum HubDistance {
-                LOW(Meters.of(2)), // 0-2 m
-                MEDIUM(Meters.of(3)), //  in
-                HIGH(Meters.of(4)); // 96+ in
-
-                private final Distance maxDistance;
-
-                private HubDistance(Distance maxDistance) {
-                    this.maxDistance = maxDistance;
-                }
-
-                public Distance maxDistance() { return maxDistance; }
-
-                public static HubDistance fromDistance(Distance pos) {
-                    for(HubDistance vol : values()) {
-                        if (pos.baseUnitMagnitude() <= vol.maxDistance().baseUnitMagnitude()) {
-                            return vol;
-                        } 
-                    }
-                    return HubDistance.HIGH;
-                }
-            }
     }
 
     public class HoodPWMs {

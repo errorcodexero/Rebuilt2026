@@ -184,7 +184,7 @@ public class Hopper extends SubsystemBase {
      * @return
      */
     public Command preShoot() {
-        return feed(DegreesPerSecond.zero(), HopperConstants.scramblerBeforeShootingVelocity.unaryMinus());
+        return feed(HopperConstants.feedingBeforeShootingVelocity.unaryMinus(), HopperConstants.scramblerBeforeShootingVelocity.unaryMinus());
     }
 
     /**

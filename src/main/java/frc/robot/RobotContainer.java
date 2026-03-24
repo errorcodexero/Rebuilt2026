@@ -244,13 +244,10 @@ public class RobotContainer {
         // AutoModes
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
 
-        autoChooser_.addDefaultOption("Neutral Zone Collect - Left Trench", AutoCommands.a2NZCollectAuto(drivebase_, shooter_, intake_, hopper_, false));
-        autoChooser_.addOption("Neutral Zone Collect - Right Trench", AutoCommands.a2NZCollectAuto(drivebase_, shooter_, intake_, hopper_, true));
-        autoChooser_.addOption("Neutral Zone Loop - Left Trench", AutoCommands.a5NZCollectAutoAlt(drivebase_, shooter_, intake_, hopper_, false));
-        autoChooser_.addOption("Neutral Zone Loop - Right Trench", AutoCommands.a5NZCollectAutoAlt(drivebase_, shooter_, intake_, hopper_, true));
-        autoChooser_.addOption("Depot Auto", AutoCommands.a3DepotAuto(drivebase_, shooter_, intake_, hopper_)); 
-        autoChooser_.addOption("Preload Only", AutoCommands.a4OnlyPreload(drivebase_, shooter_, intake_, hopper_));
-        autoChooser_.addOption("Test 1: Drive and Collect", AutoCommands.aTest1DriveCollect(drivebase_, shooter_, intake_, hopper_));
+        autoChooser_.addDefaultOption("Neutral Zone Loop W/ Depot", AutoCommands.a6CollectNZDepot(drivebase_, shooter_, intake_, hopper_));
+        autoChooser_.addOption("Neutral Zone Loop - Left Trench", AutoCommands.a5CollectNZ(drivebase_, shooter_, intake_, hopper_, false));
+        autoChooser_.addOption("Neutral Zone Loop - Right Trench", AutoCommands.a5CollectNZ(drivebase_, shooter_, intake_, hopper_, true));
+        autoChooser_.addOption("Preload Only (untested)", AutoCommands.a4OnlyPreload(drivebase_, shooter_, intake_, hopper_));
 
         autoChooser_.onChange(auto -> {
             if (auto == null) return;
