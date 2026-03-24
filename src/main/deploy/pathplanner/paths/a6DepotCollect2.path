@@ -79,7 +79,7 @@
   ],
   "eventMarkers": [
     {
-      "name": "spinup2meters",
+      "name": "stopintake",
       "waypointRelativePos": 1.4608947503419971,
       "endWaypointRelativePos": null,
       "command": null

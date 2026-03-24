@@ -126,11 +126,11 @@ public class AutoCommands {
         );
     }
 
-    public static Command a6CollectNZDepot(Drive drive, Shooter shooter, IntakeSubsystem intake, Hopper hopper, boolean mirroredX) {
-        var spinupMarker = new EventTrigger("spinup2meters");
+    public static Command a6CollectNZDepot(Drive drive, Shooter shooter, IntakeSubsystem intake, Hopper hopper) {
+        var stopIntake = new EventTrigger("stopintake");
 
         return Commands.sequence(
-            DriveCommands.initialFollowPathCommand(drive, "a5CollectLoop1", mirroredX).deadlineFor(
+            DriveCommands.initialFollowPathCommand(drive, "a5CollectLoop1").deadlineFor(
                 new StartupCmd(intake, hopper, shooter)
                     .beforeStarting(Commands.waitTime(intakeStartTime1))
                     .withTimeout(intakeLength1)
@@ -139,13 +139,11 @@ public class AutoCommands {
 
             RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(shootingLength1),
 
-            DriveCommands.followPathCommand("a6DepotCollect1", mirroredX),
+            DriveCommands.followPathCommand("a6DepotCollect1"),
 
-            DriveCommands.followPathCommand("a6DepotCollect2", mirroredX).deadlineFor(
+            DriveCommands.followPathCommand("a6DepotCollect2").deadlineFor(
                 RobotCommands.intake(intake, hopper)
-                    .until(spinupMarker)
-                    // .andThen(shooter.spinUpForDistanceHoodParked(() -> Meters.of(2)))
-                    
+                    .until(stopIntake)
             ),
 
             RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(shootingLength2)
