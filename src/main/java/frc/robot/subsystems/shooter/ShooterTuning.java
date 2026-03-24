@@ -41,10 +41,14 @@ public class ShooterTuning {
         public double hood_ ;
         public double min_dist_ ;
         public double max_dist_ ;
+        public double[] dists_ ;
+        public double[] vels_ ;
         public InterpolatingDoubleTreeMap map_ ;
 
         public OneHoodTuning(double h, double[] d, double[] v) {
             hood_ = h ;
+            dists_ = d ;
+            vels_ = v ;
             map_ = new InterpolatingDoubleTreeMap() ;
             for(var i = 0 ; i < d.length ; i++) {
                 map_.put(d[i], v[i]) ;
@@ -109,9 +113,30 @@ public class ShooterTuning {
         }
     }
 
+    private double doBetterInterpolate(OneHoodTuning tuning, double dist) {
+        double[] d = tuning.dists_ ;
+        double[] v = tuning.vels_ ;
+
+        // Below the lowest data point - extrapolate using the first two points
+        if (dist <= d[0]) {
+            double slope = (v[1] - v[0]) / (d[1] - d[0]) ;
+            return v[0] + slope * (dist - d[0]) ;
+        }
+
+        // Above the highest data point - extrapolate using the last two points
+        int n = d.length ;
+        if (dist >= d[n - 1]) {
+            double slope = (v[n - 1] - v[n - 2]) / (d[n - 1] - d[n - 2]) ;
+            return v[n - 1] + slope * (dist - d[n - 1]) ;
+        }
+
+        // Within range - use the interpolating tree map
+        return tuning.map_.get(dist) ;
+    }
+
     public ShooterParams getShooterParams(double dist) {
         int h = getHoodIndex(dist) ;
-        var ret = new ShooterParams(dist, settings_.get(h).hood_, settings_.get(h).map_.get(dist)) ;
+        double vel = doBetterInterpolate(settings_.get(h), dist) ;        var ret = new ShooterParams(dist, settings_.get(h).hood_, vel) ;
         Logger.recordOutput("ShooterTuning/hood", ret.hood);
         Logger.recordOutput("ShooterTuning/velocity", ret.velocity);
         return ret ;

@@ -11,12 +11,12 @@
                 },
                 {
                     // Shoot cmd
-                    "distance" : 1.60,
+                    "distance" : 1.61,
                     "velocity" : 56.0
                 },                
                 {
                     // Shoot cmd
-                    "distance" : 1.80,
+                    "distance" : 1.82,
                     "velocity" : 61.0
                 }
             ]
@@ -31,12 +31,12 @@
                 },                
                 {
                     // Shoot cmd
-                    "distance" : 2.20,
+                    "distance" : 2.22,
                     "velocity" : 56.0
                 },
                 {
                     // Shoot mode                    
-                    "distance" : 2.40,
+                    "distance" : 2.43,
                     "velocity" : 59.0
                 },
                 {
@@ -51,33 +51,33 @@
             "points" : [
                 {
                     // Shoot cmd
-                    "distance" : 2.8,
+                    "distance" : 2.81,
                     "velocity" : 56
                 },                
                 {
                     // Shoot cmd
-                    "distance" : 3.0,
-                    "velocity" : 58
+                    "distance" : 3.02,
+                    "velocity" : 57
                 },
                 {
                     // Shoot cmd
-                    "distance" : 3.2,
-                    "velocity" : 59
+                    "distance" : 3.21,
+                    "velocity" : 58
                 },      
                 {
                     // Shoot cmd
                     "distance" : 3.4,
-                    "velocity" : 60
+                    "velocity" : 59
                 },                             
                 {
                     // Shoot cmd
                     "distance" : 3.60,
-                    "velocity" : 61.0
+                    "velocity" : 60.0
                 },
                 {
                     // Shoot cmd
-                    "distance" : 3.8,
-                    "velocity" : 62.0
+                    "distance" : 3.81,
+                    "velocity" : 61.0
                 }
             ]
         },
@@ -87,23 +87,18 @@
                 {
                     // Shoot cmd
                     "distance" : 4.00,
-                    "velocity" : 60.0
+                    "velocity" : 58.0
                 },
                 {
                     // Shoot cmd
                     "distance" : 4.3,
-                    "velocity" : 62.0
+                    "velocity" : 60.0
                 },
                 {
                     // Shoot cmd
                     "distance" : 4.6,
-                    "velocity" : 64.0
-                },
-                {
-                    // Shoot cmd
-                    "distance" : 5.25,
-                    "velocity" : 73.0
-                }                
+                    "velocity" : 62.0
+                }              
             ]
         }
     ]
