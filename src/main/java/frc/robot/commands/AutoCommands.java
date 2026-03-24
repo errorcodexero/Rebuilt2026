@@ -101,12 +101,12 @@ public class AutoCommands {
 
     private static final Time intakeStartTime1 = Seconds.of(0.7);
     private static final Time intakeLength1 = Seconds.of(4.0);
-    private static final Time shootingLength1 = Seconds.of(5.5);
+    private static final Time shootingLength1 = Seconds.of(4);
 
     private static final Time intakeStartTime2 = Seconds.of(0.7);
     private static final Time shootingLength2 = Seconds.of(6);
 
-    public static Command a5NZCollectAutoAlt(Drive drive, Shooter shooter, IntakeSubsystem intake, Hopper hopper, boolean mirroredX) {
+    public static Command a5CollectNZ(Drive drive, Shooter shooter, IntakeSubsystem intake, Hopper hopper, boolean mirroredX) {
         return Commands.sequence(
             DriveCommands.initialFollowPathCommand(drive, "a5CollectLoop1", mirroredX).deadlineFor(
                 new StartupCmd(intake, hopper, shooter)
@@ -117,7 +117,7 @@ public class AutoCommands {
 
             RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(shootingLength1),
 
-            DriveCommands.followPathCommand("a5CollectLoop2(orwil)", mirroredX).deadlineFor(
+            DriveCommands.followPathCommand("a5CollectLoop2", mirroredX).deadlineFor(
                 RobotCommands.intake(intake, hopper).beforeStarting(Commands.waitTime(intakeStartTime2)),
                 shooter.spinUpForDistanceHoodParked(() -> Meters.of(2))
             ),
@@ -144,7 +144,8 @@ public class AutoCommands {
             DriveCommands.followPathCommand("a6DepotCollect2", mirroredX).deadlineFor(
                 RobotCommands.intake(intake, hopper)
                     .until(spinupMarker)
-                    .andThen(shooter.spinUpForDistanceHoodParked(() -> Meters.of(2)))
+                    // .andThen(shooter.spinUpForDistanceHoodParked(() -> Meters.of(2)))
+                    
             ),
 
             RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(shootingLength2)

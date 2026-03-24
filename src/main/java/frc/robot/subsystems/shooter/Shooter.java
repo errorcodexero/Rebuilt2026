@@ -145,6 +145,7 @@ public class Shooter extends SubsystemBase {
         return shooterInputs.wheelVelocity.isNear(shooterTarget, ShooterConstants.shooterTolerance); 
     }
 
+    @AutoLogOutput
     public Current getShooterCurrent() {
         return (shooterInputs.shooter1Current)
             .plus(shooterInputs.shooter2Current)
