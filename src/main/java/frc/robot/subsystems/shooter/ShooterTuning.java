@@ -113,7 +113,7 @@ public class ShooterTuning {
         }
     }
 
-    private double doBetterInterpolate(OneHoodTuning tuning, double dist) {
+    private double doBetterInterpolate(OneHoodTuning tuning, double dist, boolean last) {
         double[] d = tuning.dists_ ;
         double[] v = tuning.vels_ ;
 
@@ -125,7 +125,16 @@ public class ShooterTuning {
 
         // Above the highest data point - extrapolate using the last two points
         int n = d.length ;
+
         if (dist >= d[n - 1]) {
+            // If the last hood index, dont interpolate outwards.
+            if (last) {
+                Logger.recordOutput("NotInterpolatingEnd", true);
+                return v[n - 1];
+            } else {
+                Logger.recordOutput("NotInterpolatingEnd", false);
+            }
+
             double slope = (v[n - 1] - v[n - 2]) / (d[n - 1] - d[n - 2]) ;
             return v[n - 1] + slope * (dist - d[n - 1]) ;
         }
@@ -136,7 +145,8 @@ public class ShooterTuning {
 
     public ShooterParams getShooterParams(double dist) {
         int h = getHoodIndex(dist) ;
-        double vel = doBetterInterpolate(settings_.get(h), dist) ;        var ret = new ShooterParams(dist, settings_.get(h).hood_, vel) ;
+        double vel = doBetterInterpolate(settings_.get(h), dist, h == settings_.size() - 1) ;
+        var ret = new ShooterParams(dist, settings_.get(h).hood_, vel) ;
         Logger.recordOutput("ShooterTuning/hood", ret.hood);
         Logger.recordOutput("ShooterTuning/velocity", ret.velocity);
         return ret ;
