@@ -32,6 +32,7 @@
     },
     {
       "anchor": {
+<<<<<<< HEAD:src/main/deploy/pathplanner/paths/ShootToNZ.path
         "x": 2.972295454545454,
         "y": 0.7471249999999998
       },
@@ -42,12 +43,25 @@
       "nextControl": {
         "x": 3.168125,
         "y": 0.5100681818181818
+=======
+        "x": 3.1578181818181816,
+        "y": 1.1800113636363643
+      },
+      "prevControl": {
+        "x": 3.2110847436353143,
+        "y": 1.677165940596268
+      },
+      "nextControl": {
+        "x": 3.065056818181818,
+        "y": 0.3142386363636366
+>>>>>>> df38391 (Finished automode for sunday testing):src/main/deploy/pathplanner/paths/DepotToNZ.path
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
+<<<<<<< HEAD:src/main/deploy/pathplanner/paths/ShootToNZ.path
         "x": 6.043727272727272,
         "y": 0.5719090909090914
       },
@@ -58,6 +72,18 @@
       "nextControl": {
         "x": 6.293161385298065,
         "y": 0.5887205003092975
+=======
+        "x": 6.0025,
+        "y": 0.7883522727272725
+      },
+      "prevControl": {
+        "x": 5.753065887429208,
+        "y": 0.7715408633270664
+      },
+      "nextControl": {
+        "x": 6.251934112570793,
+        "y": 0.8051636821274786
+>>>>>>> df38391 (Finished automode for sunday testing):src/main/deploy/pathplanner/paths/DepotToNZ.path
       },
       "isLocked": false,
       "linkedName": null
@@ -94,7 +120,11 @@
   ],
   "rotationTargets": [
     {
+<<<<<<< HEAD:src/main/deploy/pathplanner/paths/ShootToNZ.path
       "waypointRelativePos": 1.9339622641509435,
+=======
+      "waypointRelativePos": 3.073899371069188,
+>>>>>>> df38391 (Finished automode for sunday testing):src/main/deploy/pathplanner/paths/DepotToNZ.path
       "rotationDegrees": 90.0
     }
   ],
