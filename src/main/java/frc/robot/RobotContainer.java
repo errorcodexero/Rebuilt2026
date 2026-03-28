@@ -306,7 +306,7 @@ public class RobotContainer {
 
         var calibrate = new LoggedNetworkBoolean("/Tuning/CalibrateWheels", false);
         new Trigger(calibrate::get)
-            .onTrue(DriveCommands.wheelRadiusCharacterization(drivebase_));
+            .whileTrue(DriveCommands.wheelRadiusCharacterization(drivebase_));
     }
 
     private void configureDriveBindings() {
