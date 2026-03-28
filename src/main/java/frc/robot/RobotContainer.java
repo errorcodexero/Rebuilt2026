@@ -303,6 +303,10 @@ public class RobotContainer {
         var refreshTuningButton = new LoggedNetworkBoolean("/Tuning/RefreshTuning", false);
         new Trigger(refreshTuningButton::get)
             .onTrue(shooter_.reloadTunings().finallyDo(() -> refreshTuningButton.set(false)));
+
+        var calibrate = new LoggedNetworkBoolean("/Tuning/CalibrateWheels", false);
+        new Trigger(calibrate::get)
+            .onTrue(DriveCommands.wheelRadiusCharacterization(drivebase_));
     }
 
     private void configureDriveBindings() {
