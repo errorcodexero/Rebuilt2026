@@ -29,8 +29,8 @@ public class HopperConstants {
     public static final double feederKV = 0.132;
     public static final double feederKA = 0.0;
 
-    public static final Current feederCurrentLimit = Amps.of(80.0);
-    public static final Time feederCurrentLimitLowerTime = Seconds.of(1);
+    public static final Current feederCurrentLimit = Amps.of(50.0);
+    public static final Time feederCurrentLimitLowerTime = Milliseconds.of(200);
 
     //Scrambler Constants
     public static final int scramblerMotorCANID = 6;
@@ -43,5 +43,5 @@ public class HopperConstants {
     public static final double scramblerKV = 0.15;
     public static final double scramblerKA = 0.0;
 
-    public static final Current scramblerCurrentLimit = Amps.of(30.0) ;
+    public static final Current scramblerCurrentLimit = Amps.of(20.0);
 }
