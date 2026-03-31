@@ -6,6 +6,11 @@
             "points" : [
                 {
                     // Shoot cmd
+                    "distance" : 0.0,
+                    "velocity" : 54.0
+                },
+                {
+                    // Shoot cmd
                     "distance" : 1.48,
                     "velocity" : 54.0
                 },
