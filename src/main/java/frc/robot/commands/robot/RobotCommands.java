@@ -35,6 +35,8 @@ public class RobotCommands {
     public static Command shootHub(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive) {
         BooleanSupplier shouldXWheels =
             () -> drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.xWheelTolerance);
+        BooleanSupplier shouldContinueXingWheels =
+            () -> drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.aimingTolerance);
 
         return shootHubNoAim(shooter, hopper, intake, drive).alongWith(
             DriveCommands.joystickDriveAtAngle(
@@ -44,7 +46,7 @@ public class RobotCommands {
                 RobotState::rotationToHub
             )
             .until(shouldXWheels)
-            .andThen(drive.stopWithXCmd(), drive.idle().onlyWhile(shouldXWheels))
+            .andThen(drive.stopWithXCmd(), drive.idle().onlyWhile(shouldContinueXingWheels))
             .repeatedly()
         );
     }
