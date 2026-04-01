@@ -13,8 +13,11 @@
 
 package frc.robot.subsystems.drive;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.Units.derive;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -51,6 +54,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -447,7 +451,8 @@ public class Drive extends SubsystemBase {
 
     /** Whether the rotation of the robot is near to a target. */
     public boolean rotationIsNear(Rotation2d target, Angle tolerance) {
-        return target.getMeasure().isNear(getRotation().getMeasure(), tolerance);
+        var difference = Degrees.of(target.minus(getRotation()).getMeasure().abs(Degrees));
+        return difference.lt(tolerance);
     }
     
     /** Resets the current odometry pose. */
