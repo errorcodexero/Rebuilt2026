@@ -39,6 +39,7 @@ public class ShooterConstants {
     public static final Angle defenseTolerance = Degrees.of(7.5);
 
     public static final Angle xWheelTolerance = Degrees.of(1);
+    public static final Angle unXWheelTolerance = Degrees.of(3);
 
     public static final Distance allowedTrenchDistance = Meters.of(1.0);
 
