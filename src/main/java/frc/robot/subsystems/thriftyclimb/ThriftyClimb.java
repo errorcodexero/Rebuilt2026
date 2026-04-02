@@ -22,6 +22,10 @@ public class ThriftyClimb extends SubsystemBase {
         outputs_.setpoint = ThriftyClimbConstants.thriftyStowedHeight;
     }
 
+    public boolean isAtPosition(){
+        inputs_.position.isNear(outputs_.setpoint, Centimeter.one());
+    }
+
     @Override
     public void periodic() {
         io_.updateInputs(inputs_);
@@ -41,7 +45,7 @@ public class ThriftyClimb extends SubsystemBase {
                 outputs_.setpoint = ThriftyClimbConstants.thriftyClimbHeight;
             }
             climbing_ = !climbing_;
-        }).andThen(Commands.waitUntil(() -> inputs_.position.isNear(outputs_.setpoint, Centimeter.one())));
+        }).andThen(Commands.waitUntil(()->isAtPosition()));
     }
 
     public Command setTarget(Distance target) {
