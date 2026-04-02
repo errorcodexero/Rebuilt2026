@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import java.lang.StackWalker.Option;
 import java.util.Arrays;
@@ -303,7 +304,10 @@ public class RobotContainer {
             .whileTrue(RobotCommands.shoot(shooter_, hopper_, intake_, drivebase_));
 
         // When the shooter isnt shooting, get it ready to shoot.
-        shooter_.setDefaultCommand(shooter_.idleCommand());
+        shooter_.setDefaultCommand(shooter_.spinUpVelocityCommand(() -> {
+            var shift = HubShiftUtil.getOfficialShiftInfo();
+            return shift.active() ? RotationsPerSecond.of(50) : RotationsPerSecond.zero();
+        }));
 
         //While the X button is held, the intake will run the eject sequence. If it the intake is stowed, it will also deploy it.
 
