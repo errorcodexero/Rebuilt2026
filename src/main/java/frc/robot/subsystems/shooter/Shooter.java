@@ -327,15 +327,12 @@ public class Shooter extends SubsystemBase {
         return startEnd(() -> setShooterVelocity(ShooterConstants.ejectVelocity), this::stopShooter);
     }
 
-    /**
-     * Idles the shooter at 0 velocity and the hood at the parked position.
-     * @return
-     */
-    public Command idleCommand() {
-        return runToSetpointsCmd(
-            RotationsPerSecond.of(0.0),
-            ShooterConstants.hoodParkedAngle
-        );
+    public Command spinUpSetpointsCommand(Supplier<AngularVelocity> velocity, Angle hoodAngle) {
+        return run(() -> setSetpoints(velocity.get(), hoodAngle));
+    }
+
+    public Command spinUpVelocityCommand(Supplier<AngularVelocity> velocity) {
+        return run(() -> setSetpoints(velocity.get(), ShooterConstants.hoodParkedAngle));
     }
 
     /**

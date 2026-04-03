@@ -14,6 +14,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.subsystems.shooter.ShooterConstants;
+import frc.robot.util.HubShiftUtil;
 import frc.robot.util.LoggedTracer;
 
 /**
@@ -42,6 +43,8 @@ public class RobotState {
      */
     public static void periodic() {
         LoggedTracer.reset();
+
+        // Calculations
         
         Pose2d currentPose = pose.get();
 
@@ -65,6 +68,10 @@ public class RobotState {
                 : ShooterConstants.Positions.redAllianceWall;
                 
         inAllianceZone = currentPose.getMeasureX().minus(allianceWall).abs(Meters) < ShooterConstants.Positions.spinUpZone.in(Meters);
+
+        // Other logging
+        
+        Logger.recordOutput("ShiftInfo", HubShiftUtil.getOfficialShiftInfo());
 
         LoggedTracer.record("RobotState");
     }
