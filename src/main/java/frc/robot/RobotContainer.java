@@ -249,6 +249,7 @@ public class RobotContainer {
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
 
         autoChooser_.addDefaultOption("Neutral Zone Loop W/ Depot", AutoCommands.a6CollectNZDepot(drivebase_, shooter_, intake_, hopper_));
+        autoChooser_.addOption("Cooperative Depot Auto", AutoCommands.a7CoopDepot(drivebase_, shooter_, intake_, hopper_));
         autoChooser_.addOption("Neutral Zone Loop - Left Trench", AutoCommands.a5CollectNZ(drivebase_, shooter_, intake_, hopper_, false));
         autoChooser_.addOption("Neutral Zone Loop - Right Trench", AutoCommands.a5CollectNZ(drivebase_, shooter_, intake_, hopper_, true));
         autoChooser_.addOption("Preload Only (untested)", AutoCommands.a4OnlyPreload(drivebase_, shooter_, intake_, hopper_));
@@ -304,8 +305,8 @@ public class RobotContainer {
 
         // When the shooter isnt shooting, get it ready to shoot.
         shooter_.setDefaultCommand(shooter_.spinUpVelocityCommand(() -> {
-            var shift = HubShiftUtil.getOfficialShiftInfo();
-            return shift.active() ? RotationsPerSecond.of(50) : RotationsPerSecond.zero();
+            return RotationsPerSecond.zero();
+            // return HubShiftUtil.getOfficialShiftInfo().active() ? RotationsPerSecond.of(50) : RotationsPerSecond.zero();
         }));
 
         //While the X button is held, the intake will run the eject sequence. If it the intake is stowed, it will also deploy it.
