@@ -331,7 +331,7 @@ public class Shooter extends SubsystemBase {
         return run(() -> setSetpoints(velocity.get(), hoodAngle));
     }
 
-    public Command spinUpSetpointsCommand(Supplier<AngularVelocity> velocity) {
+    public Command spinUpVelocityCommand(Supplier<AngularVelocity> velocity) {
         return run(() -> setSetpoints(velocity.get(), ShooterConstants.hoodParkedAngle));
     }
 
