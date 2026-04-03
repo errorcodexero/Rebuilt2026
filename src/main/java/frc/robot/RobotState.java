@@ -44,7 +44,7 @@ public class RobotState {
     public static void periodic() {
         LoggedTracer.reset();
 
-        // Calculations!!!
+        // Calculations
         
         Pose2d currentPose = pose.get();
 
@@ -70,6 +70,7 @@ public class RobotState {
         inAllianceZone = currentPose.getMeasureX().minus(allianceWall).abs(Meters) < ShooterConstants.Positions.spinUpZone.in(Meters);
 
         // Other logging
+        
         Logger.recordOutput("ShiftInfo", HubShiftUtil.getOfficialShiftInfo());
 
         LoggedTracer.record("RobotState");
