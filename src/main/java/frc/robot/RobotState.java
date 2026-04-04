@@ -70,7 +70,11 @@ public class RobotState {
         inAllianceZone = currentPose.getMeasureX().minus(allianceWall).abs(Meters) < ShooterConstants.Positions.spinUpZone.in(Meters);
 
         // Other logging
-        Logger.recordOutput("ShiftInfo", HubShiftUtil.getOfficialShiftInfo());
+        var shift = HubShiftUtil.getOfficialShiftInfo();
+        Logger.recordOutput("ShiftInfo", shift);
+        Logger.recordOutput("Shift/Active", shift.active());
+        Logger.recordOutput("Shift/Name", shift.currentShift());
+        Logger.recordOutput("Shift/SecondsRemaining", shift.remainingTime());
 
         LoggedTracer.record("RobotState");
     }

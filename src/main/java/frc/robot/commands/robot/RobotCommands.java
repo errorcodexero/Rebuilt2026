@@ -70,10 +70,10 @@ public class RobotCommands {
             () -> !drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.defenseTolerance);
 
         return Commands.repeatingSequence(
-            Commands.waitUntil(shouldShoot).deadlineFor(shooter.spinUpForDistance(RobotState::hubDistance)),
-            shooter.shootAtDistance(RobotState::hubDistance, hopper, intake)
+            Commands.waitUntil(shouldShoot),
+            hopper.feedForShooting(shouldShoot, intake)
                 .until(shouldStopShooting)
-        );
+        ).alongWith(shooter.shootAtDistance(RobotState::hubDistance));
     }
 
     /**
@@ -109,7 +109,7 @@ public class RobotCommands {
 
             return DriveCommands.joystickDriveAtAngle(targetingAngle)
                 .alongWith(
-                    shooter.shootAtDistance(targetDistance, hopper, intake),
+                    shooter.shootAtDistance(targetDistance),
                     Commands.runOnce(() -> {
                         Logger.recordOutput("Ferry/Target", target.get());
                         Logger.recordOutput("Ferry/IsFerrying", true);

@@ -303,6 +303,9 @@ public class RobotContainer {
         gamepad_.rightTrigger().or(operatorGamepad_.rightTrigger())
             .whileTrue(RobotCommands.shoot(shooter_, hopper_, intake_, drivebase_));
 
+        gamepad_.rightBumper()
+            .whileTrue(intake_.hopperEjectSequence().alongWith(hopper_.reverseFeed()));
+
         // When the shooter isnt shooting, get it ready to shoot.
         shooter_.setDefaultCommand(shooter_.spinUpVelocityCommand(() -> {
             return RotationsPerSecond.zero();

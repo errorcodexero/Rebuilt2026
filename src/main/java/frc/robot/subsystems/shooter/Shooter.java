@@ -38,7 +38,6 @@ import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.RobotState;
 import frc.robot.subsystems.hopper.Hopper;
-import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.shooter.ShooterTuning.ShooterParams;
 import frc.robot.util.LoggedTracer;
 import frc.robot.util.MapleSimUtil;
@@ -245,7 +244,7 @@ public class Shooter extends SubsystemBase {
      * 
      * 
      */
-    public Command shootAtDistance(Supplier<Distance> distance, Hopper hopper, IntakeSubsystem intake) {
+    public Command shootAtDistance(Supplier<Distance> distance) {
         Supplier<ShooterParams> shooterParams =
             () -> getTuning().getShooterParams(distance.get().in(Meters));
 
@@ -254,39 +253,8 @@ public class Shooter extends SubsystemBase {
             runDynamicSetpoints(
                 () -> RotationsPerSecond.of(shooterParams.get().velocity),
                 () -> Degrees.of(shooterParams.get().hood)
-            ),
-            
-            hopper.preShoot().until(this::isShooterReady).andThen(
-                hopper.forwardFeed().deadlineFor(Commands.run(() -> {
-                    var diff = shooterTarget.minus(shooterInputs.wheelVelocity).abs(RadiansPerSecond);
-                    // Ball counting?
-                    if (diff > 15.0) {
-                        if (!isCounted) {
-                            addBallToCount();
-                        }
-                        isCounted = true;
-                    } else {
-                        isCounted = false;
-                    }
-
-                    Logger.recordOutput("Stats/IsCounted", isCounted);
-                }).onlyIf(() -> Constants.getMode() == Mode.REPLAY))
-            ),
-
-            Commands.run(() -> {
-                Logger.recordOutput("Command/ReadyForShoot", isShooterReady());
-            }),
-
-            intake.shakeBalls()
+            )
         ).finallyDo(interrupted -> Logger.recordOutput("Command/ShootAtDistance", false));
-    }
-
-    private int ballsShot = 0;
-    private boolean isCounted = false;
-
-    private void addBallToCount() {
-        ballsShot++;
-        Logger.recordOutput("Stats/BallsShot", ballsShot);
     }
 
     /**
