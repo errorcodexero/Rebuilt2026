@@ -56,26 +56,46 @@ public class RobotCommands {
     }
 
     public static Command shootHubInCorner(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive) {
-        Supplier<Pose2d> cornerPose = () -> {
-            Pose2d rightTarget =
-                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                    ? ShooterConstants.Positions.blueCornerDepot
-                    : ShooterConstants.Positions.redCornerOutpost;
+        return Commands.defer(() -> {
+            Supplier<Pose2d> cornerPose = () -> {
+                Pose2d rightTarget =
+                    DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                        ? ShooterConstants.Positions.blueCornerOutpost
+                        : ShooterConstants.Positions.redCornerDepot;
 
-            Pose2d leftTarget =
-                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                    ? ShooterConstants.Positions.blueCornerDepot
-                    : ShooterConstants.Positions.redCornerOutpost;
+                Pose2d leftTarget =
+                    DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                        ? ShooterConstants.Positions.blueCornerDepot
+                        : ShooterConstants.Positions.redCornerOutpost;
 
-            Pose2d target =
-                drive.getPose().getY() < ShooterConstants.Positions.centerLineY
-                    ? rightTarget
-                    : leftTarget;
-            return target;
-        };
+                Pose2d target =
+                    drive.getPose().getY() < ShooterConstants.Positions.centerLineY
+                        ? rightTarget
+                        : leftTarget;
+                return target;
+            };
 
-        return DriveCommands.simplePathCommand(drive, cornerPose.get(), MetersPerSecond.of(3.0), MetersPerSecondPerSecond.of(3.0))
-            .andThen(shootHub(shooter, hopper, intake, drive));
+            Supplier<Pose2d> immdPose = () -> {
+                Pose2d rightTarget =
+                    DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                        ? ShooterConstants.Positions.blueCornerOutpostWaypoint
+                        : ShooterConstants.Positions.redCornerDepotWaypoint;
+
+                Pose2d leftTarget =
+                    DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                        ? ShooterConstants.Positions.blueCornerDepotWaypoint
+                        : ShooterConstants.Positions.redCornerOutpostWaypoint;
+
+                Pose2d target =
+                    drive.getPose().getY() < ShooterConstants.Positions.centerLineY
+                        ? rightTarget
+                        : leftTarget;
+                return target;
+            };
+
+            return DriveCommands.simplePathCommand(drive, cornerPose.get(), immdPose.get(), MetersPerSecond.of(3.0), MetersPerSecondPerSecond.of(3.0))
+                .andThen(shootHub(shooter, hopper, intake, drive));
+        }, Set.of(shooter, hopper, intake, drive));
     }
 
     /**
