@@ -149,4 +149,34 @@ public class AutoCommands {
             RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(shootingLength2)
         );
     }
+
+    public static Command a7CoopDepot(Drive drive, Shooter shooter, IntakeSubsystem intake, Hopper hopper) {
+        var startIntake = new EventTrigger("startintake");
+        var stopIntake = new EventTrigger("stopintake");
+
+        return Commands.sequence(
+            DriveCommands.initialFollowPathCommand(drive, "a7StartToCollect")
+                .deadlineFor(
+                    new StartupCmd(intake, hopper, shooter)
+                        .withTimeout(Seconds.of(1.5))
+                ),
+
+            DriveCommands.followPathCommand("a7DepotCollectFast").deadlineFor(
+                RobotCommands.intake(intake, hopper)
+                    .until(stopIntake)
+                    .andThen(shooter.spinUpForDistanceHoodParked(() -> Meters.of(2)))
+            ),
+
+            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(5)),
+
+            DriveCommands.followPathCommand("a7CollectLoop").deadlineFor(
+                RobotCommands.intake(intake, hopper)
+                    .beforeStarting(Commands.waitUntil(startIntake))
+                    .until(stopIntake)
+                    .andThen(shooter.spinUpForDistanceHoodParked(() -> Meters.of(2)))
+            ),
+
+            RobotCommands.shoot(shooter, hopper, intake, drive)
+        );
+    }
 }

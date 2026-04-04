@@ -57,6 +57,8 @@ public class HubShiftUtil {
   private static final double[] shiftStartTimes = {0.0, 10.0, 35.0, 60.0, 85.0, 110.0};
   private static final double[] shiftEndTimes = {10.0, 35.0, 60.0, 85.0, 110.0, 140.0};
 
+  private static final boolean useTimingsAtHome = true;
+
   // private static final double minFuelCountDelay = 1.0;
   // private static final double maxFuelCountDelay = 2.0;
   // private static final double shiftEndFuelCountExtension = 3.0;
@@ -139,7 +141,8 @@ public class HubShiftUtil {
       // Adjust the current offset if the time difference above the theshold
       if (Math.abs(fieldTeleopTime - currentTime) >= timeResetThreshold
           && fieldTeleopTime <= 135
-          && DriverStation.isFMSAttached()) {
+          && (DriverStation.isFMSAttached() || useTimingsAtHome)
+      ) {
         // shiftTimerOffset += currentTime - fieldTeleopTime;
         // currentTime = timerValue + shiftTimerOffset;
 
