@@ -167,7 +167,7 @@ public class AutoCommands {
                     .andThen(shooter.spinUpForDistanceHoodParked(() -> Meters.of(2)))
             ),
 
-            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(5)),
+            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(4.5)),
 
             DriveCommands.followPathCommand("a7CollectLoop").deadlineFor(
                 RobotCommands.intake(intake, hopper)

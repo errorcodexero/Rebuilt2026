@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -16,9 +17,11 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.util.LoggedTracer;
 import frc.robot.util.MapleSimUtil;
 
@@ -109,6 +112,19 @@ public class Hopper extends SubsystemBase {
     }
     
     // Commands
+
+    public Command feedForShooting(BooleanSupplier shouldFeed, IntakeSubsystem intake) {
+        return Commands.parallel(
+            preShoot().until(shouldFeed)
+                .andThen(forwardFeed()),
+
+            Commands.run(() -> {
+                Logger.recordOutput("Command/ReadyForShoot", shouldFeed);
+            }),
+
+            intake.shakeBalls()
+        );
+    }
 
     /**
      * Runs the scrambler at its idling speed until the command ends.
