@@ -95,10 +95,10 @@ public class ShooterConstants {
 
         public static final double centerLineY = 4.034536;
 
-        public static final Pose2d blueCornerDepot = new Pose2d(Inches.of(23.09), Inches.of(23.429), new Rotation2d(Degrees.of(-40.417)));
-        public static final Pose2d blueCornerOutpost = new Pose2d(Inches.of(23.09), Inches.of(294.261), new Rotation2d(Degrees.of(40.417)));
-        public static final Pose2d redCornerDepot = new Pose2d(Inches.of(628.13), Inches.of(23.429), new Rotation2d(Degrees.of(180.0 - 40.417)));
-        public static final Pose2d redCornerOutpost = new Pose2d(Inches.of(628.13), Inches.of(294.261), new Rotation2d(Degrees.of(-180.0 + 40.417)));
+        public static final Pose2d blueCornerDepot = new Pose2d(Inches.of(23.09), Inches.of(23.429), new Rotation2d(Degrees.of(40.417)));
+        public static final Pose2d blueCornerOutpost = new Pose2d(Inches.of(23.09), Inches.of(294.261), new Rotation2d(Degrees.of(-40.417)));
+        public static final Pose2d redCornerDepot = new Pose2d(Inches.of(628.13), Inches.of(23.429), new Rotation2d(Degrees.of(-180.0 + 40.417)));
+        public static final Pose2d redCornerOutpost = new Pose2d(Inches.of(628.13), Inches.of(294.261), new Rotation2d(Degrees.of(180.0 - 40.417)));
     }
 
     public class HoodPWMs {
