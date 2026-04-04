@@ -2,10 +2,13 @@ package frc.robot.subsystems.shooter;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -49,11 +52,6 @@ public class ShooterConstants {
     public static final Angle hoodMaxAngle = Degrees.of(75.0) ;
     public static final Angle hoodMinAngle = Degrees.of(0.0) ;
 
-    public class FerryPositions{
-        public static final Translation2d blueOutpostTarget= new Translation2d(2.135, 1.639);
-        public static final Translation2d redOutpostTarget= new Translation2d(14.0,6.0);
-    }
-
     public class PID {
             // shooter
             public static final double shooterkP = 0.5; 
@@ -63,50 +61,48 @@ public class ShooterConstants {
             public static final double shooterkA = 0.0;
             public static final double shooterkG = 0.0;
             public static final double shooterkS = 0.0;
-        }
+    }
 
-        public class MotionMagic {
+    public class MotionMagic {
 
-            // shooter
-            public static final double shooterkMaxVelocity = 1000.0;
-            public static final double shooterkMaxAcceleration = 3000.0;
-            public static final double shooterkJerk = 0.0;
-        }
+        // shooter
+        public static final double shooterkMaxVelocity = 1000.0;
+        public static final double shooterkMaxAcceleration = 3000.0;
+        public static final double shooterkJerk = 0.0;
+    }
 
-        public class SoftwareLimits {
-            public static final double hoodMaxAngle = 0.0;
-            public static final double hoodMinAngle = 0.0;
-        }
+    public class SoftwareLimits {
+        public static final double hoodMaxAngle = 0.0;
+        public static final double hoodMinAngle = 0.0;
+    }
 
-        public class Positions {
-            // Field Positions
-            public static final Translation2d blueHubPose = new Translation2d(4.5974,4.034536);
-            public static final Translation2d redHubPose = new Translation2d(11.938,4.034536);
+    public class Positions {
+        // Field Positions
+        public static final Translation2d blueHubPose = new Translation2d(4.5974,4.034536);
+        public static final Translation2d redHubPose = new Translation2d(11.938,4.034536);
 
-            public static final Distance allianceZone = Meters.of(4.5974);
-            public static final Distance spinUpZone = Meters.of(6.0);
+        public static final Distance allianceZone = Meters.of(4.5974);
+        public static final Distance spinUpZone = Meters.of(6.0);
 
-            public static final Distance blueAllianceWall = Meters.of(0);
-            public static final Distance redAllianceWall = Meters.of(FieldConstants.layout.getFieldLength());
+        public static final Distance blueAllianceWall = Meters.of(0);
+        public static final Distance redAllianceWall = Meters.of(FieldConstants.layout.getFieldLength());
 
-            public static final Translation2d blueTargetLeft = new Translation2d(2,6);
-            public static final Translation2d blueTargetRight = new Translation2d(2,2);
+        public static final Translation2d blueTargetLeft = new Translation2d(2,6);
+        public static final Translation2d blueTargetRight = new Translation2d(2,2);
 
-            public static final Translation2d redTargetLeft = new Translation2d(14,6);
-            public static final Translation2d redTargetRight = new Translation2d(14,2);
+        public static final Translation2d redTargetLeft = new Translation2d(14,6);
+        public static final Translation2d redTargetRight = new Translation2d(14,2);
 
-            public static final double centerLineY = 4.034536;
+        public static final double centerLineY = 4.034536;
+
+        public static final Pose2d blueCornerDepot = new Pose2d(Inches.of(23.09), Inches.of(23.429), new Rotation2d(Degrees.of(-40.417)));
+        public static final Pose2d blueCornerOutpost = new Pose2d(Inches.of(23.09), Inches.of(294.261), new Rotation2d(Degrees.of(40.417)));
+        public static final Pose2d redCornerDepot = new Pose2d(Inches.of(628.13), Inches.of(23.429), new Rotation2d(Degrees.of(180.0 - 40.417)));
+        public static final Pose2d redCornerOutpost = new Pose2d(Inches.of(628.13), Inches.of(294.261), new Rotation2d(Degrees.of(-180.0 + 40.417)));
     }
 
     public class HoodPWMs {
             public static final int hoodLeftPWMPort = 2;
             public static final int hoodRightPWMPort = 0;
-    }
-
-    public class ferryPositions{
-        public static final Translation2d blueOutpostFerryTarget= new Translation2d(2.136,1.935); //ferry target for the blue outpost
-        public static final Translation2d redOutpostFerryTarget= new Translation2d(14.0,6.0); //ferry target for the red outpost
-        public static final Translation2d blueDepotFerryTarget= new Translation2d(2.0,6.0); //ferry target for the blue depot
-        public static final Translation2d redDepotFerryTarget= new Translation2d(14.0,2.0); //ferry target for the red depot
     }
 }

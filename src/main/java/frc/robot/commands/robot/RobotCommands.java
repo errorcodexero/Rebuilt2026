@@ -1,6 +1,8 @@
 package frc.robot.commands.robot;
 
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 
 import java.util.Set;
 import java.util.function.BooleanSupplier;
@@ -8,6 +10,7 @@ import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Distance;
@@ -50,6 +53,29 @@ public class RobotCommands {
             .andThen(drive.stopWithXCmd(), drive.idle().until(shouldRotateAgain))
             .repeatedly()
         );
+    }
+
+    public static Command shootHubInCorner(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive) {
+        Supplier<Pose2d> cornerPose = () -> {
+            Pose2d rightTarget =
+                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                    ? ShooterConstants.Positions.blueCornerDepot
+                    : ShooterConstants.Positions.redCornerOutpost;
+
+            Pose2d leftTarget =
+                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                    ? ShooterConstants.Positions.blueCornerDepot
+                    : ShooterConstants.Positions.redCornerOutpost;
+
+            Pose2d target =
+                drive.getPose().getY() < ShooterConstants.Positions.centerLineY
+                    ? rightTarget
+                    : leftTarget;
+            return target;
+        };
+
+        return DriveCommands.simplePathCommand(drive, cornerPose.get(), MetersPerSecond.of(3.0), MetersPerSecondPerSecond.of(3.0))
+            .andThen(shootHub(shooter, hopper, intake, drive));
     }
 
     /**
