@@ -109,7 +109,9 @@ public class RobotCommands {
 
             return DriveCommands.joystickDriveAtAngle(targetingAngle)
                 .alongWith(
+                    hopper.feedForShooting(() -> true, intake),
                     shooter.shootAtDistance(targetDistance),
+
                     Commands.runOnce(() -> {
                         Logger.recordOutput("Ferry/Target", target.get());
                         Logger.recordOutput("Ferry/IsFerrying", true);
