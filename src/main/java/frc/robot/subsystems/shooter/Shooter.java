@@ -254,7 +254,9 @@ public class Shooter extends SubsystemBase {
                 () -> RotationsPerSecond.of(shooterParams.get().velocity),
                 () -> Degrees.of(shooterParams.get().hood)
             )
-        ).finallyDo(interrupted -> Logger.recordOutput("Command/ShootAtDistance", false));
+        )
+        .finallyDo(interrupted -> Logger.recordOutput("Command/ShootAtDistance", false))
+        .deadlineFor(Commands.run(() -> Logger.recordOutput("Shooter/ShotDistance", distance.get())));
     }
 
     /**

@@ -67,7 +67,7 @@ public class RobotState {
                 ? ShooterConstants.Positions.blueAllianceWall
                 : ShooterConstants.Positions.redAllianceWall;
                 
-        inAllianceZone = currentPose.getMeasureX().minus(allianceWall).abs(Meters) < ShooterConstants.Positions.spinUpZone.in(Meters);
+        inAllianceZone = currentPose.getMeasureX().minus(allianceWall).abs(Meters) < ShooterConstants.Positions.allianceZone.in(Meters);
 
         // Other logging
         var shift = HubShiftUtil.getOfficialShiftInfo();
