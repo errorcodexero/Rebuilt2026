@@ -69,11 +69,18 @@ public class RobotCommands {
         BooleanSupplier shouldStopShooting =
             () -> !drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.defenseTolerance);
 
+        BooleanSupplier upToSpeedAndAimed =
+            () -> shouldShoot.getAsBoolean() && shooter.isShooterReady();
+
         return Commands.repeatingSequence(
-            Commands.waitUntil(shouldShoot),
+            Commands.waitUntil(upToSpeedAndAimed),
             hopper.feedForShooting(shouldShoot, intake)
                 .until(shouldStopShooting)
-        ).alongWith(shooter.shootAtDistance(RobotState::hubDistance));
+        ).alongWith(
+            Commands.waitUntil(upToSpeedAndAimed)
+                .deadlineFor(shooter.spinUpForDistance(RobotState::hubDistance))
+                .andThen(shooter.shootAtDistance(RobotState::hubDistance))
+        );
     }
 
     /**
@@ -107,10 +114,18 @@ public class RobotCommands {
                 return new Rotation2d(botToTarget.getX(), botToTarget.getY());
             };
 
+            BooleanSupplier ready = () ->
+                drive.rotationIsNear(targetingAngle.get(), ShooterConstants.aimingTolerance)
+                && shooter.isShooterReady();
+
             return DriveCommands.joystickDriveAtAngle(targetingAngle)
                 .alongWith(
-                    hopper.feedForShooting(() -> true, intake),
-                    shooter.shootAtDistance(targetDistance),
+                    Commands.waitUntil(ready)
+                        .deadlineFor(shooter.spinUpForDistance(targetDistance))
+                        .andThen(shooter.shootAtDistance(targetDistance)),
+
+                    Commands.waitUntil(ready)
+                        .andThen(hopper.feedForShooting(() -> true, intake)),
 
                     Commands.runOnce(() -> {
                         Logger.recordOutput("Ferry/Target", target.get());
