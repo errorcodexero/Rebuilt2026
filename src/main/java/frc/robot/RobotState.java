@@ -29,6 +29,7 @@ public class RobotState {
 
     private static Rotation2d rotationToHub = Rotation2d.kZero;
     private static boolean inAllianceZone = false;
+    private static boolean inOpposingAllianceZone = false;
 
     /**
      * This method supplies the object with the information it needs for its calculations.
@@ -62,12 +63,21 @@ public class RobotState {
         Logger.recordOutput("RobotState/HubRotation", rotationToHub);
         Logger.recordOutput("RobotState/AngleDelta", rotationToHub.minus(currentPose.getRotation()));
 
+        Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+
         Distance allianceWall =
-            DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+            alliance == Alliance.Blue
                 ? ShooterConstants.Positions.blueAllianceWall
                 : ShooterConstants.Positions.redAllianceWall;
-                
+
+        Distance opposingAllianceWall =
+            alliance == Alliance.Blue
+                ? ShooterConstants.Positions.redAllianceWall
+                : ShooterConstants.Positions.blueAllianceWall;
+            
         inAllianceZone = currentPose.getMeasureX().minus(allianceWall).abs(Meters) < ShooterConstants.Positions.allianceZone.in(Meters);
+
+        inOpposingAllianceZone = currentPose.getMeasureX().minus(opposingAllianceWall).abs(Meters) < ShooterConstants.Positions.allianceZone.in(Meters);
 
         // Other logging
         var shift = HubShiftUtil.getOfficialShiftInfo();
@@ -92,5 +102,15 @@ public class RobotState {
     @AutoLogOutput
     public static boolean inAllianceZone() {
         return inAllianceZone;
+    }
+
+    @AutoLogOutput
+    public static boolean inOpposingAllianceZone() {
+        return inOpposingAllianceZone;
+    }
+
+    @AutoLogOutput
+    public static boolean inNeutralZone() {
+        return !inAllianceZone() && !inOpposingAllianceZone();
     }
 }

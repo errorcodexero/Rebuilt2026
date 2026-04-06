@@ -129,6 +129,15 @@
                     "velocity": 65
                 }
             ]
+        },
+        {
+            "hood": 60.0,
+            "points": [
+                {
+                    "distance": 7.3,
+                    "velocity": 85.0
+                }
+            ]
         }
     ]
 }

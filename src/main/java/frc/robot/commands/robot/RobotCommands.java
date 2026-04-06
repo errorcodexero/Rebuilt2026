@@ -92,15 +92,31 @@ public class RobotCommands {
      */
     public static Command ferry(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive) {
         return Commands.defer(() -> {
-            Translation2d rightTarget =
-                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                    ? ShooterConstants.Positions.blueTargetRight
-                    : ShooterConstants.Positions.redTargetRight;
+            Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+            Translation2d rightTarget;
+            Translation2d leftTarget;
 
-            Translation2d leftTarget =
-                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                    ? ShooterConstants.Positions.blueTargetLeft
-                    : ShooterConstants.Positions.redTargetLeft;
+            if (RobotState.inOpposingAllianceZone()) {
+                rightTarget =
+                    alliance == Alliance.Blue
+                        ? ShooterConstants.Positions.blueBumpTargetRight
+                        : ShooterConstants.Positions.redBumpTargetRight;
+
+                leftTarget =
+                    alliance == Alliance.Blue
+                        ? ShooterConstants.Positions.blueBumpTargetLeft
+                        : ShooterConstants.Positions.redBumpTargetLeft;
+            } else {
+                rightTarget =
+                    alliance == Alliance.Blue
+                        ? ShooterConstants.Positions.blueTargetRight
+                        : ShooterConstants.Positions.redTargetRight;
+
+                leftTarget =
+                    alliance == Alliance.Blue
+                        ? ShooterConstants.Positions.blueTargetLeft
+                        : ShooterConstants.Positions.redTargetLeft;
+            }
 
             Supplier<Translation2d> target =
                 () -> drive.getPose().getY() < ShooterConstants.Positions.centerLineY

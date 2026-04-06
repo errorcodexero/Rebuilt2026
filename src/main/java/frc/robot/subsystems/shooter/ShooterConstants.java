@@ -94,6 +94,12 @@ public class ShooterConstants {
             public static final Translation2d redTargetLeft = new Translation2d(15,6);
             public static final Translation2d redTargetRight = new Translation2d(15,2);
 
+            public static final Translation2d blueBumpTargetLeft = new Translation2d(4, FieldConstants.layout.getFieldWidth() - 2.5);
+            public static final Translation2d blueBumpTargetRight = new Translation2d(4,2.5);
+
+            public static final Translation2d redBumpTargetLeft = new Translation2d(FieldConstants.layout.getFieldLength() - 4, FieldConstants.layout.getFieldWidth() - 2.5);
+            public static final Translation2d redBumpTargetRight = new Translation2d(FieldConstants.layout.getFieldLength() - 4,2.5);
+
             public static final double centerLineY = 4.034536;
     }
 
