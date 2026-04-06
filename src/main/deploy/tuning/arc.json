@@ -126,17 +126,21 @@
                 },
                 {
                     "distance": 6.5,
-                    "velocity": 65
-                }
+                    "velocity": 70
+                },
             ]
         },
         {
             "hood": 60.0,
             "points": [
                 {
-                    "distance": 7.3,
-                    "velocity": 85.0
-                }
+                    "distance": 7.5,
+                    "velocity": 70
+                },
+                {
+                    "distance": 9.0,
+                    "velocity": 80
+                }                
             ]
         }
     ]
