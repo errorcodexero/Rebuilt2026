@@ -1,6 +1,7 @@
 package frc.robot.commands.robot;
 
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import java.util.Set;
 import java.util.function.BooleanSupplier;
@@ -70,7 +71,9 @@ public class RobotCommands {
             () -> !drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.defenseTolerance);
 
         BooleanSupplier upToSpeedAndAimed =
-            () -> shouldShoot.getAsBoolean() && shooter.isShooterReady();
+            () -> shouldShoot.getAsBoolean()
+                && shooter.isShooterReady()
+                && shooter.getShooterVelocity().gt(RotationsPerSecond.of(10));
 
         return Commands.repeatingSequence(
             Commands.waitUntil(upToSpeedAndAimed),
@@ -132,7 +135,8 @@ public class RobotCommands {
 
             BooleanSupplier ready = () ->
                 drive.rotationIsNear(targetingAngle.get(), ShooterConstants.aimingTolerance)
-                && shooter.isShooterReady();
+                && shooter.isShooterReady()
+                && shooter.getShooterVelocity().gt(RotationsPerSecond.of(10));
 
             return DriveCommands.joystickDriveAtAngle(targetingAngle)
                 .alongWith(
