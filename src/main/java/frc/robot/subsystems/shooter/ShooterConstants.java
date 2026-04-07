@@ -19,7 +19,7 @@ public class ShooterConstants {
     public static final int shooter2CANID = 1;
     public static final int shooter3CANID = 2;
 
-    public static final Current currentLimit = Amps.of(50);
+    public static final Current currentLimit = Amps.of(80);
     public static final Time currentLimitTime = Seconds.of(0.2);
 
     //

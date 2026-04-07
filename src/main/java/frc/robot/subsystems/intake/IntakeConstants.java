@@ -22,7 +22,7 @@ public final class IntakeConstants {
     public static final int pivotMotorCANID = 8;
     public static final int pivotEncoderCANID = 7;
 
-    public static final Current rollerCurrentLimit = Amps.of(60);
+    public static final Current rollerCurrentLimit = Amps.of(70);
     public static final Time rollerCurrentLimitTime = Milliseconds.of(200);
 
     public static final Current pivotCurrentLimit = Amps.of(40);

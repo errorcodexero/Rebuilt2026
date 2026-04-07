@@ -6,8 +6,8 @@
             "points" : [
                 {
                     // Shoot cmd
-                    "distance" : 1.18,
-                    "velocity" : 50.0
+                    "distance" : 1.24,
+                    "velocity" : 51.0
                 },
                 {
                     // Shoot cmd
@@ -17,7 +17,7 @@
                 {
                     // Shoot cmd
                     "distance" : 1.7,
-                    "velocity" : 55.0
+                    "velocity" : 56.0
                 }
             ]
         },
