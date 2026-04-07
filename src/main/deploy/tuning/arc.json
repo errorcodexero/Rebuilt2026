@@ -5,19 +5,19 @@
             "hood" : 5.0,
             "points" : [
                 {
-                    // Shoot cmd
+                    
                     "distance" : 1.24,
                     "velocity" : 51.0
                 },
                 {
-                    // Shoot cmd
+                    
                     "distance" : 1.4,
                     "velocity" : 54.0
                 },                
                 {
-                    // Shoot cmd
-                    "distance" : 1.7,
-                    "velocity" : 56.0
+                    
+                    "distance" : 1.73,
+                    "velocity" : 60.0
                 }
             ]
         },
@@ -25,63 +25,59 @@
             "hood" : 15.0,
             "points" : [
                 {
-                    // Shoot cmd
-                    "distance" : 1.9,
-                    "velocity" : 51.0
+                    
+                    "distance" : 1.91,
+                    "velocity" : 54.0
                 },
                 {
-                    // Shoot cmd
+                    
                     "distance" : 2.11,
-                    "velocity" : 52.0
-                },
-                {
-                    // Shoot mode                    
-                    "distance" : 2.3,
-                    "velocity" : 54.5
-                },
-                {
-                    // Shoot mode
-                    "distance" : 2.50,
                     "velocity" : 56.0
+                },
+                {
+                    
+                    "distance" : 2.3,
+                    "velocity" : 58.0
+                },
+                {
+                    
+                    "distance" : 2.49,
+                    "velocity" : 59.0
                 }
             ]
         },
         {
             "hood" : 25.0,
             "points" : [
-                // {
-                //     "distance": 2.7,
-                //     "velocity": 55.0
-                // },
                 {
-                    // Shoot cmd
+                    
                     "distance" : 2.7,
-                    "velocity" : 53
+                    "velocity" : 54
                 },                
                 {
-                    // Shoot cmd
+                    
                     "distance" : 2.9,
-                    "velocity" : 54
+                    "velocity" : 56
                 },
                 {
-                    // Shoot cmd
-                    "distance" : 3.1,
-                    "velocity" : 55.5
+                    
+                    "distance" : 3.16,
+                    "velocity" : 57
                 },      
                 {
-                    // Shoot cmd
-                    "distance" : 3.29,
-                    "velocity" : 56.0
+                    
+                    "distance" : 3.35,
+                    "velocity" : 59.0
                 },                             
                 {
-                    // Shoot cmd
-                    "distance" : 3.50,
-                    "velocity" : 57.0
+                    
+                    "distance" : 3.53,
+                    "velocity" : 61.0
                 },
                 {
-                    // Shoot cmd
+                    
                     "distance" : 3.71,
-                    "velocity" : 58.0
+                    "velocity" : 63
                 }
             ]
         },
@@ -89,35 +85,32 @@
             "hood" : 30.0,
             "points" : [
                 {
-                    "distance" : 3.8,
-                    "velocity" : 57.0
-                },
-                {
-                    // Shoot cmd
+                    
                     "distance" : 3.90,
-                    "velocity" : 58.0
+                    "velocity" : 61.0
                 },
                 {
-                    // Shoot cmd
+                    
                     "distance" : 4.1,
-                    "velocity" : 60.0
+                    "velocity" : 63.0
                 },
                 {
-                    // Shoot cmd
+                    
                     "distance" : 4.3,
-                    "velocity" : 62.5
+                    "velocity" : 65
                 },
                 {
                     "distance": 4.5,
-                    "velocity": 64
+                    "velocity": 67
                 },
                 {
                     "distance": 4.8,
-                    "velocity": 65.5
+                    "velocity": 69
+
                 },
                 {
-                    "distance": 5.3,
-                    "velocity": 70.0
+                    "distance": 5.4,
+                    "velocity": 75.0
                 }
             ]
         },
@@ -125,8 +118,8 @@
             "hood": 45.0,
             "points": [
                 {
-                    "distance": 5.5,
-                    "velocity": 65
+                    "distance": 5.8,
+                    "velocity": 66
                 },
                 {
                     "distance": 6.5,
