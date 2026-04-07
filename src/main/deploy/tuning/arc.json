@@ -89,6 +89,10 @@
             "hood" : 30.0,
             "points" : [
                 {
+                    "distance" : 3.8,
+                    "velocity" : 57.0
+                },
+                {
                     // Shoot cmd
                     "distance" : 3.90,
                     "velocity" : 58.0
@@ -127,7 +131,7 @@
                 {
                     "distance": 6.5,
                     "velocity": 70
-                },
+                }
             ]
         },
         {
