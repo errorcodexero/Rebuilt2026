@@ -103,6 +103,8 @@ public class ShooterConstants {
         public static final Pose2d redCornerDepotWaypoint = new Pose2d(Inches.of(616.709), Inches.of(33.155), new Rotation2d(Degrees.of(180.0 - 40.417)));
         public static final Pose2d redCornerOutpost = new Pose2d(Inches.of(628.13), Inches.of(294.261), new Rotation2d(Degrees.of(180.0 + 40.417)));
         public static final Pose2d redCornerOutpostWaypoint = new Pose2d(Inches.of(616.709), Inches.of(284.535), new Rotation2d(Degrees.of(180.0 + 40.417)));
+
+        public static final Distance distFromCornerToShootInCorner = Meters.of(2);
     }
 
     public class HoodPWMs {
