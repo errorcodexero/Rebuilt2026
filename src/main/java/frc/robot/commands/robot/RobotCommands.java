@@ -80,9 +80,7 @@ public class RobotCommands {
             hopper.feedForShooting(shouldShoot, intake)
                 .until(shouldStopShooting)
         ).alongWith(
-            Commands.waitUntil(upToSpeedAndAimed)
-                .deadlineFor(shooter.spinUpForDistance(RobotState::hubDistance))
-                .andThen(shooter.shootAtDistance(RobotState::hubDistance))
+            shooter.shootAtDistance(RobotState::hubDistance)
         );
     }
 
@@ -140,9 +138,7 @@ public class RobotCommands {
 
             return DriveCommands.joystickDriveAtAngle(targetingAngle)
                 .alongWith(
-                    Commands.waitUntil(ready)
-                        .deadlineFor(shooter.spinUpForDistance(targetDistance))
-                        .andThen(shooter.shootAtDistance(targetDistance)),
+                    shooter.shootAtDistance(targetDistance),
 
                     Commands.waitUntil(ready)
                         .andThen(hopper.feedForShooting(() -> true, intake)),
