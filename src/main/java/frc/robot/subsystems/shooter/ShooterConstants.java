@@ -2,10 +2,10 @@ package frc.robot.subsystems.shooter;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Inches;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -53,14 +53,14 @@ public class ShooterConstants {
     public static final Angle hoodMinAngle = Degrees.of(0.0) ;
 
     public class PID {
-            // shooter
-            public static final double shooterkP = 0.5; 
-            public static final double shooterkI = 0.0;
-            public static final double shooterkD = 0.0;
-            public static final double shooterkV = 0.132;
-            public static final double shooterkA = 0.0;
-            public static final double shooterkG = 0.0;
-            public static final double shooterkS = 0.0;
+        // shooter
+        public static final double shooterkP = 0.5; 
+        public static final double shooterkI = 0.0;
+        public static final double shooterkD = 0.0;
+        public static final double shooterkV = 0.132;
+        public static final double shooterkA = 0.0;
+        public static final double shooterkG = 0.0;
+        public static final double shooterkS = 0.0;
     }
 
     public class MotionMagic {
@@ -82,16 +82,21 @@ public class ShooterConstants {
         public static final Translation2d redHubPose = new Translation2d(11.938,4.034536);
 
         public static final Distance allianceZone = Meters.of(4.5974);
-        public static final Distance spinUpZone = Meters.of(6.0);
 
         public static final Distance blueAllianceWall = Meters.of(0);
         public static final Distance redAllianceWall = Meters.of(FieldConstants.layout.getFieldLength());
 
-        public static final Translation2d blueTargetLeft = new Translation2d(2,6);
-        public static final Translation2d blueTargetRight = new Translation2d(2,2);
+        public static final Translation2d blueTargetLeft = new Translation2d(1,6);
+        public static final Translation2d blueTargetRight = new Translation2d(1,2);
 
-        public static final Translation2d redTargetLeft = new Translation2d(14,6);
-        public static final Translation2d redTargetRight = new Translation2d(14,2);
+        public static final Translation2d redTargetLeft = new Translation2d(15,6);
+        public static final Translation2d redTargetRight = new Translation2d(15,2);
+
+        public static final Translation2d blueBumpTargetLeft = new Translation2d(4, FieldConstants.layout.getFieldWidth() - 2.5);
+        public static final Translation2d blueBumpTargetRight = new Translation2d(4,2.5);
+
+        public static final Translation2d redBumpTargetLeft = new Translation2d(FieldConstants.layout.getFieldLength() - 4, FieldConstants.layout.getFieldWidth() - 2.5);
+        public static final Translation2d redBumpTargetRight = new Translation2d(FieldConstants.layout.getFieldLength() - 4,2.5);
 
         public static final double centerLineY = 4.034536;
 
@@ -104,13 +109,7 @@ public class ShooterConstants {
         public static final Pose2d redCornerOutpost = new Pose2d(Inches.of(628.13), Inches.of(294.261), new Rotation2d(Degrees.of(180.0 + 40.417)));
         public static final Pose2d redCornerOutpostWaypoint = new Pose2d(Inches.of(616.709), Inches.of(284.535), new Rotation2d(Degrees.of(180.0 + 40.417)));
 
-            public static final Translation2d blueBumpTargetLeft = new Translation2d(4, FieldConstants.layout.getFieldWidth() - 2.5);
-            public static final Translation2d blueBumpTargetRight = new Translation2d(4,2.5);
-
-            public static final Translation2d redBumpTargetLeft = new Translation2d(FieldConstants.layout.getFieldLength() - 4, FieldConstants.layout.getFieldWidth() - 2.5);
-            public static final Translation2d redBumpTargetRight = new Translation2d(FieldConstants.layout.getFieldLength() - 4,2.5);
-
-        public static final Distance distFromCornerToShootInCorner = Meters.of(2);
+        public static final Distance distFromCornerToShootInCorner = Meters.of(2.0);
     }
 
     public class HoodPWMs {
