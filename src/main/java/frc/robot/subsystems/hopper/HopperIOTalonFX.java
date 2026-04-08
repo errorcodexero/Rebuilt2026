@@ -20,6 +20,7 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
 public class HopperIOTalonFX implements HopperIO {
@@ -40,13 +41,15 @@ public class HopperIOTalonFX implements HopperIO {
     private final StatusSignal<AngularVelocity> feederAngularVelocitySignal;
     private final StatusSignal<AngularAcceleration> feederAngularAccelerationSignal ;
     private final StatusSignal<Voltage> feederVoltageSignal;
-    private final StatusSignal<Current> feederCurrentSignal; 
+    private final StatusSignal<Current> feederCurrentSignal;
+    private final StatusSignal<Temperature> feederTemp; 
 
     //Scrambler Status Signals
     private final StatusSignal<AngularVelocity> scramblerAngularVelocitySignal;   
     private final StatusSignal<AngularAcceleration> scramblerAngularAccelerationSignal ;
     private final StatusSignal<Voltage> scramblerVoltageSignal;
     private final StatusSignal<Current> scramblerCurrentSignal;
+    private final StatusSignal<Temperature> scramblerTemp;
 
     private final Debouncer feederConnectedDebounce = new Debouncer(0.5, DebounceType.kFalling);
     private final Debouncer scramblerConnectedDebounce = new Debouncer(0.5, DebounceType.kFalling);
@@ -75,7 +78,8 @@ public class HopperIOTalonFX implements HopperIO {
         feederAngularVelocitySignal = feederMotor.getVelocity();
         feederAngularAccelerationSignal = feederMotor.getAcceleration() ;
         feederVoltageSignal = feederMotor.getMotorVoltage();
-        feederCurrentSignal = feederMotor.getSupplyCurrent();        
+        feederCurrentSignal = feederMotor.getSupplyCurrent();     
+        feederTemp = feederMotor.getDeviceTemp();   
 
         // Scrambler Motor Configuration
         scramblerMotor = new TalonFX(HopperConstants.scramblerMotorCANID);
@@ -96,14 +100,15 @@ public class HopperIOTalonFX implements HopperIO {
         scramblerAngularAccelerationSignal = scramblerMotor.getAcceleration() ;
         scramblerVoltageSignal = scramblerMotor.getMotorVoltage();
         scramblerCurrentSignal = scramblerMotor.getSupplyCurrent();
+        scramblerTemp = scramblerMotor.getDeviceTemp();
 
         BaseStatusSignal.setUpdateFrequencyForAll(50.0, 
-            feederAngularVelocitySignal, feederVoltageSignal, feederCurrentSignal, feederAngularAccelerationSignal);
+            feederAngularVelocitySignal, feederVoltageSignal, feederCurrentSignal, feederAngularAccelerationSignal, feederTemp);
         
         feederMotor.optimizeBusUtilization();
         
         BaseStatusSignal.setUpdateFrequencyForAll(50.0,
-            scramblerAngularVelocitySignal, scramblerVoltageSignal, scramblerCurrentSignal, scramblerAngularAccelerationSignal);
+            scramblerAngularVelocitySignal, scramblerVoltageSignal, scramblerCurrentSignal, scramblerAngularAccelerationSignal, scramblerTemp);
         
         scramblerMotor.optimizeBusUtilization();
     }
@@ -111,22 +116,34 @@ public class HopperIOTalonFX implements HopperIO {
     @Override
     public void updateInputs(HopperIOInputs inputs) {
         StatusCode feederStatus = BaseStatusSignal.refreshAll(
-            feederAngularVelocitySignal, feederVoltageSignal, feederCurrentSignal);
+            feederAngularVelocitySignal,
+            feederAngularAccelerationSignal,
+            feederVoltageSignal,
+            feederCurrentSignal,
+            feederTemp
+        );
         
         StatusCode scramblerStatus = BaseStatusSignal.refreshAll(
-            scramblerAngularVelocitySignal, scramblerVoltageSignal, scramblerCurrentSignal);
+            scramblerAngularVelocitySignal,
+            scramblerAngularAccelerationSignal,
+            scramblerVoltageSignal,
+            scramblerCurrentSignal,
+            scramblerTemp
+        );
         
         inputs.feederConnected = feederConnectedDebounce.calculate(feederStatus.isOK());
         inputs.feederVelocity = feederAngularVelocitySignal.getValue();
         inputs.feederAcceleration = feederAngularAccelerationSignal.getValue() ;
         inputs.feederVoltage = feederVoltageSignal.getValue();
         inputs.feederCurrent = feederCurrentSignal.getValue();
+        inputs.feederTemp = feederTemp.getValue();
 
         inputs.scramblerConnected = scramblerConnectedDebounce.calculate(scramblerStatus.isOK());
         inputs.scramblerVelocity = scramblerAngularVelocitySignal.getValue();
         inputs.scramblerAcceleration = scramblerAngularAccelerationSignal.getValue() ;
         inputs.scramblerVoltage = scramblerVoltageSignal.getValue();
         inputs.scramblerCurrent = scramblerCurrentSignal.getValue();
+        inputs.scramblerTemp = scramblerTemp.getValue();
     }
 
     @Override

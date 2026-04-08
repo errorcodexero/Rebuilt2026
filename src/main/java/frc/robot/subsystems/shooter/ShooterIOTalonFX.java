@@ -18,6 +18,7 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue;
 
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
 public class ShooterIOTalonFX implements ShooterIO {
@@ -31,14 +32,17 @@ public class ShooterIOTalonFX implements ShooterIO {
     private StatusSignal<AngularVelocity> shooter1AngularVelocity;
     private StatusSignal<Voltage> shooter1AppliedVolts;
     private StatusSignal<Current> shooter1CurrentAmps;
+    private StatusSignal<Temperature> shooter1Temp;
 
     private StatusSignal<AngularVelocity> shooter2AngularVelocity;
     private StatusSignal<Voltage> shooter2AppliedVolts;
     private StatusSignal<Current> shooter2CurrentAmps;
+    private StatusSignal<Temperature> shooter2Temp;
 
     private StatusSignal<AngularVelocity> shooter3AngularVelocity;
     private StatusSignal<Voltage> shooter3AppliedVolts;
     private StatusSignal<Current> shooter3CurrentAmps;
+    private StatusSignal<Temperature> shooter3Temp;
 
     public ShooterIOTalonFX(CANBus shooterCANBus) {
 
@@ -80,24 +84,30 @@ public class ShooterIOTalonFX implements ShooterIO {
         shooter1AngularVelocity = shooter1Motor.getVelocity();
         shooter1AppliedVolts = shooter1Motor.getMotorVoltage();
         shooter1CurrentAmps = shooter1Motor.getSupplyCurrent();
+        shooter1Temp = shooter1Motor.getDeviceTemp();
         shooter2AngularVelocity = shooter2Motor.getVelocity();
         shooter2AppliedVolts = shooter2Motor.getMotorVoltage();
         shooter2CurrentAmps = shooter2Motor.getSupplyCurrent();
+        shooter2Temp = shooter2Motor.getDeviceTemp();
         shooter3AngularVelocity = shooter3Motor.getVelocity();
         shooter3AppliedVolts = shooter3Motor.getMotorVoltage();
         shooter3CurrentAmps = shooter3Motor.getSupplyCurrent();
+        shooter3Temp = shooter3Motor.getDeviceTemp();
         
         // Status Signal Collection, less repetitive code
         signals = new StatusSignalCollection(
             shooter1AngularVelocity,
             shooter1AppliedVolts,
             shooter1CurrentAmps,
+            shooter1Temp,
             shooter2AngularVelocity,
             shooter2AppliedVolts,
             shooter2CurrentAmps,
+            shooter2Temp,
             shooter3AngularVelocity,
             shooter3AppliedVolts,
-            shooter3CurrentAmps
+            shooter3CurrentAmps,
+            shooter3Temp
         );
 
         tryUntilOk(5, () -> signals.setUpdateFrequencyForAll(50.0));
@@ -122,6 +132,10 @@ public class ShooterIOTalonFX implements ShooterIO {
         inputs.shooter1Current = shooter1CurrentAmps.getValue();
         inputs.shooter2Current = shooter2CurrentAmps.getValue();
         inputs.shooter3Current = shooter3CurrentAmps.getValue();
+
+        inputs.shooter1Temp = shooter1Temp.getValue();
+        inputs.shooter2Temp = shooter2Temp.getValue();
+        inputs.shooter3Temp = shooter3Temp.getValue();
 
         inputs.wheelVelocity = inputs.shooter1Velocity.times(ShooterConstants.gearRatio);
     }
