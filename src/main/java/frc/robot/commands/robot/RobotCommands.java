@@ -3,6 +3,7 @@ package frc.robot.commands.robot;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import java.util.Set;
 import java.util.function.BooleanSupplier;
@@ -122,10 +123,17 @@ public class RobotCommands {
         BooleanSupplier shouldStopShooting =
             () -> !drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.defenseTolerance);
 
+        BooleanSupplier upToSpeedAndAimed =
+            () -> shouldShoot.getAsBoolean()
+                && shooter.isShooterReady()
+                && shooter.getShooterVelocity().gt(RotationsPerSecond.of(10));
+
         return Commands.repeatingSequence(
-            Commands.waitUntil(shouldShoot).deadlineFor(shooter.spinUpForDistance(RobotState::hubDistance)),
-            shooter.shootAtDistance(RobotState::hubDistance, hopper, intake)
+            Commands.waitUntil(upToSpeedAndAimed),
+            hopper.feedForShooting(shouldShoot, intake)
                 .until(shouldStopShooting)
+        ).alongWith(
+            shooter.shootAtDistance(RobotState::hubDistance)
         );
     }
 
@@ -138,15 +146,31 @@ public class RobotCommands {
      */
     public static Command ferry(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive) {
         return Commands.defer(() -> {
-            Translation2d rightTarget =
-                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                    ? ShooterConstants.Positions.blueTargetRight
-                    : ShooterConstants.Positions.redTargetRight;
+            Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+            Translation2d rightTarget;
+            Translation2d leftTarget;
 
-            Translation2d leftTarget =
-                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                    ? ShooterConstants.Positions.blueTargetLeft
-                    : ShooterConstants.Positions.redTargetLeft;
+            if (RobotState.inOpposingAllianceZone()) {
+                rightTarget =
+                    alliance == Alliance.Blue
+                        ? ShooterConstants.Positions.blueBumpTargetRight
+                        : ShooterConstants.Positions.redBumpTargetRight;
+
+                leftTarget =
+                    alliance == Alliance.Blue
+                        ? ShooterConstants.Positions.blueBumpTargetLeft
+                        : ShooterConstants.Positions.redBumpTargetLeft;
+            } else {
+                rightTarget =
+                    alliance == Alliance.Blue
+                        ? ShooterConstants.Positions.blueTargetRight
+                        : ShooterConstants.Positions.redTargetRight;
+
+                leftTarget =
+                    alliance == Alliance.Blue
+                        ? ShooterConstants.Positions.blueTargetLeft
+                        : ShooterConstants.Positions.redTargetLeft;
+            }
 
             Supplier<Translation2d> target =
                 () -> drive.getPose().getY() < ShooterConstants.Positions.centerLineY
@@ -160,9 +184,18 @@ public class RobotCommands {
                 return new Rotation2d(botToTarget.getX(), botToTarget.getY());
             };
 
+            BooleanSupplier ready = () ->
+                drive.rotationIsNear(targetingAngle.get(), ShooterConstants.aimingTolerance)
+                && shooter.isShooterReady()
+                && shooter.getShooterVelocity().gt(RotationsPerSecond.of(10));
+
             return DriveCommands.joystickDriveAtAngle(targetingAngle)
                 .alongWith(
-                    shooter.shootAtDistance(targetDistance, hopper, intake),
+                    shooter.shootAtDistance(targetDistance),
+
+                    Commands.waitUntil(ready)
+                        .andThen(hopper.feedForShooting(() -> true, intake)),
+
                     Commands.runOnce(() -> {
                         Logger.recordOutput("Ferry/Target", target.get());
                         Logger.recordOutput("Ferry/IsFerrying", true);

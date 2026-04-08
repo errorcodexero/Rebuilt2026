@@ -70,6 +70,10 @@ public class ShooterTuning {
         readTuningData("tuning/" + name + ".json") ;
     }
 
+    public void reset() {
+        lastHoodIndex_ = -1 ;
+    }
+
     public String getName() {
         return name_ ;
     }
@@ -144,6 +148,7 @@ public class ShooterTuning {
     }
 
     public ShooterParams getShooterParams(double dist) {
+        lastHoodIndex_ = -1 ;
         int h = getHoodIndex(dist) ;
         double vel = doBetterInterpolate(settings_.get(h), dist, h == settings_.size() - 1) ;
         var ret = new ShooterParams(dist, settings_.get(h).hood_, vel) ;
@@ -165,6 +170,7 @@ public class ShooterTuning {
     private int processHysteresis(double dist, int newIndex) {
         if (lastHoodIndex_ == -1) {
             lastHoodIndex_ = newIndex ;
+            System.out.println("ShooterTuning: setting initial hood index to " + newIndex + " for distance " + dist) ;
             return newIndex ;
         }
 
@@ -172,16 +178,19 @@ public class ShooterTuning {
             // We moved to the next hood index
             // Stay at the old hood index until we exceed its max distance plus hysteresis
             if (dist <= settings_.get(lastHoodIndex_).max_dist_ + HYSTERESIS_DIST) {
+                System.out.println("ShooterTuning: 1 staying at hood index " + lastHoodIndex_ + " for distance " + dist + " due to hysteresis") ;
                 return lastHoodIndex_ ;
             }
         }
         else if (newIndex == lastHoodIndex_ - 1) {
             // We moved to the previous hood index
             if (dist > settings_.get(lastHoodIndex_).min_dist_ - HYSTERESIS_DIST) {
+                System.out.println("ShooterTuning: 2 staying at hood index " + lastHoodIndex_ + " for distance " + dist + " due to hysteresis") ;
                 return lastHoodIndex_ ;
             }
         }
 
+        System.out.println("ShooterTuning: moving from hood index " + lastHoodIndex_ + " to " + newIndex + " for distance " + dist) ;
         lastHoodIndex_ = newIndex ;
         return newIndex ;
     }

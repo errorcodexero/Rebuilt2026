@@ -22,7 +22,7 @@ public class ShooterConstants {
     public static final int shooter2CANID = 1;
     public static final int shooter3CANID = 2;
 
-    public static final Current currentLimit = Amps.of(60);
+    public static final Current currentLimit = Amps.of(80);
     public static final Time currentLimitTime = Seconds.of(0.2);
 
     //
@@ -103,6 +103,12 @@ public class ShooterConstants {
         public static final Pose2d redCornerDepotWaypoint = new Pose2d(Inches.of(616.709), Inches.of(33.155), new Rotation2d(Degrees.of(180.0 - 40.417)));
         public static final Pose2d redCornerOutpost = new Pose2d(Inches.of(628.13), Inches.of(294.261), new Rotation2d(Degrees.of(180.0 + 40.417)));
         public static final Pose2d redCornerOutpostWaypoint = new Pose2d(Inches.of(616.709), Inches.of(284.535), new Rotation2d(Degrees.of(180.0 + 40.417)));
+
+            public static final Translation2d blueBumpTargetLeft = new Translation2d(4, FieldConstants.layout.getFieldWidth() - 2.5);
+            public static final Translation2d blueBumpTargetRight = new Translation2d(4,2.5);
+
+            public static final Translation2d redBumpTargetLeft = new Translation2d(FieldConstants.layout.getFieldLength() - 4, FieldConstants.layout.getFieldWidth() - 2.5);
+            public static final Translation2d redBumpTargetRight = new Translation2d(FieldConstants.layout.getFieldLength() - 4,2.5);
 
         public static final Distance distFromCornerToShootInCorner = Meters.of(2);
     }

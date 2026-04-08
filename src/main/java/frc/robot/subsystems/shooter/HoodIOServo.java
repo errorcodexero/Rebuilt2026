@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.Servo;
 
 public class HoodIOServo implements HoodIO {
     private double leftOffset = 0.0;
-    private double rightOffset = 8.0;
+    private double rightOffset = 1.0;
     
     private Servo hoodLeft;
     private Servo hoodRight;
