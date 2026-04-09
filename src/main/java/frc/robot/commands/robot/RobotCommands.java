@@ -33,25 +33,23 @@ public class RobotCommands {
      * @param drive
      * @return
      */
-    public static Command shootHub(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive) {
-        BooleanSupplier shouldXWheels =
-            () -> drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.xWheelTolerance);
-
-        BooleanSupplier shouldRotateAgain =
-            () -> !drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.unXWheelTolerance);
-
+    private static Command shootHub(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive) {
+        BooleanSupplier aimedAndNotDriving = () -> 
+                drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.aimingTolerance) && 
+                DriveCommands.getLinearVelocityFromJoysticks().getNorm() == 0.0;
+        
+        BooleanSupplier shouldRotateAgain = () -> 
+            !drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.unXWheelTolerance) || 
+            DriveCommands.getLinearVelocityFromJoysticks().getNorm() == 0.0;
+  
         return shootHubNoAim(shooter, hopper, intake, drive).alongWith(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> 0,
-                () -> 0, 
-                RobotState::rotationToHub
-            )
-            .until(shouldXWheels)
-            .andThen(drive.stopWithXCmd(), drive.idle().until(shouldRotateAgain))
-            .repeatedly()
-        );
-    }
+                DriveCommands.joystickDriveAtAngle(RobotState::rotationToHub)
+                    .until(aimedAndNotDriving)
+                    .andThen(drive.stopWithXCmd(), drive.idle().onlyWhile(shouldRotateAgain))
+                    .repeatedly()
+            );
+    }            
+
 
     /**
      * Shoots into the hub, without aiming. This should not be used in most situations,
@@ -65,10 +63,12 @@ public class RobotCommands {
      */
     public static Command shootHubNoAim(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive) {
         BooleanSupplier shouldShoot =
-            () -> drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.aimingTolerance);
+            () -> drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.aimingTolerance) && 
+            DriveCommands.getLinearVelocityFromJoysticks().getNorm() == 0.0;
 
         BooleanSupplier shouldStopShooting =
-            () -> !drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.defenseTolerance);
+            () -> !drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.defenseTolerance) ||
+            DriveCommands.getLinearVelocityFromJoysticks().getNorm() == 0.0;
 
         BooleanSupplier upToSpeedAndAimed =
             () -> shouldShoot.getAsBoolean()
