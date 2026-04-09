@@ -35,18 +35,19 @@ public class RobotCommands {
      */
     private static Command shootHub(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive) {
         BooleanSupplier aimedAndNotDriving = () -> 
-            drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.aimingTolerance) && 
-            DriveCommands.getLinearVelocityFromJoysticks().getNorm() == 0.0;
+                drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.aimingTolerance) && 
+                DriveCommands.getLinearVelocityFromJoysticks().getNorm() == 0.0;
         
         BooleanSupplier shouldRotateAgain = () -> 
-          !drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.unXWheelTolerance) || 
-          DriveCommands.getLinearVelocityFromJoysticks().getNorm() == 0.0;
+            !drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.unXWheelTolerance) || 
+            DriveCommands.getLinearVelocityFromJoysticks().getNorm() == 0.0;
   
         return shootHubNoAim(shooter, hopper, intake, drive).alongWith(
-            DriveCommands.joystickDriveAtAngle(RobotState::rotationToHub)
-                .until(aimedAndNotDriving)
-                .andThen(drive.stopWithXCmd(), drive.idle().onlyWhile(shouldRotateAgain))
-                .repeatedly());
+                DriveCommands.joystickDriveAtAngle(RobotState::rotationToHub)
+                    .until(aimedAndNotDriving)
+                    .andThen(drive.stopWithXCmd(), drive.idle().onlyWhile(shouldRotateAgain))
+                    .repeatedly()
+            );
     }            
 
 
