@@ -9,8 +9,10 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
@@ -22,6 +24,7 @@ import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -63,6 +66,7 @@ import frc.robot.subsystems.vision.CameraIO;
 import frc.robot.subsystems.vision.CameraIOLimelight4;
 import frc.robot.subsystems.vision.CameraIOPhotonSim;
 import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.util.HubShiftUtil;
 import frc.robot.util.MapleSimUtil;
 import frc.robot.util.Mechanism3d;
 
@@ -244,11 +248,11 @@ public class RobotContainer {
         // AutoModes
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
 
-        autoChooser_.addDefaultOption("Neutral Zone Collect - Left Trench", AutoCommands.a2NZCollectAuto(drivebase_, shooter_, intake_, hopper_, false));
-        autoChooser_.addOption("Neutral Zone Collect - Right Trench", AutoCommands.a2NZCollectAuto(drivebase_, shooter_, intake_, hopper_, true));
-        autoChooser_.addOption("Depot Auto", AutoCommands.a3DepotAuto(drivebase_, shooter_, intake_, hopper_)); 
-        autoChooser_.addOption("Preload Only", AutoCommands.a4OnlyPreload(drivebase_, shooter_, intake_, hopper_));
-        autoChooser_.addOption("Test 1: Drive and Collect", AutoCommands.aTest1DriveCollect(drivebase_, shooter_, intake_, hopper_));
+        autoChooser_.addDefaultOption("Neutral Zone Loop W/ Depot", AutoCommands.a6CollectNZDepot(drivebase_, shooter_, intake_, hopper_));
+        autoChooser_.addOption("Cooperative Depot Auto", AutoCommands.a7CoopDepot(drivebase_, shooter_, intake_, hopper_));
+        autoChooser_.addOption("Neutral Zone Loop - Left Trench", AutoCommands.a5CollectNZ(drivebase_, shooter_, intake_, hopper_, false));
+        autoChooser_.addOption("Neutral Zone Loop - Right Trench", AutoCommands.a5CollectNZ(drivebase_, shooter_, intake_, hopper_, true));
+        autoChooser_.addOption("Preload Only (untested)", AutoCommands.a4OnlyPreload(drivebase_, shooter_, intake_, hopper_));
 
         autoChooser_.onChange(auto -> {
             if (auto == null) return;
@@ -264,6 +268,14 @@ public class RobotContainer {
         testBindings_.addOption("Shooter Setpoints", shooter_.testCommand(hopper_));
         testBindings_.addOption("Hood Calibration", shooter_.hoodCalibration());
         testBindings_.addOption("Startup Sequence Test", new StartupCmd(intake_, hopper_, shooter_)) ;
+
+        // Auto Win Override
+        LoggedNetworkBoolean winAutoPractice = new LoggedNetworkBoolean("Win Auto (Practice)", true);
+
+        HubShiftUtil.setAllianceWinOverride(() -> {
+            if (DriverStation.isFMSAttached()) return Optional.empty();
+            return Optional.of(winAutoPractice.get());
+        });
 
         // Sets the selected test binding to be triggered when the A button is pressed in test mode.
         RobotModeTriggers.test().and(gamepad_.a()).toggleOnTrue(Commands.deferredProxy(testBindings_::get));
@@ -291,8 +303,14 @@ public class RobotContainer {
         gamepad_.rightTrigger().or(operatorGamepad_.rightTrigger())
             .whileTrue(RobotCommands.shoot(shooter_, hopper_, intake_, drivebase_));
 
+        gamepad_.rightBumper()
+            .whileTrue(intake_.hopperEjectSequence().alongWith(hopper_.reverseFeed()));
+
         // When the shooter isnt shooting, get it ready to shoot.
-        shooter_.setDefaultCommand(shooter_.idleCommand());
+        shooter_.setDefaultCommand(shooter_.spinUpVelocityCommand(() -> {
+            return RotationsPerSecond.zero();
+            // return HubShiftUtil.getOfficialShiftInfo().active() ? RotationsPerSecond.of(50) : RotationsPerSecond.zero();
+        }));
 
         //While the X button is held, the intake will run the eject sequence. If it the intake is stowed, it will also deploy it.
 

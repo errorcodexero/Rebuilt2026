@@ -3,37 +3,32 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.183663543971239,
-        "y": 4.827355918141593
+        "x": 3.1160788509402657,
+        "y": 5.368689988938053
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.125880012444691,
-        "y": 7.242258849557523
+        "x": 2.144975974834071,
+        "y": 6.480037679756637
       },
       "isLocked": false,
-      "linkedName": "NZNoClimb"
+      "linkedName": "a5LoopShoot"
     },
     {
       "anchor": {
-        "x": 3.357823803926991,
-        "y": 7.436497614767699
+        "x": 0.682,
+        "y": 7.15
       },
       "prevControl": {
-        "x": 5.718853540655762,
-        "y": 7.74808770319848
+        "x": 1.496274854811947,
+        "y": 6.692400511615045
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "ShootLoc1"
+      "linkedName": "CollectDepotStart"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.8051547547846887,
-      "rotationDegrees": -90.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -46,14 +41,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": -70.0
+    "velocity": 0.0,
+    "rotation": -119.99999999999999
   },
   "reversed": false,
-  "folder": "T2NZ2TSame",
+  "folder": "Trench NZ Depot",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -135.0
+    "rotation": -41.42897951526977
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }

@@ -38,7 +38,6 @@ import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.RobotState;
 import frc.robot.subsystems.hopper.Hopper;
-import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.shooter.ShooterTuning.ShooterParams;
 import frc.robot.util.LoggedTracer;
 import frc.robot.util.MapleSimUtil;
@@ -145,6 +144,7 @@ public class Shooter extends SubsystemBase {
         return shooterInputs.wheelVelocity.isNear(shooterTarget, ShooterConstants.shooterTolerance); 
     }
 
+    @AutoLogOutput
     public Current getShooterCurrent() {
         return (shooterInputs.shooter1Current)
             .plus(shooterInputs.shooter2Current)
@@ -244,20 +244,19 @@ public class Shooter extends SubsystemBase {
      * 
      * 
      */
-    public Command shootAtDistance(Supplier<Distance> distance, Hopper hopper, IntakeSubsystem intake) {
+    public Command shootAtDistance(Supplier<Distance> distance) {
         Supplier<ShooterParams> shooterParams =
             () -> getTuning().getShooterParams(distance.get().in(Meters));
 
         return Commands.parallel(
+            Commands.runOnce(() -> Logger.recordOutput("Command/ShootAtDistance", true)),
             runDynamicSetpoints(
                 () -> RotationsPerSecond.of(shooterParams.get().velocity),
                 () -> Degrees.of(shooterParams.get().hood)
-            ),
-            
-            hopper.preShoot().until(this::isShooterReady).andThen(hopper.forwardFeed()),
-
-            intake.shakeBalls()
-        );
+            )
+        )
+        .finallyDo(interrupted -> Logger.recordOutput("Command/ShootAtDistance", false))
+        .deadlineFor(Commands.run(() -> Logger.recordOutput("Shooter/ShotDistance", distance.get())));
     }
 
     /**
@@ -298,15 +297,12 @@ public class Shooter extends SubsystemBase {
         return startEnd(() -> setShooterVelocity(ShooterConstants.ejectVelocity), this::stopShooter);
     }
 
-    /**
-     * Idles the shooter at 0 velocity and the hood at the parked position.
-     * @return
-     */
-    public Command idleCommand() {
-        return runToSetpointsCmd(
-            RotationsPerSecond.of(0.0),
-            ShooterConstants.hoodParkedAngle
-        );
+    public Command spinUpSetpointsCommand(Supplier<AngularVelocity> velocity, Angle hoodAngle) {
+        return run(() -> setSetpoints(velocity.get(), hoodAngle));
+    }
+
+    public Command spinUpVelocityCommand(Supplier<AngularVelocity> velocity) {
+        return run(() -> setSetpoints(velocity.get(), ShooterConstants.hoodParkedAngle));
     }
 
     /**

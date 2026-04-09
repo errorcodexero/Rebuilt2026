@@ -1,6 +1,7 @@
 package frc.robot.commands.robot;
 
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import java.util.Set;
 import java.util.function.BooleanSupplier;
@@ -25,7 +26,8 @@ import frc.robot.subsystems.shooter.ShooterConstants;
 
 public class RobotCommands {
     /**
-     * Shoots into the hub.
+     * Shoots into the hub while also managing the drivebase angle to aim into the hub.
+     * This is the main shooting command for most use cases.
      * @param shooter
      * @param hopper
      * @param drive
@@ -35,20 +37,49 @@ public class RobotCommands {
         BooleanSupplier aimedAndNotDriving = () -> 
             drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.aimingTolerance) && 
             DriveCommands.getLinearVelocityFromJoysticks().getNorm() == 0.0;
-
-        return Commands.parallel(
+        
+        BooleanSupplier shouldRotateAgain = () -> 
+          !drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.unXWheelTolerance) || 
+          DriveCommands.getLinearVelocityFromJoysticks().getNorm() == 0.0;
+  
+        return shootHubNoAim(shooter, hopper, intake, drive).alongWith(
             DriveCommands.joystickDriveAtAngle(RobotState::rotationToHub)
                 .until(aimedAndNotDriving)
-                .andThen(drive.stopWithXCmd(), drive.idle().onlyWhile(aimedAndNotDriving))
-                .repeatedly(),
-            Commands.waitUntil(aimedAndNotDriving)
-                .deadlineFor(shooter.spinUpForDistance(RobotState::hubDistance))
-                .andThen(
-                    shooter.shootAtDistance(RobotState::hubDistance, hopper, intake)
-                        .until(() -> !aimedAndNotDriving.getAsBoolean())
-                ).repeatedly()
-                
-            
+                .andThen(drive.stopWithXCmd(), drive.idle().onlyWhile(shouldRotateAgain))
+                .repeatedly());
+    }            
+
+
+    /**
+     * Shoots into the hub, without aiming. This should not be used in most situations,
+     * and only when you need additional flexibility like trying to squeeze
+     * the most time out of auto.
+     * @param shooter
+     * @param hopper
+     * @param intake
+     * @param drive
+     * @return
+     */
+    public static Command shootHubNoAim(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive) {
+        BooleanSupplier shouldShoot =
+            () -> drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.aimingTolerance) && 
+            DriveCommands.getLinearVelocityFromJoysticks().getNorm() == 0.0;
+
+        BooleanSupplier shouldStopShooting =
+            () -> !drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.defenseTolerance) ||
+            DriveCommands.getLinearVelocityFromJoysticks().getNorm() == 0.0;
+
+        BooleanSupplier upToSpeedAndAimed =
+            () -> shouldShoot.getAsBoolean()
+                && shooter.isShooterReady()
+                && shooter.getShooterVelocity().gt(RotationsPerSecond.of(10));
+
+        return Commands.repeatingSequence(
+            Commands.waitUntil(upToSpeedAndAimed),
+            hopper.feedForShooting(shouldShoot, intake)
+                .until(shouldStopShooting)
+        ).alongWith(
+            shooter.shootAtDistance(RobotState::hubDistance)
         );
     }
 
@@ -59,17 +90,33 @@ public class RobotCommands {
      * @param drive
      * @return
      */
-    private static Command ferry(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive) {
+    public static Command ferry(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive) {
         return Commands.defer(() -> {
-            Translation2d rightTarget =
-                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                    ? ShooterConstants.Positions.blueTargetRight
-                    : ShooterConstants.Positions.redTargetRight;
+            Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+            Translation2d rightTarget;
+            Translation2d leftTarget;
 
-            Translation2d leftTarget =
-                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-                    ? ShooterConstants.Positions.blueTargetLeft
-                    : ShooterConstants.Positions.redTargetLeft;
+            if (RobotState.inOpposingAllianceZone()) {
+                rightTarget =
+                    alliance == Alliance.Blue
+                        ? ShooterConstants.Positions.blueBumpTargetRight
+                        : ShooterConstants.Positions.redBumpTargetRight;
+
+                leftTarget =
+                    alliance == Alliance.Blue
+                        ? ShooterConstants.Positions.blueBumpTargetLeft
+                        : ShooterConstants.Positions.redBumpTargetLeft;
+            } else {
+                rightTarget =
+                    alliance == Alliance.Blue
+                        ? ShooterConstants.Positions.blueTargetRight
+                        : ShooterConstants.Positions.redTargetRight;
+
+                leftTarget =
+                    alliance == Alliance.Blue
+                        ? ShooterConstants.Positions.blueTargetLeft
+                        : ShooterConstants.Positions.redTargetLeft;
+            }
 
             Supplier<Translation2d> target =
                 () -> drive.getPose().getY() < ShooterConstants.Positions.centerLineY
@@ -83,9 +130,18 @@ public class RobotCommands {
                 return new Rotation2d(botToTarget.getX(), botToTarget.getY());
             };
 
+            BooleanSupplier ready = () ->
+                drive.rotationIsNear(targetingAngle.get(), ShooterConstants.aimingTolerance)
+                && shooter.isShooterReady()
+                && shooter.getShooterVelocity().gt(RotationsPerSecond.of(10));
+
             return DriveCommands.joystickDriveAtAngle(targetingAngle)
                 .alongWith(
-                    shooter.shootAtDistance(targetDistance, hopper, intake),
+                    shooter.shootAtDistance(targetDistance),
+
+                    Commands.waitUntil(ready)
+                        .andThen(hopper.feedForShooting(() -> true, intake)),
+
                     Commands.runOnce(() -> {
                         Logger.recordOutput("Ferry/Target", target.get());
                         Logger.recordOutput("Ferry/IsFerrying", true);

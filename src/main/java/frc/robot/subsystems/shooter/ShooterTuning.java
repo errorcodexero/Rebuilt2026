@@ -41,10 +41,14 @@ public class ShooterTuning {
         public double hood_ ;
         public double min_dist_ ;
         public double max_dist_ ;
+        public double[] dists_ ;
+        public double[] vels_ ;
         public InterpolatingDoubleTreeMap map_ ;
 
         public OneHoodTuning(double h, double[] d, double[] v) {
             hood_ = h ;
+            dists_ = d ;
+            vels_ = v ;
             map_ = new InterpolatingDoubleTreeMap() ;
             for(var i = 0 ; i < d.length ; i++) {
                 map_.put(d[i], v[i]) ;
@@ -64,6 +68,10 @@ public class ShooterTuning {
         this.name_ = name ; 
         lastHoodIndex_ = -1 ;
         readTuningData("tuning/" + name + ".json") ;
+    }
+
+    public void reset() {
+        lastHoodIndex_ = -1 ;
     }
 
     public String getName() {
@@ -109,9 +117,41 @@ public class ShooterTuning {
         }
     }
 
+    private double doBetterInterpolate(OneHoodTuning tuning, double dist, boolean last) {
+        double[] d = tuning.dists_ ;
+        double[] v = tuning.vels_ ;
+
+        // Below the lowest data point - extrapolate using the first two points
+        if (dist <= d[0]) {
+            double slope = (v[1] - v[0]) / (d[1] - d[0]) ;
+            return v[0] + slope * (dist - d[0]) ;
+        }
+
+        // Above the highest data point - extrapolate using the last two points
+        int n = d.length ;
+
+        if (dist >= d[n - 1]) {
+            // If the last hood index, dont interpolate outwards.
+            if (last) {
+                Logger.recordOutput("NotInterpolatingEnd", true);
+                return v[n - 1];
+            } else {
+                Logger.recordOutput("NotInterpolatingEnd", false);
+            }
+
+            double slope = (v[n - 1] - v[n - 2]) / (d[n - 1] - d[n - 2]) ;
+            return v[n - 1] + slope * (dist - d[n - 1]) ;
+        }
+
+        // Within range - use the interpolating tree map
+        return tuning.map_.get(dist) ;
+    }
+
     public ShooterParams getShooterParams(double dist) {
+        lastHoodIndex_ = -1 ;
         int h = getHoodIndex(dist) ;
-        var ret = new ShooterParams(dist, settings_.get(h).hood_, settings_.get(h).map_.get(dist)) ;
+        double vel = doBetterInterpolate(settings_.get(h), dist, h == settings_.size() - 1) ;
+        var ret = new ShooterParams(dist, settings_.get(h).hood_, vel) ;
         Logger.recordOutput("ShooterTuning/hood", ret.hood);
         Logger.recordOutput("ShooterTuning/velocity", ret.velocity);
         return ret ;
@@ -130,6 +170,7 @@ public class ShooterTuning {
     private int processHysteresis(double dist, int newIndex) {
         if (lastHoodIndex_ == -1) {
             lastHoodIndex_ = newIndex ;
+            System.out.println("ShooterTuning: setting initial hood index to " + newIndex + " for distance " + dist) ;
             return newIndex ;
         }
 
@@ -137,16 +178,19 @@ public class ShooterTuning {
             // We moved to the next hood index
             // Stay at the old hood index until we exceed its max distance plus hysteresis
             if (dist <= settings_.get(lastHoodIndex_).max_dist_ + HYSTERESIS_DIST) {
+                System.out.println("ShooterTuning: 1 staying at hood index " + lastHoodIndex_ + " for distance " + dist + " due to hysteresis") ;
                 return lastHoodIndex_ ;
             }
         }
         else if (newIndex == lastHoodIndex_ - 1) {
             // We moved to the previous hood index
             if (dist > settings_.get(lastHoodIndex_).min_dist_ - HYSTERESIS_DIST) {
+                System.out.println("ShooterTuning: 2 staying at hood index " + lastHoodIndex_ + " for distance " + dist + " due to hysteresis") ;
                 return lastHoodIndex_ ;
             }
         }
 
+        System.out.println("ShooterTuning: moving from hood index " + lastHoodIndex_ + " to " + newIndex + " for distance " + dist) ;
         lastHoodIndex_ = newIndex ;
         return newIndex ;
     }

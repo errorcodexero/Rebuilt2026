@@ -4,11 +4,13 @@
   "holonomicMode": true,
   "pathFolders": [
     "DepotAuto",
+    "CooperativeDepot",
     "PreloadOnly",
+    "T2NZ2TSame",
     "T2NZ2TSameAlt",
     "TestCollect",
-    "Trench2Trench",
-    "T2NZ2TSame"
+    "Trench NZ Depot",
+    "Trench2Trench"
   ],
   "autoFolders": [],
   "defaultMaxVel": 3.0,

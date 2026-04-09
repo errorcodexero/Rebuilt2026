@@ -20,7 +20,7 @@ public class ShooterConstants {
     public static final int shooter3CANID = 2;
 
     public static final Current currentLimit = Amps.of(80);
-    public static final Time currentLimitTime = Seconds.of(1);
+    public static final Time currentLimitTime = Seconds.of(0.2);
 
     //
     // The shooter velocity multiplier while the feeder is slow. This is to compensate for the 
@@ -30,10 +30,16 @@ public class ShooterConstants {
 
     public static final double gearRatio = 1.04;
 
-    public static final AngularVelocity shooterTolerance = RotationsPerSecond.of(0.1);
+    public static final AngularVelocity shooterTolerance = RotationsPerSecond.of(1.0);
     public static final AngularVelocity ejectVelocity = RotationsPerSecond.of(-20);
 
+    public static final AngularVelocity minimumVelocitySetpoint = RotationsPerSecond.of(0.5);
+
     public static final Angle aimingTolerance = Degrees.of(5);
+    public static final Angle defenseTolerance = Degrees.of(7.5);
+
+    public static final Angle xWheelTolerance = Degrees.of(1);
+    public static final Angle unXWheelTolerance = Degrees.of(3);
 
     public static final Distance allowedTrenchDistance = Meters.of(1.0);
 
@@ -50,7 +56,7 @@ public class ShooterConstants {
 
     public class PID {
             // shooter
-            public static final double shooterkP = 0.45; 
+            public static final double shooterkP = 0.5; 
             public static final double shooterkI = 0.0;
             public static final double shooterkD = 0.0;
             public static final double shooterkV = 0.132;
@@ -78,46 +84,23 @@ public class ShooterConstants {
             public static final Translation2d redHubPose = new Translation2d(11.938,4.034536);
 
             public static final Distance allianceZone = Meters.of(4.5974);
-            public static final Distance spinUpZone = Meters.of(6.0);
 
             public static final Distance blueAllianceWall = Meters.of(0);
             public static final Distance redAllianceWall = Meters.of(FieldConstants.layout.getFieldLength());
 
-            public static final Translation2d blueTargetLeft = new Translation2d(2,6);
-            public static final Translation2d blueTargetRight = new Translation2d(2,2);
+            public static final Translation2d blueTargetLeft = new Translation2d(1,6);
+            public static final Translation2d blueTargetRight = new Translation2d(1,2);
 
-            public static final Translation2d redTargetLeft = new Translation2d(14,6);
-            public static final Translation2d redTargetRight = new Translation2d(14,2);
+            public static final Translation2d redTargetLeft = new Translation2d(15,6);
+            public static final Translation2d redTargetRight = new Translation2d(15,2);
+
+            public static final Translation2d blueBumpTargetLeft = new Translation2d(4, FieldConstants.layout.getFieldWidth() - 2.5);
+            public static final Translation2d blueBumpTargetRight = new Translation2d(4,2.5);
+
+            public static final Translation2d redBumpTargetLeft = new Translation2d(FieldConstants.layout.getFieldLength() - 4, FieldConstants.layout.getFieldWidth() - 2.5);
+            public static final Translation2d redBumpTargetRight = new Translation2d(FieldConstants.layout.getFieldLength() - 4,2.5);
 
             public static final double centerLineY = 4.034536;
-
-            // Hood Setpoints
-            public static final double hoodLOW = 0;
-            public static final double hoodMEDIUM = 1;
-            public static final double hoodHIGH = 2;
-        
-            public enum HubDistance {
-                LOW(Meters.of(2)), // 0-2 m
-                MEDIUM(Meters.of(3)), //  in
-                HIGH(Meters.of(4)); // 96+ in
-
-                private final Distance maxDistance;
-
-                private HubDistance(Distance maxDistance) {
-                    this.maxDistance = maxDistance;
-                }
-
-                public Distance maxDistance() { return maxDistance; }
-
-                public static HubDistance fromDistance(Distance pos) {
-                    for(HubDistance vol : values()) {
-                        if (pos.baseUnitMagnitude() <= vol.maxDistance().baseUnitMagnitude()) {
-                            return vol;
-                        } 
-                    }
-                    return HubDistance.HIGH;
-                }
-            }
     }
 
     public class HoodPWMs {

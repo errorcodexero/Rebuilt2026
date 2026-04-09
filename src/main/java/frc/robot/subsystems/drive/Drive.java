@@ -13,6 +13,7 @@
 
 package frc.robot.subsystems.drive;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -360,7 +361,7 @@ public class Drive extends SubsystemBase {
     }
 
     public Command resetGyroCmd() {
-        return resetGyroCmd(Rotation2d.kZero);
+        return resetGyroCmd(DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? Rotation2d.kZero : Rotation2d.fromDegrees(180.0));
     }
     
     public Command stopWithXCmd() {
@@ -447,7 +448,8 @@ public class Drive extends SubsystemBase {
 
     /** Whether the rotation of the robot is near to a target. */
     public boolean rotationIsNear(Rotation2d target, Angle tolerance) {
-        return target.getMeasure().isNear(getRotation().getMeasure(), tolerance);
+        var difference = Degrees.of(target.minus(getRotation()).getMeasure().abs(Degrees));
+        return difference.lt(tolerance);
     }
     
     /** Resets the current odometry pose. */

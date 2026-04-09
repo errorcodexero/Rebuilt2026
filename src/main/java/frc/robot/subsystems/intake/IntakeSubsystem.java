@@ -1,6 +1,7 @@
 package frc.robot.subsystems.intake; 
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -32,6 +33,7 @@ public class IntakeSubsystem extends SubsystemBase {
         new Alert("The intake roller is disconnected!", AlertType.kError);
 
     private Angle setpointAngle = IntakeConstants.stowedAngle;
+    private AngularVelocity setpointVelocity = RotationsPerSecond.zero();
 
     public IntakeSubsystem(IntakeIO io) {
         this.io = io;
@@ -49,6 +51,7 @@ public class IntakeSubsystem extends SubsystemBase {
         pivotAlert.set(!inputs.pivotConnected);
         rollerAlert.set(!inputs.rollerConnected);
 
+        Logger.recordOutput("Intake/RollerSetpoint", setpointVelocity);
         Logger.recordOutput("Intake/PivotSetpoint", setpointAngle);
 
         Mechanism3d.measured.setIntake(inputs.pivotAngle);
@@ -68,6 +71,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public void setRollerVelocity(AngularVelocity velocity) {
         io.setRollerVelocity(velocity);
+        setpointVelocity = velocity;
     }
 
     public void setPivotAngle(Angle angle) {
@@ -83,7 +87,7 @@ public class IntakeSubsystem extends SubsystemBase {
      * Runs the roller.
      */
     private void startIntaking() {
-        io.setRollerVelocity(IntakeConstants.rollerCollectVelocity);
+        setRollerVelocity(IntakeConstants.rollerCollectVelocity);
     }
 
     /**
@@ -209,7 +213,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public Command shakeBalls() {
-        return new MoveIntakeCmd(this, new Angle[] {IntakeConstants.deployedAngle, IntakeConstants.waitingAngle},IntakeConstants.angleChangeDelay)
+        return new MoveIntakeCmd(this, IntakeConstants.deployedAngle, IntakeConstants.waitingAngle, Seconds.zero(), Seconds.zero())
             .finallyDo(interrupted -> deploy());
     }
 

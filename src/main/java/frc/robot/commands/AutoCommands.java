@@ -3,6 +3,9 @@ package frc.robot.commands;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Seconds;
 
+import com.pathplanner.lib.events.EventTrigger;
+
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.drive.DriveCommands;
@@ -96,22 +99,84 @@ public class AutoCommands {
         );
     }
 
-    public static Command a5NZCollectAutoAlt(Drive drive, Shooter shooter, IntakeSubsystem intake, Hopper hopper, boolean mirroredX) {
+    private static final Time intakeStartTime1 = Seconds.of(0.7);
+    private static final Time intakeLength1 = Seconds.of(4.0);
+    private static final Time shootingLength1 = Seconds.of(4);
+
+    private static final Time intakeStartTime2 = Seconds.of(0.7);
+    private static final Time shootingLength2 = Seconds.of(6);
+
+    public static Command a5CollectNZ(Drive drive, Shooter shooter, IntakeSubsystem intake, Hopper hopper, boolean mirroredX) {
         return Commands.sequence(
-            //Drive from trench to a point in neutral zone, collecting balls and bringing down intake
-            Commands.deadline(
-                DriveCommands.initialFollowPathCommand(drive, "a5FirstPath", mirroredX),
-                new StartupCmd(intake, hopper, shooter).beforeStarting(Commands.waitTime(Seconds.of(0.6)))
+            DriveCommands.initialFollowPathCommand(drive, "a5CollectLoop1", mirroredX).deadlineFor(
+                new StartupCmd(intake, hopper, shooter)
+                    .beforeStarting(Commands.waitTime(intakeStartTime1))
+                    .withTimeout(intakeLength1)
+                    .andThen(shooter.spinUpForDistanceHoodParked(() -> Meters.of(2)))
             ),
 
-            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(5.0)),
+            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(shootingLength1),
 
-            //Drive back into the neutral zone, collecting more balls along the way
-            DriveCommands.followPathCommand("a5SecondPath", mirroredX)
-                .deadlineFor(RobotCommands.intake(intake, hopper)),
+            DriveCommands.followPathCommand("a5CollectLoop2", mirroredX).deadlineFor(
+                RobotCommands.intake(intake, hopper).beforeStarting(Commands.waitTime(intakeStartTime2)),
+                shooter.spinUpForDistanceHoodParked(() -> Meters.of(2))
+            ),
 
-            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(10.0))
-            
-        ); 
-    }    
+            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(shootingLength2)
+        );
+    }
+
+    public static Command a6CollectNZDepot(Drive drive, Shooter shooter, IntakeSubsystem intake, Hopper hopper) {
+        var stopIntake = new EventTrigger("stopintake");
+
+        return Commands.sequence(
+            DriveCommands.initialFollowPathCommand(drive, "a5CollectLoop1").deadlineFor(
+                new StartupCmd(intake, hopper, shooter)
+                    .beforeStarting(Commands.waitTime(intakeStartTime1))
+                    .withTimeout(intakeLength1)
+                    .andThen(shooter.spinUpForDistanceHoodParked(() -> Meters.of(2)))
+            ),
+
+            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(shootingLength1),
+
+            DriveCommands.followPathCommand("a6DepotCollect1"),
+
+            DriveCommands.followPathCommand("a6DepotCollect2").deadlineFor(
+                RobotCommands.intake(intake, hopper)
+                    .until(stopIntake)
+            ),
+
+            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(shootingLength2)
+        );
+    }
+
+    public static Command a7CoopDepot(Drive drive, Shooter shooter, IntakeSubsystem intake, Hopper hopper) {
+        var startIntake = new EventTrigger("startintake");
+        var stopIntake = new EventTrigger("stopintake");
+
+        return Commands.sequence(
+            DriveCommands.initialFollowPathCommand(drive, "a7StartToCollect")
+                .deadlineFor(
+                    new StartupCmd(intake, hopper, shooter)
+                        .withTimeout(Seconds.of(1.5))
+                ),
+
+            DriveCommands.followPathCommand("a7DepotCollectFast").deadlineFor(
+                RobotCommands.intake(intake, hopper)
+                    .until(stopIntake)
+                    .andThen(shooter.spinUpForDistanceHoodParked(() -> Meters.of(2)))
+            ),
+
+            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(Seconds.of(4.5)),
+
+            DriveCommands.followPathCommand("a7CollectLoop").deadlineFor(
+                RobotCommands.intake(intake, hopper)
+                    .beforeStarting(Commands.waitUntil(startIntake))
+                    .until(stopIntake)
+                    .andThen(shooter.spinUpForDistanceHoodParked(() -> Meters.of(2)))
+            ),
+
+            RobotCommands.shoot(shooter, hopper, intake, drive)
+        );
+    }
 }

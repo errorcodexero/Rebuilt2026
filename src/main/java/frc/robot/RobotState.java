@@ -14,6 +14,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.subsystems.shooter.ShooterConstants;
+import frc.robot.util.HubShiftUtil;
 import frc.robot.util.LoggedTracer;
 
 /**
@@ -28,6 +29,7 @@ public class RobotState {
 
     private static Rotation2d rotationToHub = Rotation2d.kZero;
     private static boolean inAllianceZone = false;
+    private static boolean inOpposingAllianceZone = false;
 
     /**
      * This method supplies the object with the information it needs for its calculations.
@@ -42,6 +44,8 @@ public class RobotState {
      */
     public static void periodic() {
         LoggedTracer.reset();
+
+        // Calculations
         
         Pose2d currentPose = pose.get();
 
@@ -56,13 +60,31 @@ public class RobotState {
         Translation2d translationToHub = hubTranslation.minus(currentPose.getTranslation());
 
         rotationToHub = new Rotation2d(translationToHub.getX(), translationToHub.getY());
+        Logger.recordOutput("RobotState/HubRotation", rotationToHub);
+        Logger.recordOutput("RobotState/AngleDelta", rotationToHub.minus(currentPose.getRotation()));
+
+        Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
 
         Distance allianceWall =
-            DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+            alliance == Alliance.Blue
                 ? ShooterConstants.Positions.blueAllianceWall
                 : ShooterConstants.Positions.redAllianceWall;
-                
-        inAllianceZone = currentPose.getMeasureX().minus(allianceWall).abs(Meters) < ShooterConstants.Positions.spinUpZone.in(Meters);
+
+        Distance opposingAllianceWall =
+            alliance == Alliance.Blue
+                ? ShooterConstants.Positions.redAllianceWall
+                : ShooterConstants.Positions.blueAllianceWall;
+            
+        inAllianceZone = currentPose.getMeasureX().minus(allianceWall).abs(Meters) < ShooterConstants.Positions.allianceZone.in(Meters);
+
+        inOpposingAllianceZone = currentPose.getMeasureX().minus(opposingAllianceWall).abs(Meters) < ShooterConstants.Positions.allianceZone.in(Meters);
+
+        // Other logging
+        var shift = HubShiftUtil.getOfficialShiftInfo();
+        Logger.recordOutput("ShiftInfo", shift);
+        Logger.recordOutput("Shift/Active", shift.active());
+        Logger.recordOutput("Shift/Name", shift.currentShift());
+        Logger.recordOutput("Shift/SecondsRemaining", shift.remainingTime());
 
         LoggedTracer.record("RobotState");
     }
@@ -80,5 +102,15 @@ public class RobotState {
     @AutoLogOutput
     public static boolean inAllianceZone() {
         return inAllianceZone;
+    }
+
+    @AutoLogOutput
+    public static boolean inOpposingAllianceZone() {
+        return inOpposingAllianceZone;
+    }
+
+    @AutoLogOutput
+    public static boolean inNeutralZone() {
+        return !inAllianceZone() && !inOpposingAllianceZone();
     }
 }

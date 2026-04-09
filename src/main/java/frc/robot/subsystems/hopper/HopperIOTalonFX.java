@@ -1,6 +1,7 @@
 package frc.robot.subsystems.hopper;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Seconds;
 import static frc.robot.util.PhoenixUtil.tryUntilOk;
 
 import com.ctre.phoenix6.BaseStatusSignal;
@@ -65,6 +66,7 @@ public class HopperIOTalonFX implements HopperIO {
 
         feederConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive ;
         feederConfig.CurrentLimits.SupplyCurrentLimit = HopperConstants.feederCurrentLimit.in(Amps);
+        feederConfig.CurrentLimits.SupplyCurrentLowerTime = HopperConstants.feederCurrentLimitLowerTime.in(Seconds);
         feederConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
         tryUntilOk(5, () -> feederMotor.getConfigurator().apply(feederConfig, 0.25));
