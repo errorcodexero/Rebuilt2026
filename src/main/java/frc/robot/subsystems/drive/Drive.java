@@ -17,6 +17,7 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BiFunction;
@@ -60,6 +61,7 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
@@ -361,7 +363,13 @@ public class Drive extends SubsystemBase {
     }
 
     public Command resetGyroCmd() {
-        return resetGyroCmd(DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? Rotation2d.kZero : Rotation2d.fromDegrees(180.0));
+        return Commands.defer(() -> {
+            Rotation2d rotation = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                ? Rotation2d.kZero
+                : Rotation2d.fromDegrees(180.0);
+            return resetGyroCmd(rotation);
+        }, Set.of(this));
+
     }
     
     public Command stopWithXCmd() {
