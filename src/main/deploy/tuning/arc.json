@@ -87,30 +87,30 @@
                 {
                     
                     "distance" : 3.90,
-                    "velocity" : 61.0
+                    "velocity" : 60.0
                 },
                 {
                     
                     "distance" : 4.1,
-                    "velocity" : 63.0
+                    "velocity" : 62.0
                 },
                 {
                     
                     "distance" : 4.3,
-                    "velocity" : 65
+                    "velocity" : 64
                 },
                 {
                     "distance": 4.5,
-                    "velocity": 67
+                    "velocity": 66
                 },
                 {
                     "distance": 4.8,
-                    "velocity": 69
+                    "velocity": 68
 
                 },
                 {
                     "distance": 5.4,
-                    "velocity": 75.0
+                    "velocity": 74.0
                 }
             ]
         },
