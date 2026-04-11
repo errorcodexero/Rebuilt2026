@@ -8,7 +8,7 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.895976040908725,
+        "x": 1.8959760409087252,
         "y": 5.120357997131297
       },
       "isLocked": false,
@@ -186,7 +186,7 @@
   "folder": "CooperativeDepot",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -41.42897951526977
+    "rotation": -20.997669311569314
   },
   "useDefaultConstraints": false
 }
