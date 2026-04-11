@@ -4,12 +4,12 @@
     {
       "anchor": {
         "x": 0.682,
-        "y": 7.15
+        "y": 7.215
       },
       "prevControl": null,
       "nextControl": {
         "x": 0.6820000000000002,
-        "y": 6.15
+        "y": 6.215
       },
       "isLocked": false,
       "linkedName": "CollectDepotStart"
@@ -32,12 +32,12 @@
     },
     {
       "anchor": {
-        "x": 3.116,
-        "y": 5.369
+        "x": 1.6491471930309736,
+        "y": 5.160050815818583
       },
       "prevControl": {
-        "x": 2.1735160398230096,
-        "y": 4.853859513274335
+        "x": 0.706663232853983,
+        "y": 4.644910329092919
       },
       "nextControl": null,
       "isLocked": false,
