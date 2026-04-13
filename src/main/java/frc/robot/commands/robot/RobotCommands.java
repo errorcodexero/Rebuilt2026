@@ -184,7 +184,9 @@ public class RobotCommands {
      * @param hopper
      * @return
      */
-    public static Command intake(IntakeSubsystem intake, Hopper hopper) {
-        return intake.intakeSequence().alongWith(hopper.collectScrambler());
+    public static Command intake(IntakeSubsystem intake, Hopper hopper, Drive drive, Supplier<Rotation2d> angle) {
+        return intake.intakeSequence().alongWith(hopper.collectScrambler(), DriveCommands.joystickDriveAtAngle(() -> {
+            return angle.get();
+        }));
     }
 }
