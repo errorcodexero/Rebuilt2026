@@ -297,7 +297,7 @@ public class RobotContainer {
         gamepad_.back().or(operatorGamepad_.back()).onTrue(shooter_.cycleTuning()) ;
 
         // While the left trigger is held, we will run the intake. If the intake is stowed, it will also deploy it.
-        gamepad_.leftTrigger().or(operatorGamepad_.leftTrigger()).whileTrue(RobotCommands.intake(intake_, hopper_));
+        gamepad_.leftTrigger().or(operatorGamepad_.leftTrigger()).whileTrue(RobotCommands.intake(intake_, hopper_, drivebase_, () -> new Rotation2d(Math.atan2(gamepad_.getLeftY(), gamepad_.getLeftX()))));
 
         // While the right trigger is held, we will shoot into the hub or ferry. Binding A to the shaking of the shooter.
         gamepad_.rightTrigger().or(operatorGamepad_.rightTrigger())
