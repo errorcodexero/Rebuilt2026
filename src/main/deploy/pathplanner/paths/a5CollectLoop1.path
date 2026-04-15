@@ -64,12 +64,12 @@
     },
     {
       "anchor": {
-        "x": 3.1160788509402657,
-        "y": 5.368689988938053
+        "x": 1.6491471930309736,
+        "y": 5.160050815818583
       },
       "prevControl": {
-        "x": 2.8778707569951325,
-        "y": 5.292815724664674
+        "x": 1.4109390990858404,
+        "y": 5.084176551545204
       },
       "nextControl": null,
       "isLocked": false,
@@ -92,12 +92,25 @@
   ],
   "constraintZones": [
     {
-      "name": "Constraints Zone",
+      "name": "Bump",
       "minWaypointRelativePos": 2.5812305900621126,
       "maxWaypointRelativePos": 3.46074340062112,
       "constraints": {
         "maxVelocity": 1.5,
         "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    },
+    {
+      "name": "Balls",
+      "minWaypointRelativePos": 0.8571306429548563,
+      "maxWaypointRelativePos": 2.0904155266757862,
+      "constraints": {
+        "maxVelocity": 2.0,
+        "maxAcceleration": 4.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
         "nominalVoltage": 12.0,
@@ -128,7 +141,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -41.42897951526977
+    "rotation": -20.997669311569314
   },
   "reversed": false,
   "folder": "T2NZ2TSameAlt",
