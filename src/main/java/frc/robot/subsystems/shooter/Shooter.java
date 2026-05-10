@@ -258,7 +258,7 @@ public class Shooter extends SubsystemBase {
             
             hopper.preShoot().until(this::isShooterReady).andThen(
                 hopper.forwardFeed().deadlineFor(Commands.run(() -> {
-                    var diff = shooterTarget.minus(shooterInputs.wheelVelocity).abs(RadiansPerSecond);
+                    double diff = shooterTarget.minus(shooterInputs.wheelVelocity).abs(RadiansPerSecond);
                     // Ball counting?
                     if (diff > 15.0) {
                         if (!isCounted) {

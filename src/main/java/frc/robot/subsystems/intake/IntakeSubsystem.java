@@ -140,7 +140,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public boolean isPivotAtAngle(Angle angle){
-        var ret = inputs.pivotAngle.isNear(angle, IntakeConstants.pivotTolerance);
+        boolean ret = inputs.pivotAngle.isNear(angle, IntakeConstants.pivotTolerance);
         return ret;
     }
 

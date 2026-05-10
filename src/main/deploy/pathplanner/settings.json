@@ -4,11 +4,12 @@
   "holonomicMode": true,
   "pathFolders": [
     "DepotAuto",
-    "Trench NZ Depot",
+    "New Folder",
     "PreloadOnly",
     "T2NZ2TSame",
     "T2NZ2TSameAlt",
     "TestCollect",
+    "Trench NZ Depot",
     "Trench2Trench"
   ],
   "autoFolders": [],

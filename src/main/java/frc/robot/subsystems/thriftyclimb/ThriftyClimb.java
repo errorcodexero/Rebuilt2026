@@ -23,7 +23,7 @@ public class ThriftyClimb extends SubsystemBase {
     }
 
     public boolean isAtPosition(){
-        inputs_.position.isNear(outputs_.setpoint, Centimeter.one());
+        return inputs_.position.isNear(outputs_.setpoint, Centimeter.one());
     }
 
     @Override

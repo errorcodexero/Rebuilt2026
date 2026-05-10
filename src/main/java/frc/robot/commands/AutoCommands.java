@@ -149,4 +149,17 @@ public class AutoCommands {
             RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(shootingLength2)
         );
     }
+
+    public static Command a6UTurn(Drive drive, Shooter shooter, IntakeSubsystem intake, Hopper hopper){
+        return Commands.sequence(
+            DriveCommands.initialFollowPathCommand(drive, "1st Pass").deadlineFor(RobotCommands.intake(intake, hopper)),
+
+            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(5),
+
+            DriveCommands.followPathCommand("2nd pass").deadlineFor(RobotCommands.intake(intake, hopper)),
+
+            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(10)
+
+        );
+    }
 }
