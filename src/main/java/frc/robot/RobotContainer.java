@@ -267,7 +267,8 @@ public class RobotContainer {
         testBindings_.addOption("Swerve Feedforward", DriveCommands.feedforwardCharacterization(drivebase_));
         testBindings_.addOption("Shooter Setpoints", shooter_.testCommand(hopper_));
         testBindings_.addOption("Hood Calibration", shooter_.hoodCalibration());
-        testBindings_.addOption("Startup Sequence Test", new StartupCmd(intake_, hopper_, shooter_)) ;
+        testBindings_.addOption("Startup Sequence Test", new StartupCmd(intake_, hopper_, shooter_));
+        testBindings_.addOption("Demo Shooting", RobotCommands.shootAtTagDemo(shooter_, hopper_, intake_, drivebase_, vision_));
 
         // Auto Win Override
         LoggedNetworkBoolean winAutoPractice = new LoggedNetworkBoolean("Win Auto (Practice)", true);
@@ -300,8 +301,8 @@ public class RobotContainer {
         gamepad_.leftTrigger().or(operatorGamepad_.leftTrigger()).whileTrue(RobotCommands.intake(intake_, hopper_));
 
         // While the right trigger is held, we will shoot into the hub or ferry. Binding A to the shaking of the shooter.
-        gamepad_.rightTrigger().or(operatorGamepad_.rightTrigger())
-            .whileTrue(RobotCommands.shoot(shooter_, hopper_, intake_, drivebase_));
+        // gamepad_.rightTrigger().or(operatorGamepad_.rightTrigger())
+        //     .whileTrue(RobotCommands.shoot(shooter_, hopper_, intake_, drivebase_));
 
         gamepad_.rightBumper()
             .whileTrue(intake_.hopperEjectSequence().alongWith(hopper_.reverseFeed()));

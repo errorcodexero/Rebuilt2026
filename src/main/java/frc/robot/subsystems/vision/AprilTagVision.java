@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.subsystems.vision.CameraIO.CameraIOInputs;
 import frc.robot.subsystems.vision.CameraIO.Fiducial;
 import frc.robot.subsystems.vision.CameraIO.PoseEstimation;
 import frc.robot.subsystems.vision.CameraIO.PoseEstimationType;
@@ -81,6 +82,15 @@ public class AprilTagVision extends SubsystemBase {
      */
     public Command setEnabledCommand(boolean enabled) {
         return runOnce(() -> setEnabled(enabled));
+    }
+
+    /**
+     * Gets the data from a specified camera in this robot loop, needs to be called multiple times for when you want new data.
+     * @param camera
+     * @return
+     */
+    public CameraIOInputs getCameraData(int camera) {
+        return inputs_[camera].clone();
     }
 
     @Override

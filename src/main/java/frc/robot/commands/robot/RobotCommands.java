@@ -23,6 +23,7 @@ import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
+import frc.robot.subsystems.vision.AprilTagVision;
 
 public class RobotCommands {
     /**
@@ -53,17 +54,51 @@ public class RobotCommands {
         );
     }
 
+    public static Command shootAtTagDemo(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive, AprilTagVision vision) {
+        Supplier<Rotation2d> target =
+            () -> drive.getRotation().plus(Rotation2d.fromDegrees(vision.getCameraData(0).simpleX));
+
+        Supplier<Distance> distance =
+            () -> Meters.of(vision.getCameraData(0).poseEstimate.averageDist());
+
+        BooleanSupplier shouldXWheels =
+            () -> drive.rotationIsNear(target.get(), ShooterConstants.xWheelTolerance);
+
+        BooleanSupplier shouldRotateAgain =
+            () -> !drive.rotationIsNear(target.get(), ShooterConstants.unXWheelTolerance);
+
+        BooleanSupplier shooting =
+            () -> vision.getCameraData(0).simpleID == 25;
+
+        return shootNoAim(shooter, hopper, intake, drive, distance)
+            .beforeStarting(Commands.waitUntil(shooting))
+            .onlyWhile(shooting)
+            .repeatedly()
+            .alongWith(
+                DriveCommands.joystickDriveAtAngle(
+                    drive,
+                    () -> 0,
+                    () -> 0, 
+                    target
+                )
+                .until(shouldXWheels)
+                .andThen(drive.stopWithXCmd(), drive.idle().until(shouldRotateAgain))
+                .repeatedly()
+            );
+    }
+
     /**
-     * Shoots into the hub, without aiming. This should not be used in most situations,
+     * Shoots at a specified distance without aiming. This should not be used in most situations,
      * and only when you need additional flexibility like trying to squeeze
      * the most time out of auto.
      * @param shooter
      * @param hopper
      * @param intake
      * @param drive
+     * @param distance
      * @return
      */
-    public static Command shootHubNoAim(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive) {
+    public static Command shootNoAim(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive, Supplier<Distance> distance) {
         BooleanSupplier shouldShoot =
             () -> drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.aimingTolerance);
 
@@ -80,8 +115,22 @@ public class RobotCommands {
             hopper.feedForShooting(shouldShoot, intake)
                 .until(shouldStopShooting)
         ).alongWith(
-            shooter.shootAtDistance(RobotState::hubDistance)
+            shooter.shootAtDistance(distance)
         );
+    }
+
+    /**
+     * Shoots into the hub, without aiming. This should not be used in most situations,
+     * and only when you need additional flexibility like trying to squeeze
+     * the most time out of auto.
+     * @param shooter
+     * @param hopper
+     * @param intake
+     * @param drive
+     * @return
+     */
+    public static Command shootHubNoAim(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive) {
+        return shootNoAim(shooter, hopper, intake, drive, RobotState::hubDistance);
     }
 
     /**
