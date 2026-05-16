@@ -56,10 +56,10 @@ public class RobotCommands {
 
     public static Command shootAtTagDemo(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive, AprilTagVision vision) {
         Supplier<Rotation2d> target =
-            () -> drive.getRotation().plus(Rotation2d.fromDegrees(vision.getCameraData(0).simpleX));
+            () -> drive.getRotation().minus(Rotation2d.fromDegrees(vision.getCameraData(0).simpleX));
 
         Supplier<Distance> distance =
-            () -> Meters.of(vision.getCameraData(0).poseEstimate.averageDist());
+            () -> Meters.of(vision.getCameraData(0).poseEstimate.averageDist()).times(0.55);
 
         BooleanSupplier shouldXWheels =
             () -> drive.rotationIsNear(target.get(), ShooterConstants.xWheelTolerance);
@@ -70,7 +70,7 @@ public class RobotCommands {
         BooleanSupplier shooting =
             () -> vision.getCameraData(0).simpleID == 25;
 
-        return shootNoAim(shooter, hopper, intake, drive, distance)
+        return shootNoAim(shooter, hopper, intake, drive, distance, target)
             .beforeStarting(Commands.waitUntil(shooting))
             .onlyWhile(shooting)
             .repeatedly()
@@ -98,12 +98,12 @@ public class RobotCommands {
      * @param distance
      * @return
      */
-    public static Command shootNoAim(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive, Supplier<Distance> distance) {
+    public static Command shootNoAim(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive, Supplier<Distance> distance, Supplier<Rotation2d> angle) {
         BooleanSupplier shouldShoot =
-            () -> drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.aimingTolerance);
+            () -> drive.rotationIsNear(angle.get(), ShooterConstants.aimingTolerance);
 
         BooleanSupplier shouldStopShooting =
-            () -> !drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.defenseTolerance);
+            () -> !drive.rotationIsNear(angle.get(), ShooterConstants.defenseTolerance);
 
         BooleanSupplier upToSpeedAndAimed =
             () -> shouldShoot.getAsBoolean()
@@ -130,7 +130,7 @@ public class RobotCommands {
      * @return
      */
     public static Command shootHubNoAim(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive) {
-        return shootNoAim(shooter, hopper, intake, drive, RobotState::hubDistance);
+        return shootNoAim(shooter, hopper, intake, drive, RobotState::hubDistance, RobotState::rotationToHub);
     }
 
     /**

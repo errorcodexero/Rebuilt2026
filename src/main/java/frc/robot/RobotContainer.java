@@ -327,10 +327,10 @@ public class RobotContainer {
 
     private void configureDriveBindings() {
         // Default command, normal field-relative drive
-        drivebase_.setDefaultCommand(DriveCommands.joystickDrive().withName("JoystickDrive"));
+        // drivebase_.setDefaultCommand(DriveCommands.joystickDrive().withName("JoystickDrive"));
 
         // Slow Mode, during left bumper
-        gamepad_.leftBumper().whileTrue(
+        drivebase_.setDefaultCommand(
             DriveCommands.joystickDrive(
                 drivebase_,
                 () -> -gamepad_.getLeftY() * DriveConstants.slowModeJoystickMultiplier,
