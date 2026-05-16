@@ -301,8 +301,8 @@ public class RobotContainer {
         gamepad_.leftTrigger().or(operatorGamepad_.leftTrigger()).whileTrue(RobotCommands.intake(intake_, hopper_));
 
         // While the right trigger is held, we will shoot into the hub or ferry. Binding A to the shaking of the shooter.
-        // gamepad_.rightTrigger().or(operatorGamepad_.rightTrigger())
-        //     .whileTrue(RobotCommands.shoot(shooter_, hopper_, intake_, drivebase_));
+        gamepad_.rightTrigger().or(operatorGamepad_.rightTrigger())
+            .whileTrue(RobotCommands.shoot(shooter_, hopper_, intake_, drivebase_));
 
         gamepad_.rightBumper()
             .whileTrue(intake_.hopperEjectSequence().alongWith(hopper_.reverseFeed()));
