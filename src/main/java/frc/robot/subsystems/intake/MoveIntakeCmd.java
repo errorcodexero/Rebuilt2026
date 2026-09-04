@@ -11,23 +11,21 @@ public class MoveIntakeCmd extends Command {
     private final IntakeSubsystem intake;
 
     private final Timer delayTimer;
-    private final Time delayUp;
-    private final Time delayDown;
+    private final Time delayWhenUp;
+    private final Time delayWhenDown;
 
     private final Angle lower;
-    private final Angle divisionSize;
+    private final Angle upper;
 
-    private int index;
     private boolean waitingForDelay;
     private boolean upNext;
 
     public MoveIntakeCmd(IntakeSubsystem intake, Angle lower, Angle upper, Time delayUp, Time delayDown) {
         this.intake = intake;
         this.lower = lower;
-        this.delayUp = delayUp;
-        this.delayDown = delayDown;
-
-        divisionSize = lower.minus(upper).div(IntakeConstants.shakeDivisions);
+        this.delayWhenUp = delayUp;
+        this.delayWhenDown = delayDown;
+        this.upper = upper;
 
         delayTimer = new Timer();
         waitingForDelay = false;
@@ -37,12 +35,9 @@ public class MoveIntakeCmd extends Command {
 
     @Override
     public void initialize() {
-        index = 1;
         upNext = true;
 
         intake.setPivotAngle(lower);
-        intake.setRollerVelocity(IntakeConstants.rollerShootVelocity);
-
         waitingForDelay = false;
     }
 
@@ -50,17 +45,19 @@ public class MoveIntakeCmd extends Command {
     public void execute() {
         if (waitingForDelay) {
             // Waiting for delay to complete
-            if (delayTimer.hasElapsed(upNext ? delayDown : delayUp)) {
+            if (delayTimer.hasElapsed(upNext ? delayWhenDown : delayWhenUp)) {
                 // Delay complete, move to next angle
                 waitingForDelay = false;
                 if (upNext) {
-                    var setpoint = lower.minus(divisionSize.times(index));
+                    //Move to upper angle
+                    var setpoint = lower.minus(upper);
                     intake.setPivotAngle(setpoint);
-                    index = Math.min(index + 1, IntakeConstants.shakeDivisions);
+                    intake.setRollerVelocity(IntakeConstants.rollerShootVelocity);
                     upNext = false;
                 } else {
-                    var setpoint = intake.getPivotAngle().plus(Degrees.of(5));
+                    var setpoint = lower;
                     intake.setPivotAngle(setpoint);
+                    intake.stopRoller();
                     upNext = true;
                 }
             }
