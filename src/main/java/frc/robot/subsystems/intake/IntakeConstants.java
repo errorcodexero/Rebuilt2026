@@ -46,7 +46,7 @@ public final class IntakeConstants {
 
     public static final Angle stowedAngle = Degrees.of(5);
     public static final Angle waitingAngle = Degrees.of(96);
-    public static final Angle deployedAngle = Degrees.of(132);
+    public static final Angle deployedAngle = Degrees.of(130);
 
     public static final int shakeDivisions = 4;
 

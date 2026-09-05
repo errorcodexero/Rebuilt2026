@@ -263,11 +263,13 @@ public class RobotContainer {
         // Test Bindings
         testBindings_ = new LoggedDashboardChooser<>("Test Mode Choices");
 
+        
         testBindings_.addDefaultOption("Swerve Wheel Radius", DriveCommands.wheelRadiusCharacterization(drivebase_));
         testBindings_.addOption("Swerve Feedforward", DriveCommands.feedforwardCharacterization(drivebase_));
         testBindings_.addOption("Shooter Setpoints", shooter_.testCommand(hopper_));
         testBindings_.addOption("Hood Calibration", shooter_.hoodCalibration());
         testBindings_.addOption("Startup Sequence Test", new StartupCmd(intake_, hopper_, shooter_)) ;
+        testBindings_.addOption("Test Drive and Collect", AutoCommands.aTest1DriveCollect(drivebase_, shooter_, intake_, hopper_));
 
         // Auto Win Override
         LoggedNetworkBoolean winAutoPractice = new LoggedNetworkBoolean("Win Auto (Practice)", true);
