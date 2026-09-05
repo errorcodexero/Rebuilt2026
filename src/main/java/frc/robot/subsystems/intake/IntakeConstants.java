@@ -46,7 +46,7 @@ public final class IntakeConstants {
 
     public static final Angle stowedAngle = Degrees.of(5);
     public static final Angle waitingAngle = Degrees.of(96);
-    public static final Angle deployedAngle = Degrees.of(130);
+    public static final Angle deployedAngle = Degrees.of(132);
 
     public static final int shakeDivisions = 4;
 
@@ -56,7 +56,7 @@ public final class IntakeConstants {
     public static final Angle pivotTolerance = Degrees.of(3); //Tolerance to compare current angle to target
 
     public static final boolean pivotEncoderInverted = false;
-    public static final Angle pivotEncoderOffset = Degrees.of(-154.3) ;
+    public static final Angle pivotEncoderOffset = Degrees.of(115) ;
 
     // Gear Ratios
     public static final double motorToEncoderGearRatio = (1.0/45.0) * (24.0/31.0);
@@ -73,7 +73,7 @@ public final class IntakeConstants {
     public static final AngularAcceleration pivotCruiseAcceleration = RotationsPerSecondPerSecond.of(3);
     public static final double pivotMaxJerk = 0;
 
-    public static final AngularVelocity rollerCollectVelocity = RotationsPerSecond.of(80);
+    public static final AngularVelocity rollerCollectVelocity = RotationsPerSecond.of(90);
     public static final AngularVelocity rollerShootVelocity = RotationsPerSecond.of(15);
     public static final Voltage rollerEjectVoltage = Volts.of(-6);
 
