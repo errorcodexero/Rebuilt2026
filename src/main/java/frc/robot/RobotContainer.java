@@ -38,7 +38,7 @@ import frc.robot.commands.AutoCommands;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.robot.RobotCommands;
 import frc.robot.commands.robot.StartupCmd;
-import frc.robot.generated.CompTunerConstants;
+import frc.robot.generated.CompTunerConstants3;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOMaple;
@@ -108,12 +108,12 @@ public class RobotContainer {
                         ))
                         .withTrackLengthTrackWidth(
                             Meters.of(Math.abs(
-                                CompTunerConstants.FrontLeft.LocationX -
-                                CompTunerConstants.BackLeft.LocationX
+                                CompTunerConstants3.FrontLeft.LocationX -
+                                CompTunerConstants3.BackLeft.LocationX
                             )),
                             Meters.of(Math.abs(
-                                CompTunerConstants.FrontLeft.LocationY -
-                                CompTunerConstants.FrontRight.LocationY
+                                CompTunerConstants3.FrontLeft.LocationY -
+                                CompTunerConstants3.FrontRight.LocationY
                             ))
                         )
                         .withBumperSize(Inches.of(30.75), Inches.of(37.25));
@@ -126,12 +126,12 @@ public class RobotContainer {
                     drivebase_ = new Drive(
                         new GyroIOMaple(),
                         ModuleIOMaple::new,
-                        CompTunerConstants.FrontLeft,
-                        CompTunerConstants.FrontRight,
-                        CompTunerConstants.BackLeft,
-                        CompTunerConstants.BackRight,
-                        CompTunerConstants.kCANBus,
-                        CompTunerConstants.kSpeedAt12Volts
+                        CompTunerConstants3.FrontLeft,
+                        CompTunerConstants3.FrontRight,
+                        CompTunerConstants3.BackLeft,
+                        CompTunerConstants3.BackRight,
+                        CompTunerConstants3.kCANBus,
+                        CompTunerConstants3.kSpeedAt12Volts
                     );
 
                     vision_ = new AprilTagVision(
@@ -149,14 +149,14 @@ public class RobotContainer {
 
                 case COMPETITION:
                     drivebase_ = new Drive(
-                        new GyroIOPigeon2(CompTunerConstants.DrivetrainConstants.Pigeon2Id, CompTunerConstants.kCANBus),
+                        new GyroIOPigeon2(CompTunerConstants3.DrivetrainConstants.Pigeon2Id, CompTunerConstants3.kCANBus),
                         ModuleIOTalonFX::new,
-                        CompTunerConstants.FrontLeft,
-                        CompTunerConstants.FrontRight,
-                        CompTunerConstants.BackLeft,
-                        CompTunerConstants.BackRight,
-                        CompTunerConstants.kCANBus,
-                        CompTunerConstants.kSpeedAt12Volts
+                        CompTunerConstants3.FrontLeft,
+                        CompTunerConstants3.FrontRight,
+                        CompTunerConstants3.BackLeft,
+                        CompTunerConstants3.BackRight,
+                        CompTunerConstants3.kCANBus,
+                        CompTunerConstants3.kSpeedAt12Volts
                     );
 
                     vision_ = new AprilTagVision(
@@ -184,12 +184,12 @@ public class RobotContainer {
                     drivebase_ = new Drive(
                         new GyroIO() {},
                         ModuleIOReplay::new,
-                        CompTunerConstants.FrontLeft,
-                        CompTunerConstants.FrontRight,
-                        CompTunerConstants.BackLeft,
-                        CompTunerConstants.BackRight,
-                        CompTunerConstants.kCANBus,
-                        CompTunerConstants.kSpeedAt12Volts
+                        CompTunerConstants3.FrontLeft,
+                        CompTunerConstants3.FrontRight,
+                        CompTunerConstants3.BackLeft,
+                        CompTunerConstants3.BackRight,
+                        CompTunerConstants3.kCANBus,
+                        CompTunerConstants3.kSpeedAt12Volts
                     );
 
                     break;
@@ -343,17 +343,17 @@ public class RobotContainer {
 
         // Robot Relative
         gamepad_.povUp().whileTrue(
-                drivebase_.runVelocityCmd(FeetPerSecond.one(), MetersPerSecond.of(0), RadiansPerSecond.zero()));
+                drivebase_.runVelocityCmd(FeetPerSecond.of(3), MetersPerSecond.of(0), RadiansPerSecond.zero()));
 
         gamepad_.povDown().whileTrue(
-                drivebase_.runVelocityCmd(FeetPerSecond.one().unaryMinus(), MetersPerSecond.of(0),
+                drivebase_.runVelocityCmd(FeetPerSecond.of(3).unaryMinus(), MetersPerSecond.of(0),
                         RadiansPerSecond.zero()));
 
         gamepad_.povLeft().whileTrue(
-                drivebase_.runVelocityCmd(MetersPerSecond.zero(), FeetPerSecond.one(), RadiansPerSecond.zero()));
+                drivebase_.runVelocityCmd(MetersPerSecond.zero(), FeetPerSecond.of(3), RadiansPerSecond.zero()));
 
         gamepad_.povRight().whileTrue(
-                drivebase_.runVelocityCmd(MetersPerSecond.zero(), FeetPerSecond.one().unaryMinus(),
+                drivebase_.runVelocityCmd(MetersPerSecond.zero(), FeetPerSecond.of(3).unaryMinus(),
                         RadiansPerSecond.zero()));
 
         // Robot relative diagonal
