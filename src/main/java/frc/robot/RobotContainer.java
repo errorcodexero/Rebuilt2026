@@ -38,7 +38,7 @@ import frc.robot.commands.AutoCommands;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.robot.RobotCommands;
 import frc.robot.commands.robot.StartupCmd;
-import frc.robot.generated.CompTunerConstants3;
+import frc.robot.generated.CompTunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOMaple;
@@ -108,12 +108,12 @@ public class RobotContainer {
                         ))
                         .withTrackLengthTrackWidth(
                             Meters.of(Math.abs(
-                                CompTunerConstants3.FrontLeft.LocationX -
-                                CompTunerConstants3.BackLeft.LocationX
+                                CompTunerConstants.FrontLeft.LocationX -
+                                CompTunerConstants.BackLeft.LocationX
                             )),
                             Meters.of(Math.abs(
-                                CompTunerConstants3.FrontLeft.LocationY -
-                                CompTunerConstants3.FrontRight.LocationY
+                                CompTunerConstants.FrontLeft.LocationY -
+                                CompTunerConstants.FrontRight.LocationY
                             ))
                         )
                         .withBumperSize(Inches.of(30.75), Inches.of(37.25));
@@ -126,12 +126,12 @@ public class RobotContainer {
                     drivebase_ = new Drive(
                         new GyroIOMaple(),
                         ModuleIOMaple::new,
-                        CompTunerConstants3.FrontLeft,
-                        CompTunerConstants3.FrontRight,
-                        CompTunerConstants3.BackLeft,
-                        CompTunerConstants3.BackRight,
-                        CompTunerConstants3.kCANBus,
-                        CompTunerConstants3.kSpeedAt12Volts
+                        CompTunerConstants.FrontLeft,
+                        CompTunerConstants.FrontRight,
+                        CompTunerConstants.BackLeft,
+                        CompTunerConstants.BackRight,
+                        CompTunerConstants.kCANBus,
+                        CompTunerConstants.kSpeedAt12Volts
                     );
 
                     vision_ = new AprilTagVision(
@@ -149,14 +149,14 @@ public class RobotContainer {
 
                 case COMPETITION:
                     drivebase_ = new Drive(
-                        new GyroIOPigeon2(CompTunerConstants3.DrivetrainConstants.Pigeon2Id, CompTunerConstants3.kCANBus),
+                        new GyroIOPigeon2(CompTunerConstants.DrivetrainConstants.Pigeon2Id, CompTunerConstants.kCANBus),
                         ModuleIOTalonFX::new,
-                        CompTunerConstants3.FrontLeft,
-                        CompTunerConstants3.FrontRight,
-                        CompTunerConstants3.BackLeft,
-                        CompTunerConstants3.BackRight,
-                        CompTunerConstants3.kCANBus,
-                        CompTunerConstants3.kSpeedAt12Volts
+                        CompTunerConstants.FrontLeft,
+                        CompTunerConstants.FrontRight,
+                        CompTunerConstants.BackLeft,
+                        CompTunerConstants.BackRight,
+                        CompTunerConstants.kCANBus,
+                        CompTunerConstants.kSpeedAt12Volts
                     );
 
                     vision_ = new AprilTagVision(
@@ -184,12 +184,12 @@ public class RobotContainer {
                     drivebase_ = new Drive(
                         new GyroIO() {},
                         ModuleIOReplay::new,
-                        CompTunerConstants3.FrontLeft,
-                        CompTunerConstants3.FrontRight,
-                        CompTunerConstants3.BackLeft,
-                        CompTunerConstants3.BackRight,
-                        CompTunerConstants3.kCANBus,
-                        CompTunerConstants3.kSpeedAt12Volts
+                        CompTunerConstants.FrontLeft,
+                        CompTunerConstants.FrontRight,
+                        CompTunerConstants.BackLeft,
+                        CompTunerConstants.BackRight,
+                        CompTunerConstants.kCANBus,
+                        CompTunerConstants.kSpeedAt12Volts
                     );
 
                     break;
