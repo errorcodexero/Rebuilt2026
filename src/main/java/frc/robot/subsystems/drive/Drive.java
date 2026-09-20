@@ -64,6 +64,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.RobotContainer;
+import frc.robot.commands.robot.RobotCommands;
 import frc.robot.generated.CompTunerConstants;
 import frc.robot.util.LocalADStarAK;
 import frc.robot.util.LoggedTracer;
@@ -210,10 +212,10 @@ public class Drive extends SubsystemBase {
     @Override
     public void periodic() {
         LoggedTracer.reset();
-
         odometryLock.lock(); // Prevents odometry updates while reading data
         gyroIO.updateInputs(gyroInputs);
         Logger.processInputs("Drive/Gyro", gyroInputs);
+
         for (var module : modules) {
             module.periodic();
         }
@@ -455,6 +457,7 @@ public class Drive extends SubsystemBase {
     /** Resets the current odometry pose. */
     public void setPose(Pose2d pose) {
         poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
+        
     }
     
     /** Adds a new timestamped vision measurement. */

@@ -10,6 +10,7 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -23,20 +24,22 @@ import frc.robot.util.LoggedTracer;
  */
 public class RobotState {
     private static Supplier<Pose2d> pose = () -> Pose2d.kZero;
-
+    private static Supplier<ChassisSpeeds> chassisSpeeds= () -> new ChassisSpeeds(0, 0, 0);
     @AutoLogOutput
     private static Distance hubDistance = Meters.zero();
 
     private static Rotation2d rotationToHub = Rotation2d.kZero;
+    private static Rotation2d omega= Rotation2d.kZero;
     private static boolean inAllianceZone = false;
     private static boolean inOpposingAllianceZone = false;
-
     /**
      * This method supplies the object with the information it needs for its calculations.
      * @param poseSupplier
+     * @param chassisSpeedsSupplier
      */
-    public static void initialize(Supplier<Pose2d> poseSupplier) {
+    public static void initialize(Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> chassisSpeedsSupplier) {
         pose = poseSupplier;
+        chassisSpeeds = chassisSpeedsSupplier;
     }
 
     /**
@@ -45,7 +48,7 @@ public class RobotState {
     public static void periodic() {
         LoggedTracer.reset();
 
-        // Calculations
+        // Calculations for robot angle when shooting 
         
         Pose2d currentPose = pose.get();
 
@@ -79,7 +82,15 @@ public class RobotState {
 
         inOpposingAllianceZone = currentPose.getMeasureX().minus(opposingAllianceWall).abs(Meters) < ShooterConstants.Positions.allianceZone.in(Meters);
 
-        // Other logging
+        //Calculations for robot angle when intaking
+
+        double vxMetersPerSecond= chassisSpeeds.get().vxMetersPerSecond;
+        double vyMetersPerSecond= chassisSpeeds.get().vyMetersPerSecond;
+
+        omega= new Rotation2d(vxMetersPerSecond, vyMetersPerSecond);
+        Logger.recordOutput("RobotState/IntakeDriveOmega", omega);
+
+        // Other logging   
         var shift = HubShiftUtil.getOfficialShiftInfo();
         Logger.recordOutput("ShiftInfo", shift);
         Logger.recordOutput("Shift/Active", shift.active());
@@ -97,6 +108,11 @@ public class RobotState {
     @AutoLogOutput
     public static Rotation2d rotationToHub() {
         return rotationToHub;
+    }
+
+    @AutoLogOutput
+    public static Rotation2d getIntakeDriveOmega(){
+        return omega;
     }
 
     @AutoLogOutput

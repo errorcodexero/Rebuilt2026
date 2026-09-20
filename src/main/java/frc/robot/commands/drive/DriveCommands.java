@@ -84,7 +84,6 @@ public class DriveCommands {
   private static boolean configured = false;
 
   private DriveCommands() {}
-
   /**
    * Configures the drive commands. In order to call convenience drive commands, this must be configured beforehand.
    * @param drive Drive subsystem
@@ -100,7 +99,7 @@ public class DriveCommands {
 
     configured = true;
   }
-
+  
   private static Translation2d getLinearVelocityFromJoysticks(double x, double y) {
     // Apply deadband
     double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), DEADBAND);

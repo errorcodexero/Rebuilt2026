@@ -16,6 +16,7 @@ import java.util.Optional;
 
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
+import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
@@ -234,9 +235,11 @@ public class RobotContainer {
             () -> -gamepad_.getRightX()
         );
 
-        RobotState.initialize(drivebase_::getPose);
+        RobotState.initialize(drivebase_::getPose, drivebase_::getChassisSpeeds);
+        RobotCommands.initialize(gamepad_.getLeftX(), gamepad_.getLeftY());
 
-        // Initialize the visualizers.
+
+
         Mechanism3d.measured.zero();
         Mechanism3d.setpoints.zero();
 
@@ -299,7 +302,8 @@ public class RobotContainer {
         gamepad_.back().or(operatorGamepad_.back()).onTrue(shooter_.cycleTuning()) ;
 
         // While the left trigger is held, we will run the intake. If the intake is stowed, it will also deploy it.
-        gamepad_.leftTrigger().or(operatorGamepad_.leftTrigger()).whileTrue(RobotCommands.intake(intake_, hopper_));
+        //gamepad_.leftTrigger().or(operatorGamepad_.leftTrigger()).whileTrue(RobotCommands.intake(intake_, hopper_));
+        gamepad_.leftTrigger().or(operatorGamepad_.leftTrigger()).whileTrue(RobotCommands.intakeWithRotation(intake_, hopper_, drivebase_));
 
         // While the right trigger is held, we will shoot into the hub or ferry. Binding A to the shaking of the shooter.
         gamepad_.rightTrigger().or(operatorGamepad_.rightTrigger())
@@ -330,13 +334,20 @@ public class RobotContainer {
         // Default command, normal field-relative drive
         drivebase_.setDefaultCommand(DriveCommands.joystickDrive().withName("JoystickDrive"));
 
-        // Slow Mode, during left bumper
-        gamepad_.leftBumper().whileTrue(
+        // Slow Mode, when left bumper is pressed 
+        gamepad_.leftBumper().onTrue(
             DriveCommands.joystickDrive(
                 drivebase_,
                 () -> -gamepad_.getLeftY() * DriveConstants.slowModeJoystickMultiplier,
                 () -> -gamepad_.getLeftX() * DriveConstants.slowModeJoystickMultiplier,
                 () -> -gamepad_.getRightX() * DriveConstants.slowModeJoystickMultiplier));
+
+         gamepad_.leftBumper().onFalse(
+            DriveCommands.joystickDrive(
+                drivebase_,
+                () -> -gamepad_.getLeftY() * 1/DriveConstants.slowModeJoystickMultiplier,
+                () -> -gamepad_.getLeftX() * 1/DriveConstants.slowModeJoystickMultiplier,
+                () -> -gamepad_.getRightX() * 1/DriveConstants.slowModeJoystickMultiplier));
 
         // Switch to X pattern / brake while X button is pressed
         gamepad_.x().whileTrue(drivebase_.stopWithXCmd()); 

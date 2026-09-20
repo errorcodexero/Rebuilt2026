@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import java.util.Set;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
@@ -25,6 +26,15 @@ import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
 
 public class RobotCommands {
+    public static double xSupplier;
+    public static double ySupplier;
+ 
+    public static void initialize(double xSupplier_, double ySupplier_) {
+        xSupplier = xSupplier_;
+        ySupplier = ySupplier_;  
+    }
+    
+
     /**
      * Shoots into the hub while also managing the drivebase angle to aim into the hub.
      * This is the main shooting command for most use cases.
@@ -33,6 +43,8 @@ public class RobotCommands {
      * @param drive
      * @return
      */
+
+   
     public static Command shootHub(Shooter shooter, Hopper hopper, IntakeSubsystem intake, Drive drive) {
         BooleanSupplier shouldXWheels =
             () -> drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.xWheelTolerance);
@@ -52,7 +64,7 @@ public class RobotCommands {
             .repeatedly()
         );
     }
-
+    
     /**
      * Shoots into the hub, without aiming. This should not be used in most situations,
      * and only when you need additional flexibility like trying to squeeze
@@ -186,5 +198,16 @@ public class RobotCommands {
      */
     public static Command intake(IntakeSubsystem intake, Hopper hopper) {
         return intake.intakeSequence().alongWith(hopper.collectScrambler());
+    }
+
+    public static Command intakeWithRotation(IntakeSubsystem intake, Hopper hopper, Drive drive) {
+        return intake.intakeSequence().alongWith(hopper.collectScrambler(),
+            DriveCommands.joystickDriveAtAngle(
+                drive, 
+                () -> xSupplier, 
+                () -> ySupplier, 
+                RobotState::getIntakeDriveOmega
+            )
+        );
     }
 }
