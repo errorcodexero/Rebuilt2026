@@ -343,17 +343,17 @@ public class RobotContainer {
 
         // Robot Relative
         gamepad_.povUp().whileTrue(
-                drivebase_.runVelocityCmd(FeetPerSecond.one(), MetersPerSecond.of(0), RadiansPerSecond.zero()));
+                drivebase_.runVelocityCmd(FeetPerSecond.of(3), MetersPerSecond.of(0), RadiansPerSecond.zero()));
 
         gamepad_.povDown().whileTrue(
-                drivebase_.runVelocityCmd(FeetPerSecond.one().unaryMinus(), MetersPerSecond.of(0),
+                drivebase_.runVelocityCmd(FeetPerSecond.of(3).unaryMinus(), MetersPerSecond.of(0),
                         RadiansPerSecond.zero()));
 
         gamepad_.povLeft().whileTrue(
-                drivebase_.runVelocityCmd(MetersPerSecond.zero(), FeetPerSecond.one(), RadiansPerSecond.zero()));
+                drivebase_.runVelocityCmd(MetersPerSecond.zero(), FeetPerSecond.of(3), RadiansPerSecond.zero()));
 
         gamepad_.povRight().whileTrue(
-                drivebase_.runVelocityCmd(MetersPerSecond.zero(), FeetPerSecond.one().unaryMinus(),
+                drivebase_.runVelocityCmd(MetersPerSecond.zero(), FeetPerSecond.of(3).unaryMinus(),
                         RadiansPerSecond.zero()));
 
         // Robot relative diagonal
