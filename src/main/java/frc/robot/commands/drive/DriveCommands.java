@@ -82,7 +82,7 @@ public class DriveCommands {
   private static DoubleSupplier ySupplier_;
   private static DoubleSupplier omegaSupplier_;
   private static boolean configured = false;
-  private static double joystick_power = 2 ;
+  private static double joystick_power = 3 ;
 
   private DriveCommands() {}
 
