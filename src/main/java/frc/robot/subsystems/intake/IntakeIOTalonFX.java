@@ -30,6 +30,7 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage; 
 
 
@@ -66,6 +67,7 @@ public class IntakeIOTalonFX implements IntakeIO {
     private StatusSignal<AngularVelocity> rollerAngularVelocitySignal;
     private StatusSignal<Voltage> rollerAppliedVoltsSignal;
     private StatusSignal<Current> rollerCurrentAmpsSignal; 
+    private StatusSignal<Temperature> rollerDeviceTempSignal; 
 
     public IntakeIOTalonFX(CANBus canbus) {
         // Initialize motor objects
@@ -159,9 +161,10 @@ public class IntakeIOTalonFX implements IntakeIO {
         pivotCurrentAmpsSignal = pivotMotor.getSupplyCurrent();
         pivotCancoderPositionSignal = pivotCancoder.getPosition();
         pivotCancoderVelocitySignal = pivotCancoder.getVelocity();
+        rollerDeviceTempSignal = rollerMotor.getDeviceTemp();
 
         BaseStatusSignal.setUpdateFrequencyForAll(1, rollerAppliedVoltsSignal, rollerCurrentAmpsSignal, 
-                            pivotAppliedVoltsSignal, pivotCurrentAmpsSignal, rollerAngularVelocitySignal) ;
+                            pivotAppliedVoltsSignal, pivotCurrentAmpsSignal, rollerAngularVelocitySignal, rollerDeviceTempSignal) ;
         BaseStatusSignal.setUpdateFrequencyForAll(50, pivotAngleSignal,pivotAngularVelocitySignal, 
                             pivotCancoderPositionSignal, pivotCancoderVelocitySignal);
 
@@ -183,7 +186,8 @@ public class IntakeIOTalonFX implements IntakeIO {
         var rollerStatus = BaseStatusSignal.refreshAll(
             rollerAngularVelocitySignal,
             rollerAppliedVoltsSignal,
-            rollerCurrentAmpsSignal
+            rollerCurrentAmpsSignal,
+            rollerDeviceTempSignal
         );
 
         inputs.pivotConnected = pivotConnectedDebounce.calculate(pivotStatus.isOK());
@@ -198,6 +202,7 @@ public class IntakeIOTalonFX implements IntakeIO {
         inputs.rollerAngularVelocity = rollerAngularVelocitySignal.getValue();
         inputs.rollerAppliedVolts = rollerAppliedVoltsSignal.getValue();
         inputs.rollerCurrentAmps = rollerCurrentAmpsSignal.getValue();
+        inputs.rollerTemperature = rollerDeviceTempSignal.getValue();
     }
 
     @Override
