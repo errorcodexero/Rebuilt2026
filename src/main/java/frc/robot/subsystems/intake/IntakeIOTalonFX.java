@@ -22,6 +22,7 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
@@ -143,6 +144,7 @@ public class IntakeIOTalonFX implements IntakeIO {
         rollerConfigs.Slot0.kS= IntakeConstants.rollerKS;
         rollerConfigs.Slot0.kG= IntakeConstants.rollerKG;
 
+        rollerConfigs.MotorOutput.Inverted= InvertedValue.CounterClockwise_Positive;
         //Used to apply configs once instead of having multiple iterations to do this
         //Also trys the configuartion 5 times until it receives an OK status signal 
         tryUntilOk(5, () -> rollerMotor.getConfigurator().apply(rollerConfigs, 0.25));
