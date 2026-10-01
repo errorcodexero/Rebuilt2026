@@ -67,6 +67,7 @@ public class IntakeSubsystem extends SubsystemBase {
     //Intake control methods
     private void setRollerVoltage(Voltage volts) {
         io.setRollerVoltage(volts);
+        setpointVelocity = RotationsPerSecond.of(-1.0);
     }
 
     public void setRollerVelocity(AngularVelocity velocity) {
@@ -74,13 +75,14 @@ public class IntakeSubsystem extends SubsystemBase {
         setpointVelocity = velocity;
     }
 
+    public void stopRoller() {
+        io.stopRoller();
+        setpointVelocity = RotationsPerSecond.zero();
+    }
+
     public void setPivotAngle(Angle angle) {
         setpointAngle = angle;
         io.setPivotAngle(angle);
-    }
-
-    public void stopRoller() {
-        io.stopRoller();
     }
 
     /**
@@ -94,11 +96,11 @@ public class IntakeSubsystem extends SubsystemBase {
      * Stops the roller.
      */
     private void stopIntaking() {
-        io.stopRoller();
+        stopRoller();
     }
 
     private void eject(){
-        io.setRollerVoltage(IntakeConstants.rollerEjectVoltage);
+        setRollerVoltage(IntakeConstants.rollerEjectVoltage);
     }
 
     /**
