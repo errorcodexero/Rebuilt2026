@@ -81,6 +81,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public void stopRoller() {
         io.stopRoller();
+        setpointVelocity = RotationsPerSecond.zero();
     }
 
     /**
@@ -94,7 +95,7 @@ public class IntakeSubsystem extends SubsystemBase {
      * Stops the roller.
      */
     private void stopIntaking() {
-        io.stopRoller();
+        stopRoller();
     }
 
     private void eject(){

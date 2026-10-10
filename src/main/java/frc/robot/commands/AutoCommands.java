@@ -122,7 +122,7 @@ public class AutoCommands {
                 shooter.spinUpForDistanceHoodParked(() -> Meters.of(2))
             ),
 
-            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(shootingLength2)
+            RobotCommands.shoot(shooter, hopper, intake, drive)
         );
     }
 
@@ -146,7 +146,7 @@ public class AutoCommands {
                     .until(stopIntake)
             ),
 
-            RobotCommands.shoot(shooter, hopper, intake, drive).withTimeout(shootingLength2)
+            RobotCommands.shoot(shooter, hopper, intake, drive)
         );
     }
 

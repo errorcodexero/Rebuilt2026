@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.1160788509402657,
-        "y": 5.368689988938053
+        "x": 1.6491471930309736,
+        "y": 5.160050815818583
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.144975974834071,
-        "y": 6.480037679756637
+        "x": 1.5575605987278762,
+        "y": 6.2590596308075215
       },
       "isLocked": false,
       "linkedName": "a5LoopShoot"
     },
     {
       "anchor": {
-        "x": 0.682,
-        "y": 7.15
+        "x": 0.694,
+        "y": 7.215
       },
       "prevControl": {
-        "x": 1.496274854811947,
-        "y": 6.692400511615045
+        "x": 1.6562055793694692,
+        "y": 6.721632155696902
       },
       "nextControl": null,
       "isLocked": false,
@@ -48,7 +48,7 @@
   "folder": "Trench NZ Depot",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -41.42897951526977
+    "rotation": -20.997669311569314
   },
   "useDefaultConstraints": true
 }

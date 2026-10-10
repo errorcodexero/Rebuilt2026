@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.1160788509402657,
-        "y": 5.368689988938053
+        "x": 1.6491471930309736,
+        "y": 5.160050815818583
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.362907698818017,
-        "y": 5.328997170250767
+        "x": 1.8959760409087252,
+        "y": 5.120357997131297
       },
       "isLocked": false,
       "linkedName": "a5LoopShoot"
@@ -186,7 +186,7 @@
   "folder": "CooperativeDepot",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -41.42897951526977
+    "rotation": -20.997669311569314
   },
   "useDefaultConstraints": false
 }
