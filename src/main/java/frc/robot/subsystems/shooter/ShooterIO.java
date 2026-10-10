@@ -1,6 +1,7 @@
 package frc.robot.subsystems.shooter;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Celsius;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -8,6 +9,7 @@ import org.littletonrobotics.junction.AutoLog;
 
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
 public interface ShooterIO {
@@ -18,6 +20,7 @@ public interface ShooterIO {
         public Voltage shooter1Voltage = Volts.zero();
         public Current shooter1Current = Amps.zero();
         public AngularVelocity shooter1Velocity = RadiansPerSecond.zero();
+        public Temperature shooter1Temp = Celsius.zero();
 
         public Voltage shooter2Voltage = Volts.zero();
         public Current shooter2Current = Amps.zero();

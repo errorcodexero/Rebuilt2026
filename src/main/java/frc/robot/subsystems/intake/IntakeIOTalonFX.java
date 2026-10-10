@@ -30,6 +30,7 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage; 
 
 
@@ -59,6 +60,7 @@ public class IntakeIOTalonFX implements IntakeIO {
     private StatusSignal<AngularVelocity> pivotAngularVelocitySignal;
     private StatusSignal<Current> pivotCurrentAmpsSignal;
     private StatusSignal<Voltage> pivotAppliedVoltsSignal;
+    private StatusSignal<Temperature> pivotTemp;
     private StatusSignal<Angle> pivotCancoderPositionSignal;
     private StatusSignal<AngularVelocity> pivotCancoderVelocitySignal;
 
@@ -66,6 +68,7 @@ public class IntakeIOTalonFX implements IntakeIO {
     private StatusSignal<AngularVelocity> rollerAngularVelocitySignal;
     private StatusSignal<Voltage> rollerAppliedVoltsSignal;
     private StatusSignal<Current> rollerCurrentAmpsSignal; 
+    private StatusSignal<Temperature> rollerTemp;
 
     public IntakeIOTalonFX(CANBus canbus) {
         // Initialize motor objects
@@ -157,6 +160,8 @@ public class IntakeIOTalonFX implements IntakeIO {
         pivotAppliedVoltsSignal = pivotMotor.getMotorVoltage();
         rollerCurrentAmpsSignal = rollerMotor.getSupplyCurrent();
         pivotCurrentAmpsSignal = pivotMotor.getSupplyCurrent();
+        pivotTemp = pivotMotor.getDeviceTemp();
+        rollerTemp = rollerMotor.getDeviceTemp();
         pivotCancoderPositionSignal = pivotCancoder.getPosition();
         pivotCancoderVelocitySignal = pivotCancoder.getVelocity();
 
@@ -177,13 +182,15 @@ public class IntakeIOTalonFX implements IntakeIO {
             pivotAppliedVoltsSignal,
             pivotCurrentAmpsSignal,
             pivotCancoderPositionSignal,
-            pivotCancoderVelocitySignal
+            pivotCancoderVelocitySignal,
+            pivotTemp
         );
 
         var rollerStatus = BaseStatusSignal.refreshAll(
             rollerAngularVelocitySignal,
             rollerAppliedVoltsSignal,
-            rollerCurrentAmpsSignal
+            rollerCurrentAmpsSignal,
+            rollerTemp
         );
 
         inputs.pivotConnected = pivotConnectedDebounce.calculate(pivotStatus.isOK());
@@ -191,6 +198,7 @@ public class IntakeIOTalonFX implements IntakeIO {
         inputs.pivotAngularVelocity = pivotAngularVelocitySignal.getValue();
         inputs.pivotAppliedVolts = pivotAppliedVoltsSignal.getValue();
         inputs.pivotCurrentAmps = pivotCurrentAmpsSignal.getValue();
+        inputs.pivotTemp = pivotTemp.getValue();
         inputs.pivotCancoderPosition = pivotCancoderPositionSignal.getValue();
         inputs.pivotCancoderVelocity = pivotCancoderVelocitySignal.getValue();
 
@@ -198,6 +206,7 @@ public class IntakeIOTalonFX implements IntakeIO {
         inputs.rollerAngularVelocity = rollerAngularVelocitySignal.getValue();
         inputs.rollerAppliedVolts = rollerAppliedVoltsSignal.getValue();
         inputs.rollerCurrentAmps = rollerCurrentAmpsSignal.getValue();
+        inputs.rollerTemp = rollerTemp.getValue();
     }
 
     @Override
