@@ -7,12 +7,12 @@ import static edu.wpi.first.units.Units.*;
 public class HopperConstants {
 
     // Command Constants
-    public static final AngularVelocity feedingShootingVelocity = RotationsPerSecond.of(93);
+    public static final AngularVelocity feedingShootingVelocity = RotationsPerSecond.of(120);
     public static final AngularVelocity feedingEjectVelocity = RotationsPerSecond.of(-20);
     public static final AngularVelocity feedingBeforeShootingVelocity = RotationsPerSecond.of(40);
 
-    public static final AngularVelocity scramblerShootingVelocity = RotationsPerSecond.of(70);
-    public static final AngularVelocity scramblerBeforeShootingVelocity = RotationsPerSecond.of(40);
+    public static final AngularVelocity scramblerShootingVelocity = RotationsPerSecond.of(-70);
+    public static final AngularVelocity scramblerBeforeShootingVelocity = RotationsPerSecond.of(-40);
 
     public static final AngularVelocity scramblerIdleVelocity = RotationsPerSecond.of(2);
     public static final AngularVelocity scramblerCollectVelocity = RotationsPerSecond.of(0);
@@ -29,7 +29,7 @@ public class HopperConstants {
     public static final double feederKV = 0.132;
     public static final double feederKA = 0.0;
 
-    public static final Current feederCurrentLimit = Amps.of(50.0);
+    public static final Current feederCurrentLimit = Amps.of(90.0);
     public static final Time feederCurrentLimitLowerTime = Milliseconds.of(200);
 
     //Scrambler Constants

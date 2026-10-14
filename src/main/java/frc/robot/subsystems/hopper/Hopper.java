@@ -123,6 +123,7 @@ public class Hopper extends SubsystemBase {
             }),
 
             intake.shakeBalls()
+
         );
     }
 

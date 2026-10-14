@@ -263,12 +263,15 @@ public class RobotContainer {
         // Test Bindings
         testBindings_ = new LoggedDashboardChooser<>("Test Mode Choices");
 
+        
         testBindings_.addDefaultOption("Swerve Wheel Radius", DriveCommands.wheelRadiusCharacterization(drivebase_));
         testBindings_.addOption("Swerve Feedforward", DriveCommands.feedforwardCharacterization(drivebase_));
         testBindings_.addOption("Shooter Setpoints", shooter_.testCommand(hopper_));
         testBindings_.addOption("Hood Calibration", shooter_.hoodCalibration());
         testBindings_.addOption("Startup Sequence Test", new StartupCmd(intake_, hopper_, shooter_));
         testBindings_.addOption("Demo Shooting", RobotCommands.shootAtTagDemo(shooter_, hopper_, intake_, drivebase_, vision_));
+        testBindings_.addOption("Startup Sequence Test", new StartupCmd(intake_, hopper_, shooter_)) ;
+        testBindings_.addOption("Test Drive and Collect", AutoCommands.aTest1DriveCollect(drivebase_, shooter_, intake_, hopper_));
 
         // Auto Win Override
         LoggedNetworkBoolean winAutoPractice = new LoggedNetworkBoolean("Win Auto (Practice)", true);
@@ -342,17 +345,17 @@ public class RobotContainer {
 
         // Robot Relative
         gamepad_.povUp().whileTrue(
-                drivebase_.runVelocityCmd(FeetPerSecond.one(), MetersPerSecond.of(0), RadiansPerSecond.zero()));
+                drivebase_.runVelocityCmd(FeetPerSecond.of(3), MetersPerSecond.of(0), RadiansPerSecond.zero()));
 
         gamepad_.povDown().whileTrue(
-                drivebase_.runVelocityCmd(FeetPerSecond.one().unaryMinus(), MetersPerSecond.of(0),
+                drivebase_.runVelocityCmd(FeetPerSecond.of(3).unaryMinus(), MetersPerSecond.of(0),
                         RadiansPerSecond.zero()));
 
         gamepad_.povLeft().whileTrue(
-                drivebase_.runVelocityCmd(MetersPerSecond.zero(), FeetPerSecond.one(), RadiansPerSecond.zero()));
+                drivebase_.runVelocityCmd(MetersPerSecond.zero(), FeetPerSecond.of(3), RadiansPerSecond.zero()));
 
         gamepad_.povRight().whileTrue(
-                drivebase_.runVelocityCmd(MetersPerSecond.zero(), FeetPerSecond.one().unaryMinus(),
+                drivebase_.runVelocityCmd(MetersPerSecond.zero(), FeetPerSecond.of(3).unaryMinus(),
                         RadiansPerSecond.zero()));
 
         // Robot relative diagonal
