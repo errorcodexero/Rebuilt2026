@@ -251,8 +251,8 @@ public class Shooter extends SubsystemBase {
         return Commands.parallel(
             Commands.runOnce(() -> Logger.recordOutput("Command/ShootAtDistance", true)),
             runDynamicSetpoints(
-                () -> RotationsPerSecond.of(shooterParams.get().velocity),
-                () -> Degrees.of(shooterParams.get().hood)
+                () -> RotationsPerSecond.of(45),
+                () -> Degrees.of(5)
             )
         )
         .finallyDo(interrupted -> Logger.recordOutput("Command/ShootAtDistance", false))

@@ -42,7 +42,7 @@ public class RobotCommands {
             () -> !drive.rotationIsNear(RobotState.rotationToHub(), ShooterConstants.unXWheelTolerance);
 
         return shootHubNoAim(shooter, hopper, intake, drive).alongWith(
-            DriveCommands.joystickDriveAtAngle(
+            /*DriveCommands.joystickDriveAtAngle(
                 drive,
                 () -> 0,
                 () -> 0, 
@@ -50,7 +50,7 @@ public class RobotCommands {
             )
             .until(shouldXWheels)
             .andThen(drive.stopWithXCmd(), drive.idle().until(shouldRotateAgain))
-            .repeatedly()
+            .repeatedly()*/
         );
     }
 
@@ -106,14 +106,14 @@ public class RobotCommands {
             () -> !drive.rotationIsNear(angle.get(), ShooterConstants.defenseTolerance);
 
         BooleanSupplier upToSpeedAndAimed =
-            () -> shouldShoot.getAsBoolean()
-                && shooter.isShooterReady()
+            () -> //shouldShoot.getAsBoolean()
+                shooter.isShooterReady()
                 && shooter.getShooterVelocity().gt(RotationsPerSecond.of(10));
 
         return Commands.repeatingSequence(
             Commands.waitUntil(upToSpeedAndAimed),
-            hopper.feedForShooting(shouldShoot, intake)
-                .until(shouldStopShooting)
+            hopper.feedForShooting(()->true, intake)
+                //.until(shouldStopShooting)
         ).alongWith(
             shooter.shootAtDistance(distance)
         );
