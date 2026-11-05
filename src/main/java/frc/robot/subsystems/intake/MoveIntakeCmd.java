@@ -41,7 +41,7 @@ public class MoveIntakeCmd extends Command {
         upNext = true;
 
         intake.setPivotAngle(lower);
-        intake.setRollerVelocity(IntakeConstants.rollerShootVelocity);
+        //intake.setRollerVelocity(IntakeConstants.rollerShootVelocity);
 
         waitingForDelay = false;
     }

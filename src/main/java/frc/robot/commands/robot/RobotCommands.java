@@ -211,7 +211,8 @@ public class RobotCommands {
         return Commands.either(
             shootHub(shooter, hopper, intake, drive),
             ferry(shooter, hopper, intake, drive),
-            RobotState::inAllianceZone
+            //RobotState::inAllianceZone 
+            ()->true
         );
     }
 
